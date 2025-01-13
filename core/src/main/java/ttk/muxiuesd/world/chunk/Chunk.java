@@ -1,0 +1,336 @@
+package ttk.muxiuesd.world.chunk;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Disposable;
+import ttk.muxiuesd.interfaces.BlockDrawable;
+import ttk.muxiuesd.interfaces.ChunkTraversalJob;
+import ttk.muxiuesd.interfaces.ShapeRenderable;
+import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.system.ChunkSystem;
+import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.util.SimplexNoise2D;
+import ttk.muxiuesd.util.WorldMapNoise;
+import ttk.muxiuesd.world.block.instance.*;
+import ttk.muxiuesd.world.block.*;
+import ttk.muxiuesd.world.wall.Wall;
+import ttk.muxiuesd.world.wall.WallTest;
+
+
+/**
+ * 一个区块
+ * 一行一行更新绘制
+ * */
+public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRenderable {
+    public static final int ChunkWidth = 16;
+    public static final int ChunkHeight = 16;
+    public static final int LowestHeight = 0;
+    public static final int HighestHeight = 7;
+
+    private ChunkSystem chunkSystem;
+
+    //区块的坐标编号
+    private ChunkPosition chunkPosition;
+
+    //储存一个区块里的方块
+    private Block[][] blocks;
+    //储存一个区块里的墙，有的位置可能为null
+    private Wall[][]  walls;
+
+    public Chunk(ChunkSystem chunkSystem) {
+        this.chunkSystem = chunkSystem;
+        this.blocks = new Block[ChunkHeight][ChunkWidth];
+        this.walls  = new Wall[ChunkHeight][ChunkWidth];
+    }
+
+    /**
+     * 初始化区块中的方块数据
+     * */
+    public void initBlock() {
+        /*for (int y = 0; y < ChunkHeight; y++) {
+            for (int x = 0; x < ChunkWidth; x++) {
+                //计算方块相在世界中的坐标
+                float wx = this.getWorldX(x);
+                float wy = this.getWorldY(y);
+
+                Block block = this.chooseBlock(generateTerrain(wx, wy));
+                block.setPosition(wx, wy);
+                this.setBlock(block, x, y);
+            }
+        }*/
+
+        this.traversal((x, y) -> {
+            //计算方块相在世界中的坐标
+            float wx = this.getWorldX(x);
+            float wy = this.getWorldY(y);
+
+            Block block = this.chooseBlock(generateTerrain(wx, wy));
+            block.setPosition(wx, wy);
+            this.setBlock(block, x, y);
+        });
+    }
+
+    public void initWall () {
+        this.traversal((x, y) -> {
+            //水上不生成墙体
+            if (blocks[y][x] instanceof BlockWater) {
+                return;
+            }
+            int random = MathUtils.random(0, 10);
+            if (random < 1) {
+                WallTest wallTest = new WallTest();
+                wallTest.setPosition(this.getWorldX(x), this.getWorldY(y));
+                walls[y][x] = wallTest;
+            }
+        });
+    }
+
+    /**
+     * 生成地形
+     * @param wx    方块在世界的横坐标
+     * @param wy    方块在世界的纵坐标
+     * @return 返回地形高度
+     */
+    private int generateTerrain(float wx, float wy) {
+        //double v = SimplexNoise2D.noise(wx/ ChunksManager.Slope, wy/ChunksManager.Slope);
+        WorldMapNoise noise = this.chunkSystem.getNoise();
+        double v = noise.noise(wx/ ChunkSystem.Slope, wy/ ChunkSystem.Slope);
+        return (int)SimplexNoise2D.map(v, -1f, 1f, LowestHeight, HighestHeight);
+    }
+
+    /**
+     * 依据地形高度返回不同的方块（粗略版）
+     * @param blockHeight
+     * @return  方块
+     */
+    private Block chooseBlock(int blockHeight) {
+        switch (blockHeight) {
+            case 0:
+            case 1:
+            case 2:{
+                return new BlockWater();
+            }
+            case 3:{
+                return new BlockSand();
+            }
+            case 4:{
+                return new BlockStone();
+            }
+            case 5:
+            case 6:
+            case 7:{
+                return new BlockGrass();
+            }
+        }
+        //错误的高度则返回测试用方块
+        return new BlockTest();
+    }
+
+    /**
+     * 依据地形高度返回不同的方块（精确版）
+     * @param height
+     * @return  方块
+     */
+    private Block chooseBlock (double height) {
+        System.out.println(height);
+        if (height <-2){
+            return new BlockWater();
+        }
+        if (height >=-2 && height <-1){
+            return new BlockSand();
+        }
+        if (height >=-1 && height <1){
+            return new BlockStone();
+        }
+        if (height >=1 && height <=3){
+            return new BlockStone();
+        }
+        return new BlockTest();
+    }
+
+    @Override
+    public void draw(Batch batch) {
+        /*for (ArrayList<Block> blockY: blockGroup) {
+            for (Block block: blockY) {
+                if (block != null) {
+                    block.draw(batch);
+                }
+            }
+        }*/
+
+        /*for (int y = 0; y < ChunkHeight; y++) {
+            for (int x = 0; x < ChunkWidth; x++) {
+                Block block = blocks[y][x];
+                if (block != null) {
+                    block.draw(batch);
+                }
+            }
+        }*/
+
+        this.traversal((x, y) -> {
+            Block block = blocks[y][x];
+            if (block != null) {
+                block.draw(batch);
+            }
+        });
+        this.traversal((x, y) -> {
+            Wall wall = walls[y][x];
+            if (wall != null) {
+                wall.draw(batch);
+            }
+        });
+    }
+
+    @Override
+    public void update(float delta) {
+        /*for (ArrayList<Block> blockY: blockGroup) {
+            for (Block block: blockY) {
+                if (block != null) {
+                    block.update(delta);
+                }
+            }
+        }*/
+
+        /*for (int y = 0; y < ChunkHeight; y++) {
+            for (int x = 0; x < ChunkWidth; x++) {
+                Block block = blocks[y][x];
+                if (block != null) {
+                    block.update(delta);
+                }
+            }
+        }*/
+
+        this.traversal((x, y) -> {
+            Block block = blocks[y][x];
+            if (block != null) {
+                block.update(delta);
+            }
+        });
+        this.traversal((x, y) -> {
+            Wall wall = walls[y][x];
+            if (wall != null) {
+                wall.update(delta);
+            }
+        });
+    }
+
+    @Override
+    public void dispose() {
+
+        this.traversal((x, y) -> {
+            Block block = blocks[y][x];
+            if (block != null) {
+                block.dispose();
+                blocks[y][x] = null;
+            }
+
+            Wall wall = walls[y][x];
+            if (wall != null) {
+                wall.dispose();
+                walls[y][x] = null;
+            }
+        });
+    }
+
+    /**
+     * 在对应坐标上设置方块
+     * */
+    public void setBlock (Block block, int cx, int cy) {
+        //TODO 判断方块是否存在
+        //this.blockGroup.get(Math.abs(x) % ChunkWidth).add(Math.abs(y) % ChunkHeight, block);
+        this.blocks[cy][cx] = block;
+    }
+
+    /**
+     * 获取区块中的方块
+     * @param cx    方块在区块中的横坐标
+     * @param cy    方块在区块中的纵坐标
+     * @return
+     */
+    public Block getBlock (int cx, int cy) {
+        return this.blocks[cy][cx];
+    }
+
+    /**
+     * 查找方块
+     * @param wx
+     * @param wy
+     * @returnp
+     */
+    public Block seekBlock (int wx, int wy) {
+
+        final Block[] targetBlock = new Block[1];
+        this.traversal((x, y) -> {
+            Block block = blocks[y][x];
+            if (wx == block.x && wy == block.y) {
+                targetBlock[0] = block;
+            }
+        });
+        return targetBlock[0];
+    }
+
+    @Override
+    public void renderShape(ShapeRenderer batch) {
+        //绘制区块边界
+        if (this.chunkSystem.chunkEdgeRender) {
+            batch.setColor(new Color(255, 0, 0, 255));
+            batch.rect(
+                this.chunkPosition.x * ChunkWidth,
+                this.chunkPosition.y * ChunkHeight,
+                ChunkWidth, ChunkHeight);
+        }
+        //绘制墙体的碰撞箱范围
+        if (this.chunkSystem.wallHitboxRender) {
+            batch.setColor(Color.BLUE);
+            this.traversal(((x, y) -> {
+                Wall wall = walls[y][x];
+                if (wall != null && wall.getHitbox() != null) {
+                    /*Rectangle hitbox = wall.getHitbox();
+                    batch.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());*/
+                    wall.renderShape(batch);
+                }
+            }));
+        }
+        //还原颜色
+        batch.setColor(Color.WHITE);
+    }
+
+    /**
+     *
+     * @param cx 方块在区块里的横坐标
+     * @return  方块的世界坐标
+     */
+    public float getWorldX (int cx) {
+        return this.getChunkPosition().getX() * ChunkWidth + cx;
+    }
+
+    /**
+     *
+     * @param cy 方块在区块里的纵坐标
+     * @return
+     */
+    public float getWorldY (int cy) {
+        return this.getChunkPosition().getY() * ChunkHeight + cy;
+    }
+
+    public void setChunkPosition(ChunkPosition chunkPosition) {
+        this.chunkPosition = chunkPosition;
+    }
+
+    public ChunkPosition getChunkPosition() {
+        return this.chunkPosition;
+    }
+
+    /**
+     * 区块内遍历的快捷方法
+     * */
+    public void traversal (ChunkTraversalJob job) {
+        for (int y = 0; y < ChunkHeight; y++) {
+            for (int x = 0; x < ChunkWidth; x++) {
+                job.execute(x, y);
+            }
+        }
+    }
+}
