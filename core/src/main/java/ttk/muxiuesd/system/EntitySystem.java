@@ -6,11 +6,13 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
+import ttk.muxiuesd.world.entity.enemy.Slime;
 
 /**
  * 实体系统
@@ -38,6 +40,13 @@ public class EntitySystem extends GameSystem{
         this.player = ps.getPlayer();
         this.player.setEntitySystem(this);
         this.add(player);
+
+        Slime slime = new Slime();
+        slime.setEntitySystem(this);
+        slime.setBounds((float) (this.player.x + 5 * Math.cos(Util.randomRadian())),
+                  (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
+            1, 1);
+        this.add(slime);
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }
@@ -151,5 +160,9 @@ public class EntitySystem extends GameSystem{
         for (Entity entity : this.entities) {
             entity.dispose();
         }
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

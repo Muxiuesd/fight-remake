@@ -167,4 +167,8 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
     public void setEntitySystem(EntitySystem es) {
         this.es = es;
     }
+
+    public EntitySystem getEntitySystem() {
+        return this.es;
+    }
 }

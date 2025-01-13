@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.entity.bullet.Bullet;
 
 /**
  * 玩家
@@ -90,7 +91,8 @@ public class Player extends Entity {
         }
         // 左键发射攻击性子弹
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            Factory.createBullet(this, Util.getDirection());
+            Bullet bullet = Factory.createBullet(this, Util.getDirection());
+            getEntitySystem().add(bullet);
         }
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && this.defendSpan >= 1f) {
             this.isDefend = true;
