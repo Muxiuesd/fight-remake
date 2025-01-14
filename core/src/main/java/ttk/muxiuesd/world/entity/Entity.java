@@ -69,7 +69,7 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
     }
 
     public void update(float delta) {
-        setCullingArea(x, y, width, height);
+        this.setCullingArea(x, y, width, height);
     }
 
     public void setCullingArea(float x, float y, float width, float height) {

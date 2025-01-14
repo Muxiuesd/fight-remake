@@ -28,7 +28,7 @@ public class HandleInputSystem extends WorldSystem {
 
     @Override
     public void update(float delta) {
-        ChunkSystem cs = (ChunkSystem) getWorld().getSystemManager().getSystem("ChunkSystem");
+        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getPlayerCenter();

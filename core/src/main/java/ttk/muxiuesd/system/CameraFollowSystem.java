@@ -21,7 +21,7 @@ public class CameraFollowSystem extends WorldSystem {
         super(world);
         MainGameScreen screen = getWorld().getScreen();
         this.cameraController = screen.cameraController;
-        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
+        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.setFollower(ps.getPlayer());
         Log.print(TAG, "CameraFollowSystem初始化完成！");
     }

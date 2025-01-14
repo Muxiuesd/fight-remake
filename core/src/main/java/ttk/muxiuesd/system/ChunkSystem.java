@@ -3,6 +3,7 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
@@ -47,8 +48,8 @@ public class ChunkSystem extends WorldSystem {
         super(world);
 
         this.noise = new WorldMapNoise((int) (Math.random() * 10000));
-        EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
-        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
+        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
 
         this.playerLastPosition = new Vector2(this.player.x + 10000, this.player.y + 10000);
@@ -426,7 +427,7 @@ public class ChunkSystem extends WorldSystem {
      * @param wy
      * @return
      */
-    private ChunkPosition getChunkPosition(float wx, float wy) {
+    public ChunkPosition getChunkPosition(float wx, float wy) {
         ChunkPosition cp = new ChunkPosition();
 
         cp.setX((int) (Math.abs(Util.fastRound(wx)) / Chunk.ChunkWidth));
@@ -450,9 +451,26 @@ public class ChunkSystem extends WorldSystem {
         return this.getPlayerChunkPosition(this.player);
     }
 
+    /**
+     * 检测所在坐标是否为区块的边缘区域
+     * */
+    public boolean isChunkEdge (ChunkPosition chunkPosition, float wx, float wy) {
+        return !this.isChunkCenter(chunkPosition, wx, wy);
+    }
+
+    /**
+     * 检测所在坐标是否为区块的中心区域
+     * */
+    public boolean isChunkCenter (ChunkPosition chunkPosition, float wx, float wy) {
+        Rectangle chunkCenterZone = new Rectangle(
+            chunkPosition.getX() + 5f,
+            chunkPosition.getY() + 5f,
+            6f, 6f);
+        return chunkCenterZone.contains(wx, wy);
+    }
+
     // 移动阈值
     private float moveValue = 1.2f;
-
     /**
      * 如果玩家一段时间内移动距离大于这个阈值就返回true，否则为false
      */
@@ -465,7 +483,7 @@ public class ChunkSystem extends WorldSystem {
     /**
      * 关闭线程池
      */
-    public void shutdownChunkLoadPool() {
+    private void shutdownChunkLoadPool() {
         this.executor.shutdown();
         try {
             if (!this.executor.awaitTermination(5, TimeUnit.SECONDS)) {

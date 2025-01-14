@@ -26,4 +26,9 @@ public class ChunkPosition extends GridPoint2 {
     public void setY(int y) {
         super.y = y;
     }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
 }

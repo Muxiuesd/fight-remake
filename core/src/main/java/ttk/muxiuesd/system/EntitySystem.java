@@ -45,7 +45,7 @@ public class EntitySystem extends WorldSystem {
         slime.setBounds((float) (this.player.x + 5 * Math.cos(Util.randomRadian())),
                   (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
             1, 1);
-        this.add(slime);
+        //this.add(slime);
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }

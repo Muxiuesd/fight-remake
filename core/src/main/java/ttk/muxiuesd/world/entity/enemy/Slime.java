@@ -56,7 +56,8 @@ public class Slime extends Entity {
         //与玩家接近一定的距离才会开始攻击
         if (Util.getDistance(this, player) <= this.attackRange) {
             if (span >= T) {
-                this.createBullet(new Direction(player.x - x, player.y - y));
+                Bullet bullet = this.createBullet(new Direction(player.x - x, player.y - y));
+                getEntitySystem().add(bullet);
                 span = 0;
             } else {
                 span += delta;
