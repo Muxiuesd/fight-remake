@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
@@ -9,7 +10,7 @@ import ttk.muxiuesd.world.entity.Player;
 /**
  * 玩家系统
  * */
-public class PlayerSystem extends GameSystem{
+public class PlayerSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
     private Player player;

@@ -2,9 +2,10 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 
-public class EventSystem extends GameSystem{
+public class EventSystem extends WorldSystem {
     public EventSystem(World world) {
         super(world);
     }

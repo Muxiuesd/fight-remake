@@ -1,4 +1,4 @@
-package ttk.muxiuesd.system;
+package ttk.muxiuesd.system.abs;
 
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.interfaces.Drawable;
@@ -7,13 +7,14 @@ import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.World;
 
 /**
- * 所有的系统的基类
+ * 运行在世界里的系统
  * */
-public abstract class GameSystem implements Updateable, Drawable, ShapeRenderable, Disposable {
+public abstract class WorldSystem extends FightSystem {
     private World world;
 
-    public GameSystem(World world) {
+    public WorldSystem(World world) {
         this.world = world;
+        setManager(world.getSystemManager());
     }
 
     public World getWorld() {

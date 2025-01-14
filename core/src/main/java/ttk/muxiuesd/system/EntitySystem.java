@@ -3,8 +3,7 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -17,7 +16,7 @@ import ttk.muxiuesd.world.entity.enemy.Slime;
 /**
  * 实体系统
  * */
-public class EntitySystem extends GameSystem{
+public class EntitySystem extends WorldSystem {
     public final String TAG = EntitySystem.class.getSimpleName();
 
     private Player player;
@@ -36,7 +35,7 @@ public class EntitySystem extends GameSystem{
 
     public EntitySystem(World world) {
         super(world);
-        PlayerSystem ps = (PlayerSystem) getWorld().getWorldSystem().getSystem("PlayerSystem");
+        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
         this.player.setEntitySystem(this);
         this.add(player);
@@ -50,6 +49,7 @@ public class EntitySystem extends GameSystem{
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }
+
 
 
     public void add(Entity entity) {

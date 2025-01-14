@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.Block;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.*;
 
-public class ChunkSystem extends GameSystem{
+public class ChunkSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
     public boolean chunkEdgeRender = false;
@@ -46,8 +47,8 @@ public class ChunkSystem extends GameSystem{
         super(world);
 
         this.noise = new WorldMapNoise((int) (Math.random() * 10000));
-        EntitySystem es = (EntitySystem) getWorld().getWorldSystem().getSystem("EntitySystem");
-        PlayerSystem ps = (PlayerSystem) getWorld().getWorldSystem().getSystem("PlayerSystem");
+        EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
+        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
 
         this.playerLastPosition = new Vector2(this.player.x + 10000, this.player.y + 10000);

@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Entity;
@@ -11,15 +12,15 @@ import ttk.muxiuesd.world.entity.bullet.Bullet;
 /**
  * 子弹碰撞系统
  * */
-public class BulletCollisionCheckSystem extends GameSystem{
+public class BulletCollisionCheckSystem extends WorldSystem {
     public BulletCollisionCheckSystem(World world) {
         super(world);
     }
 
     @Override
     public void update(float delta) {
-        EntitySystem es = (EntitySystem) getWorld().getWorldSystem().getSystem("EntitySystem");
-        PlayerSystem ps = (PlayerSystem) getWorld().getWorldSystem().getSystem("PlayerSystem");
+        EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
+        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         Player player = ps.getPlayer();
 
         if (es == null || player == null) {

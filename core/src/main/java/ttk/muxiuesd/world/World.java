@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world;
 
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
@@ -26,32 +25,32 @@ public abstract class World implements Updateable, Drawable, ShapeRenderable, Di
     @Override
     public void draw(Batch batch) {
         if (worldSystemsManager != null) {
-            getWorldSystem().draw(batch);
+            getSystemManager().draw(batch);
         }
     }
 
     @Override
     public void renderShape(ShapeRenderer batch) {
         if (worldSystemsManager != null) {
-            getWorldSystem().renderShape(batch);
+            getSystemManager().renderShape(batch);
         }
     }
 
     @Override
     public void update(float delta) {
         if (worldSystemsManager != null) {
-            getWorldSystem().update(delta);
+            getSystemManager().update(delta);
         }
     }
 
     @Override
     public void dispose() {
         if (worldSystemsManager != null) {
-            getWorldSystem().dispose();
+            getSystemManager().dispose();
         }
     }
 
-    public WorldSystemsManager getWorldSystem() {
+    public WorldSystemsManager getSystemManager() {
         if (this.worldSystemsManager == null) {
             Log.error(TAG, "这个world的系统管理是null！！！");
         }

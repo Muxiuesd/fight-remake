@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.BlockPosition;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -13,21 +14,21 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Player;
 
-public class HandleInputSystem extends GameSystem{
+public class HandleInputSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
     private PlayerSystem playerSystem;
 
     public HandleInputSystem(World world) {
         super(world);
-        EntitySystem es = (EntitySystem) getWorld().getWorldSystem().getSystem("EntitySystem");
-        PlayerSystem ps = (PlayerSystem) getWorld().getWorldSystem().getSystem("PlayerSystem");
+        EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
+        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         playerSystem = ps;
     }
 
     @Override
     public void update(float delta) {
-        ChunkSystem cs = (ChunkSystem) getWorld().getWorldSystem().getSystem("ChunkSystem");
+        ChunkSystem cs = (ChunkSystem) getWorld().getSystemManager().getSystem("ChunkSystem");
 
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getPlayerCenter();

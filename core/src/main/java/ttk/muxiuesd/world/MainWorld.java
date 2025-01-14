@@ -13,7 +13,7 @@ public class MainWorld extends World {
         super(screen);
         //一定要最先初始化世界系统管理器
         setWorldSystemsManager(new WorldSystemsManager(this));
-        getWorldSystem()
+        getSystemManager()
             .addSystem("PlayerSystem", new PlayerSystem(this))
             .addSystem("ChunkSystem", new ChunkSystem(this))
             .addSystem("EntitySystem", new EntitySystem(this))
