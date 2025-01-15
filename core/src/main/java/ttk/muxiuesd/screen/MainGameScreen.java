@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
 
@@ -26,6 +27,7 @@ public class MainGameScreen implements Screen {
         setAutoShapeType(true);
     }};
 
+    private ModLoader modLoader;
     private World world;
 
     @Override
@@ -35,7 +37,10 @@ public class MainGameScreen implements Screen {
         this.cameraController = new CameraController(new OrthographicCamera());
         this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
+        this.modLoader = new ModLoader();
         this.world = new MainWorld(this);
+
+        this.modLoader.runMod();
     }
 
     @Override

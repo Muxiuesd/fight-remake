@@ -1,0 +1,8 @@
+{
+  "name": "mymod",
+  "namespace": "mymod",
+  "author": "muxiuesd",
+  "version": "1.0.0",
+  "description": "我的模组",
+  "main": "main.js"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "testmod",
+  "namespace": "testmod",
+  "author": "muxiuesd",
+  "version": "1.0.0",
+  "description": "测试用模组",
+  "main": "main.js"
+}
