@@ -17,11 +17,14 @@ import java.util.Objects;
 public class ModLoader {
     public final String TAG = this.getClass().getName();
 
-    private String root = "../mods/";
+    //这个必须是单例模式
+    private static ModLoader Instance;
 
+    private final String root = "../mods/";
     private HashMap<String, Mod> mods = new HashMap<>();
 
-    public ModLoader() {
+    private ModLoader() {
+
         if (!Gdx.files.local(root).exists()) {
             //新建mods文件夹
             Gdx.files.local(root).mkdirs();
@@ -45,7 +48,7 @@ public class ModLoader {
     /**
      * 加载mod
      * */
-    public void loadMod(FileHandle modDir) {
+    private void loadMod(FileHandle modDir) {
         FileHandle infoFileHandle = Gdx.files.local(modDir.path() + "/info.json");
         String infoString = infoFileHandle.readString();
         if (infoString == null) {
@@ -97,6 +100,16 @@ public class ModLoader {
      * */
     public FileHandle[] getModDirs() {
         return Gdx.files.local(root).list();
+    }
+
+    /**
+     * 获取模组加载器的实例
+     * */
+    public static ModLoader getInstance() {
+        if (Instance == null) {
+            Instance = new ModLoader();
+        }
+        return Instance;
     }
 
     public String getRoot() {
