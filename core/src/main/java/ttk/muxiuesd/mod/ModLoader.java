@@ -132,6 +132,10 @@ public class ModLoader {
         return Instance;
     }
 
+    public HashMap<String, Mod> getMods () {
+        return this.mods;
+    }
+
     /**
      * 获取底层库的代码
      * */

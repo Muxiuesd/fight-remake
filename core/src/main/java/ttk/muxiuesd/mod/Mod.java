@@ -3,6 +3,7 @@ package ttk.muxiuesd.mod;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
+import ttk.muxiuesd.util.Log;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -43,6 +44,14 @@ public class Mod implements Runnable{
             this.running = false;
             throw new RuntimeException(e);
         }
+    }
+
+    public ScriptEngine getEngine () {
+        if (this.engine == null) {
+            Log.error(TAG, "在不合适的时候获取mod的引擎！");
+            return null;
+        }
+        return this.engine;
     }
 
     public String getModName() {

@@ -3,6 +3,8 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.mod.Mod;
+import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
@@ -12,6 +14,10 @@ import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.enemy.Slime;
+
+import javax.script.Invocable;
+import javax.script.ScriptException;
+import java.util.HashMap;
 
 /**
  * 实体系统
@@ -72,6 +78,17 @@ public class EntitySystem extends WorldSystem {
             Bullet bullet = (Bullet) entity;
             if (bullet.group == Group.player) {
                 this.playerBulletEntity.add(bullet);
+
+                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                for (Mod mod : mods.values()) {
+                    Invocable invocable = (Invocable) mod.getEngine();
+                    try {
+                        invocable.invokeFunction("callBulletShootEvent", this.player, bullet);
+                    } catch (ScriptException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
             }
             if (bullet.group == Group.enemy) {
                 this.enemyBulletEntity.add(bullet);
