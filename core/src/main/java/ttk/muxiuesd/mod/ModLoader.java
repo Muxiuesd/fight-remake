@@ -2,12 +2,10 @@ package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.util.Log;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -59,23 +57,32 @@ public class ModLoader {
         JsonReader reader = new JsonReader();
         JsonValue info = reader.parse(infoString);
 
-        if (info.get("name") != null
-            && info.get("namespace") != null
+        if (! Objects.equals(info.getString("name"), "")
+            && ! Objects.equals(info.getString("namespace"), "")
             && !this.hasMod(info)
-            && info.get("version") != null
-            && info.get("author") != null
-            && info.get("description") != null
-            && info.get("main") != null) {
+            && ! Objects.equals(info.getString("version"), "")
+            && ! Objects.equals(info.getString("author"), "")
+            && ! Objects.equals(info.getString("description"), "")
+            && ! Objects.equals(info.getString("main"), "")) {
 
             Mod mod = new Mod(info, modDir);
             this.mods.put(info.get("namespace").asString(), mod);
+            Log.print(TAG, "文件夹：" + modDir.name() +" 的模组：" + mod.getModName() +" 完成加载。");
+        }else {
+            Log.error(TAG, "文件夹：" + modDir.name() + "中的info.json文件不合法，跳过加载此模组！！！");
         }
+
     }
 
     /**
      * 运行mod
     * */
     public void runMod() {
+        if (mods.isEmpty()) {
+            Log.print(TAG, "没有加载到任何模组，跳过运行");
+            return;
+        }
+        Log.print(TAG, "开始运行所有的模组……");
         for (Mod mod : this.mods.values()) {
             mod.run();
         }
@@ -87,8 +94,12 @@ public class ModLoader {
      * TODO 更加仔细的检查
      * */
     private boolean hasMod (JsonValue modInfo) {
+        String namespace = modInfo.get("namespace").asString();
         for (Mod mod : mods.values()) {
-            if (Objects.equals(modInfo.get("namespace").asString(), mod.getModNamespace())){
+            if (Objects.equals(namespace, mod.getModNamespace())){
+                Log.error(TAG,
+                    "待加载的模组："+ modInfo.getString("name") +" 的命名空间：" + namespace
+                        + " 与已有的模组：" + mod.getModName() +" 的命名空间重复！！！");
                 return true;
             }
         }

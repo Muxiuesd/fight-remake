@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
 
-import ttk.muxiuesd.util.Log;
-
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -16,8 +14,8 @@ import javax.script.ScriptException;
 public class Mod implements Runnable{
     public final String TAG = this.getClass().getName();
 
+    private boolean running = false;
     private JsonValue info;
-
     private FileHandle modDir;
     private String modPath;
 
@@ -43,9 +41,9 @@ public class Mod implements Runnable{
             engine.eval(lib + code);
             Invocable invocable = (Invocable) engine;
 
-            //Log.print(TAG, lib + code);
-
+            this.running = true;
         } catch (ScriptException e) {
+            this.running = false;
             throw new RuntimeException(e);
         }
     }
@@ -60,5 +58,9 @@ public class Mod implements Runnable{
      */
     public String getModNamespace() {
         return this.info.get("namespace").asString();
+    }
+
+    public boolean isRunning () {
+        return this.running;
     }
 }
