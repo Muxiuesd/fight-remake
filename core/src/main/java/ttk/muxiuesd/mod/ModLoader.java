@@ -19,6 +19,7 @@ public class ModLoader {
     private static ModLoader Instance;
 
     private final String root = "../mods/";
+    private String lib;
     private HashMap<String, Mod> mods = new HashMap<>();
 
     private ModLoader() {
@@ -27,14 +28,22 @@ public class ModLoader {
             //新建mods文件夹
             Gdx.files.local(root).mkdirs();
         }
-
-        boolean exists = Gdx.files.local(root + "testmod/main.js").exists();
+        //加载底层库
+        FileHandle libFile = Gdx.files.internal("lib/lib.js");
+        this.lib = libFile.readString();
+        Log.print(TAG, "模组底层库加载完毕。");
+        /*boolean exists = Gdx.files.local(root + "testmod/main.js").exists();
         if (exists) {
             Log.print(TAG, "Found main.js");
         }else {
             Log.print(TAG, "No main.js");
-        }
+        }*/
+    }
 
+    /**
+     * 对外开放的方法：加载所有mod
+     * */
+    public void loadAllMods () {
         FileHandle[] modDirs = this.getModDirs();
         for (int i = 0; i < modDirs.length; i++) {
             Log.print(TAG, modDirs[i].path());
@@ -75,9 +84,9 @@ public class ModLoader {
     }
 
     /**
-     * 运行mod
+     * 运行所有mod
     * */
-    public void runMod() {
+    public void runAllMods () {
         if (mods.isEmpty()) {
             Log.print(TAG, "没有加载到任何模组，跳过运行");
             return;
@@ -121,6 +130,13 @@ public class ModLoader {
             Instance = new ModLoader();
         }
         return Instance;
+    }
+
+    /**
+     * 获取底层库的代码
+     * */
+    public String getLib () {
+        return this.lib;
     }
 
     public String getRoot() {

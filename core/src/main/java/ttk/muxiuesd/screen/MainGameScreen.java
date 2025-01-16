@@ -38,7 +38,8 @@ public class MainGameScreen implements Screen {
 
         this.world = new MainWorld(this);
 
-        ModLoader.getInstance().runMod();
+        ModLoader.getInstance().loadAllMods();
+        ModLoader.getInstance().runAllMods();
     }
 
     @Override

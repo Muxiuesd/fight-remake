@@ -19,6 +19,8 @@ public class Mod implements Runnable{
     private FileHandle modDir;
     private String modPath;
 
+    private ScriptEngine engine;
+
     public Mod (JsonValue info, FileHandle modDir) {
         this.info = info;
         this.modDir = modDir;
@@ -27,19 +29,14 @@ public class Mod implements Runnable{
 
     @Override
     public void run() {
-        //加载底层库
-        FileHandle libFile = Gdx.files.internal("lib/lib.js");
-        String lib = libFile.readString();
-        //Log.print(TAG, lib);
-
         FileHandle mainFile = Gdx.files.local(this.modPath + info.getString("main"));
         String code = mainFile.readString();
         //Log.print(TAG, code);
 
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+        this.engine = new ScriptEngineManager().getEngineByName("nashorn");
         try {
-            engine.eval(lib + code);
-            Invocable invocable = (Invocable) engine;
+            this.engine.eval(ModLoader.getInstance().getLib() + code);
+            Invocable invocable = (Invocable) this.engine;
 
             this.running = true;
         } catch (ScriptException e) {
