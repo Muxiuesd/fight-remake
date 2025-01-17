@@ -2,12 +2,13 @@ package ttk.muxiuesd.world.entity.bullet;
 
 
 import ttk.muxiuesd.world.entity.Entity;
-import ttk.muxiuesd.world.entity.Group;
 
 /**
  * 子弹
  */
 public abstract class Bullet extends Entity {
+    public Entity owner;
+
     public float damage;
     public float xDirection;
     public float yDirection;
@@ -15,8 +16,9 @@ public abstract class Bullet extends Entity {
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
 
-    public Bullet(Group group, float maxHealth, float curHealth) {
-        initialize(group, maxHealth, curHealth);
+    public Bullet(Entity owner, float maxHealth, float curHealth) {
+        this.owner = owner;
+        initialize(owner.group, maxHealth, curHealth);
     }
 
     public float getMaxLiveTime() {

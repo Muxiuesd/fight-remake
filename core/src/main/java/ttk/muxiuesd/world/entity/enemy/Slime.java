@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.entity.enemy;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -70,7 +69,7 @@ public class Slime extends Entity {
      * @param direction 子弹的运动方向
      */
     private Bullet createBullet (Direction direction) {
-        BulletFire bullet = new BulletFire(group);
+        BulletFire bullet = new BulletFire(this);
         bullet.setSize(
             (float) (bullet.width * Math.pow(this.factor, this.generation)),
             (float) (bullet.height * Math.pow(this.factor, this.generation)));

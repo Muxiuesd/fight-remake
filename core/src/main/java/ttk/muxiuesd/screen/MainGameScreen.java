@@ -16,6 +16,7 @@ import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.event.EventBus;
 
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
@@ -37,8 +38,9 @@ public class MainGameScreen implements Screen {
         this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
         this.world = new MainWorld(this);
-
+        EventBus.getInstance();
         ModLoader.getInstance().loadAllMods();
+        EventBus.getInstance().initialize();
         ModLoader.getInstance().runAllMods();
     }
 

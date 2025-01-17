@@ -3,13 +3,13 @@ package ttk.muxiuesd.world.entity.bullet;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.Entity;
 
 public class BulletFire extends Bullet {
     //public static TextureRegion img = new TextureRegion(AssetsLoader.getInstance().get("bullet/flame.png", Texture.class));
 
-    public BulletFire(Group group) {
-        super(group, 1, 1);
+    public BulletFire(Entity owner) {
+        super(owner, 1, 1);
 
         setSize(0.5f, 0.5f);
         damage = 1f;

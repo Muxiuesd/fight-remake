@@ -3,8 +3,6 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.mod.Mod;
-import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
@@ -14,10 +12,11 @@ import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.enemy.Slime;
+import ttk.muxiuesd.world.event.BulletShootEvent;
+import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.event.EventGroup;
 
-import javax.script.Invocable;
-import javax.script.ScriptException;
-import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * 实体系统
@@ -51,7 +50,7 @@ public class EntitySystem extends WorldSystem {
         slime.setBounds((float) (this.player.x + 5 * Math.cos(Util.randomRadian())),
                   (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
             1, 1);
-        //this.add(slime);
+        this.add(slime);
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }
@@ -79,7 +78,7 @@ public class EntitySystem extends WorldSystem {
             if (bullet.group == Group.player) {
                 this.playerBulletEntity.add(bullet);
 
-                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                /*HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
                 for (Mod mod : mods.values()) {
                     Invocable invocable = (Invocable) mod.getEngine();
                     try {
@@ -87,11 +86,12 @@ public class EntitySystem extends WorldSystem {
                     } catch (ScriptException | NoSuchMethodException e) {
                         throw new RuntimeException(e);
                     }
-                }
-
+                }*/
+                this.callBulletShootEvent(this.player, bullet);
             }
             if (bullet.group == Group.enemy) {
                 this.enemyBulletEntity.add(bullet);
+                this.callBulletShootEvent(bullet.owner, bullet);
             }
         } else if (entity.group == Group.enemy) {
             this.enemyEntity.add(entity);
@@ -176,6 +176,14 @@ public class EntitySystem extends WorldSystem {
     public void dispose() {
         for (Entity entity : this.entities) {
             entity.dispose();
+        }
+    }
+
+    public void callBulletShootEvent (Entity shooter, Bullet bullet) {
+        EventGroup<BulletShootEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.BulletShoot);
+        HashSet<BulletShootEvent> events = eventGroup.getEvents();
+        for (BulletShootEvent event :events) {
+            event.call(shooter, bullet);
         }
     }
 

@@ -76,6 +76,7 @@ public class ModLoader {
 
             Mod mod = new Mod(info, modDir);
             this.mods.put(info.get("namespace").asString(), mod);
+
             Log.print(TAG, "文件夹：" + modDir.name() +" 的模组：" + mod.getModName() +" 完成加载。");
         }else {
             Log.error(TAG, "文件夹：" + modDir.name() + "中的info.json文件不合法，跳过加载此模组！！！");
@@ -88,7 +89,7 @@ public class ModLoader {
     * */
     public void runAllMods () {
         if (mods.isEmpty()) {
-            Log.print(TAG, "没有加载到任何模组，跳过运行");
+            Log.print(TAG, "没有加载任何模组，跳过运行");
             return;
         }
         Log.print(TAG, "开始运行所有的模组……");
