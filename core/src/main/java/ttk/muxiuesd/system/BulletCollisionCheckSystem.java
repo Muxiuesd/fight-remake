@@ -12,9 +12,13 @@ import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
+import ttk.muxiuesd.world.event.EntityAttackedEvent;
+import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.event.EventGroup;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * 子弹碰撞系统
@@ -55,6 +59,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                     enemy.curHealth -= playerBullet.damage;
                     enemy.attacked = true;
                     playerBullet.setLiveTime(playerBullet.getMaxLiveTime());
+                    this.callEntityAttackedEvent(playerBullet, enemy);
                     // Log.print(TAG, "敌人扣血：" + playerBullet.damage + " 目前血量：" + enemy.curHealth);
                 }
             }
@@ -81,6 +86,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                 player.curHealth -= enemyBullet.damage;
                 enemyBullet.setLiveTime(enemyBullet.getMaxLiveTime());
                 player.attacked = true;
+                this.callEntityAttackedEvent(enemyBullet, player);
                 // Log.print(TAG, "玩家扣血：" + enemyBullet.damage + " 目前血量：" + player.curHealth);
             }
             this.bulletAndWallCollision(enemyBullet, es, ps, cs);
@@ -294,6 +300,17 @@ public class BulletCollisionCheckSystem extends WorldSystem {
         //不为空就说明碰撞了
         if (!collidingWalls.isEmpty()) {
             es.remove(bullet);
+        }
+    }
+
+    /**
+     * 调用实体受攻击的事件
+     * */
+    private void callEntityAttackedEvent (Entity attackedObject, Entity victim) {
+        EventGroup<EntityAttackedEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EntityAttacked);
+        HashSet<EntityAttackedEvent> events = eventGroup.getEvents();
+        for (EntityAttackedEvent event :events) {
+            event.call(attackedObject, victim);
         }
     }
 

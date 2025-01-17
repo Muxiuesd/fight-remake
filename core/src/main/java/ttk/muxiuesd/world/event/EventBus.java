@@ -1,14 +1,8 @@
 package ttk.muxiuesd.world.event;
 
 import ttk.muxiuesd.interfaces.Event;
-import ttk.muxiuesd.mod.Mod;
-import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.world.entity.Entity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
 
-import javax.script.Invocable;
-import javax.script.ScriptException;
 import java.util.HashMap;
 
 /**
@@ -32,29 +26,8 @@ public class EventBus {
     }
 
     public void initialize() {
-        addEvent(BulletShoot, new BulletShootEvent() {
-            @Override
-            public void call (Entity shooter, Bullet bullet) {
-                Log.print(TAG, "射击者：" + shooter + " 射出子弹：" + bullet);
-                //调用mod里的事件
-                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
-                for (Mod mod : mods.values()) {
-                    Invocable invocable = (Invocable) mod.getEngine();
-                    try {
-                        invocable.invokeFunction("callBulletShootEvent", shooter, bullet);
-                    } catch (ScriptException | NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
+        //添加Mod的事件调用
 
-        addEvent(EntityAttacked, new EntityAttackedEvent() {
-            @Override
-            public void call (Entity attackObject, Entity victim) {
-
-            }
-        });
     }
 
     public boolean addEvent (int eventGroupId, Event event) {

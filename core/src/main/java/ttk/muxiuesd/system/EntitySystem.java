@@ -179,6 +179,9 @@ public class EntitySystem extends WorldSystem {
         }
     }
 
+    /**
+     * 调用事件
+     * */
     public void callBulletShootEvent (Entity shooter, Bullet bullet) {
         EventGroup<BulletShootEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.BulletShoot);
         HashSet<BulletShootEvent> events = eventGroup.getEvents();

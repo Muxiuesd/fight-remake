@@ -5,9 +5,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.bullet.Bullet;
+import ttk.muxiuesd.world.event.BulletShootEvent;
+import ttk.muxiuesd.world.event.EntityAttackedEvent;
+import ttk.muxiuesd.world.event.EventBus;
 
+import javax.script.Invocable;
+import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.Objects;
+
 
 /**
  * 模组加载器
@@ -49,6 +57,7 @@ public class ModLoader {
             Log.print(TAG, modDirs[i].path());
             this.loadMod(modDirs[i]);
         }
+        this.addModEventCaller();
         Log.print(TAG, "所有模组加载完成！共加载" + mods.size() + "个模组");
     }
 
@@ -114,6 +123,40 @@ public class ModLoader {
             }
         }
         return false;
+    }
+
+    public void addModEventCaller () {
+        EventBus eventBus = EventBus.getInstance();
+        eventBus.addEvent(EventBus.BulletShoot, new BulletShootEvent() {
+            @Override
+            public void call (Entity shooter, Bullet bullet) {
+                //Log.print(TAG, "射击者：" + shooter + " 射出子弹：" + bullet);
+                //调用mod里的事件
+                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                for (Mod mod : mods.values()) {
+                    Invocable invocable = (Invocable) mod.getEngine();
+                    try {
+                        invocable.invokeFunction("callBulletShootEvent", shooter, bullet);
+                    } catch (ScriptException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        eventBus.addEvent(EventBus.EntityAttacked, new EntityAttackedEvent() {
+            @Override
+            public void call (Entity attackObject, Entity victim) {
+                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                for (Mod mod : mods.values()) {
+                    Invocable invocable = (Invocable) mod.getEngine();
+                    try {
+                        invocable.invokeFunction("callEntityAttackedEvent", attackObject, victim);
+                    } catch (ScriptException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
     }
 
     /**

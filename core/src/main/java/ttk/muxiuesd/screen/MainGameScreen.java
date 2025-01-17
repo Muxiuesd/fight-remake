@@ -40,7 +40,6 @@ public class MainGameScreen implements Screen {
         this.world = new MainWorld(this);
         EventBus.getInstance();
         ModLoader.getInstance().loadAllMods();
-        EventBus.getInstance().initialize();
         ModLoader.getInstance().runAllMods();
     }
 
