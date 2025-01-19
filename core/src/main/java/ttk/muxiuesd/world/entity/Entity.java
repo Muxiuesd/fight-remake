@@ -3,10 +3,10 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.Updateable;
-import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.EntitySystem;
 
 import java.util.Arrays;
@@ -161,7 +161,7 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
     }
 
     public boolean isDeath () {
-        return curHealth <= 0;
+        return this.curHealth <= 0;
     }
 
     public void setEntitySystem(EntitySystem es) {

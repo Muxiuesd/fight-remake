@@ -19,34 +19,46 @@ var Log = {
 }
 
 var World = {
-    events: {
+    eventGroups: {
         bulletShoot: [],
-        entityAttacked: []
+        entityAttacked: [],
+        entityDead: []
     },
     event: {
         add: function (eventName, callback) {
             if (eventName === "bulletShoot") {
-                World.events.bulletShoot.push(callback);
+                World.eventGroups.bulletShoot.push(callback);
                 System.log("向bulletShoot添加事件");
             }
             if (eventName === "entityAttacked") {
-                World.events.entityAttacked.push(callback);
-                System.log("向entity添加事件");
+                World.eventGroups.entityAttacked.push(callback);
+                System.log("向entityAttacked添加事件");
+            }
+            if (eventName === "entityDead") {
+                World.eventGroups.entityDead.push(callback);
+                System.log("向entityDead添加事件");
             }
         }
     }
 }
-
+//以下的方法是游戏代码调用的
 var callBulletShootEvent = function (shooter, bullet) {
-    for (var i = 0; i < World.events.bulletShoot.length; i++) {
-        World.events.bulletShoot[i](shooter, bullet);
+    for (var i = 0; i < World.eventGroups.bulletShoot.length; i++) {
+        World.eventGroups.bulletShoot[i](shooter, bullet);
     }
 }
 var callEntityAttackedEvent = function (attackObject, victim) {
-    for (var i = 0; i < World.events.entityAttacked.length; i++) {
-        World.events.entityAttacked[i](attackObject, victim);
+    for (var i = 0; i < World.eventGroups.entityAttacked.length; i++) {
+        World.eventGroups.entityAttacked[i](attackObject, victim);
     }
 }
+var callEntityDeadEvent = function (deadEntity) {
+    for (var i = 0; i < World.eventGroups.entityDead.length; i++) {
+        World.eventGroups.entityDead[i](deadEntity);
+    }
+}
+//到这里为止
+
 
 var group = Java.type("ttk.muxiuesd.world.entity.Group");
 var getGroup = function (entity) {

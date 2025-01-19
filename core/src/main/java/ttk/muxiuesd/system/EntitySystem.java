@@ -13,6 +13,7 @@ import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.event.BulletShootEvent;
+import ttk.muxiuesd.world.event.EntityDeathEvent;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.EventGroup;
 
@@ -77,7 +78,6 @@ public class EntitySystem extends WorldSystem {
             Bullet bullet = (Bullet) entity;
             if (bullet.group == Group.player) {
                 this.playerBulletEntity.add(bullet);
-
                 /*HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
                 for (Mod mod : mods.values()) {
                     Invocable invocable = (Invocable) mod.getEngine();
@@ -143,8 +143,7 @@ public class EntitySystem extends WorldSystem {
         if (!_delayRemove.isEmpty()) {
             for (Entity entity : _delayRemove) {
                 _remove(entity);
-                // 实体死亡事件执行
-                //this.entityDead.handle(this, entity);
+
             }
             _delayRemove.clear();
         }
@@ -157,6 +156,12 @@ public class EntitySystem extends WorldSystem {
 
         for (Entity entity : updatableEntity) {
             entity.update(delta);
+
+            //移除死亡的实体,玩家死亡移除不在这个逻辑里
+            if (!(entity instanceof Player) && entity.isDeath()) {
+                this.callEntityDeadEvent(entity);
+                this.remove(entity);
+            }
         }
     }
 
@@ -187,6 +192,14 @@ public class EntitySystem extends WorldSystem {
         HashSet<BulletShootEvent> events = eventGroup.getEvents();
         for (BulletShootEvent event :events) {
             event.call(shooter, bullet);
+        }
+    }
+
+    public void callEntityDeadEvent (Entity deadEntity) {
+        EventGroup<EntityDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EntityDeath);
+        HashSet<EntityDeathEvent> events = eventGroup.getEvents();
+        for (EntityDeathEvent event :events) {
+            event.call(deadEntity);
         }
     }
 

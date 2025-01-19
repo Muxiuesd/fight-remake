@@ -9,6 +9,7 @@ import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.BulletShootEvent;
 import ttk.muxiuesd.world.event.EntityAttackedEvent;
+import ttk.muxiuesd.world.event.EntityDeathEvent;
 import ttk.muxiuesd.world.event.EventBus;
 
 import javax.script.Invocable;
@@ -125,7 +126,10 @@ public class ModLoader {
         return false;
     }
 
-    public void addModEventCaller () {
+    /**
+     * 向EventBus添加mod里的事件调用，使得mod里注册的事件能被正确调用
+     * */
+    private void addModEventCaller () {
         EventBus eventBus = EventBus.getInstance();
         eventBus.addEvent(EventBus.BulletShoot, new BulletShootEvent() {
             @Override
@@ -151,6 +155,20 @@ public class ModLoader {
                     Invocable invocable = (Invocable) mod.getEngine();
                     try {
                         invocable.invokeFunction("callEntityAttackedEvent", attackObject, victim);
+                    } catch (ScriptException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        eventBus.addEvent(EventBus.EntityDeath, new EntityDeathEvent() {
+            @Override
+            public void call (Entity deadEntity) {
+                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                for (Mod mod : mods.values()) {
+                    Invocable invocable = (Invocable) mod.getEngine();
+                    try {
+                        invocable.invokeFunction("callEntityDeadEvent", deadEntity);
                     } catch (ScriptException | NoSuchMethodException e) {
                         throw new RuntimeException(e);
                     }
