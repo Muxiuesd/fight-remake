@@ -12,9 +12,9 @@ import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
-import ttk.muxiuesd.world.event.EntityAttackedEvent;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.EventGroup;
+import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.ArrayList;

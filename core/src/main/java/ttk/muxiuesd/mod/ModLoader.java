@@ -7,10 +7,10 @@ import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
-import ttk.muxiuesd.world.event.BulletShootEvent;
-import ttk.muxiuesd.world.event.EntityAttackedEvent;
-import ttk.muxiuesd.world.event.EntityDeathEvent;
 import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.event.abs.BulletShootEvent;
+import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
+import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
 
 import javax.script.Invocable;
 import javax.script.ScriptException;

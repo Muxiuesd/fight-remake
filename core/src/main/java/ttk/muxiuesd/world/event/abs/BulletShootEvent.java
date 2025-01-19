@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.event;
+package ttk.muxiuesd.world.event.abs;
 
 import ttk.muxiuesd.interfaces.Event;
 import ttk.muxiuesd.world.entity.Entity;
