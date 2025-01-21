@@ -5,6 +5,10 @@ import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
+/**
+ * 实体注册
+ * TODO mod注册实体
+ * */
 public class Entities {
     static Registrant<Entity> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Entity.class);
     static {

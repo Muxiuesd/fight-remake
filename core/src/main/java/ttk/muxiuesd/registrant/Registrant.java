@@ -51,11 +51,15 @@ public class Registrant<T> {
         return (T) aClass.getDeclaredConstructor().newInstance();
     }
 
-    private String getFullName(String id) {
+    public String getFullName(String id) {
         return nameSpace + ":" + id;
     }
 
     public Class<T> getClazzType() {
         return this.clazzType;
+    }
+
+    public HashMap<String, T> getR() {
+        return (HashMap<String, T>) this.r.clone();
     }
 }

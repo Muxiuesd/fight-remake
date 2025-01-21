@@ -1,12 +1,17 @@
 package ttk.muxiuesd.world.block;
 
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.instance.*;
+
+import java.util.HashMap;
 
 /**
  * 方块注册
+ * TODO mod注册方块
  * */
 public class Blocks {
     static Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
@@ -25,5 +30,23 @@ public class Blocks {
 
     public static Block newBlock (String id) {
         return registrant.get(id);
+    }
+
+    /**
+     * 打印注册的方块
+     * TODO 打印mod里注册的方块
+     * */
+    public static void printAllBlock () {
+        HashMap<String, Block> map = registrant.getR();
+        Array<String> allBlockName = new Array<>();
+        map.keySet().forEach(allBlockName::add);
+        Log.print(Blocks.class.getName(), "注册的方块有：");
+        for (int i = 0; i < allBlockName.size; i++) {
+            if (i + 1 < allBlockName.size) {
+                System.out.print(allBlockName.get(i) + " | ");
+            }else {
+                System.out.println(allBlockName.get(i));
+            }
+        }
     }
 }
