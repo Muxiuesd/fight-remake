@@ -27,6 +27,9 @@ public class Registrant<T> {
         return this;
     }
 
+    /**
+     * 获取一个新的注册元素
+     * */
     public T get(String id) {
         String fullName = this.getFullName(id);
         if (!r.containsKey(fullName)) {

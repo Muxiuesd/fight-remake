@@ -22,4 +22,8 @@ public class Blocks {
         registrant.register(id, block);
         return;
     }
+
+    public static Block newBlock (String id) {
+        return registrant.get(id);
+    }
 }

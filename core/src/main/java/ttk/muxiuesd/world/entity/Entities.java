@@ -14,4 +14,7 @@ public class Entities {
         registrant.register(id, entity);
         return;
     }
+    public static Entity get (String id) {
+        return registrant.get(id);
+    }
 }
