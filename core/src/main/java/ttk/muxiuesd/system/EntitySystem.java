@@ -188,7 +188,7 @@ public class EntitySystem extends WorldSystem {
      * 调用事件
      * */
     public void callBulletShootEvent (Entity shooter, Bullet bullet) {
-        EventGroup<BulletShootEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.BulletShoot);
+        EventGroup<BulletShootEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.BulletShoot);
         HashSet<BulletShootEvent> events = eventGroup.getEvents();
         for (BulletShootEvent event :events) {
             event.call(shooter, bullet);
@@ -196,7 +196,7 @@ public class EntitySystem extends WorldSystem {
     }
 
     public void callEntityDeadEvent (Entity deadEntity) {
-        EventGroup<EntityDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EntityDeath);
+        EventGroup<EntityDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityDeath);
         HashSet<EntityDeathEvent> events = eventGroup.getEvents();
         for (EntityDeathEvent event :events) {
             event.call(deadEntity);

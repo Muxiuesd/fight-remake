@@ -37,20 +37,16 @@ public class ModLoader {
             //新建mods文件夹
             Gdx.files.local(root).mkdirs();
         }
+
         //加载底层库
         FileHandle libFile = Gdx.files.internal("lib/lib.js");
         this.lib = libFile.readString();
         Log.print(TAG, "模组底层库加载完毕。");
-        /*boolean exists = Gdx.files.local(root + "testmod/main.js").exists();
-        if (exists) {
-            Log.print(TAG, "Found main.js");
-        }else {
-            Log.print(TAG, "No main.js");
-        }*/
+        Log.print(TAG, "模组加载器初始化完毕！");
     }
 
     /**
-     * 对外开放的方法：加载所有mod
+     * 加载所有mod
      * */
     public void loadAllMods () {
         FileHandle[] modDirs = this.getModDirs();
@@ -63,7 +59,7 @@ public class ModLoader {
     }
 
     /**
-     * 加载mod
+     * 加载指定目录里的mod
      * */
     private void loadMod(FileHandle modDir) {
         FileHandle infoFileHandle = Gdx.files.local(modDir.path() + "/info.json");
@@ -131,7 +127,7 @@ public class ModLoader {
      * */
     private void addModEventCaller () {
         EventBus eventBus = EventBus.getInstance();
-        eventBus.addEvent(EventBus.BulletShoot, new BulletShootEvent() {
+        eventBus.addEvent(EventBus.EventType.BulletShoot, new BulletShootEvent() {
             @Override
             public void call (Entity shooter, Bullet bullet) {
                 //Log.print(TAG, "射击者：" + shooter + " 射出子弹：" + bullet);
@@ -147,7 +143,7 @@ public class ModLoader {
                 }
             }
         });
-        eventBus.addEvent(EventBus.EntityAttacked, new EntityAttackedEvent() {
+        eventBus.addEvent(EventBus.EventType.EntityAttacked, new EntityAttackedEvent() {
             @Override
             public void call (Entity attackObject, Entity victim) {
                 HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
@@ -161,7 +157,7 @@ public class ModLoader {
                 }
             }
         });
-        eventBus.addEvent(EventBus.EntityDeath, new EntityDeathEvent() {
+        eventBus.addEvent(EventBus.EventType.EntityDeath, new EntityDeathEvent() {
             @Override
             public void call (Entity deadEntity) {
                 HashMap<String, Mod> mods = ModLoader.getInstance().getMods();

@@ -19,7 +19,7 @@ public class Registrant<T> {
     }
 
     public Registrant<T> register (String id, T clazz)  {
-        String fullName = getFullName(id);
+        String fullName = this.getFullName(id);
         if (r.containsKey(fullName)) {
             return null;
         }
@@ -28,7 +28,7 @@ public class Registrant<T> {
     }
 
     public T get(String id) {
-        String fullName = getFullName(id);
+        String fullName = this.getFullName(id);
         if (!r.containsKey(fullName)) {
             return null;
         }

@@ -307,7 +307,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
      * 调用实体受攻击的事件
      * */
     private void callEntityAttackedEvent (Entity attackedObject, Entity victim) {
-        EventGroup<EntityAttackedEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EntityAttacked);
+        EventGroup<EntityAttackedEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityAttacked);
         HashSet<EntityAttackedEvent> events = eventGroup.getEvents();
         for (EntityAttackedEvent event :events) {
             event.call(attackedObject, victim);

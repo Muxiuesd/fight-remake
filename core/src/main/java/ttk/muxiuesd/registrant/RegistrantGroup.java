@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Entity;
 
@@ -9,6 +10,7 @@ import java.util.HashMap;
  * 注册器组管理器，这个类管理着游戏内所有的注册器
  * */
 public class RegistrantGroup {
+    public static final String TAG = RegistrantGroup.class.getName();
     public static final int OTHER  = -1;
     public static final int ENTITY = 0;
     public static final int BLOCK  = 1;
@@ -23,14 +25,21 @@ public class RegistrantGroup {
     private static final HashMap<String, Registrant<? extends Entity>> entityRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Block>> blockRegistrants = new HashMap<>();
 
-    static {
+    /*static {
         res.put(Type.OTHER, testRegistrants);
         res.put(Type.ENTITY, entityRegistrants);
         res.put(Type.BLOCK, blockRegistrants);
+    }*/
+
+    public RegistrantGroup () {
+        res.put(Type.OTHER, testRegistrants);
+        res.put(Type.ENTITY, entityRegistrants);
+        res.put(Type.BLOCK, blockRegistrants);
+        Log.print(TAG, "注册器组管理器初始化完成！");
     }
 
     /**
-     * 获取注册器，没有则新建一个
+     * 获取指定命名空间的注册器，没有则新建一个
      * @param nameSpace 注册器的命名空间
      * @param clazzType 注册的类型
      * @return
@@ -82,6 +91,7 @@ public class RegistrantGroup {
     }
 
     public static void main(String[] args) {
+        new RegistrantGroup();
         Registrant<Test> registrant = RegistrantGroup.getRegistrant("fight", Test.class);
         registrant.register("Water", new TestObj1());
         registrant.register("Stone", new Test());

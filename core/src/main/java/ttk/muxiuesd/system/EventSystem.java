@@ -15,7 +15,8 @@ public class EventSystem extends WorldSystem {
 
     private void initAllEvents () {
         EventBus bus = EventBus.getInstance();
-        bus.addEvent(EventBus.EntityDeath, new EventSlimeDead(getWorld()));
+        //添加游戏内事件
+        bus.addEvent(EventBus.EventType.EntityDeath, new EventSlimeDead(getWorld()));
     }
 
     @Override

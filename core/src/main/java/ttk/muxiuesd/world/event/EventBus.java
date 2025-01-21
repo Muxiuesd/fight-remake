@@ -14,20 +14,21 @@ import java.util.HashMap;
 public class EventBus {
     public final String TAG = this.getClass().getName();
 
-    //事件组id
-    public static final int BulletShoot = 0;
-    public static final int EntityAttacked = 1;
-    public static final int EntityDeath = 2;
+    public enum EventType {
+        RegistryBlock, RegistryEntity,
+        BulletShoot, EntityAttacked, EntityDeath
+    }
 
     //单例模式，游戏里的唯一事件总线
     private static EventBus instance;
-    private final HashMap<Integer, EventGroup> eventGroups;
+    private final HashMap<EventType, EventGroup> eventGroups;
 
     private EventBus() {
         eventGroups = new HashMap<>();
-        eventGroups.put(BulletShoot, new EventGroup<BulletShootEvent>());
-        eventGroups.put(EntityAttacked, new EventGroup<EntityAttackedEvent>());
-        eventGroups.put(EntityDeath, new EventGroup<EntityDeathEvent>());
+        eventGroups.put(EventType.BulletShoot, new EventGroup<BulletShootEvent>());
+        eventGroups.put(EventType.EntityAttacked, new EventGroup<EntityAttackedEvent>());
+        eventGroups.put(EventType.EntityDeath, new EventGroup<EntityDeathEvent>());
+        Log.print(TAG, "事件总线初始化完成！");
     }
 
     public void initialize() {
@@ -35,13 +36,13 @@ public class EventBus {
 
     /**
      * 添加事件
-     * @param eventGroupId
+     * @param eventType
      * @param event
      * @return
      */
-    public <T extends Event> boolean addEvent (int eventGroupId, T event) {
-        if (eventGroups.containsKey(eventGroupId)) {
-            return eventGroups.get(eventGroupId).addEvent(event);
+    public <T extends Event> boolean addEvent (EventType eventType, T event) {
+        if (eventGroups.containsKey(eventType)) {
+            return eventGroups.get(eventType).addEvent(event);
         }
         return false;
     }
@@ -49,12 +50,16 @@ public class EventBus {
     /**
      * 获取事件组
      * */
-    public EventGroup getEventGroup (int eventGroupId) {
-        if (this.eventGroups.containsKey(eventGroupId)) {
-            return this.eventGroups.get(eventGroupId);
+    public EventGroup getEventGroup (EventType eventType) {
+        if (this.eventGroups.containsKey(eventType)) {
+            return this.eventGroups.get(eventType);
         }
-        Log.error(TAG, "eventGroupId：" + eventGroupId+ " 不存在！！！");
+        log("EventType：" + eventType.name() + " 不存在！！！");
         return null;
+    }
+
+    public void log (String msg) {
+        Log.print(TAG, msg);
     }
 
     public static EventBus getInstance () {
