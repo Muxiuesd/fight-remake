@@ -8,9 +8,9 @@ import java.util.HashMap;
  * */
 public class Registrant<T> {
     //命名空间
-    private String nameSpace;
-    private Class<T> clazzType;
-    private HashMap<String, T> r;
+    private final String nameSpace;
+    private final Class<T> clazzType;
+    private final HashMap<String, T> r;
 
     public Registrant(String nameSpace, Class<T> clazzType) {
         this.nameSpace = nameSpace;
@@ -18,7 +18,7 @@ public class Registrant<T> {
         this.r = new HashMap<>();
     }
 
-    public Registrant add(String id, T clazz)  {
+    public Registrant<T> register (String id, T clazz)  {
         String fullName = getFullName(id);
         if (r.containsKey(fullName)) {
             return null;
@@ -39,6 +39,9 @@ public class Registrant<T> {
         }
     }
 
+    /**
+     * @return 返回一个注册的元素的实例
+     * */
     private T newInstance (String fullName) throws Exception{
         T t = r.get(fullName);
         Class<?> aClass = Class.forName(t.getClass().getName());
@@ -50,6 +53,6 @@ public class Registrant<T> {
     }
 
     public Class<T> getClazzType() {
-        return clazzType;
+        return this.clazzType;
     }
 }

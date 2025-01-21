@@ -1,29 +1,32 @@
 package ttk.muxiuesd.registrant;
 
-import com.badlogic.gdx.physics.bullet.collision._btMprSimplex_t;
 import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Entity;
-import ttk.muxiuesd.world.entity.enemy.Slime;
 
 import java.util.HashMap;
-import java.util.Objects;
 
-
+/**
+ * 注册器组管理器，这个类管理着游戏内所有的注册器
+ * */
 public class RegistrantGroup {
     public static final int OTHER  = -1;
     public static final int ENTITY = 0;
     public static final int BLOCK  = 1;
 
-    private static HashMap<Integer, HashMap> res = new HashMap<>();
+    enum Type {
+        OTHER, ENTITY, BLOCK
+    }
 
-    private static HashMap<String, Registrant<? extends Test>> testRegistrants = new HashMap();
-    private static HashMap<String, Registrant<? extends Entity>> entityRegistrants = new HashMap();
-    private static HashMap<String, Registrant<? extends Block>> blockRegistrants = new HashMap();
+    private static final HashMap<Type, HashMap> res = new HashMap<>();
+
+    private static final HashMap<String, Registrant<? extends Test>> testRegistrants = new HashMap<>();
+    private static final HashMap<String, Registrant<? extends Entity>> entityRegistrants = new HashMap<>();
+    private static final HashMap<String, Registrant<? extends Block>> blockRegistrants = new HashMap<>();
 
     static {
-        res.put(OTHER, testRegistrants);
-        res.put(ENTITY, entityRegistrants);
-        res.put(BLOCK, blockRegistrants);
+        res.put(Type.OTHER, testRegistrants);
+        res.put(Type.ENTITY, entityRegistrants);
+        res.put(Type.BLOCK, blockRegistrants);
     }
 
     /**
@@ -33,36 +36,36 @@ public class RegistrantGroup {
      * @return
      * @param <C>
      */
-    public static <C> Registrant getRegistrant (String nameSpace, Class<C> clazzType) {
-        int type = getRegistrantType(clazzType);
+    public static <C> Registrant<C> getRegistrant (String nameSpace, Class<C> clazzType) {
+        Type type = getRegistrantType(clazzType);
 
         HashMap map = res.get(type);
         if (map.get(nameSpace) == null) {
             newRegistrant(nameSpace, clazzType);
         }
-        return (Registrant) map.get(nameSpace);
+        return (Registrant<C>) map.get(nameSpace);
     }
 
     /**
      * 获取注册器的类型
      * */
-    private static <C> int getRegistrantType (Class<C> clazzType) {
+    private static <C> Type getRegistrantType (Class<C> clazzType) {
         if (clazzType.isAssignableFrom(Entity.class)) {
-            return ENTITY;
+            return Type.ENTITY;
         }
         if (clazzType.isAssignableFrom(Block.class)) {
-            return BLOCK;
+            return Type.BLOCK;
         }
         if (clazzType.isAssignableFrom(Test.class)) {
-            return OTHER;
+            return Type.OTHER;
         }
 
-        return OTHER;
+        return Type.OTHER;
     }
 
     private static <C> void newRegistrant(String nameSpace, Class<C> clazzType) {
         Registrant registrant = null;
-        int type = getRegistrantType(clazzType);
+        Type type = getRegistrantType(clazzType);
         if (clazzType.isAssignableFrom(Entity.class)) {
             registrant = new Registrant<>(nameSpace, clazzType);
         }
@@ -79,14 +82,14 @@ public class RegistrantGroup {
     }
 
     public static void main(String[] args) {
-        Registrant registrant = RegistrantGroup.getRegistrant("fight", Test.class);
-        registrant.add("Water", new Test());
-        registrant.add("Stone", new Test());
-        Test water1 = (Test) registrant.get("Water");
-        water1.id = "1";
-        Test water2 = (Test) registrant.get("Water");
-        water2.id = "2";
-        System.out.println(water1);
-        System.out.println(water2);
+        Registrant<Test> registrant = RegistrantGroup.getRegistrant("fight", Test.class);
+        registrant.register("Water", new TestObj1());
+        registrant.register("Stone", new Test());
+        TestObj1 water = (TestObj1) registrant.get("Water");
+        water.id = "1";
+        Test stone = (Test) registrant.get("Stone");
+        stone.id = "2";
+        System.out.println(water.id + " " + water.name);
+        System.out.println(stone + stone.id);
     }
 }
