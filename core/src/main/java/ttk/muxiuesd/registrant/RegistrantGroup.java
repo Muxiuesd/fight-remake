@@ -3,6 +3,7 @@ package ttk.muxiuesd.registrant;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
 
@@ -16,14 +17,15 @@ public class RegistrantGroup {
     public static final int BLOCK  = 1;
 
     enum Type {
-        OTHER, ENTITY, BLOCK
+        OTHER, ENTITY, BLOCK, WALL
     }
-
+    //总和
     private static final HashMap<Type, HashMap> res = new HashMap<>();
 
     private static final HashMap<String, Registrant<? extends Test>> testRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Entity>> entityRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Block>> blockRegistrants = new HashMap<>();
+    private static final HashMap<String, Registrant<? extends Wall>> wallRegistrants = new HashMap<>();
 
     /*static {
         res.put(Type.OTHER, testRegistrants);
@@ -35,6 +37,7 @@ public class RegistrantGroup {
         res.put(Type.OTHER, testRegistrants);
         res.put(Type.ENTITY, entityRegistrants);
         res.put(Type.BLOCK, blockRegistrants);
+        res.put(Type.WALL, wallRegistrants);
         Log.print(TAG, "注册器组管理器初始化完成！");
     }
 
@@ -65,6 +68,9 @@ public class RegistrantGroup {
         if (clazzType.isAssignableFrom(Block.class)) {
             return Type.BLOCK;
         }
+        if (clazzType.isAssignableFrom(Wall.class)) {
+            return Type.WALL;
+        }
         if (clazzType.isAssignableFrom(Test.class)) {
             return Type.OTHER;
         }
@@ -72,22 +78,28 @@ public class RegistrantGroup {
         return Type.OTHER;
     }
 
-    private static <C> void newRegistrant(String nameSpace, Class<C> clazzType) {
+    /**
+     * 新建一个注册器
+     * */
+    private static <C> void newRegistrant(String namespace, Class<C> clazzType) {
         Registrant registrant = null;
         Type type = getRegistrantType(clazzType);
         if (clazzType.isAssignableFrom(Entity.class)) {
-            registrant = new Registrant<>(nameSpace, clazzType);
+            registrant = new Registrant<>(namespace, clazzType);
         }
         if (clazzType.isAssignableFrom(Block.class)) {
-            registrant = new Registrant<>(nameSpace, clazzType);
+            registrant = new Registrant<>(namespace, clazzType);
+        }
+        if (clazzType.isAssignableFrom(Wall.class)) {
+            registrant = new Registrant<>(namespace, clazzType);
         }
         if (clazzType.isAssignableFrom(Test.class)) {
-            registrant = new Registrant<>(nameSpace, clazzType);
+            registrant = new Registrant<>(namespace, clazzType);
         }
         //先获取种类
         HashMap registrants = res.get(type);
-        //再添加进去
-        registrants.put(nameSpace, registrant);
+        //再把对应命名空间的注册器添加进去
+        registrants.put(namespace, registrant);
     }
 
     public static void main(String[] args) {

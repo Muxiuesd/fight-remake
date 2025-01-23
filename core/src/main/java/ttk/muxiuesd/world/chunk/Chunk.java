@@ -19,7 +19,7 @@ import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.block.Blocks;
 import ttk.muxiuesd.world.block.instance.*;
 import ttk.muxiuesd.world.wall.Wall;
-import ttk.muxiuesd.world.wall.WallTest;
+import ttk.muxiuesd.world.wall.Walls;
 
 
 /**
@@ -84,6 +84,9 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
         });
     }
 
+    /**
+     * TODO 更好的墙体生成算法、自由放置和移除墙体
+     * */
     public void initWall () {
         this.traversal((x, y) -> {
             //水上不生成墙体
@@ -92,9 +95,9 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
             }
             int random = MathUtils.random(0, 10);
             if (random < 1) {
-                WallTest wallTest = new WallTest();
-                wallTest.setPosition(this.getWorldX(x), this.getWorldY(y));
-                walls[y][x] = wallTest;
+                Wall wall = Walls.newWall("wall_smooth_stone");
+                wall.setPosition(this.getWorldX(x), this.getWorldY(y));
+                walls[y][x] = wall;
             }
         });
     }

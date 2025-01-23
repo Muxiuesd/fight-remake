@@ -13,6 +13,7 @@ import ttk.muxiuesd.world.event.EventBus;
 public class FightGameMain extends Game {
     @Override
     public void create() {
+        //先行加载
         EventBus eventBus = EventBus.getInstance();
         RegistrantGroup registrantGroup = new RegistrantGroup();
         ModLoader.getInstance().loadAllMods();
