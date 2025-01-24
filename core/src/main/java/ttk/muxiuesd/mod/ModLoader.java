@@ -27,7 +27,7 @@ public class ModLoader {
     //这个必须是单例模式
     private static ModLoader Instance;
 
-    private final String root = "../mods/";
+    private final String root = "mods/";
     private String lib;
     private HashMap<String, Mod> mods = new HashMap<>();
 
@@ -37,8 +37,9 @@ public class ModLoader {
             //新建mods文件夹
             this.getRootFile().mkdirs();
             Log.print(TAG, "创建mods文件夹");
+        }else {
+            Log.print(TAG, "mods文件夹已经存在：" + this.getRootFile().path() + "，跳过创建");
         }
-
         //加载底层库
         FileHandle libFile = Gdx.files.internal("modlib/lib.js");
         this.lib = libFile.readString();
@@ -179,7 +180,7 @@ public class ModLoader {
      * 获取所有的mod的文件根目录
      * */
     public FileHandle[] getModDirs() {
-        return Gdx.files.local(root).list();
+        return this.getRootFile().list();
     }
 
     /**
@@ -208,6 +209,6 @@ public class ModLoader {
     }
 
     public FileHandle getRootFile () {
-        return Gdx.files.local(this.getRoot());
+        return Gdx.files.absolute(this.getRoot());
     }
 }
