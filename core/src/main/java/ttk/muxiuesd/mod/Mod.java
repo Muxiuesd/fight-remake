@@ -30,7 +30,8 @@ public class Mod implements Runnable{
 
     @Override
     public void run() {
-        FileHandle mainFile = Gdx.files.local(this.modPath + info.getString("main"));
+        FileHandle mainFile = Gdx.files.absolute(this.modPath + "main.js");
+
         String code = mainFile.readString();
         //Log.print(TAG, code);
 

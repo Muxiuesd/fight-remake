@@ -32,7 +32,7 @@ public class ModLoader {
     private HashMap<String, Mod> mods = new HashMap<>();
 
     private ModLoader() {
-
+        Log.print(TAG, this.getRootFile().toString());
         if (!this.getRootFile().exists()) {
             //新建mods文件夹
             this.getRootFile().mkdirs();
@@ -65,7 +65,7 @@ public class ModLoader {
      * 加载指定目录里的mod
      * */
     private void loadMod(FileHandle modDir) {
-        FileHandle infoFileHandle = Gdx.files.local(modDir.path() + "/info.json");
+        FileHandle infoFileHandle = modDir.child("info.json");
         String infoString = infoFileHandle.readString();
         if (infoString == null) {
             //TODO
@@ -209,6 +209,7 @@ public class ModLoader {
     }
 
     public FileHandle getRootFile () {
-        return Gdx.files.absolute(this.getRoot());
+        String storagePath = Gdx.files.getLocalStoragePath();
+        return Gdx.files.absolute(storagePath + this.getRoot());
     }
 }
