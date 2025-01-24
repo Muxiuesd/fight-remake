@@ -25,7 +25,6 @@ public class Blocks {
 
     private static void register (String id, Block block) {
         registrant.register(id, block);
-        return;
     }
 
     public static Block newBlock (String id) {
