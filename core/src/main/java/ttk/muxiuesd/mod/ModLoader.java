@@ -33,15 +33,17 @@ public class ModLoader {
 
     private ModLoader() {
 
-        if (!Gdx.files.local(root).exists()) {
+        if (!this.getRootFile().exists()) {
             //新建mods文件夹
-            Gdx.files.local(root).mkdirs();
+            this.getRootFile().mkdirs();
+            Log.print(TAG, "创建mods文件夹");
         }
 
         //加载底层库
-        FileHandle libFile = Gdx.files.internal("lib/lib.js");
+        FileHandle libFile = Gdx.files.internal("modlib/lib.js");
         this.lib = libFile.readString();
         Log.print(TAG, "模组底层库加载完毕。");
+
         Log.print(TAG, "模组加载器初始化完毕！");
     }
 
@@ -203,5 +205,9 @@ public class ModLoader {
 
     public String getRoot() {
         return this.root;
+    }
+
+    public FileHandle getRootFile () {
+        return Gdx.files.local(this.getRoot());
     }
 }
