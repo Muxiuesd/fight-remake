@@ -96,6 +96,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     /**
      * 子弹与墙体碰撞
+     * TODO 修复子弹与未加载的区块检测碰撞的bug
      * */
     private void bulletAndWallCollision(Bullet bullet, EntitySystem es, PlayerSystem ps, ChunkSystem cs) {
         //墙体与子弹

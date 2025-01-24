@@ -263,11 +263,18 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     public void renderShape(ShapeRenderer batch) {
         //绘制区块边界
         if (this.chunkSystem.chunkEdgeRender) {
+            batch.setColor(Color.PURPLE);
+            for (int i = 0; i < chunkZone.length; i++) {
+                Rectangle zone = chunkZone[i];
+                batch.rect(zone.x, zone.y, zone.width, zone.height);
+            }
             batch.setColor(new Color(255, 0, 0, 255));
             batch.rect(
                 this.chunkPosition.x * ChunkWidth,
                 this.chunkPosition.y * ChunkHeight,
                 ChunkWidth, ChunkHeight);
+            //还原颜色
+            batch.setColor(Color.WHITE);
         }
         //绘制墙体的碰撞箱范围
         if (this.chunkSystem.wallHitboxRender) {
@@ -280,9 +287,10 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
                     wall.renderShape(batch);
                 }
             }));
+            //还原颜色
+            batch.setColor(Color.WHITE);
         }
-        //还原颜色
-        batch.setColor(Color.WHITE);
+
     }
 
     /**
@@ -343,7 +351,10 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
      */
     private void updateChunkZone () {
         this.chunkZone = new Rectangle[9];
-        chunkZone[LeftDown] = new Rectangle(chunkPosition.getX(), chunkPosition.getY(), 5f, 5f);
+        chunkZone[LeftDown] = new Rectangle(
+            chunkPosition.getX() * ChunkWidth,
+            chunkPosition.getY() * ChunkHeight,
+            5f, 5f);
         chunkZone[Down] = new Rectangle(
             chunkZone[LeftDown].getX() + chunkZone[LeftDown].getWidth(),
             chunkZone[LeftDown].getY(),
