@@ -44,7 +44,7 @@ public class HandleInputSystem extends WorldSystem {
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
         player.curSpeed = player.speed * block.getProperty().getFriction();
         //更新鼠标指向的世界坐标
-        this.mouseBlockPosition = getMouseBlockPosition(cs);
+        this.mouseBlockPosition = this.getMouseBlockPosition();
 
         //Log.print(TAG, "鼠标指向世界的方块坐标: (" + this.mouseBlockPosition.getX() + ", " + this.mouseBlockPosition.getY() + ")");
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -102,11 +102,21 @@ public class HandleInputSystem extends WorldSystem {
         return bp;
     }
 
-    public BlockPosition getMouseBlockPosition(ChunkSystem cs) {
+    /**
+     * 获取鼠标指向的方块坐标
+     * */
+    public BlockPosition getMouseBlockPosition() {
+        Vector2 wp = this.getMouseWorldPosition();
+        return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
+    }
+
+    /**
+     * 获取鼠标指向的世界坐标
+     * */
+    public Vector2 getMouseWorldPosition() {
         OrthographicCamera camera = cameraController.camera;
         Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 unproject = camera.unproject(mp);
-        Vector2 wp = new Vector2(unproject.x, unproject.y);
-        return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
+        Vector3 up = camera.unproject(mp);
+        return new Vector2(up.x, up.y);
     }
 }
