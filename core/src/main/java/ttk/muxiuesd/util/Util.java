@@ -2,7 +2,7 @@ package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.world.entity.*;
+import ttk.muxiuesd.world.entity.Entity;
 
 /**
  * 项目的工具类
@@ -84,7 +84,6 @@ public class Util {
 
     /**
      * 取整工具
-     * 如负值-1.2向下取整为-2，正值则四舍五入
      * */
     public static float fastRound (float value) {
         if (value < 0) {
