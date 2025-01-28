@@ -17,12 +17,15 @@ var Log = {
         logger.error(this.tag, msg);
     }
 }
-
+var Keys = Java.type("com.badlogic.gdx.Input.Keys");
+var Buttons = Java.type("com.badlogic.gdx.Input.Buttons");
 var World = {
     eventGroups: {
         bulletShoot: [],
         entityAttacked: [],
-        entityDead: []
+        entityDead: [],
+        keyInput: [],
+        buttonInput: []
     },
     event: {
         add: function (eventName, callback) {
@@ -37,6 +40,12 @@ var World = {
             if (eventName === "entityDead") {
                 World.eventGroups.entityDead.push(callback);
                 System.log("向entityDead添加事件");
+            }
+            if (eventName === "keyInput") {
+                World.eventGroups.keyInput.push(callback);
+            }
+            if (eventName === "buttonInput") {
+                World.eventGroups.buttonInput.push(callback);
             }
         }
     }
@@ -55,6 +64,16 @@ var callEntityAttackedEvent = function (attackObject, victim) {
 var callEntityDeadEvent = function (deadEntity) {
     for (var i = 0; i < World.eventGroups.entityDead.length; i++) {
         World.eventGroups.entityDead[i](deadEntity);
+    }
+}
+var callWorldKeyInputEvent = function (key) {
+    for (var i = 0; i < World.eventGroups.keyInput.length; i++) {
+        World.eventGroups.keyInput[i](key);
+    }
+}
+var callWorldButtonInput = function (button) {
+    for (var i = 0; i < World.eventGroups.buttonInput.length; i++) {
+        World.eventGroups.buttonInput[i](button);
     }
 }
 //到这里为止

@@ -8,9 +8,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.abs.BulletShootEvent;
-import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
-import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
+import ttk.muxiuesd.world.event.abs.*;
 
 import javax.script.Invocable;
 import javax.script.ScriptException;
@@ -168,6 +166,34 @@ public class ModLoader {
                     Invocable invocable = (Invocable) mod.getEngine();
                     try {
                         invocable.invokeFunction("callEntityDeadEvent", deadEntity);
+                    } catch (ScriptException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        eventBus.addEvent(EventBus.EventType.KeyInput, new KeyInputEvent() {
+            @Override
+            public void call (int key) {
+                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                for (Mod mod : mods.values()) {
+                    Invocable invocable = (Invocable) mod.getEngine();
+                    try {
+                        invocable.invokeFunction("callWorldKeyInputEvent", key);
+                    } catch (ScriptException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        eventBus.addEvent(EventBus.EventType.ButtonInput, new ButtonInputEvent() {
+            @Override
+            public void call (int button) {
+                HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
+                for (Mod mod : mods.values()) {
+                    Invocable invocable = (Invocable) mod.getEngine();
+                    try {
+                        invocable.invokeFunction("callWorldButtonInput", button);
                     } catch (ScriptException | NoSuchMethodException e) {
                         throw new RuntimeException(e);
                     }

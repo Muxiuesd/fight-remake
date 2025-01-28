@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -18,11 +19,16 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.event.EventGroup;
+import ttk.muxiuesd.world.event.abs.KeyInputEvent;
+
+import java.util.HashSet;
 
 /**
  * 输入处理系统
  * */
-public class HandleInputSystem extends WorldSystem {
+public class HandleInputSystem extends WorldSystem implements InputProcessor {
     public final String TAG = this.getClass().getName();
 
     private PlayerSystem playerSystem;
@@ -36,6 +42,8 @@ public class HandleInputSystem extends WorldSystem {
         //EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         playerSystem = ps;
+
+        Gdx.input.setInputProcessor(this);
     }
 
     @Override
@@ -67,7 +75,12 @@ public class HandleInputSystem extends WorldSystem {
 
             Log.print(TAG, "玩家所在区块坐标：" + pcp.getX() + "," + pcp.getY());
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
-            Log.print(TAG, " 方块为：" + block.getClass().getName());
+            Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
+        }
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            Vector2 mouseWorldPosition = this.getMouseWorldPosition();
+            Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+            Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
         }
     }
 
@@ -84,6 +97,58 @@ public class HandleInputSystem extends WorldSystem {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public boolean keyDown (int keycode) {
+
+        return false;
+    }
+
+    @Override
+    public boolean keyUp (int keycode) {
+        //System.out.println("keyUp");
+        EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
+        HashSet<KeyInputEvent> events = group.getEvents();
+        for (KeyInputEvent event : events) {
+            event.call(keycode);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped (char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged (int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled (float amountX, float amountY) {
+        return false;
     }
 
     /**
@@ -131,4 +196,6 @@ public class HandleInputSystem extends WorldSystem {
             //batch.set(ShapeRenderer.ShapeType.Line);
         }
     }
+
+
 }

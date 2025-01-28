@@ -2,9 +2,7 @@ package ttk.muxiuesd.world.event;
 
 import ttk.muxiuesd.interfaces.Event;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.world.event.abs.BulletShootEvent;
-import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
-import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
+import ttk.muxiuesd.world.event.abs.*;
 
 import java.util.HashMap;
 
@@ -15,8 +13,9 @@ public class EventBus {
     public final String TAG = this.getClass().getName();
 
     public enum EventType {
-        RegistryBlock, RegistryEntity,
-        BulletShoot, EntityAttacked, EntityDeath
+        RegistryBlock, RegistryWall,RegistryEntity,
+        BulletShoot, EntityAttacked, EntityDeath,
+        KeyInput, ButtonInput
     }
 
     //单例模式，游戏里的唯一事件总线
@@ -28,6 +27,8 @@ public class EventBus {
         eventGroups.put(EventType.BulletShoot, new EventGroup<BulletShootEvent>());
         eventGroups.put(EventType.EntityAttacked, new EventGroup<EntityAttackedEvent>());
         eventGroups.put(EventType.EntityDeath, new EventGroup<EntityDeathEvent>());
+        eventGroups.put(EventType.KeyInput, new EventGroup<KeyInputEvent>());
+        eventGroups.put(EventType.ButtonInput, new EventGroup<ButtonInputEvent>());
         Log.print(TAG, "事件总线初始化完成！");
     }
 
