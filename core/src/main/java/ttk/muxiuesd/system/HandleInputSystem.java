@@ -19,6 +19,9 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Player;
 
+/**
+ * 输入处理系统
+ * */
 public class HandleInputSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
@@ -30,7 +33,7 @@ public class HandleInputSystem extends WorldSystem {
         super(world);
         MainGameScreen screen = getWorld().getScreen();
         this.cameraController = screen.cameraController;
-        EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
+        //EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         playerSystem = ps;
     }
@@ -75,15 +78,7 @@ public class HandleInputSystem extends WorldSystem {
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        if (this.mouseBlockPosition != null) {
-            batch.setColor(Color.BLACK);
-            batch.rect(
-                this.mouseBlockPosition.getX(),
-                this.mouseBlockPosition.getY(),
-                1f,
-                1f);
-            batch.setColor(Color.WHITE);
-        }
+        this.renderBlockCheckBox(batch);
     }
 
     @Override
@@ -118,5 +113,22 @@ public class HandleInputSystem extends WorldSystem {
         Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
         Vector3 up = camera.unproject(mp);
         return new Vector2(up.x, up.y);
+    }
+
+    /**
+     * 绘制方块选中框
+     */
+    private void renderBlockCheckBox (ShapeRenderer batch) {
+        if (this.mouseBlockPosition != null) {
+            batch.setColor(Color.BLACK);
+            //batch.set(ShapeRenderer.ShapeType.Filled);
+            batch.rect(
+                this.mouseBlockPosition.getX() + 0.1f,
+                this.mouseBlockPosition.getY() + 0.1f,
+                0.8f,
+                0.8f);
+            batch.setColor(Color.WHITE);
+            //batch.set(ShapeRenderer.ShapeType.Line);
+        }
     }
 }
