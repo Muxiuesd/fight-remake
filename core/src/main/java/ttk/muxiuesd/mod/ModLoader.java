@@ -188,12 +188,12 @@ public class ModLoader {
         });
         eventBus.addEvent(EventBus.EventType.ButtonInput, new ButtonInputEvent() {
             @Override
-            public void call (int button) {
+            public void call (int screenX, int screenY, int pointer, int button) {
                 HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
                 for (Mod mod : mods.values()) {
                     Invocable invocable = (Invocable) mod.getEngine();
                     try {
-                        invocable.invokeFunction("callWorldButtonInput", button);
+                        invocable.invokeFunction("callWorldButtonInput", screenX, screenY, pointer, button);
                     } catch (ScriptException | NoSuchMethodException e) {
                         throw new RuntimeException(e);
                     }

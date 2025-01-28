@@ -21,6 +21,7 @@ import ttk.muxiuesd.world.block.Block;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.EventGroup;
+import ttk.muxiuesd.world.event.abs.ButtonInputEvent;
 import ttk.muxiuesd.world.event.abs.KeyInputEvent;
 
 import java.util.HashSet;
@@ -128,6 +129,11 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        EventGroup<ButtonInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.ButtonInput);
+        HashSet<ButtonInputEvent> events = group.getEvents();
+        for (ButtonInputEvent event : events) {
+            event.call(screenX, screenY, pointer, button);
+        }
         return false;
     }
 

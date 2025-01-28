@@ -71,9 +71,10 @@ var callWorldKeyInputEvent = function (key) {
         World.eventGroups.keyInput[i](key);
     }
 }
-var callWorldButtonInput = function (button) {
+var callWorldButtonInput = function (screenX, screenY, pointer, button) {
+    //屏幕坐标系原点在游戏窗口左上角，y轴向下
     for (var i = 0; i < World.eventGroups.buttonInput.length; i++) {
-        World.eventGroups.buttonInput[i](button);
+        World.eventGroups.buttonInput[i](screenX, screenY, pointer, button);
     }
 }
 //到这里为止
