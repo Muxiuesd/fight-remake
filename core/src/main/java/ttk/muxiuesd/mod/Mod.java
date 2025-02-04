@@ -5,10 +5,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.util.Log;
 
-import javax.script.Invocable;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
 /**
  * 一个mod
  * */
@@ -20,12 +21,14 @@ public class Mod implements Runnable{
     private FileHandle modDir;
     private String modPath;
 
+    private ScriptContext libContext;
     private ScriptEngine engine;
 
-    public Mod (JsonValue info, FileHandle modDir) {
+    public Mod (JsonValue info, FileHandle modDir, ScriptContext libContext) {
         this.info = info;
         this.modDir = modDir;
         this.modPath = modDir.path() + "/";
+        this.libContext = libContext;
     }
 
     @Override
@@ -37,9 +40,9 @@ public class Mod implements Runnable{
 
         this.engine = new ScriptEngineManager().getEngineByName("nashorn");
         try {
-            this.engine.eval(ModLoader.getInstance().getLib() + code);
-            Invocable invocable = (Invocable) this.engine;
-
+            //this.engine.eval(ModLoader.getInstance().getLibCode() + code);
+            this.engine.eval(code, this.libContext);
+            //Invocable invocable = (Invocable) this.engine;
             this.running = true;
         } catch (ScriptException e) {
             this.running = false;

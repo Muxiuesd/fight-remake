@@ -12,11 +12,14 @@ public class ModContainer {
     public final String TAG = this.getClass().getName();
 
     private static ModContainer singleton;
-    private HashMap<String, Mod> container = new HashMap<>();
+    private final HashMap<String, Mod> container = new HashMap<>();
 
     private ModContainer() {
     }
 
+    /**
+     * 单例模式
+     * */
     public static ModContainer getInstance() {
         if (singleton == null) {
             singleton = new ModContainer();

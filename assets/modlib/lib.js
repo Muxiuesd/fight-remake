@@ -1,3 +1,8 @@
+var IntArray = Java.type("int[]");
+var FloatArray = Java.type("float[]");
+
+var HashMap = Java.type("java.util.HashMap");
+
 var system = Java.type("java.lang.System")
 var System = {
     log: function (msg) {
