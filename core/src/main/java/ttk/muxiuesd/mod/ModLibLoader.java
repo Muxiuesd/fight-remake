@@ -25,7 +25,7 @@ public class ModLibLoader {
             Log.error(TAG, "无法加载：" + path + " ！！！");
             return;
         }
-        if (code == null || code.isEmpty()) {
+        if (code == null || code.isBlank()) {
             Log.error(TAG, path + "的内容为空！！！");
             return;
         }

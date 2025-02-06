@@ -1,4 +1,4 @@
-
+var TAG = "Muxiuesd的mod";
 World.event.add("bulletShoot", function (shooter, bullet) {
     var group = getGroup(shooter);
     //Log.print(group + "射出子弹！");
@@ -9,7 +9,7 @@ World.event.add("entityDead", function (deadEntity) {
 });
 World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
     if (button === Buttons.RIGHT) {
-        Log.print("Button is: 右键");
+        Log.print(TAG, "Button is: 右键");
     }
-    Log.print("Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
+    Log.print(TAG, "Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
 });

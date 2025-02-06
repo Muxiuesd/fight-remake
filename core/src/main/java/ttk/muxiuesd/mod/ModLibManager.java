@@ -22,7 +22,9 @@ public class ModLibManager {
 
     private ModLibManager () {
         this.libEngine = EngineFactory.createEngine();
+
         this.getLibEngine().put("ModLibLoader", new ModLibLoader());
+
         Log.print(TAG, "ModLibManager 初始化完成");
     }
 
