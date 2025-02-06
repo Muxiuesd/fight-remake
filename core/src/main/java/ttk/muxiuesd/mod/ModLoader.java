@@ -12,7 +12,6 @@ import ttk.muxiuesd.world.event.abs.*;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.Objects;
@@ -20,36 +19,24 @@ import java.util.Objects;
 
 /**
  * 模组加载器
+ * <p>
+ * 全局可调用
+ * <p>
+ * TODO mod的热加载
  * */
 public class ModLoader {
     public final String TAG = this.getClass().getName();
 
     //这个必须是单例模式
     private static ModLoader Instance;
+
     //mod根目录
     private final String root = "mods/";
-    private String libCode;
-    private ScriptEngine libEngine;
 
     private ModLoader() {
         this.checkRoot();
-        this.loadLib();
+        ModLibManager.getInstance().loadLib();
         Log.print(TAG, "模组加载器初始化完毕！");
-    }
-
-    /**
-     * 加载mod的底层库
-    * */
-    private void loadLib (){
-        FileHandle libFile = Gdx.files.internal("modlib/lib.js");
-        this.libCode = libFile.readString();
-        this.libEngine = new ScriptEngineManager().getEngineByName("nashorn");
-        try {
-            this.libEngine.eval(this.getLibCode());
-        } catch (ScriptException e) {
-            throw new RuntimeException(e);
-        }
-        Log.print(TAG, "模组底层库加载完毕。");
     }
 
     /**
@@ -92,7 +79,7 @@ public class ModLoader {
                 Log.print(TAG, "Mod的命名空间：" + namespace + "已经存在，不可重复添加！！！");
                 return;
             }*/
-            Mod mod = new Mod(info, modDir, this.libEngine.getContext());
+            Mod mod = new Mod(info, modDir, ModLibManager.getInstance().getLibEngine().getContext());
             ModContainer.getInstance().add(namespace, mod);
             //this.mods.put(info.get("namespace").asString(), mod);
 
@@ -120,7 +107,9 @@ public class ModLoader {
 
     /**
      * 检查是否有重复的mod
+     * <p>
      * namespace不可重复！
+     * <p>
      * TODO 更加仔细的检查
      * */
     private boolean hasMod (JsonValue modInfo) {
@@ -141,11 +130,12 @@ public class ModLoader {
      * */
     private void addModEventCaller () {
         EventBus eventBus = EventBus.getInstance();
+        ScriptEngine libEngine = ModLibManager.getInstance().getLibEngine();
         eventBus.addEvent(EventBus.EventType.BulletShoot, new BulletShootEvent() {
             @Override
             public void call (Entity shooter, Bullet bullet) {
                 //Log.print(TAG, "射击者：" + shooter + " 射出子弹：" + bullet);
-                Invocable invocable = (Invocable) getLibEngine();
+                Invocable invocable = (Invocable) libEngine;
                 try {
                     invocable.invokeFunction("callBulletShootEvent", shooter, bullet);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -156,7 +146,7 @@ public class ModLoader {
         eventBus.addEvent(EventBus.EventType.EntityAttacked, new EntityAttackedEvent() {
             @Override
             public void call (Entity attackObject, Entity victim) {
-                Invocable invocable = (Invocable) getLibEngine();
+                Invocable invocable = (Invocable) libEngine;
                 try {
                     invocable.invokeFunction("callEntityAttackedEvent",  attackObject, victim);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -167,7 +157,7 @@ public class ModLoader {
         eventBus.addEvent(EventBus.EventType.EntityDeath, new EntityDeathEvent() {
             @Override
             public void call (Entity deadEntity) {
-                Invocable invocable = (Invocable) getLibEngine();
+                Invocable invocable = (Invocable) libEngine;
                 try {
                     invocable.invokeFunction("callEntityDeadEvent", deadEntity);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -178,7 +168,7 @@ public class ModLoader {
         eventBus.addEvent(EventBus.EventType.KeyInput, new KeyInputEvent() {
             @Override
             public void call (int key) {
-                Invocable invocable = (Invocable) getLibEngine();
+                Invocable invocable = (Invocable) libEngine;
                 try {
                     invocable.invokeFunction("callWorldKeyInputEvent", key);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -189,7 +179,7 @@ public class ModLoader {
         eventBus.addEvent(EventBus.EventType.ButtonInput, new ButtonInputEvent() {
             @Override
             public void call (int screenX, int screenY, int pointer, int button) {
-                Invocable invocable = (Invocable) getLibEngine();
+                Invocable invocable = (Invocable) libEngine;
                 try {
                     invocable.invokeFunction("callWorldButtonInput", screenX, screenY, pointer, button);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -197,13 +187,6 @@ public class ModLoader {
                 }
             }
         });
-    }
-
-    /**
-     * 获取所有的mod的文件根目录
-     * */
-    public FileHandle[] getModDirs() {
-        return this.getRootFile().list();
     }
 
     /**
@@ -216,19 +199,15 @@ public class ModLoader {
         return Instance;
     }
 
+    /**
+     * 获取所有的mod的文件根目录
+     * */
+    public FileHandle[] getModDirs() {
+        return this.getRootFile().list();
+    }
+
     public HashMap<String, Mod> getMods () {
         return ModContainer.getInstance().getAllMods();
-    }
-
-    /**
-     * 获取底层库的代码
-     * */
-    public String getLibCode () {
-        return this.libCode;
-    }
-
-    public ScriptEngine getLibEngine () {
-        return this.libEngine;
     }
 
     public String getRoot() {

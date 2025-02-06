@@ -27,6 +27,9 @@ public class ModContainer {
         return singleton;
     }
 
+    /**
+     * 添加mod
+     * */
     public void add(String namespace, Mod mod) {
         if (this.hasMod(namespace)) {
             Log.error(TAG, "Mod的命名空间：" + namespace + "已经存在，不可重复添加！！！");
@@ -35,6 +38,9 @@ public class ModContainer {
         this.container.put(namespace, mod);
     }
 
+    /**
+     * 移除mod
+     * */
     public Mod remove(String namespace) {
         if (this.hasMod(namespace)) {
             return this.container.remove(namespace);
