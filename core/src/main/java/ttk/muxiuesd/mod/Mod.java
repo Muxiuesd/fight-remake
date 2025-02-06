@@ -7,7 +7,6 @@ import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 /**
@@ -38,7 +37,7 @@ public class Mod implements Runnable{
         String code = mainFile.readString();
         //Log.print(TAG, code);
 
-        this.engine = new ScriptEngineManager().getEngineByName("nashorn");
+        this.engine = EngineFactory.createEngine();
         try {
             //this.engine.eval(ModLoader.getInstance().getLibCode() + code);
             this.engine.eval(code, this.libContext);

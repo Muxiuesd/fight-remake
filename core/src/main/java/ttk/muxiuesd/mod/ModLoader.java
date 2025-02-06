@@ -35,7 +35,7 @@ public class ModLoader {
 
     private ModLoader() {
         this.checkRoot();
-        ModLibManager.getInstance().loadLib();
+        ModLibManager.getInstance().loadAllLib();
         Log.print(TAG, "模组加载器初始化完毕！");
     }
 

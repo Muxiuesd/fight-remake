@@ -5,13 +5,12 @@ import com.badlogic.gdx.files.FileHandle;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 /**
  * mod底层库的加载、管理
  * <p>
- * 应该仅限{@link ModLoader}使用
+ * 应该仅限{@link ModLoader}、{@link ModLibLoader}使用
  * */
 public class ModLibManager {
     public final String TAG = this.getClass().getName();
@@ -22,16 +21,17 @@ public class ModLibManager {
     private ScriptEngine libEngine;
 
     private ModLibManager () {
-
+        this.libEngine = EngineFactory.createEngine();
+        this.getLibEngine().put("ModLibLoader", new ModLibLoader());
+        Log.print(TAG, "ModLibManager 初始化完成");
     }
 
     /**
      * 加载mod的底层库
      * */
-    protected void loadLib () {
+    protected void loadAllLib () {
         FileHandle libFile = Gdx.files.internal("modlib/lib.js");
         this.libCode = libFile.readString();
-        this.libEngine = new ScriptEngineManager().getEngineByName("nashorn");
         try {
             this.libEngine.eval(this.getLibCode());
         } catch (ScriptException e) {
@@ -51,8 +51,8 @@ public class ModLibManager {
     }
 
     /**
-     * 获取底层库的代码
-     * */
+    * 获取底层库的代码
+    * */
     public String getLibCode () {
         return this.libCode;
     }

@@ -1,4 +1,3 @@
-System.log("My Mod!!!");
 
 World.event.add("bulletShoot", function (shooter, bullet) {
     var group = getGroup(shooter);
