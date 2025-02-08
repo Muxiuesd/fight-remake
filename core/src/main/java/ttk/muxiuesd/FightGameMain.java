@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.screen.MainGameScreen;
-import ttk.muxiuesd.world.block.Blocks;
 import ttk.muxiuesd.world.event.EventBus;
 
 /**
@@ -17,7 +16,7 @@ public class FightGameMain extends Game {
         EventBus eventBus = EventBus.getInstance();
         RegistrantGroup registrantGroup = new RegistrantGroup();
         ModLoader.getInstance().loadAllMods();
-        Blocks.printAllBlock();
+
         setScreen(new MainGameScreen());
     }
 

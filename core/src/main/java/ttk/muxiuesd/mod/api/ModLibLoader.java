@@ -1,13 +1,14 @@
-package ttk.muxiuesd.mod;
+package ttk.muxiuesd.mod.api;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptException;
 
 /**
- *  mod专用：用来加载mod底层库的类
+ *  modlib专用：用来加载mod底层库的类
  **/
 public class ModLibLoader {
     public final String TAG = ModLibLoader.class.getName();

@@ -16,7 +16,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.SimplexNoise2D;
 import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.block.Block;
-import ttk.muxiuesd.world.block.Blocks;
+import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.block.instance.*;
 import ttk.muxiuesd.world.wall.Wall;
 import ttk.muxiuesd.world.wall.Walls;
@@ -151,18 +151,18 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     private Block chooseBlock (double height) {
         System.out.println(height);
         if (height <-2){
-            return Blocks.newBlock("water");
+            return BlocksReg.newBlock("water");
         }
         if (height >=-2 && height <-1){
-            return Blocks.newBlock("sand");
+            return BlocksReg.newBlock("sand");
         }
         if (height >=-1 && height <1){
-            return Blocks.newBlock("stone");
+            return BlocksReg.newBlock("stone");
         }
         if (height >=1 && height <=3){
-            return Blocks.newBlock("grass");
+            return BlocksReg.newBlock("grass");
         }
-        return Blocks.newBlock("block_test");
+        return BlocksReg.newBlock("block_test");
     }
 
     @Override

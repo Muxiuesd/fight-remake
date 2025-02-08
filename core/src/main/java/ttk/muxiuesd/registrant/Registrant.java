@@ -8,12 +8,12 @@ import java.util.HashMap;
  * */
 public class Registrant<T> {
     //命名空间
-    private final String nameSpace;
+    private final String namespace;
     private final Class<T> clazzType;
     private final HashMap<String, T> r;
 
-    public Registrant(String nameSpace, Class<T> clazzType) {
-        this.nameSpace = nameSpace;
+    public Registrant(String namespace, Class<T> clazzType) {
+        this.namespace = namespace;
         this.clazzType = clazzType;
         this.r = new HashMap<>();
     }
@@ -52,7 +52,7 @@ public class Registrant<T> {
     }
 
     public String getFullName(String id) {
-        return nameSpace + ":" + id;
+        return namespace + ":" + id;
     }
 
     public Class<T> getClazzType() {

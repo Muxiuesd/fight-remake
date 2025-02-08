@@ -14,9 +14,11 @@ import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.mod.ModLoader;
+import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlocksReg;
 
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
@@ -37,8 +39,12 @@ public class MainGameScreen implements Screen {
         this.cameraController = new CameraController(new OrthographicCamera());
         this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
+
         this.world = new MainWorld(this);
+        BlocksReg.registerAllBlocks();
         ModLoader.getInstance().runAllMods();
+
+        RegistrantGroup.printAllBlock();
 
         Log.print(TAG, "------游戏正式开始运行------");
     }

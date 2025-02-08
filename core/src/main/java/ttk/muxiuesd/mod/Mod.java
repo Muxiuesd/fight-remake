@@ -20,7 +20,7 @@ public class Mod implements Runnable{
     private FileHandle modDir;
     private String modPath;
 
-    private ScriptContext libContext;
+    private ScriptContext libContext;   //mod底层库的上下文
     private ScriptEngine engine;
 
     public Mod (JsonValue info, FileHandle modDir, ScriptContext libContext) {
@@ -32,16 +32,16 @@ public class Mod implements Runnable{
 
     @Override
     public void run() {
-        FileHandle mainFile = Gdx.files.absolute(this.modPath + "main.js");
+        FileHandle mainFile = Gdx.files.absolute(this.modPath + info.getString("main"));
 
         String code = mainFile.readString();
         //Log.print(TAG, code);
 
         this.engine = EngineFactory.createEngine();
         try {
-            //this.engine.eval(ModLoader.getInstance().getLibCode() + code);
+
             this.engine.eval(code, this.libContext);
-            //Invocable invocable = (Invocable) this.engine;
+
             this.running = true;
         } catch (ScriptException e) {
             this.running = false;

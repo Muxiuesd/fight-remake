@@ -1,4 +1,11 @@
 var TAG = "测试mod";
+
+var testBlock = newBlock(new Property().setFriction(1.0), "block/grass.png");
+//BlockRegister.registry("mod_test_block", testBlock);
+var blockReg = ModRegistrant.getBlockRegister("testmod");
+blockReg.registry("test_block", testBlock);
+
+
 World.event.add("entityAttacked", function (attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);
 });
@@ -14,3 +21,4 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
     }
     Log.print(TAG, "Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
 });
+

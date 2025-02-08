@@ -2,6 +2,7 @@ package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import ttk.muxiuesd.mod.api.ModLibLoader;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptEngine;
@@ -45,7 +46,7 @@ public class ModLibManager {
     /**
      * 获取实例
      * */
-    protected static ModLibManager getInstance () {
+    public static ModLibManager getInstance () {
         if (Instance == null) {
             Instance = new ModLibManager();
         }

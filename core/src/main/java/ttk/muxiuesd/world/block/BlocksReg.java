@@ -11,16 +11,22 @@ import java.util.HashMap;
 
 /**
  * 方块注册
- * TODO mod注册方块
  * */
-public class Blocks {
+public class BlocksReg {
+    public static final String TAG = BlocksReg.class.getName();
+
     static Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
     static {
+
+    }
+
+    public static void registerAllBlocks () {
         register("block_test", new BlockTest());
         register("grass", new BlockGrass());
         register("stone", new BlockStone());
         register("sand", new BlockSand());
         register("water", new BlockWater());
+        Log.print(TAG, "游戏方块注册完毕");
     }
 
     private static void register (String id, Block block) {
@@ -39,7 +45,7 @@ public class Blocks {
         HashMap<String, Block> map = registrant.getR();
         Array<String> allBlockName = new Array<>();
         map.keySet().forEach(allBlockName::add);
-        Log.print(Blocks.class.getName(), "注册的方块有：");
+        Log.print(BlocksReg.class.getName(), "注册的方块有：");
         for (int i = 0; i < allBlockName.size; i++) {
             if (i + 1 < allBlockName.size) {
                 System.out.print(allBlockName.get(i) + " | ");

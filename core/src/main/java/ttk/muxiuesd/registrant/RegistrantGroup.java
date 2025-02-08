@@ -1,7 +1,9 @@
 package ttk.muxiuesd.registrant;
 
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -100,6 +102,24 @@ public class RegistrantGroup {
         HashMap registrants = res.get(type);
         //再把对应命名空间的注册器添加进去
         registrants.put(namespace, registrant);
+    }
+
+    public static void printAllBlock () {
+        Array<String> allBlockName = new Array<>();
+        for (Registrant<? extends Block> registrant : blockRegistrants.values()) {
+            HashMap<String, ? extends Block> r = registrant.getR();
+            for (String id : r.keySet()) {
+                allBlockName.add(id);
+            }
+        }
+        Log.print(BlocksReg.class.getName(), "注册的方块有：");
+        for (int i = 0; i < allBlockName.size; i++) {
+            if (i + 1 < allBlockName.size) {
+                System.out.print(allBlockName.get(i) + " | ");
+            }else {
+                System.out.println(allBlockName.get(i));
+            }
+        }
     }
 
     public static void main(String[] args) {
