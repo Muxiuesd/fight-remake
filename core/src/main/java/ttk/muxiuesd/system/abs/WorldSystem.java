@@ -1,9 +1,5 @@
 package ttk.muxiuesd.system.abs;
 
-import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.World;
 
 /**
@@ -15,6 +11,13 @@ public abstract class WorldSystem extends FightSystem {
     public WorldSystem(World world) {
         this.world = world;
         setManager(world.getSystemManager());
+    }
+
+    /**
+     * 延迟初始化
+     * */
+    public void initialize () {
+
     }
 
     public World getWorld() {

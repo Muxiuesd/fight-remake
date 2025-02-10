@@ -10,6 +10,11 @@ import ttk.muxiuesd.world.event.EventSlimeDead;
 public class EventSystem extends WorldSystem {
     public EventSystem(World world) {
         super(world);
+
+    }
+
+    @Override
+    public void initialize () {
         this.initAllEvents();
     }
 

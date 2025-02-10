@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
 
 /**
@@ -17,7 +18,13 @@ public class PlayerSystem extends WorldSystem {
 
     public PlayerSystem(World world) {
         super(world);
-        this.player = new Player(1000, 1000);
+
+    }
+
+    @Override
+    public void initialize () {
+        //this.player = new Player(1000, 1000);
+        this.player = (Player) EntitiesReg.get("player");
         Log.print(TAG, "PlayerSystem初始化完成！");
     }
 

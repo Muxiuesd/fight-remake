@@ -19,6 +19,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlocksReg;
+import ttk.muxiuesd.world.entity.EntitiesReg;
 
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
@@ -39,12 +40,18 @@ public class MainGameScreen implements Screen {
         this.cameraController = new CameraController(new OrthographicCamera());
         this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
+        //手动注册游戏内的元素
+        BlocksReg.registerAllBlocks();
+        EntitiesReg.registerAllEntities();
 
         this.world = new MainWorld(this);
-        BlocksReg.registerAllBlocks();
+        this.world.getSystemManager().initAllSystems();
+
+        //执行mod代码
         ModLoader.getInstance().runAllMods();
 
-        RegistrantGroup.printAllBlock();
+        RegistrantGroup.printAllBlocks();
+        RegistrantGroup.printAllEntities();
 
         Log.print(TAG, "------游戏正式开始运行------");
     }

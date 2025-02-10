@@ -46,6 +46,9 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
         this.id = idIndex++;
     }
 
+    /**
+     * 延迟初始化
+     * */
     public void initialize(Group group, float maxHealth, float curHealth) {
         this.group = group;
         this.maxHealth = maxHealth;

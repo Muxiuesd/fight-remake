@@ -3,7 +3,6 @@ package ttk.muxiuesd.registrant;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.Block;
-import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -14,6 +13,7 @@ import java.util.HashMap;
  * */
 public class RegistrantGroup {
     public static final String TAG = RegistrantGroup.class.getName();
+
     public static final int OTHER  = -1;
     public static final int ENTITY = 0;
     public static final int BLOCK  = 1;
@@ -104,7 +104,10 @@ public class RegistrantGroup {
         registrants.put(namespace, registrant);
     }
 
-    public static void printAllBlock () {
+    /**
+     * 打印出游戏内所有注册的方块
+     * */
+    public static void printAllBlocks () {
         Array<String> allBlockName = new Array<>();
         for (Registrant<? extends Block> registrant : blockRegistrants.values()) {
             HashMap<String, ? extends Block> r = registrant.getR();
@@ -112,12 +115,30 @@ public class RegistrantGroup {
                 allBlockName.add(id);
             }
         }
-        Log.print(BlocksReg.class.getName(), "注册的方块有：");
-        for (int i = 0; i < allBlockName.size; i++) {
-            if (i + 1 < allBlockName.size) {
-                System.out.print(allBlockName.get(i) + " | ");
+        printAll(allBlockName, "注册的方块有：");
+    }
+
+    /**
+     * 打印出所有注册的实体
+     */
+    public static void printAllEntities () {
+        Array<String> allName = new Array<>();
+        for (Registrant<? extends Entity> registrant : entityRegistrants.values()) {
+            HashMap<String, ? extends Entity> r = registrant.getR();
+            for (String id : r.keySet()) {
+                allName.add(id);
+            }
+        }
+        printAll(allName, "注册的实体有：");
+    }
+
+    private static void printAll (Array<String> allName, String msg) {
+        Log.print(TAG, msg);
+        for (int i = 0; i < allName.size; i++) {
+            if (i + 1 < allName.size) {
+                System.out.print(allName.get(i) + " | ");
             }else {
-                System.out.println(allBlockName.get(i));
+                System.out.println(allName.get(i));
             }
         }
     }

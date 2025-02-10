@@ -31,6 +31,11 @@ public class BulletCollisionCheckSystem extends WorldSystem {
     }
 
     @Override
+    public void initialize () {
+
+    }
+
+    @Override
     public void update(float delta) {
         EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");

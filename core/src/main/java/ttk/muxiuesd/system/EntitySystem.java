@@ -23,7 +23,7 @@ import java.util.HashSet;
  * 实体系统
  * */
 public class EntitySystem extends WorldSystem {
-    public final String TAG = EntitySystem.class.getSimpleName();
+    public final String TAG = EntitySystem.class.getName();
 
     private Player player;
 
@@ -41,6 +41,10 @@ public class EntitySystem extends WorldSystem {
 
     public EntitySystem(World world) {
         super(world);
+    }
+
+    @Override
+    public void initialize () {
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
         this.player.setEntitySystem(this);
@@ -49,13 +53,12 @@ public class EntitySystem extends WorldSystem {
         Slime slime = new Slime();
         slime.setEntitySystem(this);
         slime.setBounds((float) (this.player.x + 5 * Math.cos(Util.randomRadian())),
-                  (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
+            (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
             1, 1);
         this.add(slime);
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }
-
 
 
     public void add(Entity entity) {

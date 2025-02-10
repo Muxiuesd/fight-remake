@@ -19,6 +19,11 @@ public class CameraFollowSystem extends WorldSystem {
 
     public CameraFollowSystem(World world) {
         super(world);
+
+    }
+
+    @Override
+    public void initialize () {
         MainGameScreen screen = getWorld().getScreen();
         this.cameraController = screen.cameraController;
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");

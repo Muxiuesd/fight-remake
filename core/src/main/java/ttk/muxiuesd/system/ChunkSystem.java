@@ -46,7 +46,10 @@ public class ChunkSystem extends WorldSystem {
 
     public ChunkSystem(World world) {
         super(world);
+    }
 
+    @Override
+    public void initialize () {
         this.noise = new WorldMapNoise((int) (Math.random() * 10000));
         //EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");

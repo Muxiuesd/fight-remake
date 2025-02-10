@@ -38,6 +38,10 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     public HandleInputSystem(World world) {
         super(world);
+    }
+
+    @Override
+    public void initialize () {
         MainGameScreen screen = getWorld().getScreen();
         this.cameraController = screen.cameraController;
         //EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");

@@ -16,6 +16,7 @@ public class EntitiesReg {
     }
 
     public static void registerAllEntities () {
+        register("player", new Player());
         register("slime", new Slime());
     }
 
@@ -23,7 +24,12 @@ public class EntitiesReg {
         registrant.register(id, entity);
         return;
     }
+
     public static Entity get (String id) {
         return registrant.get(id);
+    }
+
+    public static <T> T get (String id, Class<T> clazz) {
+        return (T) get(id);
     }
 }

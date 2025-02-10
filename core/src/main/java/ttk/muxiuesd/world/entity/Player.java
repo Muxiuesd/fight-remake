@@ -27,6 +27,9 @@ public class Player extends Entity {
     public boolean isDefend = false;
     public float defenseRadius = 1.23f;
 
+    public Player () {
+        this(100, 100);
+    }
 
     public Player(float maxHealth, float curHealth) {
         initialize(Group.player, maxHealth, curHealth);
