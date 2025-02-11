@@ -22,8 +22,13 @@ public class CameraController {
     }
 
     public void resize(int width, int height) {
-        this.camera.viewportWidth = this.viewportWidth;
-        this.camera.viewportHeight = this.viewportHeight * height / width;
+        if (width >= height) {
+            this.camera.viewportWidth = this.viewportWidth ;
+            this.camera.viewportHeight = this.viewportHeight * height / width;
+        }else {
+            this.camera.viewportWidth = this.viewportWidth * width / height;
+            this.camera.viewportHeight = this.viewportHeight ;
+        }
         this.camera.update();
     }
 }
