@@ -10,11 +10,11 @@ public class AssetsLoader implements Disposable {
     private final AsyncExecutor asyncExecutor = new AsyncExecutor(10);
 
     private static final class Holder {
-        private static final AssetsLoader instance = new AssetsLoader();
+        private static final AssetsLoader INSTANCE = new AssetsLoader();
     }
 
     public static AssetsLoader getInstance() {
-        return Holder.instance;
+        return Holder.INSTANCE;
     }
 
     /**

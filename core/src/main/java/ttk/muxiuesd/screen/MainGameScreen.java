@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ttk.muxiuesd.audio.AudioReg;
 import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.registrant.RegistrantGroup;
@@ -41,6 +42,7 @@ public class MainGameScreen implements Screen {
         this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
         //手动注册游戏内的元素
+        AudioReg.registerAllAudios();
         BlocksReg.registerAllBlocks();
         EntitiesReg.registerAllEntities();
 

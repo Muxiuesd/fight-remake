@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.audio.AudioManager;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
@@ -96,6 +97,7 @@ public class Player extends Entity {
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());
             getEntitySystem().add(bullet);
+            AudioManager.getInstance().playSound("shoot");
         }
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && this.defendSpan >= 1f) {
             this.isDefend = true;

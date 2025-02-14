@@ -10,30 +10,33 @@ import ttk.muxiuesd.util.Log;
 import java.util.LinkedHashMap;
 
 /**
- * 音效管理
- * TODO Mod实现添加音效和播放音效
+ * 全局声音管理
+ * <p>
+ * sound和music统称为声音
+ * <p>
+ * TODO Mod实现添加音效（乐）和播放音效（乐）
  * */
 public class AudioManager {
     public static String TAG = AudioManager.class.getName();
 
-    private static AudioManager Instance;
+    private final String root = "audio/";
 
-    private final String root = "sound/";
+    private final LinkedHashMap<String, Sound> sounds = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Music> musics = new LinkedHashMap<>();
 
-    private LinkedHashMap<String, Sound> sounds;
-    private LinkedHashMap<String, Music> musics;
-
-    private AudioManager () {
-        if (Instance == null) {
-            Instance = new AudioManager();
-        }
+    private static final class Holder {
+        private static final AudioManager INSTANCE = new AudioManager();
     }
 
     public static AudioManager getInstance() {
-        return Instance;
+        return Holder.INSTANCE;
     }
 
-
+    /**
+     * 加载音效
+     * @param id    音效的id
+     * @param path  音效在audio文件夹里的路径
+     * */
     public void loadSound(String id, String path) {
         if (getInstance().getSounds().containsKey(id)) {
             Log.error(TAG, "Id为：" + id + " 的音效已经存在！！！");
@@ -48,6 +51,11 @@ public class AudioManager {
         });
     }
 
+    /**
+     * 加载音乐
+     * @param id    音乐的id
+     * @param path  音乐在audio文件夹里的路径
+     * */
     public void loadMusic(String id, String path) {
         if (getInstance().getMusics().containsKey(id)) {
             Log.error(TAG, "Id为：" + id + " 的音乐已经存在！！！");
@@ -63,11 +71,21 @@ public class AudioManager {
     }
 
     public void playSound(String id) {
-
+        if (!this.getSounds().containsKey(id)) {
+            Log.error(TAG, "Id为：" + id + " 的音效不存在，无法播放！！！");
+            return;
+        }
+        Sound sound = this.getSounds().get(id);
+        sound.play();
     }
 
     public void playMusic(String id) {
-
+        if (!this.getMusics().containsKey(id)) {
+            Log.error(TAG, "Id为：" + id + " 的音乐不存在，无法播放！！！");
+            return;
+        }
+        Music music = this.getMusics().get(id);
+        music.play();
     }
 
     protected LinkedHashMap<String, Sound> getSounds() {
@@ -79,7 +97,7 @@ public class AudioManager {
     }
 
     /**
-     * sound里面的路径
+     * audio里面的路径
      * */
     private FileHandle getFile (String path) {
         return Gdx.files.internal(this.getPath(path));
