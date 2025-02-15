@@ -8,6 +8,8 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.Updateable;
 
+import java.util.Objects;
+
 /**
  * 方块
  * */
@@ -82,6 +84,7 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
      * */
     public static class Property {
         private float friction;
+        private String walkSoundId;
 
         public Property() {
         }
@@ -92,6 +95,16 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
 
         public Property setFriction(float friction) {
             this.friction = friction;
+            return this;
+        }
+
+        public String getWalkSoundId () {
+            //为null则返回默认情况
+            return Objects.requireNonNullElse(walkSoundId, "grass_walk");
+        }
+
+        public Property setWalkSoundId (String walkSoundId) {
+            this.walkSoundId = walkSoundId;
             return this;
         }
     }

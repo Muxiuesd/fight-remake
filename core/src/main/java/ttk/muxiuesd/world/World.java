@@ -15,7 +15,7 @@ import ttk.muxiuesd.util.Log;
 public abstract class World implements Updateable, Drawable, ShapeRenderable, Disposable {
     public final String TAG = this.getClass().getName();
 
-    private MainGameScreen screen;
+    private final MainGameScreen screen;
     private WorldSystemsManager worldSystemsManager;
 
     public World(MainGameScreen screen) {

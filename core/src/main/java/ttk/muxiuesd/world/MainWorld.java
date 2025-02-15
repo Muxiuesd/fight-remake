@@ -21,6 +21,7 @@ public class MainWorld extends World {
             .addSystem("CameraFollowSystem", new CameraFollowSystem(this))
             .addSystem("BulletCollisionCheckSystem", new BulletCollisionCheckSystem(this))
             .addSystem("HandleInputSystem", new HandleInputSystem(this))
+            .addSystem("SoundEffectSystem", new SoundEffectSystem(this))
         ;
     }
 

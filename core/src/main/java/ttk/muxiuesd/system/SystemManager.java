@@ -41,6 +41,9 @@ public class SystemManager implements Updateable, Drawable, ShapeRenderable, Dis
         return null;
     }
 
+    /**
+     * 延迟初始化
+     * */
     public void initAllSystems() {
         for (WorldSystem system : systems.values()) {
             system.initialize();

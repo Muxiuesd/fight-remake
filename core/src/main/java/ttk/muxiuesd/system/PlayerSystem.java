@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
@@ -15,6 +16,7 @@ public class PlayerSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
     private Player player;
+    private Vector2 playerLastPosition;
 
     public PlayerSystem(World world) {
         super(world);
@@ -25,12 +27,13 @@ public class PlayerSystem extends WorldSystem {
     public void initialize () {
         //this.player = new Player(1000, 1000);
         this.player = (Player) EntitiesReg.get("player");
+        this.playerLastPosition = this.player.getPosition();
         Log.print(TAG, "PlayerSystem初始化完成！");
     }
 
     @Override
     public void update(float delta) {
-
+        //this.playerLastPosition = player.getPosition();
     }
 
     @Override
@@ -49,5 +52,16 @@ public class PlayerSystem extends WorldSystem {
 
     public Player getPlayer() {
         return this.player;
+    }
+
+    /**
+     * 检查玩家是否移动
+     * */
+    public boolean playerMoved () {
+        Vector2 lp = this.playerLastPosition;
+        Vector2 np = this.getPlayer().getPosition();
+        boolean result = !lp.equals(np);
+        if (result) this.playerLastPosition = np;
+        return result;
     }
 }

@@ -16,9 +16,6 @@ import ttk.muxiuesd.world.entity.bullet.Bullet;
  * 玩家
  */
 public class Player extends Entity {
-    /*public TextureRegion body = new TextureRegion(AssetsLoader.getInstance().get("player/player.png", Texture.class));
-    public TextureRegion shield = new TextureRegion(AssetsLoader.getInstance().get("player/shield.png", Texture.class));
-    */
     public TextureRegion body;
     public TextureRegion shield;
     public float maxDefendSpan = 1f;
@@ -108,7 +105,7 @@ public class Player extends Entity {
 
     /**
      * 获取玩家中心的坐标（世界坐标）
-     * @return
+     * @return 二维坐标
      */
     public Vector2 getPlayerCenter () {
         return new Vector2(x + getWidth() / 2, y + getHeight() / 2);

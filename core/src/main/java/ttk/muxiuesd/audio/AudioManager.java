@@ -71,12 +71,21 @@ public class AudioManager {
     }
 
     public void playSound(String id) {
+        this.playSound(id, 1f);
+    }
+    public void playSound(String id, float volume) {
+        this.playSound(id, volume, 1f);
+    }
+    public void playSound(String id, float volume, float pitch) {
+        this.playSound(id, volume, pitch, 0f);
+    }
+    public void playSound(String id, float volume, float pitch, float pan) {
         if (!this.getSounds().containsKey(id)) {
             Log.error(TAG, "Id为：" + id + " 的音效不存在，无法播放！！！");
             return;
         }
         Sound sound = this.getSounds().get(id);
-        sound.play();
+        sound.play(volume, pitch, pan);
     }
 
     public void playMusic(String id) {

@@ -6,7 +6,9 @@ import ttk.muxiuesd.world.block.Block;
 
 public class BlockGrass extends Block {
     public BlockGrass() {
-        super(new ttk.muxiuesd.world.block.Block.Property().setFriction(1f), "block/grass.png");
+        super(new ttk.muxiuesd.world.block.Block.Property()
+            .setFriction(1f).setWalkSoundId("grass_walk"),
+            "block/grass.png");
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/grass.png", Texture.class));
     }
 
