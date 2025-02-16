@@ -1,5 +1,9 @@
 # ***游戏：战斗——爽！***
 
+[![Fork me on Gitee](https://gitee.com/muxiuesd12138/fight-remake/widgets/widget_2.svg)](https://gitee.com/muxiuesd12138/fight-remake)
+[![star](https://gitee.com/muxiuesd12138/fight-remake/badge/star.svg?theme=dark)](https://gitee.com/muxiuesd12138/fight-remake/stargazers)
+[![fork](https://gitee.com/muxiuesd12138/fight-remake/badge/fork.svg?theme=dark)](https://gitee.com/muxiuesd12138/fight-remake/members)
+
 ##  一、游戏类型：
     - 2D无限地图
     - 射击
