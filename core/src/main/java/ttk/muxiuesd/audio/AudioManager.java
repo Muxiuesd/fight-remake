@@ -70,22 +70,23 @@ public class AudioManager {
         });
     }
 
-    public void playSound(String id) {
-        this.playSound(id, 1f);
+    public Sound playSound(String id) {
+        return this.playSound(id, 1f);
     }
-    public void playSound(String id, float volume) {
-        this.playSound(id, volume, 1f);
+    public Sound playSound(String id, float volume) {
+        return this.playSound(id, volume, 1f);
     }
-    public void playSound(String id, float volume, float pitch) {
-        this.playSound(id, volume, pitch, 0f);
+    public Sound playSound(String id, float volume, float pitch) {
+        return this.playSound(id, volume, pitch, 0f);
     }
-    public void playSound(String id, float volume, float pitch, float pan) {
+    public Sound playSound(String id, float volume, float pitch, float pan) {
         if (!this.getSounds().containsKey(id)) {
             Log.error(TAG, "Id为：" + id + " 的音效不存在，无法播放！！！");
-            return;
+            return null;
         }
         Sound sound = this.getSounds().get(id);
         sound.play(volume, pitch, pan);
+        return sound;
     }
 
     public void playMusic(String id) {
@@ -97,12 +98,20 @@ public class AudioManager {
         music.play();
     }
 
-    protected LinkedHashMap<String, Sound> getSounds() {
+    public LinkedHashMap<String, Sound> getSounds() {
         return this.sounds;
     }
 
-    protected LinkedHashMap<String, Music> getMusics() {
+    public LinkedHashMap<String, Music> getMusics() {
         return this.musics;
+    }
+
+    public Sound getSound(String id) {
+        return this.getSounds().get(id);
+    }
+
+    public Music getMusic(String id) {
+        return this.getMusics().get(id);
     }
 
     /**

@@ -13,6 +13,7 @@ public class AudioReg {
 
         //方块
         registerSound("grass_walk", "block/walk/grass.wav");
+        registerSound("stone_walk", "block/walk/stone.wav");
     }
 
     public static void registerSound (String id, String path) {
