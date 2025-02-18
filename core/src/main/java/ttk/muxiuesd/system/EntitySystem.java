@@ -81,15 +81,6 @@ public class EntitySystem extends WorldSystem {
             Bullet bullet = (Bullet) entity;
             if (bullet.group == Group.player) {
                 this.playerBulletEntity.add(bullet);
-                /*HashMap<String, Mod> mods = ModLoader.getInstance().getMods();
-                for (Mod mod : mods.values()) {
-                    Invocable invocable = (Invocable) mod.getEngine();
-                    try {
-                        invocable.invokeFunction("callBulletShootEvent", this.player, bullet);
-                    } catch (ScriptException | NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
-                }*/
                 this.callBulletShootEvent(this.player, bullet);
             }
             if (bullet.group == Group.enemy) {
