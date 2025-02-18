@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.event;
+package ttk.muxiuesd.world.event.instance;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.system.EntitySystem;

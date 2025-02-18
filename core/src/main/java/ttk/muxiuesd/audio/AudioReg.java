@@ -5,7 +5,7 @@ package ttk.muxiuesd.audio;
  * */
 public class AudioReg {
 
-    public static final AudioManager manager = AudioManager.getInstance();
+    public static final AudioLoader loader = AudioLoader.getInstance();
 
     public static void registerAllAudios () {
         //玩家
@@ -17,10 +17,10 @@ public class AudioReg {
     }
 
     public static void registerSound (String id, String path) {
-        manager.loadSound(id, "sound/" + path);
+        loader.loadSound(id, "sound/" + path);
     }
 
     public static void registerMusic (String id, String path) {
-        manager.loadMusic(id,  "music/" + path);
+        loader.loadMusic(id,  "music/" + path);
     }
 }
