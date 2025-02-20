@@ -60,15 +60,15 @@ public class SoundEffectSystem extends WorldSystem {
 
     @Override
     public void update (float delta) {
-        this.playerSoundEffect(delta);
-        this.enemySoundEffect(delta);
-        this.environmentalEffects(delta);
+        this.updatePlayerSoundEffect(delta);
+        this.updateEnemySoundEffect(delta);
+        this.updateEnvironmentalEffects(delta);
     }
 
     /**
      * 玩家相关的音效
      * */
-    private void playerSoundEffect (float delta) {
+    private void updatePlayerSoundEffect (float delta) {
         this.updatePlayerWalkSoundEffect(delta);
     }
 
@@ -119,14 +119,14 @@ public class SoundEffectSystem extends WorldSystem {
     /**
      * 敌人音效
      * */
-    private void enemySoundEffect (float delta) {
+    private void updateEnemySoundEffect (float delta) {
 
     }
 
     /**
      * 环境音效
      * */
-    private void environmentalEffects (float delta) {
+    private void updateEnvironmentalEffects (float delta) {
         //更新空间音效
         for (SpatialSoundInstance instance : this.activeSpatialSounds) {
             instance.update(delta);
