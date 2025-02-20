@@ -133,7 +133,7 @@ public class SoundEffectSystem extends WorldSystem {
             //TODO 音效播放完后移除
 
         }
-        System.out.println(this.activeSpatialSounds.size);
+        //System.out.println(this.activeSpatialSounds.size);
     }
 
     /**
@@ -149,6 +149,6 @@ public class SoundEffectSystem extends WorldSystem {
             this.activeSpatialSounds.removeValue(instance, true);
         });
         this.activeSpatialSounds.add(instance);
-        instance.play();
+        //instance.play();
     }
 }

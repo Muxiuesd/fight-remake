@@ -33,6 +33,9 @@ public class SpatialSoundInstance extends MusicInstance implements Updateable {
                 volume *= 0.7f;
             }
             music.setPan(pan, volume);
+            if (!isPlaying()) {
+                getMusic().play();
+            }
         }
     }
 
