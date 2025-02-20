@@ -1,6 +1,6 @@
 package ttk.muxiuesd.audio;
 
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
@@ -9,15 +9,16 @@ import ttk.muxiuesd.world.entity.Entity;
 
 /**
  * 空间音效实例
+ * 为了控制音效播放以及检测播放状态，迫不得已改为 {@link Music}
  * */
-public class SpatialSoundInstance extends SoundInstance implements Updateable {
+public class SpatialSoundInstance extends MusicInstance implements Updateable {
     private final Entity sounder;   //发声者
     private final Entity receiver;  //接收者
 
     private boolean isFront = true; //是否在前方，在后方的音量会较小
 
-    public SpatialSoundInstance (Sound sound, Entity sounder, Entity receiver) {
-        super(sound);
+    public SpatialSoundInstance (Music music, Entity sounder, Entity receiver) {
+        super(music);
         this.sounder = sounder;
         this.receiver = receiver;
     }
@@ -25,14 +26,13 @@ public class SpatialSoundInstance extends SoundInstance implements Updateable {
     @Override
     public void update (float delta) {
         float volume = this.calculateVolume();
-
-        Sound sound = getSound();
+        Music music = getMusic();
         if (volume > 0f) {
             float pan = this.calculatePan();
             if (!this.isFront) {
                 volume *= 0.7f;
             }
-            sound.setPan(getId(), pan, volume);
+            music.setPan(pan, volume);
         }
     }
 
@@ -57,7 +57,7 @@ public class SpatialSoundInstance extends SoundInstance implements Updateable {
         Vector2 rp = this.receiver.getPosition();
         //TODO 目前先这么写吧
         float deg = MathUtils.atan2Deg360(sp.y - rp.y, sp.x - rp.x);
-        if (this.inRange(deg, 0f, 60f)) {
+        /*if (this.inRange(deg, 0f, 60f)) {
             this.isFront = true;
             return 0.7f;
         }
@@ -76,12 +76,14 @@ public class SpatialSoundInstance extends SoundInstance implements Updateable {
         if (this.inRange(deg, 240f, 300f)) {
             this.isFront = false;
             return 0f;
-        }
-        this.isFront = false;
-        return 0.7f;
+        }*/
+        float v = MathUtils.cosDeg(deg);
+        //判断前后
+        this.isFront = !this.inRange(deg, 240f, 360f);
+        return v;
     }
 
     private boolean inRange(float value, float start, float end) {
-        return value >= start && value < end;
+        return value > start && value < end;
     }
 }

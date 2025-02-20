@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
  * */
 public class EventSlimeDead extends EntityDeathEvent {
 
-    private World world;
+    private final World world;
     public int maxGeneration = 3;
 
     public EventSlimeDead (World world) {

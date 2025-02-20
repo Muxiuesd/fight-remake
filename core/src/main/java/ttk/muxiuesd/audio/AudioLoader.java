@@ -1,5 +1,6 @@
 package ttk.muxiuesd.audio;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
@@ -17,6 +18,9 @@ public class AudioLoader {
 
     private final LinkedHashMap<String, Sound> soundCache = new LinkedHashMap<>();
     private final LinkedHashMap<String, Music> musicCache = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> soundIdToPath = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> musicIdToPath = new LinkedHashMap<>();
+
 
     private AudioLoader() {}
     private static final class Holder {
@@ -43,6 +47,8 @@ public class AudioLoader {
             Sound sound = loader.get(soundPath, soundClass);
             getInstance().getSoundCache().put(id, sound);
         });
+
+        this.soundIdToPath.put(id, soundPath);
     }
 
     /**
@@ -62,6 +68,8 @@ public class AudioLoader {
             Music music = loader.get(musicPath, musicClass);
             getInstance().getMusicCache().put(id, music);
         });
+
+        this.musicIdToPath.put(id, musicPath);
     }
 
     public LinkedHashMap<String, Sound> getSoundCache () {
@@ -84,6 +92,32 @@ public class AudioLoader {
      * */
     public Music getMusic(String id) {
         return this.getMusicCache().get(id);
+    }
+
+    /**
+     * 新建一个sound
+     * */
+    public Sound newSound (String id) {
+        String path = this.soundIdToPath.get(id);
+        if (path == null) {
+            Log.error(TAG, "Id为：" + id + " 的sound不存在！！！");
+            return null;
+        }
+        //return AssetsLoader.getInstance().get(path, Sound.class);
+        return Gdx.audio.newSound(Gdx.files.internal(path));
+    }
+
+    /**
+     * 新建一个music
+     * */
+    public Music newMusic (String id) {
+        String path = this.musicIdToPath.get(id);
+        if (path == null) {
+            Log.error(TAG, "Id为：" + id + " 的music不存在！！！");
+            return null;
+        }
+        //return AssetsLoader.getInstance().get(path, Music.class);
+        return Gdx.audio.newMusic(Gdx.files.internal(path));
     }
 
     public String getPath (String path) {

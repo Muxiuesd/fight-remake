@@ -9,7 +9,7 @@ public class AudioReg {
 
     public static void registerAllAudios () {
         //玩家
-        registerSound("shoot", "player/shoot.wav");
+        registerSoundAsMusic("shoot", "player/shoot.wav");
 
         //方块
         registerSound("grass_walk", "block/walk/grass.wav");
@@ -18,6 +18,13 @@ public class AudioReg {
 
     public static void registerSound (String id, String path) {
         loader.loadSound(id, "sound/" + path);
+    }
+
+    /**
+     * 把sound加载成music
+     * */
+    public static void registerSoundAsMusic (String id, String path) {
+        loader.loadMusic(id, "sound/" + path);
     }
 
     public static void registerMusic (String id, String path) {

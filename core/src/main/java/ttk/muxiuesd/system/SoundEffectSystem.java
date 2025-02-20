@@ -1,6 +1,7 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -28,9 +29,8 @@ public class SoundEffectSystem extends WorldSystem {
     private EntitySystem es;
 
     private LinkedHashMap<String, SoundInstance> activeSounds;  //正在播放的音效
-    //private LinkedHashMap<String, SpatialSoundInstance> activeSpatialSounds;
     private Array<SpatialSoundInstance> activeSpatialSounds;//正在播放的空间音效
-    //private LinkedHashMap<Long, Sound> soundInstances;
+
     private String curWalkSoundId;
 
     public SoundEffectSystem (World world) {
@@ -100,7 +100,7 @@ public class SoundEffectSystem extends WorldSystem {
     }
 
     private void startPlayerWalkSound (String walkSoundId) {
-        Sound sound = AudioLoader.getInstance().getSound(walkSoundId);
+        Sound sound = AudioLoader.getInstance().newSound(walkSoundId);
         SoundInstance instance = new SoundInstance(
             sound,
             SoundInstance.LOOPING,
@@ -123,21 +123,32 @@ public class SoundEffectSystem extends WorldSystem {
 
     }
 
+    /**
+     * 环境音效
+     * */
     private void environmentalEffects (float delta) {
         //更新空间音效
         for (SpatialSoundInstance instance : this.activeSpatialSounds) {
             instance.update(delta);
             //TODO 音效播放完后移除
+
         }
-        //System.out.println(this.activeSpatialSounds.size);
+        System.out.println(this.activeSpatialSounds.size);
     }
 
     /**
+     * 新建一个空间音效
+     * @param id 音效的Id，但是Music
      * @param sounder 发出声音的实体
      * */
-    public void newSpatialSound (Sound sound, Entity sounder) {
-        SpatialSoundInstance instance = new SpatialSoundInstance(sound, sounder, this.ps.getPlayer());
-        instance.play();
+    public void newSpatialSound (String id, Entity sounder) {
+        Music music = AudioLoader.getInstance().newMusic(id);
+        SpatialSoundInstance instance = new SpatialSoundInstance(music, sounder, this.ps.getPlayer());
+        //播放结束回调
+        instance.setOnCompletionListener(music1 -> {
+            this.activeSpatialSounds.removeValue(instance, true);
+        });
         this.activeSpatialSounds.add(instance);
+        instance.play();
     }
 }
