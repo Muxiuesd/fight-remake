@@ -11,8 +11,8 @@ import ttk.muxiuesd.world.block.Block;
 public abstract class Wall extends Block implements ShapeRenderable {
     private Rectangle hitbox;
 
-    public Wall(Property property, String texturePath) {
-        super(property, texturePath);
+    public Wall(Property property, String textureId, String texturePath) {
+        super(property, textureId, texturePath);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.audio.SoundInstance;
 import ttk.muxiuesd.audio.SpatialSoundInstance;
@@ -85,14 +86,14 @@ public class SoundEffectSystem extends WorldSystem {
             if ((this.curWalkSoundId != null) && (!Objects.equals(this.curWalkSoundId, walkSoundId))) {
                 //先停止先前的音效
                 this.stopPlayerWalkSound();
-                Log.print(TAG, "脚下方块变换");
+                //Log.print(TAG, "脚下方块变换");
                 //再播放新的音效
                 this.startPlayerWalkSound(walkSoundId);
             }
-            if (!this.activeSounds.containsKey("player_walk")) {
+            if (!this.activeSounds.containsKey(Fight.getId("player_walk"))) {
                 this.startPlayerWalkSound(walkSoundId);
             }
-        }else if (!this.ps.playerMoved() && this.activeSounds.containsKey("player_walk")) {
+        }else if (!this.ps.playerMoved() && this.activeSounds.containsKey(Fight.getId("player_walk"))) {
             //如果玩家停止了，但是音效在播放
             this.stopPlayerWalkSound();
             this.curWalkSoundId = null;
@@ -107,12 +108,12 @@ public class SoundEffectSystem extends WorldSystem {
             1.5f,
             1.5f,
             0);
-        this.activeSounds.put("player_walk", instance);
+        this.activeSounds.put(Fight.getId("player_walk"), instance);
         this.curWalkSoundId = walkSoundId;
     }
 
     private void stopPlayerWalkSound () {
-        SoundInstance playerWalkSound = this.activeSounds.remove("player_walk");
+        SoundInstance playerWalkSound = this.activeSounds.remove(Fight.getId("player_walk"));
         playerWalkSound.stop();
     }
 

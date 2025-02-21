@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
@@ -35,11 +36,11 @@ public class Player extends Entity {
         curSpeed = speed;
         setSize(1, 1);
 
-        AssetsLoader.getInstance().loadAsync("player/player.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player"), "player/player.png", Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().get("player/player.png", Texture.class);
             textureRegion = new TextureRegion(texture);
         });
-        AssetsLoader.getInstance().loadAsync("player/shield.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"), "player/shield.png", Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().get("player/shield.png", Texture.class);
             this.shield = new TextureRegion(texture);
         });

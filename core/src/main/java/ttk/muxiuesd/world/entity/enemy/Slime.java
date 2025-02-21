@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.entity.enemy;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
@@ -21,6 +22,7 @@ public class Slime extends Entity {
     public float factor = 0.7f;    //分裂时的缩放因子
     public float attackRange = 10f;
 
+
     public Slime () {
         this(1);
     }
@@ -30,15 +32,13 @@ public class Slime extends Entity {
 
         setSize(1, 1);
         speed = 1f;
-        /*setBounds((float) (EntityManager.getInstance().player.x + 5 * Math.cos(Util.randomRadian())),
-                  (float) (EntityManager.getInstance().player.y + 5 * Math.sin(Util.randomRadian())),
-            1, 1);*/
         this.generation = generation;
 
-        AssetsLoader.getInstance().loadAsync("enemy/slime.png", Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().get("enemy/slime.png", Texture.class);
+        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),"enemy/slime.png", Texture.class, () -> {
+            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("slime"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });
+
         Log.print(this.getClass().getName(), "Slime 初始化完成");
     }
 

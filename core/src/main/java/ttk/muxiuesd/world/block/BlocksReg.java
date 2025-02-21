@@ -29,12 +29,12 @@ public class BlocksReg {
         Log.print(TAG, "游戏方块注册完毕");
     }
 
-    private static void register (String id, Block block) {
-        registrant.register(id, block);
+    private static void register (String name, Block block) {
+        registrant.register(name, block);
     }
 
-    public static Block newBlock (String id) {
-        return registrant.get(id);
+    public static Block newBlock (String name) {
+        return registrant.get(name);
     }
 
     /**

@@ -1,6 +1,6 @@
 var TAG = "测试mod";
 
-var testBlock = newBlock(new Property().setFriction(1.0), "block/grass.png");
+var testBlock = newBlock(new Property().setFriction(1.0), "testmod:grass", "block/grass.png");
 //BlockRegister.registry("mod_test_block", testBlock);
 var blockReg = ModRegistrant.getBlockRegister("testmod");
 blockReg.registry("test_block", testBlock);

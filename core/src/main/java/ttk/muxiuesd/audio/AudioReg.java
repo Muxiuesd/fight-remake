@@ -1,5 +1,7 @@
 package ttk.muxiuesd.audio;
 
+import ttk.muxiuesd.Fight;
+
 /**
  * 声音注册
  * */
@@ -16,18 +18,18 @@ public class AudioReg {
         registerSound("stone_walk", "block/walk/stone.wav");
     }
 
-    public static void registerSound (String id, String path) {
-        loader.loadSound(id, "sound/" + path);
+    public static void registerSound (String name, String path) {
+        loader.loadSound(Fight.getId(name), "sound/" + path);
     }
 
     /**
      * 把sound加载成music
      * */
-    public static void registerSoundAsMusic (String id, String path) {
-        loader.loadMusic(id, "sound/" + path);
+    public static void registerSoundAsMusic (String name, String path) {
+        loader.loadMusic(Fight.getId(name), "sound/" + path);
     }
 
-    public static void registerMusic (String id, String path) {
-        loader.loadMusic(id,  "music/" + path);
+    public static void registerMusic (String name, String path) {
+        loader.loadMusic(Fight.getId(name), "music/" + path);
     }
 }

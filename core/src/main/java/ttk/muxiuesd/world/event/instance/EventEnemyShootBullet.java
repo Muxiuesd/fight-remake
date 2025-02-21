@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.event.instance;
 
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Entity;
@@ -24,7 +25,7 @@ public class EventEnemyShootBullet extends BulletShootEvent {
                 .getSystemManager()
                 .getSystem("SoundEffectSystem");
             //TODO 不同子弹不同音效，不同实体不同音效
-            ses.newSpatialSound("shoot", bullet);
+            ses.newSpatialSound(Fight.getId("shoot"), bullet);
         }
     }
 }

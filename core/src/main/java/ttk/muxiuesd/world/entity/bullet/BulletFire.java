@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.entity.bullet;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.world.entity.Entity;
 
@@ -17,8 +18,8 @@ public class BulletFire extends Bullet {
         setLiveTime(0f);
         speed = 15f;
 
-        AssetsLoader.getInstance().loadAsync("bullet/flame.png", Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().get("bullet/flame.png", Texture.class);
+        AssetsLoader.getInstance().loadAsync(Fight.getId("bullet_fire"), "bullet/flame.png", Texture.class, () -> {
+            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("bullet_fire"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });
     }

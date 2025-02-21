@@ -49,6 +49,18 @@
     ```java
     public String abc = "I love Rem!";  //这是文本
     ```
+
+- ### 术语定义
+  - Id的定义：
+    ```text
+       分隔符  这是名称（name）
+         ↓     ↓
+    fight:grass_block  -> 这一整串称为Id
+    ~~~~~
+      ↑
+    这个是命名空间（namespace）
+    ```
+
 ---
 
 ## 四、游戏Mod开发相关：

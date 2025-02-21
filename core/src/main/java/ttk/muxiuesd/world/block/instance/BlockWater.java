@@ -2,11 +2,14 @@ package ttk.muxiuesd.world.block.instance;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.world.block.Block;
 
 public class BlockWater extends Block {
     public BlockWater() {
-        super(new Property().setFriction(0.2f), "block/water_overlay.png");
+        super(new Property().setFriction(0.2f),
+            Fight.getId("water"),
+            "block/water_overlay.png");
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/water_overlay.png", Texture.class));
     }
 

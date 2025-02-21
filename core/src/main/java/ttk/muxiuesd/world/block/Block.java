@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -26,9 +27,9 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
 
     private Property property;
 
-    public Block(Property property, String texturePath) {
+    public Block(Property property, String textureId, String texturePath) {
         this.setProperty(property);
-        this.loadTextureRegion(texturePath);
+        this.loadTextureRegion(textureId, texturePath);
     }
 
     @Override
@@ -68,9 +69,9 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
         this.property = property;
     }
 
-    public void loadTextureRegion(String texturePath) {
-        AssetsLoader.getInstance().loadAsync(texturePath, Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().get(texturePath, Texture.class);
+    public void loadTextureRegion(String id, String texturePath) {
+        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, () -> {
+            Texture texture = AssetsLoader.getInstance().getById(id, Texture.class);
             this.textureRegion = new TextureRegion(texture);
         });
     }
@@ -100,7 +101,7 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
 
         public String getWalkSoundId () {
             //为null则返回默认情况
-            return Objects.requireNonNullElse(walkSoundId, "grass_walk");
+            return Objects.requireNonNullElse(walkSoundId, Fight.getId("grass_walk"));
         }
 
         public Property setWalkSoundId (String walkSoundId) {
