@@ -20,16 +20,25 @@ public class EntityCollisionSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
     private final EntitySystem es;
+    private final PlayerSystem ps;
     private final ChunkSystem cs;
 
     public EntityCollisionSystem (World world) {
         super(world);
         this.es = (EntitySystem) getManager().getSystem("EntitySystem");
+        this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
     }
 
     @Override
     public void update (float delta) {
+        this.playerCollisionCheck(delta);
+    }
+
+    /**
+     * 玩家相关碰撞
+     * */
+    private void playerCollisionCheck (float delta) {
         Player player = this.es.getPlayer();
         Vector2 perPosition = player.getPosition();
         float perX = perPosition.x;
@@ -109,6 +118,6 @@ public class EntityCollisionSystem extends WorldSystem {
     public void renderShape (ShapeRenderer batch) {
         Player player = this.es.getPlayer();
         Rectangle hurtbox = player.hurtbox;
-        batch.rect(hurtbox.x, hurtbox.y, player.getWidth(), player.getHeight());
+        batch.rect(hurtbox.x, hurtbox.y, hurtbox.getWidth(), hurtbox.getHeight());
     }
 }
