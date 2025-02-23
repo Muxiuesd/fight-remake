@@ -19,14 +19,15 @@ import java.util.Map;
 public abstract class Entity implements Disposable, Drawable, Updateable {
 
     private static int idIndex = 0;
-
     public final int id;
+
     public Group group;
     public float maxHealth; // 生命值上限
     public float curHealth; // 当前生命值
     public float speed, curSpeed;
 
     public float x, y;
+    public float velX, velY;
     public float width, height;
     public float originX, originY;
     public float scaleX = 1, scaleY = 1;
@@ -40,7 +41,7 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
 
     // 动态数据存储
     private Component[] dynamicData = new Component[10]; // 初始大小为10，可以根据需要调整
-    private static Map<Class<? extends Component>, Integer> componentIndexMap = new HashMap<>();
+    private static final Map<Class<? extends Component>, Integer> componentIndexMap = new HashMap<>();
 
     {
         this.id = idIndex++;
@@ -120,6 +121,10 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
 
     public Vector2 getPosition() {
         return new Vector2(this.x, this.y);
+    }
+
+    public Vector2 getVelocity() {
+        return new Vector2(this.velX, this.velY);
     }
 
     public void setPosition(Vector2 vector2) {

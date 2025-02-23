@@ -79,17 +79,23 @@ public class Player extends Entity {
 
     private void handleInput(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            this.y = y + curSpeed * delta;
+            //this.y = y + curSpeed * delta;
+            velY += curSpeed * delta;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            this.y = y - curSpeed * delta;
+            //this.y = y - curSpeed * delta;
+            velY -= curSpeed * delta;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            this.x = x - curSpeed * delta;
+            //this.x = x - curSpeed * delta;
+            velX -= curSpeed * delta;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            this.x = x + curSpeed * delta;
+            //this.x = x + curSpeed * delta;
+            velX += curSpeed * delta;
         }
+
+
         // 左键发射攻击性子弹
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());

@@ -25,12 +25,10 @@ public class SystemManager implements Updateable, Drawable, ShapeRenderable, Dis
 
     public SystemManager addSystem(String name, WorldSystem system) {
         if (!this.systems.containsKey(name)) {
-            //system.setManager(this);
             this.systems.put(name, system);
             return this;
         }
-        //TODO
-        return this;
+        throw new RuntimeException("名称为：" + name + " 的系统已存在！！！");
     }
 
     public WorldSystem getSystem(String name) {
@@ -38,7 +36,7 @@ public class SystemManager implements Updateable, Drawable, ShapeRenderable, Dis
             return systems.get(name);
         }
         Log.error(TAG, "无法获取名为 "+ name +" 的系统！！！");
-        return null;
+        throw new RuntimeException("名称为：" + name + " 的系统不存在！！！");
     }
 
     /**

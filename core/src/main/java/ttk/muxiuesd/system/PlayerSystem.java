@@ -1,7 +1,5 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
@@ -29,25 +27,6 @@ public class PlayerSystem extends WorldSystem {
         this.player = (Player) EntitiesReg.get("player");
         this.playerLastPosition = this.player.getPosition();
         Log.print(TAG, "PlayerSystem初始化完成！");
-    }
-
-    @Override
-    public void update(float delta) {
-        //this.playerLastPosition = player.getPosition();
-    }
-
-    @Override
-    public void draw(Batch batch) {
-
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-
-    }
-
-    @Override
-    public void dispose() {
     }
 
     public Player getPlayer() {

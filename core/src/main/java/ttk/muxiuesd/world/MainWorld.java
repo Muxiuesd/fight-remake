@@ -19,6 +19,7 @@ public class MainWorld extends World {
             .addSystem("ChunkSystem", new ChunkSystem(this))
             .addSystem("EntitySystem", new EntitySystem(this))
             .addSystem("CameraFollowSystem", new CameraFollowSystem(this))
+            .addSystem("EntityCollisionSystem", new EntityCollisionSystem(this))
             .addSystem("BulletCollisionCheckSystem", new BulletCollisionCheckSystem(this))
             .addSystem("HandleInputSystem", new HandleInputSystem(this))
             .addSystem("SoundEffectSystem", new SoundEffectSystem(this))

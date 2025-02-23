@@ -27,17 +27,17 @@ public class EntitySystem extends WorldSystem {
 
     private Player player;
 
-    private Array<Entity> _delayAdd = new Array<>();
-    private Array<Entity> _delayRemove = new Array<>();
+    private final Array<Entity> _delayAdd = new Array<>();
+    private final Array<Entity> _delayRemove = new Array<>();
 
-    private Array<Entity> entities = new Array<>();
+    private final Array<Entity> entities = new Array<>();
 
     public Array<Entity> enemyEntity = new Array<>();
     public Array<Bullet> playerBulletEntity = new Array<>();
     public Array<Bullet> enemyBulletEntity = new Array<>();
 
-    private Array<Entity> updatableEntity = new Array<>();
-    private Array<Entity> drawableEntity = new Array<>();
+    private final Array<Entity> updatableEntity = new Array<>();
+    private final Array<Entity> drawableEntity = new Array<>();
 
     public EntitySystem(World world) {
         super(world);
@@ -55,7 +55,7 @@ public class EntitySystem extends WorldSystem {
         slime.setBounds((float) (this.player.x + 5 * Math.cos(Util.randomRadian())),
             (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
             1, 1);
-        this.add(slime);
+        //this.add(slime);
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }
@@ -198,6 +198,10 @@ public class EntitySystem extends WorldSystem {
     }
 
     public Player getPlayer() {
-        return player;
+        return this.player;
+    }
+
+    public Array<Entity> getEntities () {
+        return this.entities;
     }
 }
