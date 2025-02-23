@@ -69,6 +69,13 @@ public class Mod implements Runnable{
         return this.info.get("namespace").asString();
     }
 
+    /**
+     * 获取mod文件夹的路径
+     * */
+    public String getModPath() {
+        return this.modPath;
+    }
+
     public boolean isRunning () {
         return this.running;
     }

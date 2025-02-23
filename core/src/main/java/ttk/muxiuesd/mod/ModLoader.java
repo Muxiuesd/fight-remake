@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
@@ -75,13 +76,9 @@ public class ModLoader {
             && ! Objects.equals(info.getString("description"), "")
             && ! Objects.equals(info.getString("main"), "")) {
 
-            /*if (ModContainer.getInstance().hasMod(namespace)) {
-                Log.print(TAG, "Mod的命名空间：" + namespace + "已经存在，不可重复添加！！！");
-                return;
-            }*/
             Mod mod = new Mod(info, modDir, ModLibManager.getInstance().getLibEngine().getContext());
             ModContainer.getInstance().add(namespace, mod);
-            //this.mods.put(info.get("namespace").asString(), mod);
+            AssetsLoader.getInstance().addModAssetManager(namespace);
 
             Log.print(TAG, "文件夹：" + modDir.name() +" 的模组：" + mod.getModName() +" 完成加载。");
         }else {

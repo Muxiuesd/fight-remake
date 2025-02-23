@@ -5,6 +5,16 @@ var testBlock = newBlock(new Property().setFriction(1.0), "testmod:grass", "bloc
 var blockReg = ModRegistrant.getBlockRegister("testmod");
 blockReg.registry("test_block", testBlock);
 
+var fileLoader = getFileLoader("testmod");
+
+fileLoader.load(
+    "testmod:grass",
+    "assets/grass.png",
+    Texture.class,
+    new FileLoadCallback(function (file) {
+        Log.print(TAG, "资源加载完成！");
+    })
+);
 
 World.event.add("entityAttacked", function (attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);

@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.util.Log;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * 游戏资源加载管理器
@@ -15,7 +17,8 @@ import java.util.HashMap;
 public class AssetsLoader implements Disposable {
     public final String TAG = this.getClass().getSimpleName();
 
-    private final AssetManager assetManager = new AssetManager();
+    private final AssetManager gameAssetManager = new AssetManager();
+    private final HashMap<String, AssetManager> modAssetManagers = new HashMap<>();  //每一个mod分配一个资源管理器
     private final AsyncExecutor asyncExecutor = new AsyncExecutor(10);
 
     private final HashMap<String, String> idToPath; //id映射路径，规范id例子： fight:grass_block
@@ -37,11 +40,11 @@ public class AssetsLoader implements Disposable {
      * @param id 路径映射id
      * @param filePath 资源文件的路径
      * @param type 资源类型
-     * @param callback 加载完成后的回调函数
+     * @param callback 加载完成后的回调函数，可以为null
      * @param <T> 资源类型
      */
     public <T> void loadAsync(String id, String filePath, Class<T> type, Runnable callback) {
-        if (this.idToPath.containsKey(id)) {
+        if (this.containsId(id)) {
             //已存在则直接执行回调中的加载
             Gdx.app.postRunnable(callback);
             return;
@@ -50,19 +53,20 @@ public class AssetsLoader implements Disposable {
         this.idToPath.put(id, filePath);
     }
 
-
     public <T> void loadAsync(String filePath, Class<T> type, Runnable callback) {
-        if (!this.assetManager.isLoaded(filePath, type)) {
-            this.assetManager.load(filePath, type);
+        if (!this.gameAssetManager.isLoaded(filePath, type)) {
+            this.gameAssetManager.load(filePath, type);
 
             // 使用Gdx.app.postRunnable，确保在主线程中处理
             Gdx.app.postRunnable(() -> {
                 try {
                     // 在主线程中等待加载完成
-                    this.assetManager.finishLoading();
+                    this.gameAssetManager.finishLoading();
                     // 检查资源加载是否成功
-                    if (this.assetManager.isLoaded(filePath, type)) {
-                        callback.run(); // 资源加载完成，执行回调
+                    if (this.gameAssetManager.isLoaded(filePath, type)) {
+                        if (callback != null) {
+                            callback.run();
+                        }// 资源加载完成，执行回调
                     } else {
                         throw new IllegalStateException("资源加载失败: " + filePath);
                     }
@@ -72,7 +76,9 @@ public class AssetsLoader implements Disposable {
             });
         } else {
             // 如果已经加载，直接在主线程中执行回调
-            Gdx.app.postRunnable(callback);
+            if (callback != null) {
+                Gdx.app.postRunnable(callback);
+            }
         }
     }
 
@@ -84,12 +90,20 @@ public class AssetsLoader implements Disposable {
      * @return 已加载的资源
      */
     public <T> T getById(String id, Class<T> type) {
-        if (!this.idToPath.containsKey(id)) {
+        if (!this.containsId(id)) {
             Log.error(TAG, "Id为：" + id + "的资源路径根本不存在！！！");
             throw new IllegalStateException("无效Id" + id);
         }
-        String path = this.idToPath.get(id);
-        return this.get(path, type);
+        String[] split = id.split(":");
+        if (Objects.equals(split[0], Fight.NAMESPACE)) {
+            //先从游戏内部资源探查
+            return this.gameAssetManager.get(this.idToPath.get(id), type);
+        }else {
+            //mod资源
+            AssetManager modAssetManager = this.getModAssetManager(split[0]);
+            return modAssetManager.get(this.idToPath.get(id), type);
+        }
+        //throw new RuntimeException();
     }
 
     /**
@@ -101,16 +115,45 @@ public class AssetsLoader implements Disposable {
      * TODO 逐渐弃用这个
      */
     public <T> T get(String filePath, Class<T> type) {
-        if (!this.assetManager.isLoaded(filePath, type)) {
+        if (!this.gameAssetManager.isLoaded(filePath, type)) {
             throw new IllegalStateException("资源未加载: " + filePath);
         }
-        return this.assetManager.get(filePath, type);
+        return this.gameAssetManager.get(filePath, type);
     }
 
+    /**
+     * 添加mod的资源管理，在mod最开始加载的时候添加
+     * */
+    public void addModAssetManager(String namespace) {
+        if (!this.modAssetManagers.containsKey(namespace)) {
+            this.modAssetManagers.put(namespace, new AssetManager());
+        }else {
+            throw new RuntimeException("命名空间为：" + namespace + " 的资源管理器不可重复添加！！！");
+        }
+    }
+
+    /**
+     * 获取mod自己的资源管理器
+     * */
+    public AssetManager getModAssetManager(String namespace) {
+        return this.modAssetManagers.get(namespace);
+    }
+
+    public boolean containsId(String id) {
+        return this.idToPath.containsKey(id);
+    }
+
+    /**
+     * 内部的为assets里的路径
+     * mod的为mod文件加里的路径
+     * */
+    public void idMap (String id, String path) {
+        this.idToPath.put(id, path);
+    }
 
     @Override
     public void dispose() {
-        this.assetManager.dispose();
+        this.gameAssetManager.dispose();
         this.asyncExecutor.dispose();
     }
 
