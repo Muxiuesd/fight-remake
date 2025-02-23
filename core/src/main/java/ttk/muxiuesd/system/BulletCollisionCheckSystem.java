@@ -1,8 +1,9 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -321,17 +322,17 @@ public class BulletCollisionCheckSystem extends WorldSystem {
     }
 
     @Override
-    public void draw(Batch batch) {
-
-    }
-
-    @Override
     public void renderShape(ShapeRenderer batch) {
-
-    }
-
-    @Override
-    public void dispose() {
-
+        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        Array<Bullet> playerBulletEntity = es.playerBulletEntity;
+        Array<Bullet> enemyBulletEntity = es.enemyBulletEntity;
+        for (Bullet bullet : playerBulletEntity) {
+            Rectangle hurtbox = bullet.hurtbox;
+            batch.rect(hurtbox.getX(), hurtbox.getY(), hurtbox.getWidth(), hurtbox.getHeight());
+        }
+        for (Bullet bullet : enemyBulletEntity) {
+            Rectangle hurtbox = bullet.hurtbox;
+            batch.rect(hurtbox.getX(), hurtbox.getY(), hurtbox.getWidth(), hurtbox.getHeight());
+        }
     }
 }
