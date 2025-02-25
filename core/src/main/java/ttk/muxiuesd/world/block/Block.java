@@ -27,6 +27,11 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
 
     private Property property;
 
+    public Block (Property property, String textureId) {
+        this.setProperty(property);
+        this.loadTextureRegion(textureId);
+    }
+
     public Block(Property property, String textureId, String texturePath) {
         this.setProperty(property);
         this.loadTextureRegion(textureId, texturePath);
@@ -61,15 +66,19 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
         }
     }
 
-    public Property getProperty() {
+    public Property getProperty () {
         return property;
     }
 
-    public void setProperty(Property property) {
+    public void setProperty (Property property) {
         this.property = property;
     }
 
-    public void loadTextureRegion(String id, String texturePath) {
+    public void loadTextureRegion (String id) {
+        this.textureRegion = new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    }
+
+    public void loadTextureRegion (String id, String texturePath) {
         AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(id, Texture.class);
             this.textureRegion = new TextureRegion(texture);

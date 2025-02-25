@@ -17,6 +17,4 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
 });
 
 
-loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class, function (file) {
-    Log.print(TAG, file.getClass().getName() + "资源加载完成！");
-});
+loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);

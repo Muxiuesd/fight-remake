@@ -92,7 +92,7 @@ public class AssetsLoader implements Disposable {
     public <T> T getById(String id, Class<T> type) {
         if (!this.containsId(id)) {
             Log.error(TAG, "Id为：" + id + "的资源路径根本不存在！！！");
-            throw new IllegalStateException("无效Id" + id);
+            throw new IllegalStateException("无效Id：" + id);
         }
         String[] split = id.split(":");
         if (Objects.equals(split[0], Fight.NAMESPACE)) {
