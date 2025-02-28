@@ -14,7 +14,7 @@ public class EventBus {
 
     public enum EventType {
         RegistryBlock, RegistryWall,RegistryEntity,
-        BulletShoot, EntityAttacked, EntityDeath,
+        BulletShoot, EntityAttacked, EntityDeath, PlayerDeath,
         KeyInput, ButtonInput
     }
 
@@ -27,6 +27,7 @@ public class EventBus {
         eventGroups.put(EventType.BulletShoot, new EventGroup<BulletShootEvent>());
         eventGroups.put(EventType.EntityAttacked, new EventGroup<EntityAttackedEvent>());
         eventGroups.put(EventType.EntityDeath, new EventGroup<EntityDeathEvent>());
+        eventGroups.put(EventType.PlayerDeath, new EventGroup<PlayerDeathEvent>());
         eventGroups.put(EventType.KeyInput, new EventGroup<KeyInputEvent>());
         eventGroups.put(EventType.ButtonInput, new EventGroup<ButtonInputEvent>());
         Log.print(TAG, "事件总线初始化完成！");
@@ -42,10 +43,10 @@ public class EventBus {
      * @return
      */
     public <T extends Event> boolean addEvent (EventType eventType, T event) {
-        if (eventGroups.containsKey(eventType)) {
-            return eventGroups.get(eventType).addEvent(event);
+        if (!eventGroups.containsKey(eventType)) {
+            throw new IllegalArgumentException("不存在的事件类型：" + eventType);
         }
-        return false;
+        return eventGroups.get(eventType).addEvent(event);
     }
 
     /**
@@ -55,12 +56,8 @@ public class EventBus {
         if (this.eventGroups.containsKey(eventType)) {
             return this.eventGroups.get(eventType);
         }
-        log("EventType：" + eventType.name() + " 不存在！！！");
-        return null;
-    }
-
-    public void log (String msg) {
-        Log.print(TAG, msg);
+        Log.error(TAG, "EventType：" + eventType.name() + " 不存在！！！");
+        throw new IllegalArgumentException("不存在的事件类型：" + eventType);
     }
 
     public static EventBus getInstance () {

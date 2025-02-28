@@ -1,7 +1,5 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.screen.MainGameScreen;
@@ -44,21 +42,6 @@ public class CameraFollowSystem extends WorldSystem {
         float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
         cameraController.setPosition(follower.x + follower.width / 2 + xOffset,
             follower.y + follower.height / 2 + yOffset);
-    }
-
-    @Override
-    public void draw(Batch batch) {
-
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-
-    }
-
-    @Override
-    public void dispose() {
-
     }
 
     public Entity getFollower() {

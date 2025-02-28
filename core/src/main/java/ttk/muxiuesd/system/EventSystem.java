@@ -4,6 +4,7 @@ import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.instance.EventEnemyShootBullet;
+import ttk.muxiuesd.world.event.instance.EventPlayerDead;
 import ttk.muxiuesd.world.event.instance.EventPlayerShootBullet;
 import ttk.muxiuesd.world.event.instance.EventSlimeDead;
 
@@ -29,6 +30,7 @@ public class EventSystem extends WorldSystem {
     private void initAllEvents () {
         EventBus bus = EventBus.getInstance();
         //添加游戏内事件
+        bus.addEvent(EventBus.EventType.PlayerDeath, new EventPlayerDead());
         bus.addEvent(EventBus.EventType.EntityDeath, new EventSlimeDead(getWorld()));
         bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
         bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));

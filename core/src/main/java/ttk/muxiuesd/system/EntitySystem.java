@@ -25,8 +25,6 @@ import java.util.HashSet;
 public class EntitySystem extends WorldSystem {
     public final String TAG = EntitySystem.class.getName();
 
-    private Player player;
-
     private final Array<Entity> _delayAdd = new Array<>();
     private final Array<Entity> _delayRemove = new Array<>();
 
@@ -46,14 +44,14 @@ public class EntitySystem extends WorldSystem {
     @Override
     public void initialize () {
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.player = ps.getPlayer();
-        this.player.setEntitySystem(this);
+        Player player = ps.getPlayer();
+        player.setEntitySystem(this);
         this.add(player);
 
         Slime slime = new Slime();
         slime.setEntitySystem(this);
-        slime.setBounds((float) (this.player.x + 5 * Math.cos(Util.randomRadian())),
-            (float) (this.player.y + 5 * Math.sin(Util.randomRadian())),
+        slime.setBounds((float) (player.x + 5 * Math.cos(Util.randomRadian())),
+            (float) (player.y + 5 * Math.sin(Util.randomRadian())),
             1, 1);
         this.add(slime);
 
@@ -75,25 +73,26 @@ public class EntitySystem extends WorldSystem {
      * @param entity 实体
      */
     private void _add(Entity entity) {
-        if (entity instanceof Player) {
+        /*if (entity instanceof Player) {
             this.player = (Player) entity;
-        } else if (entity instanceof Bullet) {
+        }*/
+        if (entity instanceof Bullet) {
             Bullet bullet = (Bullet) entity;
             if (bullet.group == Group.player) {
                 this.playerBulletEntity.add(bullet);
-                this.callBulletShootEvent(this.player, bullet);
+                this.callBulletShootEvent(this.getPlayer(), bullet);
             }
             if (bullet.group == Group.enemy) {
                 this.enemyBulletEntity.add(bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             }
-        } else if (entity.group == Group.enemy) {
+        }
+        if (entity.group == Group.enemy) {
             this.enemyEntity.add(entity);
         }
 
-        updatableEntity.add(entity);
-        drawableEntity.add(entity);
-
+        this.updatableEntity.add(entity);
+        this.drawableEntity.add(entity);
         this.entities.add(entity);
     }
 
@@ -103,23 +102,21 @@ public class EntitySystem extends WorldSystem {
      * @param entity 实体
      */
     private void _remove(Entity entity) {
-        //暂时先不能移除玩家
-        /*if (player != null && player.id == entity.id) {
-            player = null;
-        }*/
-
         //优先进行实体组类型判断
         if (entity.group == Group.enemy) {
-            //敌人实体
+            //绝大部分移除调用都是敌人相关的实体
             if (entity instanceof Bullet) {
+                //大部分是子弹
                 Bullet bullet = (Bullet) entity;
                 this.enemyBulletEntity.removeValue(bullet, true);
             }else {
                 this.enemyEntity.removeValue(entity, true);
             }
-        }else if (entity.group == Group.player) {
-            //玩家实体
+        }
+        if (entity.group == Group.player) {
+            //其次是玩家相关的实体
             if (entity instanceof Bullet) {
+                //大部分是子弹
                 Bullet bullet = (Bullet) entity;
                 this.playerBulletEntity.removeValue(bullet, true);
             }else {
@@ -135,20 +132,20 @@ public class EntitySystem extends WorldSystem {
     @Override
     public void update(float delta) {
         if (!_delayRemove.isEmpty()) {
-            for (Entity entity : _delayRemove) {
+            for (Entity entity : this._delayRemove) {
                 _remove(entity);
 
             }
             _delayRemove.clear();
         }
         if (!_delayAdd.isEmpty()) {
-            for (Entity entity : _delayAdd) {
+            for (Entity entity : this._delayAdd) {
                 _add(entity);
             }
             _delayAdd.clear();
         }
 
-        for (Entity entity : updatableEntity) {
+        for (Entity entity : this.updatableEntity) {
             entity.update(delta);
 
             //移除死亡的实体,玩家死亡移除不在这个逻辑里
@@ -198,7 +195,8 @@ public class EntitySystem extends WorldSystem {
     }
 
     public Player getPlayer() {
-        return this.player;
+        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        return ps.getPlayer();
     }
 
     public Array<Entity> getEntities () {

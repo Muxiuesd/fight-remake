@@ -11,25 +11,23 @@ import ttk.muxiuesd.world.entity.enemy.Slime;
  * */
 public class EntitiesReg {
     static Registrant<Entity> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Entity.class);
-    static {
-        //register("slime", new Slime());
-    }
+
 
     public static void registerAllEntities () {
         register("player", new Player());
         register("slime", new Slime());
     }
 
-    private static void register (String id, Entity entity) {
-        registrant.register(id, entity);
+    private static void register (String name, Entity entity) {
+        registrant.register(name, entity);
         return;
     }
 
-    public static Entity get (String id) {
-        return registrant.get(id);
+    public static Entity get (String name) {
+        return registrant.get(name);
     }
 
-    public static <T> T get (String id, Class<T> clazz) {
-        return (T) get(id);
+    public static <T> T get (String name, Class<T> clazz) {
+        return (T) get(name);
     }
 }

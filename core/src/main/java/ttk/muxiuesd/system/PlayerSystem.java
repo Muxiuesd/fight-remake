@@ -6,6 +6,9 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.event.EventGroup;
+import ttk.muxiuesd.world.event.abs.PlayerDeathEvent;
 
 /**
  * 玩家系统
@@ -29,6 +32,41 @@ public class PlayerSystem extends WorldSystem {
         Log.print(TAG, "PlayerSystem初始化完成！");
     }
 
+    @Override
+    public void update (float delta) {
+        if (this.player.isDeath()) {
+            EventGroup<PlayerDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.PlayerDeath);
+            for (PlayerDeathEvent event : eventGroup.getEvents()) {
+                event.call(getWorld(), this.player);
+            }
+            this.remakePlayer();
+            return;
+        }
+    }
+
+    /**
+     *
+     * */
+    private void remakePlayer () {
+        //移除旧的玩家实体
+        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        es.remove(this.player);
+
+        //生成新的玩家实体
+        this.player = (Player) EntitiesReg.get("player");
+        this.player.setEntitySystem(es);
+        this.playerLastPosition = this.player.getPosition();
+        es.add(player);
+
+        //更新其他与玩家有关的配置
+        CameraFollowSystem cfs = (CameraFollowSystem)getManager().getSystem("CameraFollowSystem");
+        cfs.setFollower(this.player);
+    }
+
+
+    /**
+     * 获取玩家的唯一方式，其他地方获取玩家也是通过这个方法
+     * */
     public Player getPlayer() {
         return this.player;
     }

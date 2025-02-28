@@ -72,6 +72,9 @@ public class ChunkSystem extends WorldSystem {
 
     @Override
     public void update(float delta) {
+        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        this.player = ps.getPlayer();
+
         if (delta == 0) {
             // 预加载
             // 先强制加载一次玩家所在的区块
@@ -334,9 +337,9 @@ public class ChunkSystem extends WorldSystem {
     }
 
     /**
-     * 初始化区块
+     * （主线程）初始化区块
      */
-    private Chunk initChunk(int chunkX, int chunkY) {
+    public Chunk initChunk(int chunkX, int chunkY) {
         Chunk chunk = new Chunk(this);
         chunk.setChunkPosition(new ChunkPosition(chunkX, chunkY));
         chunk.initBlock();
@@ -410,8 +413,9 @@ public class ChunkSystem extends WorldSystem {
             }
         }
         // 如果没有这个区块,暂时就这么处理
-        // TODO
-        return null;
+        Chunk chunk = this.initChunk(chunkPosition.getX(), chunkPosition.getY());
+        this._loadChunks.add(chunk);
+        return chunk;
     }
 
     /**
