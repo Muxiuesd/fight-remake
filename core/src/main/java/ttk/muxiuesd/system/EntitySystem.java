@@ -86,8 +86,7 @@ public class EntitySystem extends WorldSystem {
                 this.enemyBulletEntity.add(bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             }
-        }
-        if (entity.group == Group.enemy) {
+        }else if (entity.group == Group.enemy) {
             this.enemyEntity.add(entity);
         }
 

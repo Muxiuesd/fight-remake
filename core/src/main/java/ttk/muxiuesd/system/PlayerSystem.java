@@ -26,7 +26,7 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        //this.player = new Player(1000, 1000);
+
         this.player = (Player) EntitiesReg.get("player");
         this.playerLastPosition = this.player.getPosition();
         Log.print(TAG, "PlayerSystem初始化完成！");
