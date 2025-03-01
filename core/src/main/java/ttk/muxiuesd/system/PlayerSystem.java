@@ -1,6 +1,8 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
@@ -45,7 +47,7 @@ public class PlayerSystem extends WorldSystem {
     }
 
     /**
-     *
+     * 玩家重开
      * */
     private void remakePlayer () {
         //移除旧的玩家实体
@@ -61,6 +63,8 @@ public class PlayerSystem extends WorldSystem {
         //更新其他与玩家有关的配置
         CameraFollowSystem cfs = (CameraFollowSystem)getManager().getSystem("CameraFollowSystem");
         cfs.setFollower(this.player);
+
+        AudioPlayer.getInstance().playMusic(Fight.getId("player_resurrection"));
     }
 
 

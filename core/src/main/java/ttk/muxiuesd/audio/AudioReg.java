@@ -12,6 +12,7 @@ public class AudioReg {
     public static void registerAllAudios () {
         //玩家
         registerSoundAsMusic("shoot", "player/shoot.wav");
+        registerMusic("player_resurrection", "player_resurrection.mp3");
 
         //方块
         registerSound("grass_walk", "block/walk/grass.wav");

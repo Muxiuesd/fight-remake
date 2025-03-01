@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 
 /**
  * 声音播放器
+ * <p>
+ * 没有特殊音效方面的需求的话可以直接调用此类播放
  * */
 public class AudioPlayer {
     public final String TAG = this.getClass().getName();
