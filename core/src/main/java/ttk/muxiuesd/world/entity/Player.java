@@ -36,12 +36,12 @@ public class Player extends Entity {
         curSpeed = speed;
         setSize(1, 1);
 
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player"), "player/player.png", Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().get("player/player.png", Texture.class);
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player"), "texture/player/player.png", Texture.class, () -> {
+            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"), "player/shield.png", Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().get("player/shield.png", Texture.class);
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"), "texture/player/shield.png", Texture.class, () -> {
+            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player_shield"), Texture.class);
             this.shield = new TextureRegion(texture);
         });
 

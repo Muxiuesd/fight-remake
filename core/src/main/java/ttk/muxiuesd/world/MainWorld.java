@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.screen.MainGameScreen;
@@ -19,6 +18,7 @@ public class MainWorld extends World {
             .addSystem("PlayerSystem", new PlayerSystem(this))
             .addSystem("ChunkSystem", new ChunkSystem(this))
             .addSystem("EntitySystem", new EntitySystem(this))
+            .addSystem("ParticleSystem", new ParticleSystem(this))
             .addSystem("CameraFollowSystem", new CameraFollowSystem(this))
             .addSystem("EntityCollisionSystem", new EntityCollisionSystem(this))
             .addSystem("BulletCollisionCheckSystem", new BulletCollisionCheckSystem(this))
@@ -30,7 +30,7 @@ public class MainWorld extends World {
     @Override
     public void update(float delta) {
         super.update(delta);
-        System.out.println(Gdx.graphics.getFramesPerSecond());
+        //System.out.println(Gdx.graphics.getFramesPerSecond());
     }
 
     @Override

@@ -132,12 +132,28 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
         this.y = vector2.y;
     }
 
+    public Vector2 getSize () {
+        return new Vector2(this.width, this.height);
+    }
+
     public float getWidth() {
         return this.width;
     }
 
     public float getHeight() {
         return this.height;
+    }
+
+    public Vector2 getOrigin() {
+        return new Vector2(this.originX, this.originY);
+    }
+
+    public Vector2 getCenter() {
+        return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
+    }
+
+    public Vector2 getScale () {
+        return new Vector2(this.scaleX, this.scaleY);
     }
 
     // 添加组件
