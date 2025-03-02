@@ -29,8 +29,8 @@ public class BulletFire extends Bullet {
         super.update(delta);
 
         setLiveTime(getLiveTime() + delta);
-        this.x = x + speed * delta * xDirection;
-        this.y = y + speed * delta * yDirection;
+        this.x = x + speed * delta * velX;
+        this.y = y + speed * delta * velY;
     }
 
 }

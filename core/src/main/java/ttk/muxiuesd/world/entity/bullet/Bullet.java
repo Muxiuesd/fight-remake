@@ -10,8 +10,6 @@ public abstract class Bullet extends Entity {
     public Entity owner;
 
     public float damage;
-    public float xDirection;
-    public float yDirection;
     public float speed;
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
@@ -38,8 +36,8 @@ public abstract class Bullet extends Entity {
     }
 
     public void setDirection(float xDirection, float yDirection) {
-        this.xDirection = xDirection;
-        this.yDirection = yDirection;
+        this.velX = xDirection;
+        this.velY = yDirection;
         this.setDegrees();
     }
 
@@ -50,7 +48,7 @@ public abstract class Bullet extends Entity {
         // 调整旋转原点
         setOrigin(width / 2, height / 2);
         // 计算旋转角度
-        double v = Math.atan2(yDirection, xDirection);
+        double v = Math.atan2(velX, velY);
         this.rotation = (float) Math.toDegrees(v);
     }
 

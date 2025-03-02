@@ -1,17 +1,17 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.particle.Particle;
 import ttk.muxiuesd.world.particle.ParticleAssets;
-import ttk.muxiuesd.world.particle.ParticlePool;
+import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
+import ttk.muxiuesd.world.particle.emitters.EmitterPlayerBulletParticle;
+
+import java.util.LinkedHashMap;
 
 /**
  * 粒子系统
@@ -19,10 +19,12 @@ import ttk.muxiuesd.world.particle.ParticlePool;
 public class ParticleSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
-    private ParticlePool pool;
-    private Array<Particle> activeParticles;
-    private Array<Particle> delayAddParticles;
-    private Array<Particle> delayRemoveParticles;
+    private LinkedHashMap<String, ParticleEmitter> emitters;
+
+    private Array<ParticleEmitter> activeEmitters;  //活跃的粒子发射器
+    private Array<ParticleEmitter> delayAddEmitters;
+    private Array<ParticleEmitter> delayRemoveEmitters;
+
 
     public ParticleSystem (World world) {
         super(world);
@@ -31,82 +33,82 @@ public class ParticleSystem extends WorldSystem {
     @Override
     public void initialize () {
         ParticleAssets.loadAll();
-        this.pool = new ParticlePool();
-        this.activeParticles = new Array<>();
-        this.delayAddParticles = new Array<>();
-        this.delayRemoveParticles = new Array<>();
+        this.emitters = new LinkedHashMap<>();
+        this.activeEmitters = new Array<>();
+        this.delayAddEmitters = new Array<>();
+        this.delayRemoveEmitters = new Array<>();
+
+        this.addEmitter(Fight.getId("player_shoot"), new EmitterPlayerBulletParticle());
+
         Log.print(TAG, "粒子系统初始化完成");
     }
 
     @Override
     public void update (float delta) {
-        if (this.delayRemoveParticles.size > 0) {
-            this.activeParticles.removeAll(this.delayRemoveParticles, true);
-            this.pool.freeAll(this.delayRemoveParticles);
-            this.delayRemoveParticles.clear();
+        if (this.delayAddEmitters.size > 0) {
+            this.activeEmitters.addAll(this.delayAddEmitters);
+            this.delayAddEmitters.clear();
         }
-        if (this.delayAddParticles.size > 0) {
-            this.activeParticles.addAll(this.delayAddParticles);
-            this.delayAddParticles.clear();
+        if (this.delayRemoveEmitters.size > 0) {
+            this.activeEmitters.removeAll(this.delayRemoveEmitters, true);
+            this.delayRemoveEmitters.clear();
         }
-        //进行更新
-        for (Particle p : this.activeParticles) {
-            if (p.lifetime >= p.duration) {
-                this.removeParticle(p);
+
+        for (ParticleEmitter emitter : this.activeEmitters) {
+            //把没有活跃粒子的粒子发射器移出来，跳过更新
+            if (emitter.getActiveParticlesCount() <= 0) {
+                this.delayRemoveEmitters.add(emitter);
                 continue;
             }
-            // 空气阻力
-            p.velocity.scl((float) Math.pow(0.98, delta * 60));
-            p.position.mulAdd(p.velocity, delta);
-
-            // 尺寸变化
-            float t = p.lifetime / p.duration;
-            p.curSize.x = p.startSize.x + (p.endSize.x - p.startSize.x) * t;
-            p.curSize.y = p.startSize.y + (p.endSize.y - p.startSize.y) * t;
-
-            p.lifetime += delta;
+            emitter.update(delta);
         }
+        //System.out.println(this.activeEmitters.size);
     }
 
     @Override
     public void draw (Batch batch) {
-        for (Particle p : this.activeParticles) {
-            p.draw(batch);
+        for (ParticleEmitter emitter : this.activeEmitters) {
+            emitter.draw(batch);
         }
     }
 
     /**
      * 发射粒子
      * */
-    public void emitParticle (String textureId,
+    public void emitParticle (String emitterId, int count,
                               Vector2 position, Vector2 velocity, Vector2 origin,
                               Vector2 startSize, Vector2 endSize, Vector2 scale,
                               float rotation, float duration) {
-        Particle p = this.pool.obtain();
-        p.region = new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
-        p.position.set(position);
-        p.velocity.set(velocity);
-        p.origin.set(origin);
-        p.startSize.set(startSize);
-        p.endSize.set(endSize);
-        p.scale.set(scale);
-        p.rotation = rotation;
-        p.duration = duration;
-        //添加粒子
-        this.addParticle(p);
+        if (!this.emitters.containsKey(emitterId)) {
+            throw new IllegalArgumentException("id为：" + emitterId + " 的粒子发射器不存在！！！");
+        }
+        ParticleEmitter emitter = this.activateEmitter(emitterId);
+        for (int i = 0; i < count; i++) {
+            emitter.summon(position, velocity, origin, startSize, endSize, scale, rotation, duration);
+        }
     }
 
     /**
-     * 延迟增加粒子
+     * 添加一种粒子发射器
      * */
-    public void addParticle (Particle p) {
-        this.delayAddParticles.add(p);
+    public void addEmitter (String id, ParticleEmitter emitter) {
+        if (this.emitters.containsKey(id)) {
+            throw new RuntimeException("发射器id：" + id + " 已存在，不可重复添加！！！");
+        }
+        this.emitters.put(id, emitter);
     }
 
     /**
-     * 延迟移除粒子
+     * 激活粒子发射器
+     * @return 返回激活的粒子发射器
      * */
-    public void removeParticle (Particle p) {
-        this.delayRemoveParticles.add(p);
+    private ParticleEmitter activateEmitter (String id) {
+        ParticleEmitter emitter = this.emitters.get(id);
+        if (this.activeEmitters.contains(emitter, true)) {
+            Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");
+            return emitter;
+        }
+        this.delayAddEmitters.add(emitter);
+        return emitter;
     }
 }

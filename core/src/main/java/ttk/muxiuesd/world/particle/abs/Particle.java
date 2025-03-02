@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.particle;
+package ttk.muxiuesd.world.particle.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,7 +10,7 @@ import ttk.muxiuesd.interfaces.Drawable;
 /**
  * 粒子
  * */
-public class Particle implements Drawable, Pool.Poolable, Disposable {
+public abstract class Particle implements Drawable, Pool.Poolable, Disposable {
     public TextureRegion region;    //材质需单独设置
 
     public Vector2 position;
