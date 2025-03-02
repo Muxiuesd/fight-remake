@@ -56,9 +56,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
         Player player = playerSystem.getPlayer();
-        Vector2 playerCenter = player.getPlayerCenter();
+        Vector2 playerCenter = player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
-        player.curSpeed = player.speed * block.getProperty().getFriction();
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
 

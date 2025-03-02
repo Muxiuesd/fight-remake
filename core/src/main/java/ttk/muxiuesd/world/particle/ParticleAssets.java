@@ -12,7 +12,7 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 public class ParticleAssets {
     public static void loadAll (){
         loadTexture("spell", "texture/particle/spell.png");
-
+        loadTexture("bubble", "texture/particle/bubble.png");
     }
 
     private static void loadTexture (String name, String path) {

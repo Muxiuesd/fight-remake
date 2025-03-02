@@ -9,6 +9,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
+import ttk.muxiuesd.world.particle.emitters.EmitterEntitySwimming;
 import ttk.muxiuesd.world.particle.emitters.EmitterPlayerBulletParticle;
 
 import java.util.LinkedHashMap;
@@ -39,6 +40,7 @@ public class ParticleSystem extends WorldSystem {
         this.delayRemoveEmitters = new Array<>();
 
         this.addEmitter(Fight.getId("player_shoot"), new EmitterPlayerBulletParticle());
+        this.addEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
 
         Log.print(TAG, "粒子系统初始化完成");
     }
@@ -105,7 +107,7 @@ public class ParticleSystem extends WorldSystem {
     private ParticleEmitter activateEmitter (String id) {
         ParticleEmitter emitter = this.emitters.get(id);
         if (this.activeEmitters.contains(emitter, true)) {
-            Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");
+            //Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");
             return emitter;
         }
         this.delayAddEmitters.add(emitter);

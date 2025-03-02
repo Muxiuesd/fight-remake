@@ -1,11 +1,14 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
@@ -20,6 +23,9 @@ public class PlayerSystem extends WorldSystem {
 
     private Player player;
     private Vector2 playerLastPosition;
+
+    public float maxSpan = 0.5f;
+    public float span = 0;
 
     public PlayerSystem(World world) {
         super(world);
@@ -43,6 +49,24 @@ public class PlayerSystem extends WorldSystem {
             }
             this.remakePlayer();
             return;
+        }
+
+        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        Vector2 playerCenter = this.player.getCenter();
+        Block block = cs.getBlock(playerCenter.x, playerCenter.y);
+        player.curSpeed = player.speed * block.getProperty().getFriction();
+
+        if (this.span >= this.maxSpan && block instanceof BlockWater) {
+            ParticleSystem pts = (ParticleSystem) getManager().getSystem("ParticleSystem");
+            pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(3, 7),
+                playerCenter.set(playerCenter.x, playerCenter.y - 0.4f),
+                new Vector2(MathUtils.random(1, 2), 0),
+                this.player.getOrigin(),
+                this.player.getSize().scl(0.2f), this.player.getSize().scl(0.05f),
+                this.player.getScale(), MathUtils.random(0, 360), 2f);
+            this.span = 0;
+        }else if (this.span < this.maxSpan) {
+            this.span += delta;
         }
     }
 
