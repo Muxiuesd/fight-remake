@@ -8,9 +8,11 @@ import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.particle.ParticleAssets;
+import ttk.muxiuesd.world.particle.ParticleDefaultConfig;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
+import ttk.muxiuesd.world.particle.emitters.EmitterEnemyShootParticle;
 import ttk.muxiuesd.world.particle.emitters.EmitterEntitySwimming;
-import ttk.muxiuesd.world.particle.emitters.EmitterPlayerBulletParticle;
+import ttk.muxiuesd.world.particle.emitters.EmitterPlayerShootParticle;
 
 import java.util.LinkedHashMap;
 
@@ -39,8 +41,9 @@ public class ParticleSystem extends WorldSystem {
         this.delayAddEmitters = new Array<>();
         this.delayRemoveEmitters = new Array<>();
 
-        this.addEmitter(Fight.getId("player_shoot"), new EmitterPlayerBulletParticle());
-        this.addEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
+        this.registryEmitter(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
+        this.registryEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
+        this.registryEmitter(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());
 
         Log.print(TAG, "粒子系统初始化完成");
     }
@@ -75,6 +78,26 @@ public class ParticleSystem extends WorldSystem {
     }
 
     /**
+     * 简单发射粒子，使用默认参数
+     * TODO 用id来使用不同的默认参数
+     * */
+    public void emitParticle (String emitterId, int count, Vector2 position, ParticleDefaultConfig defaultConfig) {
+        this.emitParticle(emitterId, count,
+            position, defaultConfig.velocity, defaultConfig.origin,
+            defaultConfig.startSize, defaultConfig.endSize, defaultConfig.scale,
+            defaultConfig.rotation, defaultConfig.duration);
+    }
+
+    public void emitParticle (String emitterId, int count,
+                              Vector2 position, Vector2 velocity,
+                              float duration, ParticleDefaultConfig defaultConfig) {
+        this.emitParticle(emitterId, count,
+            position, velocity, new Vector2(),
+            defaultConfig.startSize, defaultConfig.endSize, defaultConfig.scale,
+            0f, duration);
+    }
+
+    /**
      * 发射粒子
      * */
     public void emitParticle (String emitterId, int count,
@@ -93,7 +116,7 @@ public class ParticleSystem extends WorldSystem {
     /**
      * 添加一种粒子发射器
      * */
-    public void addEmitter (String id, ParticleEmitter emitter) {
+    public void registryEmitter (String id, ParticleEmitter emitter) {
         if (this.emitters.containsKey(id)) {
             throw new RuntimeException("发射器id：" + id + " 已存在，不可重复添加！！！");
         }

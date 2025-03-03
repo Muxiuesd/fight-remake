@@ -13,11 +13,8 @@ import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 /**
  * 玩家发射子弹的粒子发射器
  * */
-public class EmitterPlayerBulletParticle extends ParticleEmitter<ParticleSpell> {
-
-    private TextureRegion region;
-
-    public EmitterPlayerBulletParticle () {
+public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
+    public EmitterPlayerShootParticle () {
         setParticlePool(new ParticlePool<>(100) {
             @Override
             protected ParticleSpell newObject () {
@@ -26,6 +23,7 @@ public class EmitterPlayerBulletParticle extends ParticleEmitter<ParticleSpell> 
                 return particleSpell;
             }
         });
+        //这里设置默认的贴图会出错
         //this.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("spell"), Texture.class));
     }
 

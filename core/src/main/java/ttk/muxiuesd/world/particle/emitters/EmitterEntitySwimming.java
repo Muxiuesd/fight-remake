@@ -28,7 +28,7 @@ public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
     @Override
     public void motionLogic (ParticleBubble particle, float delta) {
         //水体阻力
-        particle.velocity.scl((float) Math.pow(0.98, delta * 60));
+        particle.velocity.scl((float) Math.pow(0.98, delta * 120));
         particle.position.mulAdd(particle.velocity, delta);
 
         // 尺寸变化
