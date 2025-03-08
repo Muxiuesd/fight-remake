@@ -15,6 +15,7 @@ public class EventBus {
     public enum EventType {
         RegistryBlock, RegistryWall,RegistryEntity,
         BulletShoot, EntityAttacked, EntityDeath, PlayerDeath,
+        TickUpdate,
         KeyInput, ButtonInput
     }
 
@@ -28,6 +29,7 @@ public class EventBus {
         eventGroups.put(EventType.EntityAttacked, new EventGroup<EntityAttackedEvent>());
         eventGroups.put(EventType.EntityDeath, new EventGroup<EntityDeathEvent>());
         eventGroups.put(EventType.PlayerDeath, new EventGroup<PlayerDeathEvent>());
+        eventGroups.put(EventType.TickUpdate, new EventGroup<WorldTickUpdateEvent>());
         eventGroups.put(EventType.KeyInput, new EventGroup<KeyInputEvent>());
         eventGroups.put(EventType.ButtonInput, new EventGroup<ButtonInputEvent>());
         Log.print(TAG, "事件总线初始化完成！");

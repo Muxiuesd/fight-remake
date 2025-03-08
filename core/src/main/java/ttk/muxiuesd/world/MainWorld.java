@@ -14,6 +14,7 @@ public class MainWorld extends World {
         //一定要最先初始化世界系统管理器
         setWorldSystemsManager(new WorldSystemsManager(this));
         getSystemManager()
+            .addSystem("TimeSystem", new TimeSystem(this))
             .addSystem("EventSystem", new EventSystem(this))
             .addSystem("PlayerSystem", new PlayerSystem(this))
             .addSystem("ChunkSystem", new ChunkSystem(this))
