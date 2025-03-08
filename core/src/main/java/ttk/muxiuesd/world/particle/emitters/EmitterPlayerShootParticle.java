@@ -38,6 +38,9 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
         particle.curSize.x = particle.startSize.x + (particle.endSize.x - particle.startSize.x) * t;
         particle.curSize.y = particle.startSize.y + (particle.endSize.y - particle.startSize.y) * t;
 
+        particle.origin.set(particle.curSize.x / 2, particle.curSize.y / 2);
+        //particle.rotation += (particle.duration - particle.lifetime) * 360;
+
         particle.lifetime += delta;
     }
 
@@ -49,11 +52,11 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
         p.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("spell"), Texture.class));
         p.position.set(position);
         p.origin.set(origin);
-        p.startSize.set(startSize);
+        p.startSize.set(startSize).scl(MathUtils.random(0.8f, 1.3f));
         p.endSize.set(endSize);
         p.scale.set(scale);
-        p.rotation = rotation;
-        p.duration = duration;
+        p.rotation = rotation + MathUtils.random(0, 360);
+        p.duration = duration + MathUtils.random(-0.6f, 1.5f);
 
         // 初始化运动参数
         float angle = MathUtils.random(0, 360);

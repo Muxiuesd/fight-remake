@@ -31,7 +31,7 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
     public abstract void motionLogic (T particle, float delta);
 
     /**
-     * 生成逻辑
+     * 粒子的生成逻辑
      * */
     public abstract void summon (Vector2 position, Vector2 velocity, Vector2 origin,
                                  Vector2 startSize, Vector2 endSize, Vector2 scale,

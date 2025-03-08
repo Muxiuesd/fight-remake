@@ -8,7 +8,8 @@ import com.badlogic.gdx.math.Vector2;
  * */
 public class ParticleDefaultConfig {
     //注册不同的默认粒子参数
-    public static final ParticleDefaultConfig ShootParticle = registry(null, null, new Vector2(),
+    public static final ParticleDefaultConfig ShootParticle = registry(
+        null, null, new Vector2(0.25f, 0.25f),
         new Vector2(0.5f, 0.5f), new Vector2(0.1f, 0.1f), new Vector2(1f, 1f),
         0f, 1f);
 

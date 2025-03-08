@@ -52,8 +52,8 @@ public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
         p.startSize.set(startSize);
         p.endSize.set(endSize);
         p.scale.set(scale);
-        p.rotation = rotation;
-        p.duration = duration;
+        p.rotation = rotation + MathUtils.random(0, 360);
+        p.duration = duration + MathUtils.random(-0.4f, 1f);
 
         p.velocity.set(velocity).setAngleDeg(MathUtils.random(0, 360));
 
