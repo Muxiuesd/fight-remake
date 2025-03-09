@@ -1,6 +1,8 @@
 #version 330 core
 
 in vec2 v_texCoord;
+in vec4 v_color;//从顶点着色器传入的纹理颜色
+
 out vec4 fragColor;
 
 uniform sampler2D u_texture;
@@ -8,12 +10,12 @@ uniform float u_time; // 0.0(午夜) ~ 1.0(次日午夜)
 
 // 定义昼夜颜色配置
 #define DAY_COLOR vec3(1.0, 0.98, 0.9)    // 浅黄色（白天）
-#define NIGHT_COLOR vec3(0.2, 0.3, 0.8)   // 深蓝色（夜晚）
+#define NIGHT_COLOR vec3(0.05, 0.07, 0.1)   // 深蓝色（夜晚）
 #define DUSK_COLOR vec3(0.8, 0.4, 0.2)    // 黄昏橙红色
 
 void main() {
     // 基础纹理颜色
-    vec4 texColor = texture(u_texture, v_texCoord);
+    vec4 texColor = texture(u_texture, v_texCoord)*v_color;//乘以顶点颜色
 
     // 计算时间曲线（平滑过渡）
     float timeCurve = sin(u_time * 3.14159265 * 2.0) * 0.5 + 0.5;

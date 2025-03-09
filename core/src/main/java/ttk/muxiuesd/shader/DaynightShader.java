@@ -24,7 +24,7 @@ public class DaynightShader {
     }
 
     public void update(float delta) {
-        // 每60秒完成一次昼夜循环
+        // 每120秒完成一次昼夜循环
         timeCycle += delta / 120.0f;
         timeCycle %= 1.0f;
     }
