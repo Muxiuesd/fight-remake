@@ -61,7 +61,7 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.WHITE);
+        ScreenUtils.clear(Color.BLACK);
 
         this.world.update(delta);
 

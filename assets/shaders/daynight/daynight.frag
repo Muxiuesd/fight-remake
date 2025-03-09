@@ -8,6 +8,8 @@ out vec4 fragColor;
 uniform sampler2D u_texture;
 uniform float u_time; // 0.0(午夜) ~ 1.0(次日午夜)
 
+#define PI 3.1415926535
+
 // 定义昼夜颜色配置
 #define DAY_COLOR vec3(1.0, 0.98, 0.9)    // 浅黄色（白天）
 #define NIGHT_COLOR vec3(0.05, 0.07, 0.1)   // 深蓝色（夜晚）
@@ -18,7 +20,7 @@ void main() {
     vec4 texColor = texture(u_texture, v_texCoord)*v_color;//乘以顶点颜色
 
     // 计算时间曲线（平滑过渡）
-    float timeCurve = sin(u_time * 3.14159265 * 2.0) * 0.5 + 0.5;
+    float timeCurve = sin(u_time * PI * 2.0) * 0.5 + 0.5;
 
     // 混合昼夜颜色
     vec3 lightColor = mix(NIGHT_COLOR, DAY_COLOR, smoothstep(0.2, 0.8, timeCurve));

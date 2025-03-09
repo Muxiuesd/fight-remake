@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import ttk.muxiuesd.system.DaynightSystem;
 import ttk.muxiuesd.util.Log;
 
 /**
@@ -11,9 +12,10 @@ import ttk.muxiuesd.util.Log;
  * */
 public class DaynightShader {
     private final ShaderProgram shader;
-    private float timeCycle; // 0~1 循环
+    private DaynightSystem daynightSystem;
 
-    public DaynightShader() {
+    public DaynightShader(DaynightSystem daynightSystem) {
+        this.daynightSystem = daynightSystem;
         String vert = Gdx.files.internal("shaders/daynight/daynight.vert").readString();
         String frag = Gdx.files.internal("shaders/daynight/daynight.frag").readString();
         this.shader = new ShaderProgram(vert, frag);
@@ -24,15 +26,14 @@ public class DaynightShader {
     }
 
     public void update(float delta) {
-        // 每120秒完成一次昼夜循环
-        timeCycle += delta / 360.0f;
-        timeCycle %= 1.0f;
+
     }
 
     public void begin(Batch batch, OrthographicCamera camera) {
         shader.bind();
         shader.setUniformMatrix("u_projTrans", camera.combined);
-        shader.setUniformf("u_time", timeCycle);
+        //转换为0 ~ 1.0
+        shader.setUniformf("u_time", daynightSystem.getGameTime() / 24f);
 
         batch.setShader(shader);
     }

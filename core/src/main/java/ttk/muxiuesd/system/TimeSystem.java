@@ -14,13 +14,13 @@ import ttk.muxiuesd.world.event.abs.WorldTickUpdateEvent;
  * tick更新为不精确更新，无法保证每秒一定更新多少次，但会传入每两次tick更新的间隔以供使用
  * */
 public class TimeSystem extends WorldSystem implements Tickable {
-    // 游戏时间参数（1秒现实=10分钟游戏时间）
-    public static final float REAL_SECOND_TO_GAME_MINUTE = 10f;
-
+    // 游戏时间参数（1秒现实=5分钟游戏时间）
+    public static final float REAL_SECOND_TO_GAME_MINUTE = 5f;
     public static final int TicksPerSecond = 20;
     public static final float TickMaxSpan = 1f / TicksPerSecond;
+
     private float tickSpan = 0f;
-    private float gameTime = 0f;
+    private float gameTime = 0f;    //游戏内的时间
 
     private final Array<Tickable> tickUpdates;
     private final Array<Tickable> delayAdd;
@@ -48,6 +48,8 @@ public class TimeSystem extends WorldSystem implements Tickable {
         this.gameTime += delta * REAL_SECOND_TO_GAME_MINUTE / 60f;
         // 24小时循环
         if(this.gameTime >= 24f) this.gameTime -= 24f;
+
+        //System.out.println("游戏内时间：" + this.gameTime);
 
         if (this.tickSpan >= TickMaxSpan) {
             this.tick(this.tickSpan);

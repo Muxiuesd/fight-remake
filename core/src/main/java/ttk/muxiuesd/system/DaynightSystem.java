@@ -12,11 +12,18 @@ public class DaynightSystem extends WorldSystem {
 
     private DaynightShader daynightShader;
     private OrthographicCamera camera;
+    private TimeSystem timeSystem;
+
 
     public DaynightSystem (World world) {
         super(world);
-        this.daynightShader = new DaynightShader();
+    }
+
+    @Override
+    public void initialize () {
+        this.daynightShader = new DaynightShader(this);
         this.camera = getWorld().getScreen().cameraController.camera;
+        this.timeSystem = (TimeSystem) getManager().getSystem("TimeSystem");
     }
 
     @Override
@@ -30,5 +37,9 @@ public class DaynightSystem extends WorldSystem {
 
     public void end() {
         this.daynightShader.end(getWorld().getScreen().batch);
+    }
+
+    public float getGameTime () {
+        return this.timeSystem.getGameTime();
     }
 }
