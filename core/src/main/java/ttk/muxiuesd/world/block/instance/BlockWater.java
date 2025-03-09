@@ -9,7 +9,7 @@ public class BlockWater extends Block {
     public BlockWater() {
         super(new Property().setFriction(0.2f),
             Fight.getId("water"),
-            "block/water_overlay.png");
+            Fight.getBlockTexture("water_overlay.png"));
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/water_overlay.png", Texture.class));
     }
 

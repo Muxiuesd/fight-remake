@@ -31,6 +31,7 @@ public class MainGameScreen implements Screen {
     public ShapeRenderer shapeRenderer = new ShapeRenderer() {{
         setAutoShapeType(true);
     }};
+
     //游戏目前加载的世界，后续可能有多个世界
     private World world;
 

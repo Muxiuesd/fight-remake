@@ -9,7 +9,7 @@ public class WallTest extends Wall{
     public WallTest() {
         super(new Property().setFriction(1f),
             Fight.getId("test"),
-            "block/block_test.png");
+            Fight.getBlockTexture("block_test.png"));
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/block_test.png", Texture.class));
     }
 }

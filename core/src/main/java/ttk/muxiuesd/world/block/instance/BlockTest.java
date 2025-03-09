@@ -7,7 +7,7 @@ public class BlockTest extends Block {
     public BlockTest() {
         super(new Property().setFriction(1.0f),
             Fight.getId("test"),
-            "block/block_test.png");
+            Fight.getBlockTexture("block_test.png"));
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/block_test.png", Texture.class));
     }
 }

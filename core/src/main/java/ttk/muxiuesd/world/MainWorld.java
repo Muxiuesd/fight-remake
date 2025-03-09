@@ -20,6 +20,7 @@ public class MainWorld extends World {
             .addSystem("ChunkSystem", new ChunkSystem(this))
             .addSystem("EntitySystem", new EntitySystem(this))
             .addSystem("ParticleSystem", new ParticleSystem(this))
+            .addSystem("DaynightSystem", new DaynightSystem(this))
             .addSystem("CameraFollowSystem", new CameraFollowSystem(this))
             .addSystem("EntityCollisionSystem", new EntityCollisionSystem(this))
             .addSystem("BulletCollisionCheckSystem", new BulletCollisionCheckSystem(this))
@@ -36,7 +37,10 @@ public class MainWorld extends World {
 
     @Override
     public void draw(Batch batch) {
+        DaynightSystem daynightSystem = (DaynightSystem) getSystemManager().getSystem("DaynightSystem");
+        daynightSystem.begin();
         super.draw(batch);
+        daynightSystem.end();
     }
 
     @Override

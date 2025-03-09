@@ -8,7 +8,7 @@ public class BlockStone extends Block {
     public BlockStone() {
         super(new Property().setFriction(0.95f).setWalkSoundId(Fight.getId("stone_walk")),
             Fight.getId("stone"),
-            "block/stone.png");
+            Fight.getBlockTexture("stone.png"));
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/stone.png", Texture.class));
     }
 }

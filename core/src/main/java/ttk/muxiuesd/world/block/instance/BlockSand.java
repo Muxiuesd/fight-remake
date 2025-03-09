@@ -8,7 +8,7 @@ public class BlockSand extends Block {
     public BlockSand() {
         super(new Block.Property().setFriction(0.9f),
             Fight.getId("sand"),
-            "block/sand.png");
+            Fight.getBlockTexture("sand.png"));
         //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/sand.png", Texture.class));
     }
 }
