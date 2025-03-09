@@ -62,10 +62,7 @@ public class TimeSystem extends WorldSystem implements Tickable {
         //更新所有的tick
         this.tickUpdates.forEach(t -> t.tick(delta));
 
-        EventGroup<WorldTickUpdateEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.TickUpdate);
-        eventGroup.getEvents().forEach(e -> {
-            e.tick(getWorld(), delta);
-        });
+        this.callWorldTickEvent(delta);
     }
 
     /**
@@ -81,6 +78,17 @@ public class TimeSystem extends WorldSystem implements Tickable {
     public void remove(Tickable tickable) {
         this.delayRemove.add(tickable);
     }
+
+    /**
+     * 调用相关事件
+     * */
+    public void callWorldTickEvent  (float delta) {
+        EventGroup<WorldTickUpdateEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.TickUpdate);
+        eventGroup.getEvents().forEach(e -> {
+            e.tick(getWorld(), delta);
+        });
+    }
+
 
     /**
      * 获取当前游戏内的时间

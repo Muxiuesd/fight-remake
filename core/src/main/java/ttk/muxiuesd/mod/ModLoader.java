@@ -6,14 +6,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.world.entity.Entity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
-import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.abs.*;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -49,7 +42,7 @@ public class ModLoader {
             Log.print(TAG, modDirs[i].path());
             this.loadMod(modDirs[i]);
         }
-        this.addModEventCaller();
+        ModEventCaller.registryAllEventCaller();
         Log.print(TAG, "所有模组加载完成！共加载" + ModContainer.getInstance().getAllMods().size() + "个模组");
     }
 
@@ -122,69 +115,6 @@ public class ModLoader {
         return false;
     }
 
-    /**
-     * 向EventBus添加mod里的事件调用，使得mod里注册的事件能被正确调用
-     * */
-    private void addModEventCaller () {
-        EventBus eventBus = EventBus.getInstance();
-        ScriptEngine libEngine = ModLibManager.getInstance().getLibEngine();
-        eventBus.addEvent(EventBus.EventType.BulletShoot, new BulletShootEvent() {
-            @Override
-            public void call (Entity shooter, Bullet bullet) {
-                //Log.print(TAG, "射击者：" + shooter + " 射出子弹：" + bullet);
-                Invocable invocable = (Invocable) libEngine;
-                try {
-                    invocable.invokeFunction("callBulletShootEvent", shooter, bullet);
-                } catch (ScriptException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        eventBus.addEvent(EventBus.EventType.EntityAttacked, new EntityAttackedEvent() {
-            @Override
-            public void call (Entity attackObject, Entity victim) {
-                Invocable invocable = (Invocable) libEngine;
-                try {
-                    invocable.invokeFunction("callEntityAttackedEvent",  attackObject, victim);
-                } catch (ScriptException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        eventBus.addEvent(EventBus.EventType.EntityDeath, new EntityDeathEvent() {
-            @Override
-            public void call (Entity deadEntity) {
-                Invocable invocable = (Invocable) libEngine;
-                try {
-                    invocable.invokeFunction("callEntityDeadEvent", deadEntity);
-                } catch (ScriptException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        eventBus.addEvent(EventBus.EventType.KeyInput, new KeyInputEvent() {
-            @Override
-            public void call (int key) {
-                Invocable invocable = (Invocable) libEngine;
-                try {
-                    invocable.invokeFunction("callWorldKeyInputEvent", key);
-                } catch (ScriptException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        eventBus.addEvent(EventBus.EventType.ButtonInput, new ButtonInputEvent() {
-            @Override
-            public void call (int screenX, int screenY, int pointer, int button) {
-                Invocable invocable = (Invocable) libEngine;
-                try {
-                    invocable.invokeFunction("callWorldButtonInput", screenX, screenY, pointer, button);
-                } catch (ScriptException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
 
     /**
      * 获取模组加载器的实例

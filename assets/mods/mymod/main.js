@@ -15,6 +15,8 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
     }
     Log.print(TAG, "Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
 });
-
+World.event.add("worldTick", function (world, delta) {
+    Log.print(TAG, "世界："+ world +" 调用tick，间隔时间：" + delta);
+});
 
 loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);

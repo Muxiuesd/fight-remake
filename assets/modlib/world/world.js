@@ -4,24 +4,23 @@ var World = {
         entityAttacked: [],
         entityDead: [],
         keyInput: [],
-        buttonInput: []
+        buttonInput: [],
+        ticks: []
     },
     event: {
         add: function (eventName, callback) {
             if (eventName === "bulletShoot") {
                 World.eventGroups.bulletShoot.push(callback);
-            }
-            if (eventName === "entityAttacked") {
+            }else if (eventName === "entityAttacked") {
                 World.eventGroups.entityAttacked.push(callback);
-            }
-            if (eventName === "entityDead") {
+            }else if (eventName === "entityDead") {
                 World.eventGroups.entityDead.push(callback);
-            }
-            if (eventName === "keyInput") {
+            }else if (eventName === "keyInput") {
                 World.eventGroups.keyInput.push(callback);
-            }
-            if (eventName === "buttonInput") {
+            } else if (eventName === "buttonInput") {
                 World.eventGroups.buttonInput.push(callback);
+            }else if (eventName === "worldTick") {
+                World.eventGroups.ticks.push(callback);
             }
         }
     }
@@ -47,10 +46,15 @@ var callWorldKeyInputEvent = function (key) {
         World.eventGroups.keyInput[i](key);
     }
 }
-var callWorldButtonInput = function (screenX, screenY, pointer, button) {
+var callWorldButtonInputEvent = function (screenX, screenY, pointer, button) {
     //屏幕坐标系原点在游戏窗口左上角，y轴向下
     for (var i = 0; i < World.eventGroups.buttonInput.length; i++) {
         World.eventGroups.buttonInput[i](screenX, screenY, pointer, button);
+    }
+}
+var callWorldTickEvent = function (world, delta) {
+    for (var i = 0; i < World.eventGroups.ticks.length; i++) {
+        World.eventGroups.ticks[i](world, delta);
     }
 }
 //到这里为止
