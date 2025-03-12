@@ -15,7 +15,7 @@ import ttk.muxiuesd.world.event.abs.WorldTickUpdateEvent;
  * */
 public class TimeSystem extends WorldSystem implements Tickable {
     // 游戏时间参数（1秒现实=5分钟游戏时间）
-    public static final float REAL_SECOND_TO_GAME_MINUTE = 5f;
+    public static final float REAL_SECOND_TO_GAME_MINUTE = 60f;
     public static final int TicksPerSecond = 20;
     public static final float TickMaxSpan = 1f / TicksPerSecond;
 

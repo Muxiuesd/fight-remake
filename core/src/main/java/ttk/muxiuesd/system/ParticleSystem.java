@@ -67,14 +67,17 @@ public class ParticleSystem extends WorldSystem {
             }
             emitter.update(delta);
         }
-        //System.out.println(this.activeEmitters.size);
     }
 
     @Override
     public void draw (Batch batch) {
+        //batch.begin();
         for (ParticleEmitter emitter : this.activeEmitters) {
             emitter.draw(batch);
         }
+        //batch.end();
+        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        daynightSystem.end();
     }
 
     /**

@@ -1,11 +1,18 @@
 package ttk.muxiuesd.world.particle.emitters;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.shader.ShaderReg;
+import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
@@ -65,5 +72,31 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
 
         //添加粒子
         addParticle(p);
+    }
+
+    @Override
+    public void draw (Batch batch) {
+        // 设置混合模式
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+
+        ShaderProgram particleShader = ShaderScheduler.getInstance().begin(ShaderReg.PARTICLE_2_SHADER, batch);
+        particleShader.setUniformMatrix("u_projTrans", batch.getProjectionMatrix());
+
+        //super.draw(batch);
+        for (ParticleSpell p : getActiveParticles()) {
+            Color color = p.light.getColor();
+            batch.setColor(color.r, color.g, color.b, 0.5f);
+            //particleShader.setUniformf("u_glowColor", color.r, color.g, color.b);
+            particleShader.setUniformf("u_glowColor", color);
+            particleShader.setUniformf("u_intensity", 3f);
+
+            p.draw(batch);
+            batch.setColor(1, 1, 1, 1);
+        }
+
+        // 恢复默认混合模式
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        ShaderScheduler.getInstance().end(ShaderReg.PARTICLE_2_SHADER);
     }
 }

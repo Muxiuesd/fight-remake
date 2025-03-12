@@ -55,6 +55,10 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
                 continue;
             }
             this.motionLogic(particle, delta);
+            if (particle instanceof ShinyParticle) {
+                ShinyParticle sp = (ShinyParticle) particle;
+                sp.update(delta);
+            }
         }
     }
 
@@ -92,5 +96,9 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
      * */
     public int getActiveParticlesCount () {
         return this.activeParticles.size + this.delayAddParticles.size;
+    }
+
+    public Array<T> getActiveParticles () {
+        return this.activeParticles;
     }
 }
