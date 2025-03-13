@@ -11,6 +11,8 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
+import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
+import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
 
 /**
  * 玩家发射子弹的粒子发射器
@@ -27,23 +29,15 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
         });
         //这里设置默认的贴图会出错
         //this.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("spell"), Texture.class));
+        addMotionComp(new PmcAirFriction());
+        addMotionComp(new PmcSizeTrans());
     }
 
     @Override
     public void motionLogic (ParticleSpell particle, float delta) {
-        // 空气阻力
-        particle.velocity.scl((float) Math.pow(0.98, delta * 60));
-        particle.position.mulAdd(particle.velocity, delta);
-
-        // 尺寸变化
-        float t = particle.lifetime / particle.duration;
-        particle.curSize.x = particle.startSize.x + (particle.endSize.x - particle.startSize.x) * t;
-        particle.curSize.y = particle.startSize.y + (particle.endSize.y - particle.startSize.y) * t;
+        super.motionLogic(particle, delta);
 
         particle.origin.set(particle.curSize.x / 2, particle.curSize.y / 2);
-        //particle.rotation += (particle.duration - particle.lifetime) * 360;
-
-        particle.lifetime += delta;
     }
 
     @Override

@@ -9,6 +9,8 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.world.particle.ParticleBubble;
 import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
+import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
+import ttk.muxiuesd.world.particle.motion.PmcWaterFriction;
 
 /**
  * 实体在水中游泳粒子发射器
@@ -23,20 +25,14 @@ public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
                 return particle;
             }
         });
+        addMotionComp(new PmcWaterFriction());
+        addMotionComp(new PmcSizeTrans());
     }
 
     @Override
     public void motionLogic (ParticleBubble particle, float delta) {
-        //水体阻力
-        particle.velocity.scl((float) Math.pow(0.98, delta * 120));
-        particle.position.mulAdd(particle.velocity, delta);
-
-        // 尺寸变化
-        float t = particle.lifetime / particle.duration;
-        particle.curSize.x = particle.startSize.x + (particle.endSize.x - particle.startSize.x) * t;
-        particle.curSize.y = particle.startSize.y + (particle.endSize.y - particle.startSize.y) * t;
-
-        particle.lifetime += delta;
+        super.motionLogic(particle, delta);
+        particle.origin.set(particle.curSize.x / 2, particle.curSize.y / 2);
     }
 
     @Override
