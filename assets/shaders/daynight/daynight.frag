@@ -10,8 +10,8 @@ uniform sampler2D u_texture;
 uniform float u_time; // 0.0(午夜) ~ 1.0(次日午夜)
 
 layout(std140) uniform LightBlock {
-    vec4 u_light[200];
-    vec4 u_lightColor[200];
+    vec4 u_light[1688];
+    vec4 u_lightColor[1688];
     int u_lighsize;
 };
 

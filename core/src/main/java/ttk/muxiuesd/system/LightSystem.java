@@ -19,14 +19,14 @@ import java.nio.IntBuffer;
  * 光源系统
  * */
 public class LightSystem extends WorldSystem {
-
+    public static final int MAX_LIGHTS = 1688;
     // 假设每个光源位置是2个float,第3个是光的强度，一个light占4个，第四个没用，但是为了对齐内存，创建vec3也会要四个内存，glsl内部是vec4好计算
-    private float[] lightPos = new float[200 * 4];
+    private float[] lightPos = new float[MAX_LIGHTS * 4];
 
     // 假设每个光源颜色是3个float(我认为光不需要透明度)，第4个同样为了对齐内存，如果有需求可以用来传递额外内容
-    private float[] lightColors = new float[200 * 4];
+    private float[] lightColors = new float[MAX_LIGHTS * 4];
 
-    private int lightSize =0;
+    private int lightSize = 0;
     private int uboId;
 
     public LightSystem (World world) {
@@ -91,12 +91,13 @@ public class LightSystem extends WorldSystem {
         this.lightSize = 0;//清除数组大小标记，以便下一帧重新收集
     }
 
+    /**
+     * 收集所有的发光例子的数据
+     * */
     public void useLight(Array<? extends Particle> particleArray) {
-        for (Particle p:particleArray)
-        {
-            if(p instanceof ShinyParticle)
-            {
-                ShinyParticle sp=(ShinyParticle)p;
+        for (Particle particle:particleArray) {
+            if(particle instanceof ShinyParticle) {
+                ShinyParticle sp = (ShinyParticle) particle;
                 this.useLight(sp.light);
             }
         }
@@ -104,8 +105,7 @@ public class LightSystem extends WorldSystem {
 
     private void useLight (PointLight light) {
         //在这一帧里收集调用该方法的y所有光源数据
-        if(this.lightSize<100)
-        {
+        if(this.lightSize < MAX_LIGHTS) {
             //往数组里传入light的数据
             this.lightPos[this.lightSize*4] = light.getPosition().x;
             this.lightPos[this.lightSize*4+1] = light.getPosition().y;
