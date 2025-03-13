@@ -44,7 +44,6 @@ public class ParticleSystem extends WorldSystem {
         this.registryEmitter(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
         this.registryEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
         this.registryEmitter(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());
-
         Log.print(TAG, "粒子系统初始化完成");
     }
 
@@ -74,6 +73,8 @@ public class ParticleSystem extends WorldSystem {
         //batch.begin();
         for (ParticleEmitter emitter : this.activeEmitters) {
             emitter.draw(batch);
+            LightSystem lightSystem=(LightSystem)getManager().getSystem("LightSystem");
+            lightSystem.useLight(emitter.getActiveParticles());
         }
         //batch.end();
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
@@ -132,6 +133,7 @@ public class ParticleSystem extends WorldSystem {
      * */
     private ParticleEmitter activateEmitter (String id) {
         ParticleEmitter emitter = this.emitters.get(id);
+
         if (this.activeEmitters.contains(emitter, true)) {
             //Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");
             return emitter;

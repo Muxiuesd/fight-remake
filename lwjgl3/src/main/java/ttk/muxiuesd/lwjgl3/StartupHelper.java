@@ -114,6 +114,7 @@ public class StartupHelper {
 
         jvmArgs.add(javaExecPath);
         jvmArgs.add("-XstartOnFirstThread");
+        jvmArgs.add("--gl30");
         jvmArgs.add("-D" + JVM_RESTARTED_ARG + "=true");
         jvmArgs.addAll(ManagementFactory.getRuntimeMXBean().getInputArguments());
         jvmArgs.add("-cp");
