@@ -5,6 +5,6 @@ import ttk.muxiuesd.world.particle.abs.ShinyParticle;
 
 public class ParticleSpell extends ShinyParticle {
     public ParticleSpell () {
-        super(Color.RED, 2f);
+        super(Color.RED, 0.3f);
     }
 }
