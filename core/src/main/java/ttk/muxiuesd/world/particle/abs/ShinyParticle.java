@@ -24,5 +24,6 @@ public abstract class ShinyParticle extends Particle implements Updateable {
     public void reset () {
         super.reset();
         this.light.setPosition(position);
+
     }
 }

@@ -88,8 +88,8 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
             Color color = p.light.getColor();
             batch.setColor(color.r, color.g, color.b, 0.5f);
             //particleShader.setUniformf("u_glowColor", color.r, color.g, color.b);
-            particleShader.setUniformf("u_glowColor", color);
-            particleShader.setUniformf("u_intensity", 3f);
+            //particleShader.setUniformf("u_glowColor", color);
+            //particleShader.setUniformf("u_intensity", 3f);
 
             p.draw(batch);
             batch.setColor(1, 1, 1, 1);
