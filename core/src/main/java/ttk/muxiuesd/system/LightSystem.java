@@ -66,8 +66,6 @@ public class LightSystem extends WorldSystem {
             lightPosBuffer.put(this.lightPos, 0, this.lightSize *4); // 将需要更新的数据填充到 FloatBuffer 中
             lightPosBuffer.flip(); // 翻转缓冲区，使其准备好被ubo读取
 
-            /**/
-
             // 创建一个大小为 lightSize *4 的 FloatBuffer，颜色个数和光源个数是相等的
             FloatBuffer lightColorBuffer = BufferUtils.newFloatBuffer(this.lightSize *4);
             lightColorBuffer.put(this.lightColors, 0, this.lightSize *4); // 将需要更新的数据填充到 FloatBuffer 中
@@ -78,7 +76,6 @@ public class LightSystem extends WorldSystem {
             Gdx.gl30.glBufferSubData(GL30.GL_UNIFORM_BUFFER, 0/*索引开始*/, this.lightSize *4*4/*长度*/, lightPosBuffer);
             Gdx.gl30.glBufferSubData(GL30.GL_UNIFORM_BUFFER, (this.lightPos.length) * 4/*索引开始，glsl端通过ubo里开始变量*/,
                 lightSize *4*4, lightColorBuffer);
-
         }
 
         IntBuffer lightSizeBuffer = BufferUtils.newIntBuffer(1);// 创建一个大小为1 的 IntBuffer
@@ -91,7 +88,7 @@ public class LightSystem extends WorldSystem {
 
         Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, 0);//解除绑定
 
-        this.lightSize =0;//清除数组大小标记，以便下一帧重新收集
+        this.lightSize = 0;//清除数组大小标记，以便下一帧重新收集
     }
 
     public void useLight(Array<? extends Particle> particleArray) {
@@ -110,13 +107,13 @@ public class LightSystem extends WorldSystem {
         if(this.lightSize<100)
         {
             //往数组里传入light的数据
-            this.lightPos[this.lightSize*4]=light.getPosition().x;
-            this.lightPos[this.lightSize*4+1]=light.getPosition().y;
-            this.lightPos[this.lightSize*4+2]=light.getIntensity();
+            this.lightPos[this.lightSize*4] = light.getPosition().x;
+            this.lightPos[this.lightSize*4+1] = light.getPosition().y;
+            this.lightPos[this.lightSize*4+2] = light.getIntensity();
             // 颜色
-            this.lightColors[this.lightSize*4]=light.getColor().r;
-            this.lightColors[this.lightSize*4+1]=light.getColor().g;
-            this.lightColors[this.lightSize*4+2]=light.getColor().b;
+            this.lightColors[this.lightSize*4] = light.getColor().r;
+            this.lightColors[this.lightSize*4+1] = light.getColor().g;
+            this.lightColors[this.lightSize*4+2] = light.getColor().b;
             //数组可用长度
             this.lightSize++;
         }
