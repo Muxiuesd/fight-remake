@@ -14,15 +14,16 @@ public class ShaderReg {
         "shaders/daynight/daynight.vert",
         "shaders/daynight/daynight.frag");
 
-//    public static final String PARTICLE_SHADER = registry(
-//        Fight.getId("particle_shader"),
-//        "shaders/particle/particle.vert",
-//        "shaders/particle/particle.frag"
-//    );
-    public static final String PARTICLE_2_SHADER = registry(
-        Fight.getId("particle_shader"),
+    public static final String PARTICLE_SHADER = registry(
+        Fight.getId("particle_1_shader"),
         "shaders/particle/particle.vert",
         "shaders/particle/particle.frag"
+    );
+
+    public static final String PARTICLE_2_SHADER = registry(
+        Fight.getId("particle_shader"),
+        "shaders/particle/particle_2.vert",
+        "shaders/particle/particle_2.frag"
     );
 
     /**

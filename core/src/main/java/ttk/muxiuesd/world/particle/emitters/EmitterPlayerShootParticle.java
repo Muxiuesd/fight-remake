@@ -1,18 +1,13 @@
 package ttk.muxiuesd.world.particle.emitters;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.shader.ShaderReg;
-import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
@@ -63,7 +58,7 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
         p.endSize.set(endSize);
         p.scale.set(scale);
         p.rotation = rotation + MathUtils.random(0, 360);
-        p.duration = duration + MathUtils.random(-0.6f, 1.5f);
+        p.duration = duration + MathUtils.random(-0.7f, 0.5f);
 
         // 初始化运动参数
         float angle = MathUtils.random(0, 360);
@@ -76,27 +71,14 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
 
     @Override
     public void draw (Batch batch) {
-        // 设置混合模式
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
-
-        ShaderProgram particleShader = ShaderScheduler.getInstance().begin(ShaderReg.PARTICLE_2_SHADER, batch);
-        particleShader.setUniformMatrix("u_projTrans", batch.getProjectionMatrix());
-
+        //ShaderProgram particleShader = ShaderScheduler.getInstance().begin(ShaderReg.PARTICLE_2_SHADER, batch);
+        //particleShader.setUniformMatrix("u_projTrans", batch.getProjectionMatrix());
         //super.draw(batch);
         for (ParticleSpell p : getActiveParticles()) {
             Color color = p.light.getColor();
-            batch.setColor(color.r, color.g, color.b, 0.5f);
-            //particleShader.setUniformf("u_glowColor", color.r, color.g, color.b);
-            //particleShader.setUniformf("u_glowColor", color);
-            //particleShader.setUniformf("u_intensity", 3f);
-
+            batch.setColor(color.r, color.g, color.b, 1f);
             p.draw(batch);
             batch.setColor(1, 1, 1, 1);
         }
-
-        // 恢复默认混合模式
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        ShaderScheduler.getInstance().end(ShaderReg.PARTICLE_2_SHADER);
     }
 }

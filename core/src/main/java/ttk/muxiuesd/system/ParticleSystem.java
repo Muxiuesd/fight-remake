@@ -1,5 +1,7 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -70,13 +72,17 @@ public class ParticleSystem extends WorldSystem {
 
     @Override
     public void draw (Batch batch) {
-        //batch.begin();
+        // 设置混合模式
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         for (ParticleEmitter emitter : this.activeEmitters) {
             emitter.draw(batch);
-            LightSystem lightSystem=(LightSystem)getManager().getSystem("LightSystem");
+            LightSystem lightSystem = (LightSystem)getManager().getSystem("LightSystem");
             lightSystem.useLight(emitter.getActiveParticles());
         }
-        //batch.end();
+        // 恢复默认混合模式
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
         daynightSystem.end();
     }
