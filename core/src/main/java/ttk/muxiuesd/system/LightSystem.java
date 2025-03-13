@@ -28,7 +28,6 @@ public class LightSystem extends WorldSystem {
 
     private static int lightSize =0;
     private static int uboId;
-    boolean inied=false;
 
     public LightSystem (World world) {
         super(world);
@@ -36,34 +35,29 @@ public class LightSystem extends WorldSystem {
 
     @Override
     public void initialize () {
+        int programID = getWorld().getScreen().batch.getShader().getHandle();//获取着色器句柄，以供获取Uniform Block 的索引
+        int blockIndex = Gdx.gl30.glGetUniformBlockIndex(programID, "LightBlock"); // 获取 Uniform Block 的索引
+        Gdx.gl30.glUniformBlockBinding(programID, blockIndex, 0); // 绑定到绑定点 GPU会来0这个位置找数据
 
+        uboId =Gdx.gl30.glGenBuffer();//获取一个还没用的uboID
+
+        //根据uboID创建ubo，并绑定到ID，顺便绑定当前ubo为此ubo
+        Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER/*表示要创建的东西为UBO*/, uboId);
+
+        Gdx.gl30.glBufferData(GL30.GL_UNIFORM_BUFFER,
+            (lightp.length * 4 + lightColors.length * 4+4)/*ubo空间大小:位置强度+颜色+记录光源个数的int*/,
+            null/*null表示不立即上传数据,因为主要在draw()通过glBufferSubData更新数据*/,
+            GL20.GL_DYNAMIC_DRAW/*表示数据需要频繁更新*/);
+
+        // 将创建UBO 绑定到绑定点 0,和前面"LightBlock"的相同，GPU早到的就是这个已经创建好了的ubo
+        Gdx.gl30.glBindBufferBase(GL30.GL_UNIFORM_BUFFER, 0, uboId);
+
+        Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, 0);//解除绑定当前ubo，以免其它东西受影响
     }
 
     @Override
     public void draw(Batch batch) {
         //通过ubo的id绑定当前ubo为此ubo，该uboId已经创建ubo，所以不会再创建了
-        if(!inied)
-        {
-            int programID = getWorld().getScreen().batch.getShader().getHandle();//获取着色器句柄，以供获取Uniform Block 的索引
-            int blockIndex = Gdx.gl30.glGetUniformBlockIndex(programID, "LightBlock"); // 获取 Uniform Block 的索引
-            Gdx.gl30.glUniformBlockBinding(programID, blockIndex, 0); // 绑定到绑定点 GPU会来0这个位置找数据
-
-            uboId =Gdx.gl30.glGenBuffer();//获取一个还没用的uboID
-
-            //根据uboID创建ubo，并绑定到ID，顺便绑定当前ubo为此ubo
-            Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER/*表示要创建的东西为UBO*/, uboId);
-
-            Gdx.gl30.glBufferData(GL30.GL_UNIFORM_BUFFER,
-                (lightp.length * 4 + lightColors.length * 4+4)/*ubo空间大小:位置强度+颜色+记录光源个数的int*/,
-                null/*null表示不立即上传数据,因为主要在draw()通过glBufferSubData更新数据*/,
-                GL20.GL_DYNAMIC_DRAW/*表示数据需要频繁更新*/);
-
-            // 将创建UBO 绑定到绑定点 0,和前面"LightBlock"的相同，GPU早到的就是这个已经创建好了的ubo
-            Gdx.gl30.glBindBufferBase(GL30.GL_UNIFORM_BUFFER, 0, uboId);
-
-            Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, 0);//解除绑定当前ubo，以免其它东西受影响
-            inied=true;
-        }
         Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, uboId);
         if(lightSize !=0)
         {

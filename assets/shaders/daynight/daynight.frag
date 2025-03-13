@@ -56,7 +56,8 @@ void main() {
     }
 
     // 最终颜色混合
-    vec3 finalColor=clamp(texColor.rgb * lightColor * brightness+sumLightColor,vec3(0.0),initialTexColor.rgb+0.01*(sumLightColor));
+    vec3 finalColor=clamp(texColor.rgb * lightColor * brightness+sumLightColor,vec3(0.0),initialTexColor.rgb+0.1*(sumLightColor));
+    finalColor=clamp(finalColor,0.0,1.0);//限制颜色在0~1之间，避免可能产生未定义行为
     fragColor = vec4(finalColor, texColor.a);
 }
 
