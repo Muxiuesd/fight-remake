@@ -10,6 +10,11 @@ public class AudioReg {
     public static final AudioLoader loader = AudioLoader.getInstance();
 
     public static void registerAllAudios () {
+        //实体
+        registerSoundAsMusic("hurt_1",  "entity/damage/hit_1.ogg");
+        registerSoundAsMusic("hurt_2",  "entity/damage/hit_2.ogg");
+        registerSoundAsMusic("hurt_3",  "entity/damage/hit_3.ogg");
+
         //玩家
         registerSoundAsMusic("shoot", "player/shoot.wav");
         registerMusic("player_resurrection", "player_resurrection.mp3");
@@ -17,6 +22,7 @@ public class AudioReg {
         //方块
         registerSound("grass_walk", "block/walk/grass.wav");
         registerSound("stone_walk", "block/walk/stone.wav");
+        registerSound("stone_walk_1", "block/walk/stone_1.ogg");
     }
 
     public static void registerSound (String name, String path) {

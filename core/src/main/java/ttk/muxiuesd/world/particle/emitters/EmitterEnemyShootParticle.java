@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.particle.emitters;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -22,6 +24,7 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
             protected ParticleSpell newObject () {
                 ParticleSpell spell = new ParticleSpell();
                 spell.init();
+                spell.getLight().setColor(new Color(0.9f, 0.1f, 0.3f, 1f));
                 return spell;
             }
         });
@@ -54,5 +57,15 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
 
         //添加粒子
         addParticle(p);
+    }
+
+    @Override
+    public void draw (Batch batch) {
+        for (ParticleSpell p : getActiveParticles()) {
+            Color color = p.getLight().getColor();
+            batch.setColor(color.r, color.g, color.b, 1f);
+            p.draw(batch);
+            batch.setColor(1, 1, 1, 1);
+        }
     }
 }

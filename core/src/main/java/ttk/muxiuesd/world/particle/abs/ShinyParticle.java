@@ -8,7 +8,7 @@ import ttk.muxiuesd.world.light.PointLight;
  * 发光粒子
  * */
 public abstract class ShinyParticle extends Particle implements Updateable {
-    public PointLight light;
+    private PointLight light;
 
     public ShinyParticle (Color color, float intensity) {
         this.light = new PointLight(color, intensity);
@@ -27,5 +27,13 @@ public abstract class ShinyParticle extends Particle implements Updateable {
     public void reset () {
         super.reset();
         this.light.setPosition(position);
+    }
+
+    public PointLight getLight () {
+        return this.light;
+    }
+
+    public void setLight (PointLight light) {
+        this.light = light;
     }
 }

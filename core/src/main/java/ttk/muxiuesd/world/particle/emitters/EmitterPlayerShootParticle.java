@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.particle.emitters;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -65,14 +64,6 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
 
     @Override
     public void draw (Batch batch) {
-        //ShaderProgram particleShader = ShaderScheduler.getInstance().begin(ShaderReg.PARTICLE_2_SHADER, batch);
-        //particleShader.setUniformMatrix("u_projTrans", batch.getProjectionMatrix());
-        //super.draw(batch);
-        for (ParticleSpell p : getActiveParticles()) {
-            Color color = p.light.getColor();
-            batch.setColor(color.r, color.g, color.b, 1f);
-            p.draw(batch);
-            batch.setColor(1, 1, 1, 1);
-        }
+        super.draw(batch);
     }
 }

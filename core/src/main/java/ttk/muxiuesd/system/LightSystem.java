@@ -98,7 +98,7 @@ public class LightSystem extends WorldSystem {
         for (Particle particle:particleArray) {
             if(particle instanceof ShinyParticle) {
                 ShinyParticle sp = (ShinyParticle) particle;
-                this.useLight(sp.light);
+                this.useLight(sp.getLight());
             }
         }
     }

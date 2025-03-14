@@ -57,6 +57,7 @@ public class TimeSystem extends WorldSystem implements Tickable {
         }else {
             this.tickSpan += delta;
         }
+        System.out.println(20f / this.tickSpan);
     }
 
     @Override
