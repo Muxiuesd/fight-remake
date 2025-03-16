@@ -11,13 +11,14 @@ fileLoader.load(
     })
 );
 
-var testBlock = newBlock(
-    new Property().setFriction(1.0),
-    "testmod:grass");
+//var testBlock = newBlock(new Property().setFriction(1.0), "testmod:grass");
+
 var blockReg = ModRegistrant.getBlockRegister("testmod");
-blockReg.registry("test_block", testBlock);
 
-
+blockReg.register("test_block", newBlockSupplier(function () {
+    return new Block(new Property().setFriction(1.0), "testmod:grass");
+    })
+);
 
 World.event.add("entityAttacked", function (attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);

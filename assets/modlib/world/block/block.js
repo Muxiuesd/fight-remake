@@ -13,3 +13,12 @@ function newBlock (property, textureId, texturePath) {
 function newBlock (property, textureId) {
     return new Block(property, textureId);
 }
+
+function newBlockSupplier (func) {
+    var supplier = Java.extend(Java.type("java.util.function.Supplier"), {
+        get: function (){
+            return func;
+        }
+    });
+    return new supplier();
+}
