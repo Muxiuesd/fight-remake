@@ -20,4 +20,3 @@ void main() {
     v_position2d=a_position;
     gl_Position = u_projTrans * vec4(a_position, 0.0, 1.0);
 }
-

@@ -82,6 +82,10 @@ public class Util {
         return Math.random() * PI2;
     }
 
+    public static float randomAngle () {
+        return (float) Math.random() * 360f;
+    }
+
     /**
      * 取整工具
      * */

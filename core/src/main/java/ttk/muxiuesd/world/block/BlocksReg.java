@@ -8,29 +8,33 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.instance.*;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * 方块注册
  * */
 public class BlocksReg {
     public static final String TAG = BlocksReg.class.getName();
-
-    static Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
-    static {
-
-    }
+    public static final Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
 
     public static void registerAllBlocks () {
-        register("block_test", new BlockTest());
-        register("grass", new BlockGrass());
-        register("stone", new BlockStone());
-        register("sand", new BlockSand());
-        register("water", new BlockWater());
+        /*register("block_test", BlockTest::new);
+        register("grass", BlockGrass::new);
+        register("stone", BlockStone::new);
+        register("sand", BlockSand::new);
+        register("water", BlockWater::new);*/
+
         Log.print(TAG, "游戏方块注册完毕");
     }
 
-    private static void register (String name, Block block) {
-        registrant.register(name, block);
+    public static final Block TEST_BLOCK = register("block_test", () -> {return new BlockTest();});
+    public static final Block GRASS = register("grass", BlockGrass::new);
+    public static final Block STONE = register("stone", BlockStone::new);
+    public static final Block SAND = register("sand", BlockSand::new);
+    public static final Block WATER = register("water", BlockWater::new);
+
+    private static Block register (String name, Supplier<Block> supplier) {
+        return registrant.register(name, supplier);
     }
 
     public static Block newBlock (String name) {
@@ -42,9 +46,10 @@ public class BlocksReg {
      * TODO 打印mod里注册的方块
      * */
     public static void printAllBlock () {
-        HashMap<String, Block> map = registrant.getR();
+        HashMap<String, Supplier<Block>> map = registrant.getRegedit();
         Array<String> allBlockName = new Array<>();
         map.keySet().forEach(allBlockName::add);
+
         Log.print(BlocksReg.class.getName(), "注册的方块有：");
         for (int i = 0; i < allBlockName.size; i++) {
             if (i + 1 < allBlockName.size) {

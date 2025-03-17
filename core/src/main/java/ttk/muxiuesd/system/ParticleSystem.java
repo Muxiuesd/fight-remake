@@ -1,5 +1,7 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -44,7 +46,6 @@ public class ParticleSystem extends WorldSystem {
         this.registryEmitter(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
         this.registryEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
         this.registryEmitter(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());
-
         Log.print(TAG, "粒子系统初始化完成");
     }
 
@@ -67,14 +68,23 @@ public class ParticleSystem extends WorldSystem {
             }
             emitter.update(delta);
         }
-        //System.out.println(this.activeEmitters.size);
     }
 
     @Override
     public void draw (Batch batch) {
+        // 设置混合模式
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         for (ParticleEmitter emitter : this.activeEmitters) {
             emitter.draw(batch);
+            LightSystem lightSystem = (LightSystem)getManager().getSystem("LightSystem");
+            lightSystem.useLight(emitter.getActiveParticles());
         }
+        // 恢复默认混合模式
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        daynightSystem.end();
     }
 
     /**
@@ -129,6 +139,7 @@ public class ParticleSystem extends WorldSystem {
      * */
     private ParticleEmitter activateEmitter (String id) {
         ParticleEmitter emitter = this.emitters.get(id);
+
         if (this.activeEmitters.contains(emitter, true)) {
             //Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");
             return emitter;

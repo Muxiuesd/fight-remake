@@ -28,8 +28,13 @@ public class EventSystem extends WorldSystem {
         EventBus bus = EventBus.getInstance();
         //添加游戏内事件
         bus.addEvent(EventBus.EventType.TickUpdate, new EventWorldWorldTick());
+
+        bus.addEvent(EventBus.EventType.EntityAttacked, new EventPlayerAttacked());
+        bus.addEvent(EventBus.EventType.EntityAttacked, new EventSlimeAttacked(getWorld()));
+
         bus.addEvent(EventBus.EventType.PlayerDeath, new EventPlayerDead());
         bus.addEvent(EventBus.EventType.EntityDeath, new EventSlimeDead(getWorld()));
+
         bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
         bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));
     }

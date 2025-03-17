@@ -25,17 +25,8 @@ public class DaynightShader {
         }
     }
 
-    public void update(float delta) {
-
-    }
-
     public void begin(Batch batch, OrthographicCamera camera) {
-        shader.bind();
-        shader.setUniformMatrix("u_projTrans", camera.combined);
-        //转换为0 ~ 1.0
-        shader.setUniformf("u_time", daynightSystem.getGameTime() / 24f);
 
-        batch.setShader(shader);
     }
 
     public void end(Batch batch) {

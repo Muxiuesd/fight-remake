@@ -3,6 +3,7 @@ package ttk.muxiuesd.mod;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import ttk.muxiuesd.mod.api.ModLibLoader;
+import ttk.muxiuesd.mod.api.ModRegistrant;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptEngine;
@@ -25,6 +26,7 @@ public class ModLibManager {
         this.libEngine = EngineFactory.createEngine();
 
         this.getLibEngine().put("ModLibLoader", new ModLibLoader());
+        this.getLibEngine().put("ModRegistrant", new ModRegistrant());
 
         Log.print(TAG, "ModLibManager 初始化完成");
     }
