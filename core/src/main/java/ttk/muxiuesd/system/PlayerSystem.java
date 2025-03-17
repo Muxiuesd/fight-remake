@@ -34,7 +34,6 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-
         this.player = (Player) EntitiesReg.get("player");
         this.playerLastPosition = this.player.getPosition();
         Log.print(TAG, "PlayerSystem初始化完成！");
@@ -56,7 +55,9 @@ public class PlayerSystem extends WorldSystem {
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
         player.curSpeed = player.speed * block.getProperty().getFriction();
 
+        //玩家游泳
         if (this.span >= this.maxSpan && block instanceof BlockWater) {
+            //发射气泡粒子
             ParticleSystem pts = (ParticleSystem) getManager().getSystem("ParticleSystem");
             pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(3, 7),
                 playerCenter.set(playerCenter.x, playerCenter.y - 0.4f),

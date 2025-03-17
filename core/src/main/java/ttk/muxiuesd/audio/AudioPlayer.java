@@ -42,6 +42,9 @@ public class AudioPlayer {
         return sound;
     }
 
+    /**
+     * 播放音乐，若已经在播放则中途停下来再重头播放
+     * */
     public void playMusic(String id) {
         LinkedHashMap<String, Music> musicCache = AudioLoader.getInstance().getMusicCache();
         if (!musicCache.containsKey(id)) {
@@ -49,6 +52,9 @@ public class AudioPlayer {
             return;
         }
         Music music = musicCache.get(id);
+        if (music.isPlaying()) {
+            music.stop();
+        }
         music.play();
     }
 }

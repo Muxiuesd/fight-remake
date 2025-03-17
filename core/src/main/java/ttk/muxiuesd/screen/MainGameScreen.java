@@ -16,12 +16,16 @@ import ttk.muxiuesd.audio.AudioReg;
 import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 
+/**
+ * 主游戏屏幕
+ * */
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
 
@@ -47,6 +51,9 @@ public class MainGameScreen implements Screen {
         BlocksReg.registerAllBlocks();
         EntitiesReg.registerAllEntities();
 
+        //初始化着色器调度器
+        ShaderScheduler.init();
+
         this.world = new MainWorld(this);
         this.world.getSystemManager().initAllSystems();
 
@@ -69,13 +76,14 @@ public class MainGameScreen implements Screen {
         camera.update();
         Batch batch = this.batch;
         batch.setProjectionMatrix(camera.combined);
-        batch.begin();
+
+        //batch.begin();
         //绘制
         this.world.draw(batch);
-        batch.end();
+        //batch.end();
 
-        shapeRenderer.begin();
         shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin();
         this.world.renderShape(shapeRenderer);
         shapeRenderer.end();
     }

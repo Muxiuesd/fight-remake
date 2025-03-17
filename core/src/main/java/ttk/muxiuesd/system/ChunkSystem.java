@@ -1,6 +1,5 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -144,7 +143,11 @@ public class ChunkSystem extends WorldSystem {
 
     @Override
     public void draw(Batch batch) {
-        batch.setColor(Color.WHITE);
+        //这里开始日夜着色
+        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        daynightSystem.begin();
+
+        //batch.setColor(Color.WHITE);
         for (Chunk chunk : this.activeChunks) {
             chunk.draw(batch);
         }

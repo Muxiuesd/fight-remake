@@ -1,6 +1,10 @@
 package ttk.muxiuesd.world.particle;
 
-import ttk.muxiuesd.world.particle.abs.Particle;
+import com.badlogic.gdx.graphics.Color;
+import ttk.muxiuesd.world.particle.abs.ShinyParticle;
 
-public class ParticleSpell extends Particle {
+public class ParticleSpell extends ShinyParticle {
+    public ParticleSpell () {
+        super(new Color(1.0f, 1.0f, 1f, 1f), 0.3f);
+    }
 }

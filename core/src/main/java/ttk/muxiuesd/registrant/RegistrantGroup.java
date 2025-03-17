@@ -7,6 +7,7 @@ import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * 注册器组管理器，这个类管理着游戏内所有的注册器
@@ -29,11 +30,6 @@ public class RegistrantGroup {
     private static final HashMap<String, Registrant<? extends Block>> blockRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Wall>> wallRegistrants = new HashMap<>();
 
-    /*static {
-        res.put(Type.OTHER, testRegistrants);
-        res.put(Type.ENTITY, entityRegistrants);
-        res.put(Type.BLOCK, blockRegistrants);
-    }*/
 
     public RegistrantGroup () {
         res.put(Type.OTHER, testRegistrants);
@@ -87,16 +83,16 @@ public class RegistrantGroup {
         Registrant registrant = null;
         Type type = getRegistrantType(clazzType);
         if (clazzType.isAssignableFrom(Entity.class)) {
-            registrant = new Registrant<>(namespace, clazzType);
+            registrant = new Registrant<>(namespace);
         }
         if (clazzType.isAssignableFrom(Block.class)) {
-            registrant = new Registrant<>(namespace, clazzType);
+            registrant = new Registrant<>(namespace);
         }
         if (clazzType.isAssignableFrom(Wall.class)) {
-            registrant = new Registrant<>(namespace, clazzType);
+            registrant = new Registrant<>(namespace);
         }
         if (clazzType.isAssignableFrom(Test.class)) {
-            registrant = new Registrant<>(namespace, clazzType);
+            registrant = new Registrant<>(namespace);
         }
         //先获取种类
         HashMap registrants = res.get(type);
@@ -110,9 +106,9 @@ public class RegistrantGroup {
     public static void printAllBlocks () {
         Array<String> allBlockName = new Array<>();
         for (Registrant<? extends Block> registrant : blockRegistrants.values()) {
-            HashMap<String, ? extends Block> r = registrant.getR();
-            for (String id : r.keySet()) {
-                allBlockName.add(id);
+            HashMap<String, ? extends Supplier<? extends Block>> r = registrant.getRegedit();
+            for (String name : r.keySet()) {
+                allBlockName.add(registrant.getId(name));
             }
         }
         printAll(allBlockName, "注册的方块有：");
@@ -124,9 +120,9 @@ public class RegistrantGroup {
     public static void printAllEntities () {
         Array<String> allName = new Array<>();
         for (Registrant<? extends Entity> registrant : entityRegistrants.values()) {
-            HashMap<String, ? extends Entity> r = registrant.getR();
-            for (String id : r.keySet()) {
-                allName.add(id);
+            HashMap<String, ? extends Supplier<? extends Entity>> r = registrant.getRegedit();
+            for (String name : r.keySet()) {
+                allName.add(registrant.getId(name));
             }
         }
         printAll(allName, "注册的实体有：");
@@ -143,7 +139,7 @@ public class RegistrantGroup {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         new RegistrantGroup();
         Registrant<Test> registrant = RegistrantGroup.getRegistrant("fight", Test.class);
         registrant.register("Water", new TestObj1());
@@ -154,5 +150,5 @@ public class RegistrantGroup {
         stone.id = "2";
         System.out.println(water.id + " " + water.name);
         System.out.println(stone + stone.id);
-    }
+    }*/
 }

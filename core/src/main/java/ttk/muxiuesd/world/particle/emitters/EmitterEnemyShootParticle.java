@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.particle.emitters;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -9,6 +11,8 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
+import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
+import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
 
 /**
  * 敌人射出子弹的粒子发射器
@@ -20,21 +24,18 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
             protected ParticleSpell newObject () {
                 ParticleSpell spell = new ParticleSpell();
                 spell.init();
+                spell.getLight().setColor(new Color(0.9f, 0.1f, 0.3f, 1f));
                 return spell;
             }
         });
+        addMotionComp(new PmcAirFriction());
+        addMotionComp(new PmcSizeTrans());
     }
 
     @Override
     public void motionLogic (ParticleSpell particle, float delta) {// 空气阻力
-        particle.velocity.scl((float) Math.pow(0.98, delta * 20));
-        particle.position.mulAdd(particle.velocity, delta);
-
-        float t = particle.lifetime / particle.duration;
-        particle.curSize.x = particle.startSize.x + (particle.endSize.x - particle.startSize.x) * t;
-        particle.curSize.y = particle.startSize.y + (particle.endSize.y - particle.startSize.y) * t;
-
-        particle.lifetime += delta;
+        super.motionLogic(particle, delta);
+        particle.origin.set(particle.curSize.x / 2, particle.curSize.y / 2);
     }
 
     @Override
@@ -56,5 +57,15 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
 
         //添加粒子
         addParticle(p);
+    }
+
+    @Override
+    public void draw (Batch batch) {
+        for (ParticleSpell p : getActiveParticles()) {
+            Color color = p.getLight().getColor();
+            batch.setColor(color.r, color.g, color.b, 1f);
+            p.draw(batch);
+            batch.setColor(1, 1, 1, 1);
+        }
     }
 }

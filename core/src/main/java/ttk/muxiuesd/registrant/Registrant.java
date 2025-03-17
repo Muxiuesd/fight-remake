@@ -1,65 +1,52 @@
 package ttk.muxiuesd.registrant;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * 实体，方块，墙，等等游戏元素的注册
  * 为之后的MOD做准备
  * */
 public class Registrant<T> {
-    //命名空间
-    private final String namespace;
-    private final Class<T> clazzType;
-    private final HashMap<String, T> r;
+    private final String namespace; //命名空间
+    private final HashMap<String, Supplier<T>> regedit; //注册表，key为名称而不是id
 
-    public Registrant(String namespace, Class<T> clazzType) {
+    public Registrant(String namespace) {
         this.namespace = namespace;
-        this.clazzType = clazzType;
-        this.r = new HashMap<>();
+        this.regedit = new HashMap<>();
     }
 
-    public Registrant<T> register (String id, T clazz)  {
-        String fullName = this.getFullName(id);
-        if (r.containsKey(fullName)) {
-            return null;
+    /**
+     * 注册
+     * */
+    public T register (String name, Supplier<T> factory)  {
+        if (this.contains(name)) {
+            throw new RuntimeException("注册Id：" + this.getId(name) + " 重复！！！");
         }
-        r.put(fullName, clazz);
-        return this;
+        this.regedit.put(name, factory);
+        return factory.get();
     }
 
     /**
      * 获取一个新的注册元素
      * */
-    public T get(String id) {
-        String fullName = this.getFullName(id);
-        if (!r.containsKey(fullName)) {
-            return null;
+    public T get(String name) {
+        if (!this.contains(name)) {
+            throw new RuntimeException("注册Id：" + this.getId(name) + " 不存在！！！");
         }
-        try {
-            return this.newInstance(fullName);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return this.regedit.get(name).get();
     }
 
-    /**
-     * @return 返回一个注册的元素的实例
-     * */
-    private T newInstance (String fullName) throws Exception{
-        T t = r.get(fullName);
-        Class<?> aClass = Class.forName(t.getClass().getName());
-        return (T) aClass.getDeclaredConstructor().newInstance();
+
+    public String getId (String name) {
+        return namespace + ":" + name;
     }
 
-    public String getFullName(String id) {
-        return namespace + ":" + id;
+    public boolean contains (String name) {
+        return this.regedit.containsKey(name);
     }
 
-    public Class<T> getClazzType() {
-        return this.clazzType;
-    }
-
-    public HashMap<String, T> getR() {
-        return (HashMap<String, T>) this.r.clone();
+    public HashMap<String, Supplier<T>> getRegedit () {
+        return this.regedit;
     }
 }
