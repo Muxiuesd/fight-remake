@@ -5,11 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.key.InputBinding;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.BlockPosition;
@@ -53,8 +54,9 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void update(float delta) {
-        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        this.updateButtonStates();
 
+        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
@@ -81,17 +83,29 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (KeyBindings.PlayerShoot.wasPressed()) {
             Vector2 mouseWorldPosition = this.getMouseWorldPosition();
             Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
             Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
         }
     }
 
-    @Override
-    public void draw(Batch batch) {
+    /**
+     * 更新鼠标按键状态
+     * */
+    private void updateButtonStates() {
+        boolean[] code = new boolean[5];
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) code[Input.Buttons.LEFT] = true;
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) code[Input.Buttons.RIGHT] = true;
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.MIDDLE)) code[Input.Buttons.MIDDLE] = true;
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.BACK)) code[Input.Buttons.BACK] = true;
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.FORWARD)) code[Input.Buttons.FORWARD] = true;
 
+        for (int i = 0; i < code.length; i++) {
+            InputBinding.updateButtonState(i, code[i]);
+        }
     }
+
 
     @Override
     public void renderShape(ShapeRenderer batch) {
@@ -99,13 +113,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     }
 
     @Override
-    public void dispose() {
-
-    }
-
-    @Override
     public boolean keyDown (int keycode) {
-
+        InputBinding.updateKeyState(keycode, true);
         return false;
     }
 
@@ -117,6 +126,9 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         for (KeyInputEvent event : events) {
             event.call(keycode);
         }
+
+        InputBinding.updateKeyState(keycode, false);
+
         return false;
     }
 

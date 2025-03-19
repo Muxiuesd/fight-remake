@@ -1,12 +1,11 @@
 package ttk.muxiuesd.world.entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
@@ -82,31 +81,31 @@ public class Player extends Entity {
     }
 
     private void handleInput(float delta) {
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (KeyBindings.PlayerWalkUp.wasPressed()) {
             //this.y = y + curSpeed * delta;
             velY += curSpeed * delta;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (KeyBindings.PlayerWalkDown.wasPressed()) {
             //this.y = y - curSpeed * delta;
             velY -= curSpeed * delta;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (KeyBindings.PlayerWalkLeft.wasPressed()) {
             //this.x = x - curSpeed * delta;
             velX -= curSpeed * delta;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (KeyBindings.PlayerWalkRight.wasPressed()) {
             //this.x = x + curSpeed * delta;
             velX += curSpeed * delta;
         }
 
 
         // 左键发射攻击性子弹
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (KeyBindings.PlayerShoot.wasPressed()) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());
             getEntitySystem().add(bullet);
             //AudioPlayer.getInstance().playSound("shoot");
         }
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && this.defendSpan >= 1f) {
+        if (KeyBindings.PlayerShield.wasPressed() && this.defendSpan >= 1f) {
             this.isDefend = true;
             this.defendSpan = 0f;
             this.defendDuration = 0f;
