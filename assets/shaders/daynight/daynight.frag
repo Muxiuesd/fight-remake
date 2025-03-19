@@ -17,7 +17,7 @@ layout(std140) uniform LightBlock {
 
 // 定义昼夜颜色配置
 #define DAY_COLOR vec3(1.0, 0.98, 0.9)    // 浅黄色（白天）
-#define NIGHT_COLOR vec3(0.2, 0.3, 0.8)   // 深蓝色（夜晚）
+#define NIGHT_COLOR vec3(0.04, 0.06, 0.12)   // 深蓝色（夜晚）
 #define DUSK_COLOR vec3(0.8, 0.4, 0.2)    // 黄昏橙红色
 
 void main() {
