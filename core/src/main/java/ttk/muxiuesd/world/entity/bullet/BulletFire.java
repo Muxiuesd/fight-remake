@@ -18,7 +18,9 @@ public class BulletFire extends Bullet {
         setLiveTime(0f);
         speed = 15f;
 
-        AssetsLoader.getInstance().loadAsync(Fight.getId("bullet_fire"), "texture/bullet/flame.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("bullet_fire"),
+            Fight.getEntityTexture("bullet/flame.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("bullet_fire"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });

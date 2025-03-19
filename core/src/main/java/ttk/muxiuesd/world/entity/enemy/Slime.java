@@ -34,7 +34,9 @@ public class Slime extends Entity {
         speed = 1f;
         this.generation = generation;
 
-        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),"enemy/slime.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),
+            Fight.getEntityTexture("enemy/slime.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("slime"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });

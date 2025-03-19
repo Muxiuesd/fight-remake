@@ -426,7 +426,7 @@ public class ChunkSystem extends WorldSystem {
      * 获取玩家所在的区块编号
      */
     private ChunkPosition getPlayerChunkPosition(Player player) {
-        Vector2 playerCenter = player.getPlayerCenter();
+        Vector2 playerCenter = player.getCenter();
         return this.getChunkPosition(playerCenter.x, playerCenter.y);
     }
 

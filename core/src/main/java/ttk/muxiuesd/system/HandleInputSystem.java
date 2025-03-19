@@ -165,7 +165,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
      */
     public BlockPosition getPlayerBlockPosition() {
         BlockPosition bp = new BlockPosition();
-        Vector2 playerCenter = playerSystem.getPlayer().getPlayerCenter();
+        Vector2 playerCenter = playerSystem.getPlayer().getCenter();
         bp.setX((int) Util.fastRound(playerCenter.x));
         bp.setY((int) Util.fastRound(playerCenter.y));
         return bp;

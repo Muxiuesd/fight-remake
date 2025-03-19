@@ -79,7 +79,7 @@ public class SoundEffectSystem extends WorldSystem {
     private void updatePlayerWalkSoundEffect (float delta) {
         if (this.ps.playerMoved()) {
             Player player = this.ps.getPlayer();
-            Vector2 playerCenter = player.getPlayerCenter();
+            Vector2 playerCenter = player.getCenter();
             Block underfootBlock = cs.getBlock(playerCenter.x, playerCenter.y);
             String walkSoundId = underfootBlock.getProperty().getWalkSoundId();
             //检测方块不一样时

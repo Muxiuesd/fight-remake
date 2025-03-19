@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.util.Log;
@@ -36,11 +35,15 @@ public class Player extends Entity {
         curSpeed = speed;
         setSize(1, 1);
 
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player"), "texture/player/player.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player"),
+            Fight.getEntityTexture("player/player.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"), "texture/player/shield.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"),
+            Fight.getEntityTexture("player/shield.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player_shield"), Texture.class);
             this.shield = new TextureRegion(texture);
         });
@@ -108,13 +111,5 @@ public class Player extends Entity {
             this.defendSpan = 0f;
             this.defendDuration = 0f;
         }
-    }
-
-    /**
-     * 获取玩家中心的坐标（世界坐标）
-     * @return 二维坐标
-     */
-    public Vector2 getPlayerCenter () {
-        return new Vector2(x + getWidth() / 2, y + getHeight() / 2);
     }
 }

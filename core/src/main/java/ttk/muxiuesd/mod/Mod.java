@@ -45,6 +45,7 @@ public class Mod implements Runnable{
             this.running = true;
         } catch (ScriptException e) {
             this.running = false;
+            Log.error(TAG, "Mod：" + this.getModName() + " 出bug了，运行失败！！！");
             throw new RuntimeException(e);
         }
     }
