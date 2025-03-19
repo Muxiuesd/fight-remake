@@ -30,17 +30,45 @@ public class InputBinding {
     }
 
     /**
-     * 移动绑定
-     * @param keycode 绑定到的新的键位
+     * 更换绑定
      * */
-    public static void moveBinding (int keycode, KeyBinding keyBinding) {
+    public static void moveBinding (String bindingId, KeyBinding.Type newType, int newKeycode) {
+        KeyBinding keyBinding = keyBindingMap.get(bindingId);
+        KeyBinding.Type oldType;
+        if (keyBinding != null) {
+            oldType = keyBinding.getType();
+        }else {
+            keyBinding = buttonBindingMap.get(bindingId);
+            if (keyBinding != null) {
+                oldType = keyBinding.getType();
+            }else {
+                throw new IllegalArgumentException("按键绑定id：" + bindingId + " 不存在！！！");
+            }
+        }
+
+        if (oldType == KeyBinding.Type.Keyboard) {
+            //键盘
+            keyToBinding.remove(keyBinding.getKeyCode());
+        }else {
+            //鼠标
+            buttonToBinding.remove(keyBinding.getKeyCode());
+        }
+
+        moveBinding(newKeycode, keyBinding);
+    }
+    /**
+     * 移动绑定
+     * @param newKeycode 绑定到的新的键位
+     * @param keyBinding 被更换的绑定物
+     * */
+    public static void moveBinding (int newKeycode, KeyBinding keyBinding) {
         if (keyBinding.getType() == KeyBinding.Type.Keyboard) {
             keyToBinding.remove(keyBinding.getKeyCode());
-            keyToBinding.put(keycode, keyBinding);
+            keyToBinding.put(newKeycode, keyBinding);
         }
         if (keyBinding.getType() == KeyBinding.Type.Mouse) {
             buttonToBinding.remove(keyBinding.getKeyCode());
-            buttonToBinding.put(keycode, keyBinding);
+            buttonToBinding.put(newKeycode, keyBinding);
         }
     }
 

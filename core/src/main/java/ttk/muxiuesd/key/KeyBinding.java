@@ -4,7 +4,7 @@ package ttk.muxiuesd.key;
  * 按键绑定，键盘或鼠标的按键
  * */
 public class KeyBinding {
-    enum Type{
+    public enum Type{
         Keyboard, Mouse
     }
 
@@ -34,11 +34,14 @@ public class KeyBinding {
         return this.keyCode;
     }
 
-    public void setKeyCode (int keyCode) {
-        if (this.keyCode == keyCode) return;
+    /**
+     * 更换绑定的按键
+     * */
+    public void changeKeyCode (Type newType, int newKeyCode) {
+        if (this.keyCode == newKeyCode) return;
 
-        InputBinding.moveBinding(keyCode, this);
-        this.keyCode = keyCode;
+        InputBinding.moveBinding(this.id, newType, newKeyCode);
+        this.keyCode = newKeyCode;
     }
 
     public Type getType () {

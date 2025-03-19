@@ -29,6 +29,7 @@ import java.util.HashSet;
 
 /**
  * 输入处理系统
+ * 按键状态的更新都在这里面
  * */
 public class HandleInputSystem extends WorldSystem implements InputProcessor {
     public final String TAG = this.getClass().getName();
