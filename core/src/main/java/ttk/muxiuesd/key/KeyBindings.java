@@ -33,4 +33,21 @@ public class KeyBindings {
         KeyBinding.Type.Mouse, Input.Buttons.RIGHT
     ));
 
+    public static KeyBinding ExitGame = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_exit_game"), "key_exit_game",
+        KeyBinding.Type.Keyboard, Input.Keys.ESCAPE
+    ));
+
+    public static KeyBinding ChunkBoundaryDisplay = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_chunk_boundary_display"), "key_chunk_boundary_display",
+        KeyBinding.Type.Keyboard, Input.Keys.C
+    ));
+    public static KeyBinding WallHitboxDisplay = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_wall_hitbox_display"), "key_wall_hitbox_display",
+        KeyBinding.Type.Keyboard, Input.Keys.H
+    ));
+    public static KeyBinding PlayerPositionPrint = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_position_print"), "key_player_position_print",
+        KeyBinding.Type.Keyboard, Input.Keys.P
+    ));
 }

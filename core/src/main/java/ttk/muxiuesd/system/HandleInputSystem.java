@@ -46,7 +46,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     public void initialize () {
         MainGameScreen screen = getWorld().getScreen();
         this.cameraController = screen.cameraController;
-        //EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         playerSystem = ps;
 
@@ -65,18 +64,18 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
         //Log.print(TAG, "鼠标指向世界的方块坐标: (" + this.mouseBlockPosition.getX() + ", " + this.mouseBlockPosition.getY() + ")");
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (KeyBindings.ExitGame.wasPressed()) {
             Log.print(TAG, "游戏退出！");
             Gdx.app.exit();
         }
         // C键控制区块边界是否绘制
-        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+        if (KeyBindings.ChunkBoundaryDisplay.wasPressed()) {
             cs.chunkEdgeRender = !cs.chunkEdgeRender;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+        if (KeyBindings.WallHitboxDisplay.wasPressed()) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        if (KeyBindings.PlayerPositionPrint.wasPressed()) {
             BlockPosition pbp = this.getPlayerBlockPosition();
             ChunkPosition pcp = cs.getPlayerChunkPosition();
 
