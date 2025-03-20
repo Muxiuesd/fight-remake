@@ -1,5 +1,7 @@
 package ttk.muxiuesd.key;
 
+import com.badlogic.gdx.Gdx;
+
 /**
  * 按键绑定，键盘或鼠标的按键
  * */
@@ -50,26 +52,9 @@ public class KeyBinding {
         this.pressed = pressed;
     }
 
-    /**
-     * 按键释放
-     * */
-    public boolean wasReleased () {
-        return this.released;
-    }
-
-    public void setReleased (boolean released) {
-        this.released = released;
-    }
-
-    /**
-     * 点按一次按键
-     * */
-    public boolean wasTyped () {
-        return this.typed;
-    }
-
-    public void setTyped (boolean typed) {
-        this.typed = typed;
+    public boolean wasJustPressed() {
+        if (this.type == Type.Keyboard) return Gdx.input.isKeyJustPressed(keyCode);
+        return Gdx.input.isButtonJustPressed(keyCode);
     }
 
     public Type getType () {

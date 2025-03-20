@@ -70,14 +70,14 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Gdx.app.exit();
         }
         // C键控制区块边界是否绘制
-        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+        if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
             cs.chunkEdgeRender = !cs.chunkEdgeRender;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+        if (KeyBindings.WallHitboxDisplay.wasJustPressed()) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        if (KeyBindings.PlayerPositionPrint.wasJustPressed()) {
             BlockPosition pbp = this.getPlayerBlockPosition();
             ChunkPosition pcp = cs.getPlayerChunkPosition();
 

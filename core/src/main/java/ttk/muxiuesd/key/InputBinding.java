@@ -84,26 +84,6 @@ public class InputBinding {
         keyBinding.setPressed(pressed);
     }
 
-    /*public static void updateKeyReleased (int keyCode, boolean released) {
-        for (KeyBinding keyBinding : keyToBinding.values()) {
-            keyBinding.setReleased(false);
-        }
-        if (!keyToBinding.containsKey(keyCode)) return;
-
-        KeyBinding keyBinding = keyToBinding.get(keyCode);
-        keyBinding.setReleased(released);
-    }
-
-    public static void updateKeyTyped (int keyCode, boolean typed) {
-        for (KeyBinding keyBinding : keyToBinding.values()) {
-            keyBinding.setTyped(false);
-        }
-        if (!keyToBinding.containsKey(keyCode)) return;
-
-        KeyBinding keyBinding = keyToBinding.get(keyCode);
-        keyBinding.setTyped(typed);
-    }*/
-
     /**
      * 更新鼠标按键状态
      * */
