@@ -73,18 +73,6 @@ public class InputBinding {
     }
 
     /**
-     * 更新键盘按键状态
-     * @param keyCode 按下的按键
-     * @param pressed 按下则true，放开或根本没按则false
-     * */
-    public static void updateKeyPressed (int keyCode, boolean pressed) {
-        if (!keyToBinding.containsKey(keyCode)) return;
-
-        KeyBinding keyBinding = keyToBinding.get(keyCode);
-        keyBinding.setPressed(pressed);
-    }
-
-    /**
      * 更新鼠标按键状态
      * */
     public static void updateButtonState(int buttonCode, boolean pressed) {

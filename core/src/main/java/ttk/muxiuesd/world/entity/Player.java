@@ -100,12 +100,12 @@ public class Player extends Entity {
 
 
         // 左键发射攻击性子弹
-        if (KeyBindings.PlayerShoot.wasPressed()) {
+        if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());
             getEntitySystem().add(bullet);
             //AudioPlayer.getInstance().playSound("shoot");
         }
-        if (KeyBindings.PlayerShield.wasPressed() && this.defendSpan >= 1f) {
+        if (KeyBindings.PlayerShield.wasJustPressed() && this.defendSpan >= 1f) {
             this.isDefend = true;
             this.defendSpan = 0f;
             this.defendDuration = 0f;

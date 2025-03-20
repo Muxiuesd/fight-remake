@@ -55,7 +55,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     @Override
     public void update(float delta) {
 
-        this.updateButtonStates();
+        //this.updateButtonStates();
 
         ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         Player player = playerSystem.getPlayer();
@@ -85,7 +85,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
-        if (KeyBindings.PlayerShoot.wasPressed()) {
+        if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Vector2 mouseWorldPosition = this.getMouseWorldPosition();
             Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
             Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
@@ -97,11 +97,11 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
      * */
     private void updateButtonStates() {
         boolean[] code = new boolean[5];
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) code[Input.Buttons.LEFT] = true;
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) code[Input.Buttons.RIGHT] = true;
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.MIDDLE)) code[Input.Buttons.MIDDLE] = true;
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.BACK)) code[Input.Buttons.BACK] = true;
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.FORWARD)) code[Input.Buttons.FORWARD] = true;
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) code[Input.Buttons.LEFT] = true;
+        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) code[Input.Buttons.RIGHT] = true;
+        if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) code[Input.Buttons.MIDDLE] = true;
+        if (Gdx.input.isButtonPressed(Input.Buttons.BACK)) code[Input.Buttons.BACK] = true;
+        if (Gdx.input.isButtonPressed(Input.Buttons.FORWARD)) code[Input.Buttons.FORWARD] = true;
 
         for (int i = 0; i < code.length; i++) {
             InputBinding.updateButtonState(i, code[i]);
@@ -116,30 +116,21 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean keyDown (int keycode) {
-        InputBinding.updateKeyPressed(keycode, true);
-
         return false;
     }
 
     @Override
     public boolean keyUp (int keycode) {
-        //System.out.println("keyUp");
         EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
         HashSet<KeyInputEvent> events = group.getEvents();
         for (KeyInputEvent event : events) {
             event.call(keycode);
         }
-
-        InputBinding.updateKeyPressed(keycode, false);
-        //InputBinding.updateKeyReleased(keycode, true);
         return false;
     }
 
     @Override
     public boolean keyTyped (char character) {
-        //System.out.println(character);
-        //InputBinding.updateKeyTyped(Input.Keys.valueOf(), true);
-
         return false;
     }
 

@@ -17,8 +17,6 @@ public class KeyBinding {
     private int keyCode;
 
     private boolean pressed = false;
-    private boolean released = false;
-    private boolean typed = false;
 
     public KeyBinding (String id, String name, Type type, int keyCode) {
         this.id = id;
@@ -45,7 +43,8 @@ public class KeyBinding {
      * 按下按键
      * */
     public boolean wasPressed() {
-        return this.pressed;
+        if (this.type == Type.Keyboard) return Gdx.input.isKeyPressed(this.keyCode);
+        return Gdx.input.isButtonPressed(this.keyCode);
     }
 
     public void setPressed(boolean pressed) {
@@ -53,8 +52,8 @@ public class KeyBinding {
     }
 
     public boolean wasJustPressed() {
-        if (this.type == Type.Keyboard) return Gdx.input.isKeyJustPressed(keyCode);
-        return Gdx.input.isButtonJustPressed(keyCode);
+        if (this.type == Type.Keyboard) return Gdx.input.isKeyJustPressed(this.keyCode);
+        return Gdx.input.isButtonJustPressed(this.keyCode);
     }
 
     public Type getType () {
@@ -64,8 +63,5 @@ public class KeyBinding {
     public void setType (Type type) {
         if (this.type == type) return;
         this.type = type;
-
     }
-
-
 }
