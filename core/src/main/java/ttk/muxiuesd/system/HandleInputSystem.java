@@ -54,6 +54,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void update(float delta) {
+
         this.updateButtonStates();
 
         ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
@@ -69,13 +70,14 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Gdx.app.exit();
         }
         // C键控制区块边界是否绘制
-        if (KeyBindings.ChunkBoundaryDisplay.wasPressed()) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
             cs.chunkEdgeRender = !cs.chunkEdgeRender;
         }
-        if (KeyBindings.WallHitboxDisplay.wasPressed()) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
-        if (KeyBindings.PlayerPositionPrint.wasPressed()) {
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
             BlockPosition pbp = this.getPlayerBlockPosition();
             ChunkPosition pcp = cs.getPlayerChunkPosition();
 
@@ -114,7 +116,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean keyDown (int keycode) {
-        InputBinding.updateKeyState(keycode, true);
+        InputBinding.updateKeyPressed(keycode, true);
+
         return false;
     }
 
@@ -127,13 +130,16 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             event.call(keycode);
         }
 
-        InputBinding.updateKeyState(keycode, false);
-
+        InputBinding.updateKeyPressed(keycode, false);
+        //InputBinding.updateKeyReleased(keycode, true);
         return false;
     }
 
     @Override
     public boolean keyTyped (char character) {
+        //System.out.println(character);
+        //InputBinding.updateKeyTyped(Input.Keys.valueOf(), true);
+
         return false;
     }
 

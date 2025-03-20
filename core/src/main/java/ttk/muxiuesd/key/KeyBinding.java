@@ -14,20 +14,15 @@ public class KeyBinding {
     private Type type;
     private int keyCode;
 
-    public boolean pressed = false;
+    private boolean pressed = false;
+    private boolean released = false;
+    private boolean typed = false;
 
     public KeyBinding (String id, String name, Type type, int keyCode) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.keyCode = keyCode;
-    }
-
-    /**
-     * 按下按键
-     * */
-    public boolean wasPressed() {
-        return this.pressed;
     }
 
     public int getKeyCode () {
@@ -42,6 +37,39 @@ public class KeyBinding {
 
         InputBinding.moveBinding(this.id, newType, newKeyCode);
         this.keyCode = newKeyCode;
+    }
+
+    /**
+     * 按下按键
+     * */
+    public boolean wasPressed() {
+        return this.pressed;
+    }
+
+    public void setPressed(boolean pressed) {
+        this.pressed = pressed;
+    }
+
+    /**
+     * 按键释放
+     * */
+    public boolean wasReleased () {
+        return this.released;
+    }
+
+    public void setReleased (boolean released) {
+        this.released = released;
+    }
+
+    /**
+     * 点按一次按键
+     * */
+    public boolean wasTyped () {
+        return this.typed;
+    }
+
+    public void setTyped (boolean typed) {
+        this.typed = typed;
     }
 
     public Type getType () {

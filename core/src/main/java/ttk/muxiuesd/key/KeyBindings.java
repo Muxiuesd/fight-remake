@@ -38,7 +38,7 @@ public class KeyBindings {
         KeyBinding.Type.Keyboard, Input.Keys.ESCAPE
     ));
 
-    public static KeyBinding ChunkBoundaryDisplay = InputBinding.registerBinding(new KeyBinding(
+    /*public static KeyBinding ChunkBoundaryDisplay = InputBinding.registerBinding(new KeyBinding(
         Fight.getId("key_chunk_boundary_display"), "key_chunk_boundary_display",
         KeyBinding.Type.Keyboard, Input.Keys.C
     ));
@@ -49,5 +49,5 @@ public class KeyBindings {
     public static KeyBinding PlayerPositionPrint = InputBinding.registerBinding(new KeyBinding(
         Fight.getId("key_player_position_print"), "key_player_position_print",
         KeyBinding.Type.Keyboard, Input.Keys.P
-    ));
+    ));*/
 }

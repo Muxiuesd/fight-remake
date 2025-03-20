@@ -77,12 +77,32 @@ public class InputBinding {
      * @param keyCode 按下的按键
      * @param pressed 按下则true，放开或根本没按则false
      * */
-    public static void updateKeyState(int keyCode, boolean pressed) {
+    public static void updateKeyPressed (int keyCode, boolean pressed) {
         if (!keyToBinding.containsKey(keyCode)) return;
 
         KeyBinding keyBinding = keyToBinding.get(keyCode);
-        keyBinding.pressed = pressed;
+        keyBinding.setPressed(pressed);
     }
+
+    /*public static void updateKeyReleased (int keyCode, boolean released) {
+        for (KeyBinding keyBinding : keyToBinding.values()) {
+            keyBinding.setReleased(false);
+        }
+        if (!keyToBinding.containsKey(keyCode)) return;
+
+        KeyBinding keyBinding = keyToBinding.get(keyCode);
+        keyBinding.setReleased(released);
+    }
+
+    public static void updateKeyTyped (int keyCode, boolean typed) {
+        for (KeyBinding keyBinding : keyToBinding.values()) {
+            keyBinding.setTyped(false);
+        }
+        if (!keyToBinding.containsKey(keyCode)) return;
+
+        KeyBinding keyBinding = keyToBinding.get(keyCode);
+        keyBinding.setTyped(typed);
+    }*/
 
     /**
      * 更新鼠标按键状态
@@ -91,6 +111,6 @@ public class InputBinding {
         if (!buttonToBinding.containsKey(buttonCode)) return;
 
         KeyBinding keyBinding = buttonToBinding.get(buttonCode);
-        keyBinding.pressed = pressed;
+        keyBinding.setPressed(pressed);
     }
 }
