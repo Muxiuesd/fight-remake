@@ -9,6 +9,7 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.enemy.Slime;
@@ -30,7 +31,7 @@ public class EntitySystem extends WorldSystem {
 
     private final Array<Entity> entities = new Array<>();
 
-    public Array<Entity> enemyEntity = new Array<>();
+    public Array<LivingEntity> enemyEntity = new Array<>();
     public Array<Bullet> playerBulletEntity = new Array<>();
     public Array<Bullet> enemyBulletEntity = new Array<>();
 
@@ -87,7 +88,7 @@ public class EntitySystem extends WorldSystem {
                 this.callBulletShootEvent(bullet.owner, bullet);
             }
         }else if (entity.group == Group.enemy) {
-            this.enemyEntity.add(entity);
+            this.enemyEntity.add((LivingEntity) entity);
         }
 
         this.updatableEntity.add(entity);
@@ -109,7 +110,7 @@ public class EntitySystem extends WorldSystem {
                 Bullet bullet = (Bullet) entity;
                 this.enemyBulletEntity.removeValue(bullet, true);
             }else {
-                this.enemyEntity.removeValue(entity, true);
+                this.enemyEntity.removeValue((LivingEntity) entity, true);
             }
         }
         if (entity.group == Group.player) {
@@ -148,9 +149,12 @@ public class EntitySystem extends WorldSystem {
             entity.update(delta);
 
             //移除死亡的实体,玩家死亡移除不在这个逻辑里
-            if (!(entity instanceof Player) && entity.isDeath()) {
-                this.callEntityDeadEvent(entity);
-                this.remove(entity);
+            if (entity instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) entity;
+                if (livingEntity.isDeath()) {
+                    this.callEntityDeadEvent(livingEntity);
+                    this.remove(entity);
+                }
             }
         }
     }
@@ -185,7 +189,7 @@ public class EntitySystem extends WorldSystem {
         }
     }
 
-    public void callEntityDeadEvent (Entity deadEntity) {
+    public void callEntityDeadEvent (LivingEntity deadEntity) {
         EventGroup<EntityDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityDeath);
         HashSet<EntityDeathEvent> events = eventGroup.getEvents();
         for (EntityDeathEvent event :events) {

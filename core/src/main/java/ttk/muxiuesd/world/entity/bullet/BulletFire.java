@@ -10,7 +10,7 @@ public class BulletFire extends Bullet {
     //public static TextureRegion img = new TextureRegion(AssetsLoader.getInstance().get("bullet/flame.png", Texture.class));
 
     public BulletFire(Entity owner) {
-        super(owner, 1, 1);
+        super(owner);
 
         setSize(0.5f, 0.5f);
         damage = 1f;

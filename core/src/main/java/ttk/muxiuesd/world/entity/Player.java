@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.entity.bullet.Bullet;
 /**
  * 玩家
  */
-public class Player extends Entity {
+public class Player extends LivingEntity {
     public TextureRegion body;
     public TextureRegion shield;
     public float maxDefendSpan = 1f;

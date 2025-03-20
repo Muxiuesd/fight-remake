@@ -14,9 +14,9 @@ public abstract class Bullet extends Entity {
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
 
-    public Bullet(Entity owner, float maxHealth, float curHealth) {
+    public Bullet(Entity owner) {
         this.owner = owner;
-        initialize(owner.group, maxHealth, curHealth);
+        initialize(owner.group);
     }
 
     public float getMaxLiveTime() {
