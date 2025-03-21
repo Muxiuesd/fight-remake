@@ -18,22 +18,16 @@ public class BlocksReg {
     public static final Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
 
     public static void registerAllBlocks () {
-        /*register("block_test", BlockTest::new);
-        register("grass", BlockGrass::new);
-        register("stone", BlockStone::new);
-        register("sand", BlockSand::new);
-        register("water", BlockWater::new);*/
-
         Log.print(TAG, "游戏方块注册完毕");
     }
 
-    public static final Block TEST_BLOCK = register("block_test", () -> {return new BlockTest();});
+    public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
     public static final Block GRASS = register("grass", BlockGrass::new);
     public static final Block STONE = register("stone", BlockStone::new);
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
 
-    private static Block register (String name, Supplier<Block> supplier) {
+    public static Block register (String name, Supplier<Block> supplier) {
         return registrant.register(name, supplier);
     }
 

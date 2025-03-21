@@ -3,12 +3,16 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.ItemsReg;
 
 /**
  * 玩家
@@ -28,7 +32,7 @@ public class Player extends LivingEntity {
     }
 
     public Player(float maxHealth, float curHealth) {
-        initialize(Group.player, maxHealth, curHealth);
+        initialize(Group.player, maxHealth, curHealth, 16);
 
         speed = 8;
         curSpeed = speed;
@@ -46,6 +50,8 @@ public class Player extends LivingEntity {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player_shield"), Texture.class);
             this.shield = new TextureRegion(texture);
         });
+
+        backpack.setItemStack(0, ItemsReg.getItem("test_item"));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }
@@ -72,6 +78,20 @@ public class Player extends LivingEntity {
     @Override
     public void draw(Batch batch) {
         super.draw(batch);
+        ItemStack itemStack = backpack.getItemStack(0);
+
+        if (itemStack != null) {
+            TextureRegion texture = itemStack.getItem().texture;
+            if (texture != null) {
+                Direction direction = Util.getDirection();
+                float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection()) - 45;
+                batch.draw(texture, x + getWidth() / 2, y + getHeight() / 2,
+                    0, 0,
+                    width, height,
+                    scaleX, scaleY, rotation);
+            }
+        }
+
         if (this.isDefend && this.shield != null) {
             batch.draw(this.shield, x, y,
                 originX, originY,
