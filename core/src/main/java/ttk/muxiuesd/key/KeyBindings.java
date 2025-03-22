@@ -28,6 +28,14 @@ public class KeyBindings {
         Fight.getId("key_player_shoot"), "key_player_shoot",
         KeyBinding.Type.Mouse, Input.Buttons.LEFT
     ));
+    public static KeyBinding PlayerUseItem = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_use_item"), "key_player_use_item",
+        KeyBinding.Type.Mouse, Input.Buttons.LEFT
+    ));
+    public static KeyBinding PlayerChangeItem = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_change_item"), "key_player_change_item",
+        KeyBinding.Type.Mouse, Input.Buttons.MIDDLE
+    ));
     public static KeyBinding PlayerShield = InputBinding.registerBinding(new KeyBinding(
         Fight.getId("key_player_shield"), "key_player_shield",
         KeyBinding.Type.Mouse, Input.Buttons.RIGHT

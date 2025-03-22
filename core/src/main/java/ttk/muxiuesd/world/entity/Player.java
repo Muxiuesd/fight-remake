@@ -3,15 +3,12 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
-import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.ItemsReg;
 
 /**
@@ -52,6 +49,7 @@ public class Player extends LivingEntity {
         });
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
+        backpack.setItemStack(1, ItemsReg.getItem("stick"));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }
@@ -78,8 +76,7 @@ public class Player extends LivingEntity {
     @Override
     public void draw(Batch batch) {
         super.draw(batch);
-        ItemStack itemStack = backpack.getItemStack(0);
-
+        /*ItemStack itemStack = backpack.getItemStack(getHandIndex());
         if (itemStack != null) {
             TextureRegion texture = itemStack.getItem().texture;
             if (texture != null) {
@@ -90,7 +87,7 @@ public class Player extends LivingEntity {
                     width, height,
                     scaleX, scaleY, rotation);
             }
-        }
+        }*/
 
         if (this.isDefend && this.shield != null) {
             batch.draw(this.shield, x, y,
@@ -129,6 +126,13 @@ public class Player extends LivingEntity {
             this.isDefend = true;
             this.defendSpan = 0f;
             this.defendDuration = 0f;
+        }
+        if (KeyBindings.PlayerUseItem.wasJustPressed()) {
+            useItem(getEntitySystem().getWorld(), this);
+        }
+        if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
+            if (getHandIndex() == 0) setHandIndex(1);
+            else if (getHandIndex() == 1) setHandIndex(0);
         }
     }
 }

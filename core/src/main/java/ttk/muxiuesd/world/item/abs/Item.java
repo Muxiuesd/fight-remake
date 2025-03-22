@@ -1,9 +1,14 @@
 package ttk.muxiuesd.world.item.abs;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.LivingEntity;
 
@@ -23,9 +28,31 @@ public abstract class Item {
     }
 
     /**
-     * 使用此物品
+     * 在持有者手上持有时的绘制方法
+     * TODO 不同类型的物品不同的绘制方式
      * */
-    public void ues (World world, LivingEntity user) {
+    public void drawOnHand (Batch batch, LivingEntity holder) {
+        if (texture != null) {
+            Direction direction = Util.getDirection();
+            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection()) - 45;
+            batch.draw(texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                0, 0,
+                holder.width, holder.height,
+                holder.scaleX, holder.scaleY, rotation);
+        }
+    }
+
+    /**
+     * 使用此物品
+     * @return 是否使用成功
+     * */
+    public boolean ues (World world, LivingEntity user) {
+        //播放物品使用音效
+        String useSoundId = this.property.getUseSoundId();
+        SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
+        ses.newSpatialSound(useSoundId, user);
+
+        return true;
     }
 
 
@@ -39,6 +66,8 @@ public abstract class Item {
             this.texture = new TextureRegion(texture);
         });
     }
+
+
     public static class Property {
         private int maxCount = 64;
         private String useSoundId;
