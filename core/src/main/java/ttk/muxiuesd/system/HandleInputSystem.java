@@ -1,7 +1,6 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ttk.muxiuesd.camera.CameraController;
-import ttk.muxiuesd.key.InputBinding;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -92,23 +90,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         }
     }
 
-    /**
-     * 更新鼠标按键状态
-     * */
-    private void updateButtonStates() {
-        boolean[] code = new boolean[5];
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) code[Input.Buttons.LEFT] = true;
-        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) code[Input.Buttons.RIGHT] = true;
-        if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) code[Input.Buttons.MIDDLE] = true;
-        if (Gdx.input.isButtonPressed(Input.Buttons.BACK)) code[Input.Buttons.BACK] = true;
-        if (Gdx.input.isButtonPressed(Input.Buttons.FORWARD)) code[Input.Buttons.FORWARD] = true;
-
-        for (int i = 0; i < code.length; i++) {
-            InputBinding.updateButtonState(i, code[i]);
-        }
-    }
-
-
     @Override
     public void renderShape(ShapeRenderer batch) {
         this.renderBlockCheckBox(batch);
@@ -166,6 +147,16 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean scrolled (float amountX, float amountY) {
+        //玩家背包物品指针循环
+        Player player = playerSystem.getPlayer();
+        int newIndex = player.getHandIndex() + (int) amountY;
+        if (newIndex >= player.backpack.getSize()) {
+            newIndex -= player.backpack.getSize();
+        }else if (newIndex < 0) {
+            newIndex = player.backpack.getSize() + (int) amountY;
+        }
+        player.setHandIndex(newIndex);
+        System.out.println(newIndex);
         return false;
     }
 

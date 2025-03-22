@@ -130,6 +130,7 @@ public class Player extends LivingEntity {
         if (KeyBindings.PlayerUseItem.wasJustPressed()) {
             useItem(getEntitySystem().getWorld(), this);
         }
+        //头两个物品槽（0号和1号）快捷循环
         if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
             if (getHandIndex() == 0) setHandIndex(1);
             else if (getHandIndex() == 1) setHandIndex(0);
