@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class ModFileLoader {
     public static final String TAG = ModFileLoader.class.getName();
 
-    public static final HashMap<String, ModFileLoader> loaders = new HashMap<String, ModFileLoader>();
+    private static final HashMap<String, ModFileLoader> loaders = new HashMap<String, ModFileLoader>();
 
     public final String modRoot;    //mod的根文件夹
 
@@ -49,15 +49,16 @@ public class ModFileLoader {
     }
 
 
-    public <T> void load (String id, String path, Class<T> type) {
-        this.load(id, path, type, null);
-    }
+    /*public <T> void load (String id, String path, Class<T> type, Runnable callback) {
+        this.load(id, path, type, callback);
+    }*/
 
     /**
      * 加载文件的核心方法
      * */
     public <T> void load (String id, String path, Class<T> type, ScriptObjectMirror callback) {
         String[] split = id.split(":");
+        //获取此mod自己的资源管理器
         AssetManager modAssetManager = AssetsLoader.getInstance().getModAssetManager(split[0]);
         String filePath = this.getAbsolutePath(path);
 
@@ -68,10 +69,12 @@ public class ModFileLoader {
             if (modAssetManager.isLoaded(filePath, type)) {
                 AssetsLoader.getInstance().idMap(id, filePath);
                 Log.print(TAG, "类型为：" + type.getName() + " 的资源：" + id + " 添加成功");
+
                 if (callback != null) {
+                    // 资源加载完成，执行回调
                     T file = modAssetManager.get(filePath, type);
                     callback.callMember("run", file);
-                }// 资源加载完成，执行回调
+                }
             } else {
                 throw new IllegalStateException("资源加载失败: " + filePath);
             }
@@ -83,12 +86,39 @@ public class ModFileLoader {
         }
     }
 
+    public <T> void load (String id, String path, Class<T> type, Runnable callback) {
+        String[] split = id.split(":");
+        //获取此mod自己的资源管理器
+        AssetManager modAssetManager = AssetsLoader.getInstance().getModAssetManager(split[0]);
+        String filePath = this.getAbsolutePath(path);
+
+        if (!modAssetManager.isLoaded(filePath)) {
+            modAssetManager.load(filePath, type);
+            modAssetManager.finishLoading();
+            // 检查资源加载是否成功
+            if (modAssetManager.isLoaded(filePath, type)) {
+                AssetsLoader.getInstance().idMap(id, filePath);
+                Log.print(TAG, "类型为：" + type.getName() + " 的资源：" + id + " 添加成功");
+
+                if (callback != null) {
+                    // 资源加载完成，执行回调
+                    callback.run();
+                }
+            } else {
+                throw new IllegalStateException("资源加载失败: " + filePath);
+            }
+        }else {
+            if (callback != null) {
+                callback.run();
+            }
+        }
+    }
 
     private FileHandle getFileHandle (String path) {
         return Gdx.files.absolute(this.getAbsolutePath(path));
     }
 
     private String getAbsolutePath (String path) {
-        return modRoot + path;
+        return this.modRoot + path;
     }
 }

@@ -18,6 +18,11 @@ blockReg.register("test_block", newBlockSupplier(function () {
     return newBlock(new Property().setFriction(1.0), "testmod:grass");
 }));
 
+var audioRegister = Audio.getRegister("testmod");
+audioRegister.registerSoundAsMusic("testmod:ignite", "assets/audio/sound/ignite.ogg");
+
+
+
 World.event.add("entityAttacked", function (attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);
 });

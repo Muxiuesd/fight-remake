@@ -97,7 +97,7 @@ public class AssetsLoader implements Disposable {
         String[] split = id.split(":");
         if (Objects.equals(split[0], Fight.NAMESPACE)) {
             //先从游戏内部资源探查
-            return this.gameAssetManager.get(this.idToPath.get(id), type);
+            return this.get(this.idToPath.get(id), type);
         }else {
             //mod资源
             AssetManager modAssetManager = this.getModAssetManager(split[0]);
@@ -112,9 +112,8 @@ public class AssetsLoader implements Disposable {
      * @param type 资源类型
      * @param <T> 资源类型
      * @return 已加载的资源
-     * TODO 逐渐弃用这个
      */
-    public <T> T get(String filePath, Class<T> type) {
+    private <T> T get(String filePath, Class<T> type) {
         if (!this.gameAssetManager.isLoaded(filePath, type)) {
             throw new IllegalStateException("资源未加载: " + filePath);
         }
@@ -154,6 +153,10 @@ public class AssetsLoader implements Disposable {
     @Override
     public void dispose() {
         this.gameAssetManager.dispose();
+        this.modAssetManagers.forEach((manager, assetManager) -> {
+            assetManager.dispose();
+        });
+        this.modAssetManagers.clear();
         this.asyncExecutor.dispose();
     }
 

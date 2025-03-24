@@ -139,7 +139,7 @@ public class SoundEffectSystem extends WorldSystem {
 
     /**
      * 新建一个空间音效
-     * @param id 音效的Id，但是Music
+     * @param id 音效的Id，但必须是Music
      * @param sounder 发出声音的实体
      * */
     public void newSpatialSound (String id, Entity sounder) {

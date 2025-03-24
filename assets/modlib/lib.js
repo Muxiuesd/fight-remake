@@ -3,6 +3,7 @@ ModLibLoader.load("obj.js");
 
 ModLibLoader.load("input.js");
 ModLibLoader.load("file.js");
+ModLibLoader.load("audio.js");
 ModLibLoader.load("world/world.js");
 ModLibLoader.load("world/entity/entity.js");
 ModLibLoader.load("world/block/block.js");
