@@ -1,6 +1,7 @@
 var TAG = "测试mod";
 
 var fileLoader = File.getFileLoader("testmod");
+var fileLoader2 = File.getFileLoader("testmod");
 
 fileLoader.load(
     "testmod:grass",

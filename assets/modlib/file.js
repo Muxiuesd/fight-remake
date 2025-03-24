@@ -39,7 +39,9 @@ var File = {
  * 文件加载回调
  * */
 function FileLoadCallback (callback) {
-    //file 为加载完成后传回的文件
+    /**
+     * @param file 为加载完成后传回的文件
+     */
     this.run = function (file) {
         if (callback !== undefined) {
             callback(file);

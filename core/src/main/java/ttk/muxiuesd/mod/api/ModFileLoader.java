@@ -9,6 +9,8 @@ import ttk.muxiuesd.mod.Mod;
 import ttk.muxiuesd.mod.ModContainer;
 import ttk.muxiuesd.util.Log;
 
+import java.util.HashMap;
+
 /**
  * modApi：mod文件加载
  * <p>
@@ -18,6 +20,8 @@ import ttk.muxiuesd.util.Log;
 public class ModFileLoader {
     public static final String TAG = ModFileLoader.class.getName();
 
+    public static final HashMap<String, ModFileLoader> loaders = new HashMap<String, ModFileLoader>();
+
     public final String modRoot;    //mod的根文件夹
 
     public ModFileLoader (String modRoot) {
@@ -25,7 +29,7 @@ public class ModFileLoader {
     }
 
     /**
-     * 获取指定命名空间的文件加载器
+     * 获取指定命名空间的文件加载器。loader已存在时直接获取，不存在时新建一个
      * */
     public static ModFileLoader getFileLoader (String namespace) {
         ModContainer modContainer = ModContainer.getInstance();
@@ -34,8 +38,14 @@ public class ModFileLoader {
             Log.error(TAG, "不存在namespace为：" + namespace + " 的模组，无法加载此mod的文件加载器");
             throw new RuntimeException("不存在namespace为：" + namespace + " 的模组！！！");
         }
+
+        if (loaders.containsKey(namespace)) {
+            return loaders.get(namespace);
+        }
         Mod mod = modContainer.get(namespace);
-        return new ModFileLoader(mod.getModPath());
+        ModFileLoader loader = new ModFileLoader(mod.getModPath());
+        loaders.put(namespace, loader);
+        return loader;
     }
 
 
