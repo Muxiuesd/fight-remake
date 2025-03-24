@@ -16,7 +16,7 @@ import ttk.muxiuesd.util.Log;
  * TODO 增加能够加载的资源文件的种类
  * */
 public class ModFileLoader {
-    public final String TAG = this.getClass().getName();
+    public static final String TAG = ModFileLoader.class.getName();
 
     public final String modRoot;    //mod的根文件夹
 
@@ -31,6 +31,7 @@ public class ModFileLoader {
         ModContainer modContainer = ModContainer.getInstance();
         boolean hasMod = modContainer.hasMod(namespace);
         if (!hasMod) {
+            Log.error(TAG, "不存在namespace为：" + namespace + " 的模组，无法加载此mod的文件加载器");
             throw new RuntimeException("不存在namespace为：" + namespace + " 的模组！！！");
         }
         Mod mod = modContainer.get(namespace);
@@ -42,6 +43,9 @@ public class ModFileLoader {
         this.load(id, path, type, null);
     }
 
+    /**
+     * 加载文件的核心方法
+     * */
     public <T> void load (String id, String path, Class<T> type, ScriptObjectMirror callback) {
         String[] split = id.split(":");
         AssetManager modAssetManager = AssetsLoader.getInstance().getModAssetManager(split[0]);

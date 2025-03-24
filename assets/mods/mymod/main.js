@@ -19,4 +19,4 @@ World.event.add("worldTick", function (world, delta) {
     //Log.print(TAG, "世界："+ world +" 调用tick，间隔时间：" + delta);
 });
 
-loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);
+File.loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);

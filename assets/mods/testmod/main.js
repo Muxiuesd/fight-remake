@@ -1,24 +1,21 @@
 var TAG = "测试mod";
 
-var fileLoader = getFileLoader("testmod");
+var fileLoader = File.getFileLoader("testmod");
 
 fileLoader.load(
     "testmod:grass",
     "assets/grass.png",
     Texture.class,
     new FileLoadCallback(function (file) {
-        Log.print(TAG, "资源加载完成！");
+        Log.print(TAG, "资源" + file + "加载完成！");
     })
 );
-
-//var testBlock = newBlock(new Property().setFriction(1.0), "testmod:grass");
 
 var blockReg = ModRegistrant.getBlockRegister("testmod");
 
 blockReg.register("test_block", newBlockSupplier(function () {
-    return new Block(new Property().setFriction(1.0), "testmod:grass");
-    })
-);
+    return newBlock(new Property().setFriction(1.0), "testmod:grass");
+}));
 
 World.event.add("entityAttacked", function (attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);

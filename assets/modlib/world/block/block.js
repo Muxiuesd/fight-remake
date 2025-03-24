@@ -10,6 +10,10 @@ function newBlock (property, textureId, texturePath) {
     return new Block(property, textureId, texturePath);
 }
 
+/**
+ * @param property  方块属性
+ * @param textureId 方块的贴图id，（需要贴图提前加载过）
+ * */
 function newBlock (property, textureId) {
     return new Block(property, textureId);
 }
