@@ -32,8 +32,7 @@ public class RegistrantGroup {
     private static final HashMap<String, Registrant<? extends Wall>> wallRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Item>> itemRegistrants = new HashMap<>();
 
-
-    public RegistrantGroup () {
+    public static void init () {
         res.put(Type.OTHER, testRegistrants);
         res.put(Type.ENTITY, entityRegistrants);
         res.put(Type.BLOCK, blockRegistrants);
@@ -41,7 +40,6 @@ public class RegistrantGroup {
         res.put(Type.ITEM, itemRegistrants);
         Log.print(TAG, "注册器组管理器初始化完成！");
     }
-
     /**
      * 获取指定命名空间的注册器，没有则新建一个
      * @param nameSpace 注册器的命名空间

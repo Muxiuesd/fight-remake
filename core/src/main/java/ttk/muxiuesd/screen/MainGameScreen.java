@@ -14,7 +14,9 @@ import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ttk.muxiuesd.audio.AudioReg;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
+import ttk.muxiuesd.mod.api.ModWorldProvider;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.util.Log;
@@ -54,10 +56,13 @@ public class MainGameScreen implements Screen {
         //初始化着色器调度器
         ShaderScheduler.init();
 
-        this.world = new MainWorld(this);
+        this.setWorld(new MainWorld(this));
         this.world.getSystemManager().initAllSystems();
 
         //执行mod代码
+        ModLibManager.getInstance().loadCoreLib();
+
+        ModLoader.getInstance().loadAllMods();
         ModLoader.getInstance().runAllMods();
 
         RegistrantGroup.printAllBlocks();
@@ -112,5 +117,13 @@ public class MainGameScreen implements Screen {
     @Override
     public void dispose() {
         this.world.dispose();
+    }
+    /**
+     * 设置当前世界
+     * */
+    private void setWorld(World world) {
+        this.world = world;
+        //使mod知道当前的游戏世界的实例
+        ModWorldProvider.setCurWorld(world);
     }
 }

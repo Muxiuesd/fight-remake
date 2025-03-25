@@ -1,4 +1,9 @@
 var World = {
+    /** 获取当前世界 */
+    get: function () {
+        var worldProvider = Java.type("ttk.muxiuesd.mod.api.ModWorldProvider");
+        return worldProvider.getWorld();
+    },
     eventGroups: {
         bulletShoot: [],
         entityAttacked: [],
@@ -22,6 +27,18 @@ var World = {
             }else if (eventName === "worldTick") {
                 World.eventGroups.ticks.push(callback);
             }
+        }
+    },
+    /** 世界系统 */
+    systems: {
+        /**
+         * 获取系统
+         * @param systemName 系统名称
+         * */
+        get: function (systemName) {
+            var world = World.get();
+            var manager = world.getSystemManager();
+            return manager.getSystem(systemName);
         }
     }
 }

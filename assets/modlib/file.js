@@ -1,13 +1,14 @@
 var Texture = Java.type("com.badlogic.gdx.graphics.Texture");
 var TextureRegion = Java.type("com.badlogic.gdx.graphics.g2d.TextureRegion");
 
-var ModFileLoader = Java.type("ttk.muxiuesd.mod.api.ModFileLoader");
+
 
 var File = {
     /**
      * 获取文件加载器
      * */
     getFileLoader: function (namespace) {
+        var ModFileLoader = Java.type("ttk.muxiuesd.mod.api.ModFileLoader");
         return ModFileLoader.getFileLoader(namespace);
     },
     /**

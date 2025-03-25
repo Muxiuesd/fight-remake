@@ -29,7 +29,7 @@ public class ModLoader {
 
     private ModLoader() {
         this.checkRoot();
-        ModLibManager.getInstance().loadAllLib();
+        //ModLibManager.getInstance().loadAllLib();
         Log.print(TAG, "模组加载器初始化完毕！");
     }
 
@@ -42,8 +42,10 @@ public class ModLoader {
             Log.print(TAG, modDirs[i].path());
             this.loadMod(modDirs[i]);
         }
+        //注册mod里的事件调用
         ModEventCaller.registryAllEventCaller();
-        Log.print(TAG, "所有模组加载完成！共加载" + ModContainer.getInstance().getAllMods().size() + "个模组");
+
+        Log.print(TAG, "所有模组加载完成！共加载：" + ModContainer.getInstance().getAllMods().size() + " 个模组");
     }
 
     /**

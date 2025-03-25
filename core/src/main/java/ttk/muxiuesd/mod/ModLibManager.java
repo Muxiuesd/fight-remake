@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import ttk.muxiuesd.mod.api.ModLibLoader;
 import ttk.muxiuesd.mod.api.ModRegistrant;
+import ttk.muxiuesd.mod.api.ModWorldProvider;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptEngine;
@@ -19,22 +20,29 @@ public class ModLibManager {
     //单例模式
     private static ModLibManager Instance;
 
-    private String libCode;
-    private ScriptEngine libEngine;
+    private String libCode; //底层库源码
+    private ScriptEngine libEngine; //运行底层库的引擎
+    private boolean loaded = false;
 
     private ModLibManager () {
         this.libEngine = EngineFactory.createEngine();
 
         this.getLibEngine().put("ModLibLoader", new ModLibLoader());
         this.getLibEngine().put("ModRegistrant", new ModRegistrant());
+        this.getLibEngine().put("ModWorldProvider", new ModWorldProvider());
 
         Log.print(TAG, "ModLibManager 初始化完成");
     }
 
     /**
-     * 加载mod的底层库
+     * 加载mod的底层核心库
      * */
-    protected void loadAllLib () {
+    public void loadCoreLib () {
+        if (this.loaded) {
+            Log.error(TAG, "核心库已经加载过，请勿重复调用加载！！！");
+            return;
+        }
+
         FileHandle libFile = Gdx.files.internal("modlib/lib.js");
         this.libCode = libFile.readString();
         try {
