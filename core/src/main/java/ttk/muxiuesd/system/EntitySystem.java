@@ -3,14 +3,12 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Entity;
-import ttk.muxiuesd.world.entity.Group;
-import ttk.muxiuesd.world.entity.LivingEntity;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.*;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.event.EventBus;
@@ -34,6 +32,7 @@ public class EntitySystem extends WorldSystem {
     public Array<LivingEntity> enemyEntity = new Array<>();
     public Array<Bullet> playerBulletEntity = new Array<>();
     public Array<Bullet> enemyBulletEntity = new Array<>();
+    public Array<ItemEntity> itemEntity = new Array<>();
 
     private final Array<Entity> updatableEntity = new Array<>();
     private final Array<Entity> drawableEntity = new Array<>();
@@ -74,9 +73,6 @@ public class EntitySystem extends WorldSystem {
      * @param entity 实体
      */
     private void _add(Entity entity) {
-        /*if (entity instanceof Player) {
-            this.player = (Player) entity;
-        }*/
         if (entity instanceof Bullet) {
             Bullet bullet = (Bullet) entity;
             if (bullet.group == Group.player) {
@@ -89,6 +85,9 @@ public class EntitySystem extends WorldSystem {
             }
         }else if (entity.group == Group.enemy) {
             this.enemyEntity.add((LivingEntity) entity);
+        }
+        if (entity instanceof ItemEntity) {
+            this.itemEntity.add((ItemEntity) entity);
         }
 
         this.updatableEntity.add(entity);
@@ -123,6 +122,9 @@ public class EntitySystem extends WorldSystem {
                 //TODO 暂时不能移除玩家
             }
         }
+        if (entity instanceof ItemEntity) {
+            this.itemEntity.removeValue((ItemEntity) entity, true);
+        }
 
         this.updatableEntity.removeValue(entity, true);
         this.drawableEntity.removeValue(entity, true);
@@ -154,6 +156,22 @@ public class EntitySystem extends WorldSystem {
                 if (livingEntity.isDeath()) {
                     this.callEntityDeadEvent(livingEntity);
                     this.remove(entity);
+                }
+            }
+
+            if (entity instanceof ItemEntity) {
+                //移除超过存活时间的物品实体
+                ItemEntity itemEntity = (ItemEntity) entity;
+                if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME) {
+                    this.remove(itemEntity);
+                    continue;
+                }
+                if (itemEntity.getLivingTime() > 3f) {
+                    float distance = Util.getDistance(itemEntity, this.getPlayer());
+                    if (distance <= 2f ) {
+
+                        this.remove(itemEntity);
+                    }
                 }
             }
         }

@@ -14,6 +14,7 @@ public class ItemEntity extends Entity{
     private ItemStack itemStack;
     private Vector2 positionOffset;
     private float cycle;
+    private float livingTime;   //存在时间
 
     public ItemEntity () {
         initialize(Group.item);
@@ -22,6 +23,7 @@ public class ItemEntity extends Entity{
 
     @Override
     public void update (float delta) {
+        this.livingTime += delta;
         this.cycle += delta / 2;
         if (cycle > 1f) cycle -= 1f;
         this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.3f);
@@ -47,5 +49,13 @@ public class ItemEntity extends Entity{
 
     public void setPositionOffset (Vector2 positionOffset) {
         this.positionOffset = positionOffset;
+    }
+
+    public float getLivingTime () {
+        return this.livingTime;
+    }
+
+    public void setLivingTime (float livingTime) {
+        this.livingTime = livingTime;
     }
 }

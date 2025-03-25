@@ -68,6 +68,19 @@ public abstract class LivingEntity extends Entity {
         return true;
     }
 
+    /**
+     * 捡起物品
+     * @return 若捡起物品后返回的为null说明物品被全部成功捡起，若不为null但数量有变化则是被部分捡起，反之则为false
+     * */
+    public boolean pickUpItem (ItemStack itemStack) {
+        int oldAmount = itemStack.getAmount();
+        ItemStack pickedUpItem = this.backpack.pickUpItem(itemStack);
+        if (pickedUpItem == null) {
+            return true;
+        }
+        return pickedUpItem.getAmount() != oldAmount;
+    }
+
     public boolean isDeath () {
         return this.curHealth <= 0;
     }
