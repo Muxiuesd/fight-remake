@@ -80,6 +80,7 @@ public class Backpack {
         for (int i = 0; i < nullStacks.length; ++i) {
             if (nullStacks[i]) {
                 this.setItemStack(i, itemStack);
+                return null;
             }
         }
         return null;

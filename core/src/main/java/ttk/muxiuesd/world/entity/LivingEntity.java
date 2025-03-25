@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -70,15 +71,18 @@ public abstract class LivingEntity extends Entity {
 
     /**
      * 捡起物品
-     * @return 若捡起物品后返回的为null说明物品被全部成功捡起，若不为null但数量有变化则是被部分捡起，反之则为false
+     * @return 若捡起物品后返回的为null说明物品被全部捡起，返回WHOLE；若不为null但数量有变化则是被部分捡起为PARTIAL，反之则为FAILURE
      * */
-    public boolean pickUpItem (ItemStack itemStack) {
+    public ItemPickUpState pickUpItem (ItemStack itemStack) {
         int oldAmount = itemStack.getAmount();
         ItemStack pickedUpItem = this.backpack.pickUpItem(itemStack);
         if (pickedUpItem == null) {
-            return true;
+            return ItemPickUpState.WHOLE;
         }
-        return pickedUpItem.getAmount() != oldAmount;
+        if (pickedUpItem.getAmount() != oldAmount) {
+            return ItemPickUpState.PARTIAL;
+        }
+        return ItemPickUpState.FAILURE;
     }
 
     public boolean isDeath () {

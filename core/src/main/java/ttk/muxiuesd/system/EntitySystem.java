@@ -15,6 +15,8 @@ import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.EventGroup;
 import ttk.muxiuesd.world.event.abs.BulletShootEvent;
 import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
+import ttk.muxiuesd.world.item.ItemPickUpState;
+import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.HashSet;
 
@@ -148,31 +150,48 @@ public class EntitySystem extends WorldSystem {
         }
 
         for (Entity entity : this.updatableEntity) {
+            //先把所有实体更新一次
             entity.update(delta);
-
-            //移除死亡的实体,玩家死亡移除不在这个逻辑里
+            //细化实体更新
+            //对于活物实体
             if (entity instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) entity;
-                if (livingEntity.isDeath()) {
-                    this.callEntityDeadEvent(livingEntity);
-                    this.remove(entity);
-                }
+                this.updateLivingEntity((LivingEntity) entity, delta);
             }
+            //对于物品实体
+            else if (entity instanceof ItemEntity) {
+                this.updateItemEntity((ItemEntity) entity, delta);
+            }
+        }
+    }
 
-            if (entity instanceof ItemEntity) {
-                //移除超过存活时间的物品实体
-                ItemEntity itemEntity = (ItemEntity) entity;
-                if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME) {
+    private void updateLivingEntity(LivingEntity livingEntity, float delta) {
+        //移除死亡的实体,玩家死亡移除不在这个逻辑里
+        if (livingEntity.isDeath()) {
+            this.callEntityDeadEvent(livingEntity);
+            this.remove(livingEntity);
+        }
+    }
+
+    private void updateItemEntity (ItemEntity itemEntity, float delta) {
+        //移除超过存活时间的物品实体
+        if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME) {
+            this.remove(itemEntity);
+            //跳过这个物品实体的 其他操作
+            return;
+        }
+
+        if (itemEntity.getLivingTime() > 3f) {
+            float distance = Util.getDistance(itemEntity, this.getPlayer());
+            if (distance <= 2f ) {
+                ItemStack itemStack = itemEntity.getItemStack();
+                ItemPickUpState state = this.getPlayer().pickUpItem(itemStack);
+                if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    continue;
+                }else if (state == ItemPickUpState.PARTIAL) {
+                    //部分捡起时刷新存在时间
+                    itemEntity.setLivingTime(0);
                 }
-                if (itemEntity.getLivingTime() > 3f) {
-                    float distance = Util.getDistance(itemEntity, this.getPlayer());
-                    if (distance <= 2f ) {
-
-                        this.remove(itemEntity);
-                    }
-                }
+                //捡起失败则什么也没发生
             }
         }
     }
