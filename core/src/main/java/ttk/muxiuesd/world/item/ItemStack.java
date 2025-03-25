@@ -8,6 +8,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class ItemStack {
     private final Item item;
     private int amount;
+
     public ItemStack(Item item) {
         //默认直接最大堆叠值
         this(item, item.property.getMaxCount());

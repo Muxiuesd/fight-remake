@@ -41,12 +41,31 @@ public abstract class LivingEntity extends Entity {
      * 实体使用手上的物品
      * @return 物品使用成功返回true，使用失败或者手上没有物品可供使用则返回false
      * */
-    public boolean useItem (World world, LivingEntity user) {
+    public boolean useItem (World world) {
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
-            return itemStack.getItem().ues(world, user);
+            return itemStack.getItem().ues(world, this);
         }
         return false;
+    }
+
+    /**
+     * 丢弃物品
+     * @return 丢弃成功返回true，丢弃失败返回false
+     * */
+    public boolean dropItem (int index, int amount) {
+        ItemStack itemStack = this.backpack.dropItem(index, amount);
+        if (itemStack == null) {
+            return false;
+        }
+
+        ItemEntity itemEntity = (ItemEntity) EntitiesReg.get("item_entity");
+        itemEntity.setPosition(getPosition());
+        itemEntity.setSize(getSize());
+        itemEntity.setItemStack(itemStack);
+        getEntitySystem().add(itemEntity);
+
+        return true;
     }
 
     public boolean isDeath () {

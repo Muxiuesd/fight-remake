@@ -10,6 +10,7 @@ import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.LivingEntity;
 
 import java.util.Objects;
@@ -39,6 +40,19 @@ public abstract class Item {
                 0, 0,
                 holder.width, holder.height,
                 holder.scaleX, holder.scaleY, rotation);
+        }
+    }
+
+    /**
+     * 在掉落物形式下的绘制方法
+     * @param itemEntity 所属的物品实体
+     * */
+    public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
+        if (this.texture != null) {
+            batch.draw(this.texture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
+                itemEntity.originX, itemEntity.originY,
+                itemEntity.width, itemEntity.height,
+                itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
         }
     }
 

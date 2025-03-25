@@ -107,6 +107,10 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
         }
     }
 
+    public void setSize (Vector2 size) {
+        this.setSize(size.x, size.y);
+    }
+
     /**
      * Set bounds the x, y, width, and height.
      */

@@ -21,9 +21,9 @@ public class EntitiesReg {
         Log.print(TAG, "游戏方块注册完毕");
     }
 
+    public static final Entity ITEM_ENTITY = register("item_entity", ItemEntity::new);
     public static final Entity PLAYER = register("player", Player::new);
     public static final Entity SLIME = register("slime", Slime::new);
-
 
     private static Entity register (String name, Supplier<Entity> supplier) {
         return registrant.register(name, supplier);

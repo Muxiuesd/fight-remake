@@ -128,12 +128,15 @@ public class Player extends LivingEntity {
             this.defendDuration = 0f;
         }
         if (KeyBindings.PlayerUseItem.wasJustPressed()) {
-            useItem(getEntitySystem().getWorld(), this);
+            useItem(getEntitySystem().getWorld());
         }
         //头两个物品槽（0号和1号）快捷循环
         if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
             if (getHandIndex() == 0) setHandIndex(1);
             else if (getHandIndex() == 1) setHandIndex(0);
+        }
+        if (KeyBindings.PlayerDropItem.wasJustPressed()) {
+            dropItem(getHandIndex(), 1);
         }
     }
 }
