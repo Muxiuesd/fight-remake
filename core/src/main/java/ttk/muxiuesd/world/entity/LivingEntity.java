@@ -71,6 +71,7 @@ public abstract class LivingEntity extends Entity {
 
     /**
      * 捡起物品
+     * @param itemStack 被捡起来的物品堆叠
      * @return 若捡起物品后返回的为null说明物品被全部捡起，返回WHOLE；若不为null但数量有变化则是被部分捡起为PARTIAL，反之则为FAILURE
      * */
     public ItemPickUpState pickUpItem (ItemStack itemStack) {

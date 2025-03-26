@@ -42,6 +42,7 @@ public class Backpack {
         }
         //非全部数量丢出
         itemStack.setAmount(itemStack.getAmount() - amount);
+        //System.out.println("还剩：" + itemStack.getAmount() + " 个");
         return new ItemStack(itemStack.getItem(), amount);
     }
 
