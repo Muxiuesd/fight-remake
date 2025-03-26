@@ -39,3 +39,8 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
     Log.print(TAG, "Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
 });
 
+Library.export("Fun", {
+    say: function () {
+        Log.print(TAG, "Hello other Mod!");
+    }
+});

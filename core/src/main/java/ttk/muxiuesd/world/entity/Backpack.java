@@ -18,7 +18,7 @@ public class Backpack {
 
     public ItemStack getItemStack (int index) {
         if (this.exceed(index)) throw new IndexOutOfBoundsException();
-        return itemStacks.get(index);
+        return this.itemStacks.get(index);
     }
 
     public void setItemStack (int index, ItemStack itemStack) {

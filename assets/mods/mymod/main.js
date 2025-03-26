@@ -23,3 +23,6 @@ World.event.add("worldTick", function (world, delta) {
 });
 
 File.loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);
+
+var fun = Library.import("Fun");
+fun.say();
