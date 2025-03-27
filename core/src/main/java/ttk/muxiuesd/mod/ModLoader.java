@@ -89,12 +89,30 @@ public class ModLoader {
             Log.print(TAG, "没有加载任何模组，跳过运行");
             return;
         }
-
+        Log.print(TAG, "开始分析模组之间的依赖关系……");
+        HashMap<String, ModNode> nodeHashMap = ModDependency.analysis();
         Log.print(TAG, "开始运行所有的模组……");
-        HashMap<String, Mod> allMods = ModContainer.getInstance().getAllMods();
+        final int[] order = {1};
+        for (ModNode node : nodeHashMap.values()) {
+            Mod mod = node.mod;
+            if (node.getChildren().isEmpty() && !mod.isRunning()) {
+                Log.print(TAG, "Mod：" + mod.getModNamespace() + " 第" + order[0] + "个开始运行");
+                mod.run();
+                order[0]++;
+                node.getParents().forEach(parent -> {
+                    if (!parent.mod.isRunning()) {
+                        Log.print(TAG, "Mod：" + mod.getModNamespace() + " 第" + order[0] + "个开始运行");
+                        order[0]++;
+                        parent.run();
+                    }
+                });
+            }
+        }
+
+        /*HashMap<String, Mod> allMods = ModContainer.getInstance().getAllMods();
         for (Mod mod : allMods.values()) {
             mod.run();
-        }
+        }*/
     }
 
     /**

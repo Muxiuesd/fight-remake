@@ -1,8 +1,9 @@
 {
   "name": "测试 模组",
   "namespace": "testmod",
-  "author": "muxiuesd",
+  "author": "Muxiuesd",
   "version": "1.0.0",
   "description": "测试用模组",
-  "main": "main.js"
+  "main": "main.js",
+  "dependence": []
 }
