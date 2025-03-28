@@ -18,7 +18,8 @@ public class ModNode {
     }
 
     /**
-     * 运行mod
+     * 运行节点里的mod
+     * @return 如果自己被正确运行完则返回true，否则都是false
      * */
     public boolean run () {
         //没有依赖的，也没有被依赖，就直接执行完事

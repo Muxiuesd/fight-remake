@@ -2,7 +2,6 @@ package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
@@ -92,31 +91,13 @@ public class ModLoader {
         }
         Log.print(TAG, "开始分析模组之间的依赖关系……");
         HashMap<String, ModNode> nodeHashMap = ModDependency.analysis();
+
         Log.print(TAG, "开始运行所有的模组……");
-        final int[] order = {1};
         //TODO 更好的算法来确定mod的运行顺序
-        //叶节点（没有子节点的都算）最先运行
-        Array<ModNode> leafNode = new Array<>();
         for (ModNode node : nodeHashMap.values()) {
-            /*if (node.getChildren().isEmpty()) {
-                leafNode.add(node);
-            }*/
             node.run();
         }
-
-        /*for (ModNode node : leafNode) {
-            if (node.getParents().isEmpty()) {
-                node.mod.run();
-                continue;
-            }
-            node.getParents().forEach(parent -> {
-            });
-        }*/
-
-        /*HashMap<String, Mod> allMods = ModContainer.getInstance().getAllMods();
-        for (Mod mod : allMods.values()) {
-            mod.run();
-        }*/
+        Log.print(TAG, "————所有的模组运行完毕————");
     }
 
     /**
