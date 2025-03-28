@@ -32,6 +32,8 @@ public class Mod implements Runnable{
 
     @Override
     public void run() {
+        if (this.running) return;
+
         FileHandle mainFile = Gdx.files.absolute(this.modPath + info.getString("main"));
 
         String code = mainFile.readString();

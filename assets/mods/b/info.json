@@ -1,13 +1,13 @@
 {
-  "name": "测试 模组",
-  "namespace": "testmod",
+  "name": "B",
+  "namespace": "b",
   "author": "Muxiuesd",
   "version": "1.0.0",
-  "description": "测试用模组",
+  "description": "test",
   "main": "main.js",
   "dependence": [
     {
-      "namespace": "b",
+      "namespace": "c",
       "version": "1.0.0"
     }
   ]

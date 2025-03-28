@@ -44,3 +44,6 @@ Library.export("Fun", {
         Log.print(TAG, "Hello other Mod!");
     }
 });
+
+var bFun = Library.import("bFun");
+bFun.call();
