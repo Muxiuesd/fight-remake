@@ -16,6 +16,10 @@ public abstract class Weapon extends Item{
         return super.use(world, user);
     }
 
+    public WeaponProperties getProperties () {
+        return (WeaponProperties) property;
+    }
+
     /**
      * 武器属性
      */

@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.entity;
 
+import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.HashMap;
@@ -7,7 +8,7 @@ import java.util.HashMap;
 /**
  * 实体所拥有的物品背包
  * */
-public class Backpack {
+public class Backpack implements Updateable {
     private HashMap<Integer, ItemStack> itemStacks;
     private final int maxCapacity;
 
@@ -122,5 +123,12 @@ public class Backpack {
      * */
     public int getSize () {
         return this.maxCapacity;
+    }
+
+    @Override
+    public void update (float delta) {
+        this.itemStacks.forEach((index, itemStack) -> {
+           itemStack.update(delta);
+        });
     }
 }

@@ -29,6 +29,12 @@ public abstract class LivingEntity extends Entity {
     }
 
     @Override
+    public void update (float delta) {
+        super.update(delta);
+        this.backpack.update(delta);
+    }
+
+    @Override
     public void draw (Batch batch) {
         super.draw(batch);
         //如果手上有物品，则绘制手上的物品

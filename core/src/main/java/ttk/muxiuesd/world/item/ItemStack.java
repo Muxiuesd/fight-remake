@@ -2,6 +2,8 @@ package ttk.muxiuesd.world.item;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import ttk.muxiuesd.interfaces.IItemStackBehaviour;
+import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -10,12 +12,12 @@ import ttk.muxiuesd.world.item.abs.Weapon;
 /**
  * 物品堆栈
  * */
-public class ItemStack {
+public class ItemStack implements Updateable {
     private final Item item;
     private Item.Property property;
     private int amount;
     private float useSpan;
-
+    private IItemStackBehaviour behaviour;
 
     public ItemStack(Item item) {
         //默认直接最大堆叠值
@@ -25,6 +27,16 @@ public class ItemStack {
         } catch (ReflectionException e) {
             throw new RuntimeException(e);
         }
+        //根据不同的物品类型来注入行为
+        if (this.getItem().type == Item.Type.COMMON) {
+            this.behaviour = new CommonItemStackBehaviour();
+        }else if (this.getItem().type == Item.Type.CONSUMPTION) {
+            this.behaviour = new ConsumptionItemStackBehaviour();
+        }else if (this.getItem().type == Item.Type.WEAPON) {
+            this.behaviour = new WeaponItemStackBehaviour();
+        } else if (this.getItem().type == Item.Type.EQUIPMENT) {
+            this.behaviour = new EquipmentItemStackBehaviour();
+        }
     }
     public ItemStack (Item item, int amount) {
         this.item = item;
@@ -33,50 +45,50 @@ public class ItemStack {
 
     /**
      * 使用
-     * TODO 使用行为依赖注入，避免判断
      * */
     public boolean use (World world, LivingEntity user) {
-        if (this.getItem().type == Item.Type.COMMON) {
-            return this.getItem().use(world, user);
-        }
-        if (this.getItem().type == Item.Type.CONSUMPTION) {
-            boolean used = this.getItem().use(world, user);
-            if (!used) {
-                return false;
-            }
-            if (this.getAmount() - 1 > 0) {
-                //用一次数量减一
-                this.setAmount(this.getAmount() - 1);
-            }else {
-                //数量用光了
-                user.backpack.clear(this);
-            }
-        }else if (this.getItem().type == Item.Type.WEAPON && this.getItem() instanceof Weapon) {
-            Weapon weapon = (Weapon) this.getItem();
-            boolean used = weapon.use(world, user);
-            if (!used) {
-                return false;
-            }
-            Weapon.WeaponProperties properties = (Weapon.WeaponProperties) this.property;
-            //用一次耐久减一
-            properties.setDuration(properties.getDuration() - 1);
-        } else if (this.getItem().type == Item.Type.EQUIPMENT) {
-            //TODO 装备使用
-        }
-        //到这里说明不论何种类型都使用成功
-        return true;
+        return this.behaviour.use(world, user, this);
     }
 
+    @Override
+    public void update (float delta) {
+        if (this.getItem() instanceof Weapon) {
+            Weapon weapon = (Weapon) this.getItem();
+            this.useSpan += delta;
+            float maxSpan = weapon.getProperties().getUseSpan();
+            if (this.useSpan > maxSpan) {
+                this.useSpan = maxSpan + 1f;
+            }
+        }
+    }
 
     public Item getItem () {
         return this.item;
     }
 
+    public Item.Property getProperty () {
+        return this.property;
+    }
+
+    public ItemStack setProperty (Item.Property property) {
+        this.property = property;
+        return this;
+    }
+
     public int getAmount () {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount (int amount) {
         if (amount > 0) this.amount = amount;
+    }
+
+    public float getUseSpan () {
+        return this.useSpan;
+    }
+
+    public ItemStack setUseSpan (float useSpan) {
+        this.useSpan = useSpan;
+        return this;
     }
 }
