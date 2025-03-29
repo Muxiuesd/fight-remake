@@ -20,7 +20,7 @@ import java.util.Objects;
  * */
 public abstract class Item {
 
-    public final Property property;
+    public Property property;
     public TextureRegion texture;
 
     public Item (Property property, String textureId, String texturePath) {
