@@ -45,7 +45,7 @@ public abstract class LivingEntity extends Entity {
     public boolean useItem (World world) {
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
-            return itemStack.getItem().ues(world, this);
+            return itemStack.use(world, this);
         }
         return false;
     }

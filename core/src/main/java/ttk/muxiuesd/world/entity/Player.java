@@ -50,6 +50,7 @@ public class Player extends LivingEntity {
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
         backpack.setItemStack(1, ItemsReg.getItem("stick"));
+        backpack.setItemStack(2, ItemsReg.getItem("test_weapon"));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }
@@ -119,8 +120,7 @@ public class Player extends LivingEntity {
         // 左键发射攻击性子弹
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());
-            getEntitySystem().add(bullet);
-            //AudioPlayer.getInstance().playSound("shoot");
+            //getEntitySystem().add(bullet);
         }
         if (KeyBindings.PlayerShield.wasJustPressed() && this.defendSpan >= 1f) {
             this.isDefend = true;
@@ -128,7 +128,9 @@ public class Player extends LivingEntity {
             this.defendDuration = 0f;
         }
         if (KeyBindings.PlayerUseItem.wasJustPressed()) {
-            useItem(getEntitySystem().getWorld());
+            if (useItem(getEntitySystem().getWorld())){
+                System.out.println("使用成功");
+            }
         }
         //头两个物品槽（0号和1号）快捷循环
         if (KeyBindings.PlayerChangeItem.wasJustPressed()) {

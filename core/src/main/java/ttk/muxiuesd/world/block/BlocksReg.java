@@ -40,7 +40,7 @@ public class BlocksReg {
      * TODO 打印mod里注册的方块
      * */
     public static void printAllBlock () {
-        HashMap<String, Supplier<Block>> map = registrant.getRegedit();
+        HashMap<String, Supplier<? extends Block>> map = registrant.getRegedit();
         Array<String> allBlockName = new Array<>();
         map.keySet().forEach(allBlockName::add);
 

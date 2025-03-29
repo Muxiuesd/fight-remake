@@ -9,7 +9,7 @@ import java.util.function.Supplier;
  * */
 public class Registrant<T> {
     private final String namespace; //命名空间
-    private final HashMap<String, Supplier<T>> regedit; //注册表，key为名称而不是id
+    private final HashMap<String, Supplier<? extends T>> regedit; //注册表，key为名称而不是id
 
     public Registrant(String namespace) {
         this.namespace = namespace;
@@ -19,7 +19,7 @@ public class Registrant<T> {
     /**
      * 注册
      * */
-    public T register (String name, Supplier<T> factory)  {
+    public T register (String name, Supplier<? extends T> factory)  {
         if (this.contains(name)) {
             throw new RuntimeException("注册Id：" + this.getId(name) + " 重复！！！");
         }
@@ -46,7 +46,7 @@ public class Registrant<T> {
         return this.regedit.containsKey(name);
     }
 
-    public HashMap<String, Supplier<T>> getRegedit () {
+    public HashMap<String, Supplier<? extends T>> getRegedit () {
         return this.regedit;
     }
 }

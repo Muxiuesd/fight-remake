@@ -8,7 +8,7 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class ItemStick extends Item {
     public ItemStick () {
-        super(new Property().setMaxCount(64),
+        super(Type.CONSUMPTION, new Property().setMaxCount(64),
             Fight.getId("stick"),
             Fight.getItemTexture("stick.png"));
     }

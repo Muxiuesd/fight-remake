@@ -1,13 +1,20 @@
 package ttk.muxiuesd.world.item.abs;
 
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.LivingEntity;
+
 /**
  * 武器类
  * */
 public abstract class Weapon extends Item{
     public Weapon (WeaponProperties property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+        super(Type.WEAPON, property, textureId, texturePath);
     }
 
+    @Override
+    public boolean use (World world, LivingEntity user) {
+        return super.use(world, user);
+    }
 
     /**
      * 武器属性
@@ -18,7 +25,7 @@ public abstract class Weapon extends Item{
         private float useSpan = 1f;  //使用间隔
 
         public WeaponProperties () {
-            //武器最大只能堆叠一个
+            //默认武器最大只能堆叠一个
             setMaxCount(1);
         }
 

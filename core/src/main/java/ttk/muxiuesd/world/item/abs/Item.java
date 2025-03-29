@@ -19,11 +19,12 @@ import java.util.Objects;
  * 物品
  * */
 public abstract class Item {
-
+    public Type type;
     public Property property;
     public TextureRegion texture;
 
-    public Item (Property property, String textureId, String texturePath) {
+    public Item (Type type, Property property, String textureId, String texturePath) {
+        this.type = type;
         this.property = property;
         this.loadTextureRegion(textureId, texturePath);
     }
@@ -60,7 +61,7 @@ public abstract class Item {
      * 使用此物品
      * @return 是否使用成功
      * */
-    public boolean ues (World world, LivingEntity user) {
+    public boolean use (World world, LivingEntity user) {
         //播放物品使用音效
         String useSoundId = this.property.getUseSoundId();
         SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
@@ -81,6 +82,15 @@ public abstract class Item {
         });
     }
 
+    /**
+     * 物品的类型
+     * */
+    public enum Type {
+        COMMON,         //普通物品
+        CONSUMPTION,    //消耗品
+        WEAPON,         //武器
+        EQUIPMENT       //装备
+    }
 
     public static class Property {
         private int maxCount = 64;

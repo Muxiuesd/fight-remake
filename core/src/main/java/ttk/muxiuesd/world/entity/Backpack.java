@@ -98,6 +98,12 @@ public class Backpack {
         return null;
     }
 
+    /**/
+    public ItemStack clear (ItemStack itemStack) {
+        if (this.itemStacks.containsValue(itemStack)) return this.itemStacks.remove(itemStack);
+        return null;
+    }
+
     /**
      * 是否超出背包大小
      * */
