@@ -150,6 +150,10 @@ public class AssetsLoader implements Disposable {
         this.idToPath.put(id, path);
     }
 
+    public String getPath (String id) {
+        return this.idToPath.get(id);
+    }
+
     @Override
     public void dispose() {
         this.gameAssetManager.dispose();

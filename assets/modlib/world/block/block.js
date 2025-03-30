@@ -19,8 +19,8 @@ function newBlock (property, textureId) {
 }
 
 function newBlockSupplier (func) {
-    var supplier = Java.extend(Java.type("java.util.function.Supplier"), {
-        get: function (){
+    var supplier = Java.extend(Java.type("ttk.muxiuesd.mod.api.ModSupplier"), {
+        getNew: function (){
             return func;
         }
     });

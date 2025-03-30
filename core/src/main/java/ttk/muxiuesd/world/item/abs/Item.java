@@ -23,11 +23,15 @@ public abstract class Item {
     public Property property;
     public TextureRegion texture;
 
+    public Item (Type type, Property property, String textureId) {
+        this(type, property, textureId, null);
+    }
     public Item (Type type, Property property, String textureId, String texturePath) {
         this.type = type;
         this.property = property;
         this.loadTextureRegion(textureId, texturePath);
     }
+
 
     /**
      * 在持有者手上持有时的绘制方法
@@ -76,6 +80,9 @@ public abstract class Item {
     }
 
     public void loadTextureRegion (String id, String texturePath) {
+        if (texturePath == null) {
+            texturePath = AssetsLoader.getInstance().getPath(id);
+        }
         AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(id, Texture.class);
             this.texture = new TextureRegion(texture);

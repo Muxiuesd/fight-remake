@@ -7,6 +7,7 @@ ModLibLoader.load("Internal", "audio.js");
 ModLibLoader.load("Internal", "world/world.js");
 ModLibLoader.load("Internal", "world/entity/entity.js");
 ModLibLoader.load("Internal", "world/block/block.js");
+ModLibLoader.load("Internal", "world/item/item.js");
 
 var _libs = new HashMap();
 var Library = {

@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 
 /**
  * 所有物品的注册
- * TODO mod注册物品
  * */
 public class ItemsReg {
     public static final Registrant<Item> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Item.class);

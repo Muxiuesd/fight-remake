@@ -30,6 +30,7 @@ public class ModLibManager {
         this.getLibEngine().put("ModLibLoader", new ModLibLoader());
         this.getLibEngine().put("ModRegistrant", new ModRegistrant());
         this.getLibEngine().put("ModWorldProvider", new ModWorldProvider());
+        //this.getLibEngine().put("ModItems", new ModItems());
 
         Log.print(TAG, "ModLibManager 初始化完成");
     }

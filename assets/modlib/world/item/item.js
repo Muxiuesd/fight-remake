@@ -1,0 +1,44 @@
+var ItemType = Java.type("ttk.muxiuesd.world.item.abs.Item.Type");
+
+var Items = {
+    types: {
+        COMMON: ItemType.COMMON,
+        CONSUMPTION: ItemType.CONSUMPTION,
+        WEAPON: ItemType.WEAPON,
+        EQUIPMENT: ItemType.EQUIPMENT,
+    },
+    properties: {
+        newProperty: function () {
+            var ip = Java.type("ttk.muxiuesd.world.item.abs.Item.Property");
+            return new ip;
+        },
+        newWeaponProperty: function () {
+            var wp = Java.type("ttk.muxiuesd.world.item.abs.Weapon.WeaponProperties");
+            return new wp;
+        }
+    },
+    getAbstractItem: function (obj) {
+        return Java.extend(Java.type("ttk.muxiuesd.world.item.abs.Item"), obj);
+    },
+    newItem: function (type, property, textureId, texturePath) {
+        var Item = this.getAbstractItem({});
+        Log.print("Items", Item);
+        return new Item(type, property, textureId, texturePath);
+    },
+    newItem: function (type, property, textureId) {
+        var Item = this.getAbstractItem({});
+        return new Item(type, property, textureId);
+    },
+    newSupplier: function (func) {
+        var supplier = Java.extend(Java.type("ttk.muxiuesd.mod.api.ModSupplier"), {
+            getNew: function (){
+                return func;
+            }
+        });
+        return new supplier();
+    },
+    getItem: function (id) {
+        var api = Java.type("ttk.muxiuesd.mod.api.ModItems");
+        return api.getItem(id);
+    }
+}

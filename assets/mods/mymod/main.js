@@ -5,11 +5,10 @@ World.event.add("bulletShoot", function (shooter, bullet) {
     var group = getGroup(shooter);
     var soundEffectSystem = World.systems.get("SoundEffectSystem");
     soundEffectSystem.newSpatialSound("testmod:ignite", shooter);
-    //Log.print(group + "射出子弹！");
 });
 World.event.add("entityDead", function (deadEntity) {
     var group = getGroup(deadEntity);
-    //Log.print(group + "死亡!");
+
 });
 World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
     if (button === Buttons.RIGHT) {
@@ -19,7 +18,6 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
 });
 World.event.add("worldTick", function (world, delta) {
     //Audio.getPlayer().playMusic("testmod:ignite");
-
 });
 
 File.loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);

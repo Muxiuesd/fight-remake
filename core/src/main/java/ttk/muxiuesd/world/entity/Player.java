@@ -78,19 +78,6 @@ public class Player extends LivingEntity {
     @Override
     public void draw(Batch batch) {
         super.draw(batch);
-        /*ItemStack itemStack = backpack.getItemStack(getHandIndex());
-        if (itemStack != null) {
-            TextureRegion texture = itemStack.getItem().texture;
-            if (texture != null) {
-                Direction direction = Util.getDirection();
-                float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection()) - 45;
-                batch.draw(texture, x + getWidth() / 2, y + getHeight() / 2,
-                    0, 0,
-                    width, height,
-                    scaleX, scaleY, rotation);
-            }
-        }*/
-
         if (this.isDefend && this.shield != null) {
             batch.draw(this.shield, x, y,
                 originX, originY,

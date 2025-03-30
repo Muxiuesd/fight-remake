@@ -133,7 +133,19 @@ public class RegistrantGroup {
         }
         printAll(allName, "注册的实体有：");
     }
-
+    /**
+     * 打印出所有注册的物品
+     */
+    public static void printAllItems () {
+        Array<String> allName = new Array<>();
+        for (Registrant<? extends Item> registrant : itemRegistrants.values()) {
+            HashMap<String, ? extends Supplier<? extends Item>> r = registrant.getRegedit();
+            for (String name : r.keySet()) {
+                allName.add(registrant.getId(name) + "::" + r.get(name).get().getClass().getName());
+            }
+        }
+        printAll(allName, "注册的物品有：");
+    }
     private static void printAll (Array<String> allName, String msg) {
         Log.print(TAG, msg);
         for (int i = 0; i < allName.size; i++) {

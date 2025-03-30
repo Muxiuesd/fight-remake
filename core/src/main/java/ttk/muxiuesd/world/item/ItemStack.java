@@ -8,6 +8,9 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.abs.Weapon;
+import ttk.muxiuesd.world.item.stack.behaviour.CommonItemStackBehaviour;
+import ttk.muxiuesd.world.item.stack.behaviour.ConsumptionItemStackBehaviour;
+import ttk.muxiuesd.world.item.stack.behaviour.EquipmentItemStackBehaviour;
 
 /**
  * 物品堆栈
