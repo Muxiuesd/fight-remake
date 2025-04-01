@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.wall;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 
 /**
  * 墙体，即有碰撞箱的特殊方块

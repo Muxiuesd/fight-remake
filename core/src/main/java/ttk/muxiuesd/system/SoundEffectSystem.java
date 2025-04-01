@@ -12,7 +12,7 @@ import ttk.muxiuesd.audio.SpatialSoundInstance;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Player;
 

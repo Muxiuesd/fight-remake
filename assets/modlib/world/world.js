@@ -1,7 +1,7 @@
 var World = {
     /** 获取当前世界 */
     get: function () {
-        var worldProvider = Java.type("ttk.muxiuesd.mod.api.ModWorldProvider");
+        var worldProvider = Java.type("ttk.muxiuesd.mod.api.world.ModWorldProvider");
         return worldProvider.getWorld();
     },
     eventGroups: {

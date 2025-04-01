@@ -37,8 +37,8 @@ var Items = {
         });
         return new supplier();
     },
-    getItem: function (id) {
-        var api = Java.type("ttk.muxiuesd.mod.api.ModItems");
+    giveNewItem: function (id) {
+        var api = Java.type("ttk.muxiuesd.mod.api.world.ModItems");
         return api.getItem(id);
     }
 }

@@ -16,7 +16,7 @@ import ttk.muxiuesd.audio.AudioReg;
 import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
-import ttk.muxiuesd.mod.api.ModWorldProvider;
+import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.util.Log;

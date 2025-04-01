@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import ttk.muxiuesd.mod.api.ModLibLoader;
 import ttk.muxiuesd.mod.api.ModRegistrant;
-import ttk.muxiuesd.mod.api.ModWorldProvider;
+import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptEngine;

@@ -1,4 +1,4 @@
-package ttk.muxiuesd.mod.api;
+package ttk.muxiuesd.mod.api.world;
 
 import ttk.muxiuesd.world.World;
 

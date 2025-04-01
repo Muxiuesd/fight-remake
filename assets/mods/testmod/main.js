@@ -14,8 +14,8 @@ fileLoader.load(
 
 var blockReg = ModRegistrant.getBlockRegister(namespace);
 
-blockReg.register("test_block", newBlockSupplier(function () {
-    return newBlock(new Property().setFriction(1.0), "testmod:grass");
+blockReg.register("test_block", Blocks.newSupplier(function () {
+    return Blocks.newBlock(Blocks.properties.newProperty().setFriction(1.0), "testmod:grass");
 }));
 
 var audioRegister = Audio.getRegister(namespace);
@@ -55,8 +55,10 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
 });
 
 Library.export("Fun", {
+    count: 0,
     say: function () {
-        Log.print(TAG, "Hello other Mod!");
+        Log.print(TAG, "Hello other Mod!" + this.count);
+        this.count++;
     }
 });
 
