@@ -24,35 +24,36 @@ public abstract class World implements Updateable, Drawable, ShapeRenderable, Di
 
     @Override
     public void draw(Batch batch) {
-        if (worldSystemsManager != null) {
-            getSystemManager().draw(batch);
+        if (this.worldSystemsManager != null) {
+            this.getSystemManager().draw(batch);
         }
     }
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        if (worldSystemsManager != null) {
-            getSystemManager().renderShape(batch);
+        if (this.worldSystemsManager != null) {
+            this.getSystemManager().renderShape(batch);
         }
     }
 
     @Override
     public void update(float delta) {
-        if (worldSystemsManager != null) {
-            getSystemManager().update(delta);
+        if (this.worldSystemsManager != null) {
+            this.getSystemManager().update(delta);
         }
     }
 
     @Override
     public void dispose() {
-        if (worldSystemsManager != null) {
-            getSystemManager().dispose();
+        if (this.worldSystemsManager != null) {
+            this.getSystemManager().dispose();
         }
     }
 
     public WorldSystemsManager getSystemManager() {
         if (this.worldSystemsManager == null) {
             Log.error(TAG, "这个world的系统管理是null！！！");
+            throw new RuntimeException();
         }
         return this.worldSystemsManager;
     }

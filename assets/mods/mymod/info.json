@@ -1,8 +1,18 @@
 {
   "name": "My Mod",
   "namespace": "mymod",
-  "author": "muxiuesd",
+  "author": "Muxiuesd",
   "version": "1.0.0",
   "description": "我的模组",
-  "main": "main.js"
+  "main": "main.js",
+  "dependence": [
+    {
+      "namespace": "library",
+      "version": "1.0.0"
+    },
+    {
+      "namespace": "testmod",
+      "version": "1.0.0"
+    }
+  ]
 }

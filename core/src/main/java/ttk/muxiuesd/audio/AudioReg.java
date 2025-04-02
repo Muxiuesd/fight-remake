@@ -23,6 +23,9 @@ public class AudioReg {
         registerSound("grass_walk", "block/walk/grass.wav");
         registerSound("stone_walk", "block/walk/stone.wav");
         registerSound("stone_walk_1", "block/walk/stone_1.ogg");
+
+        //物品
+        registerSoundAsMusic("click", "item/click.ogg");
     }
 
     public static void registerSound (String name, String path) {

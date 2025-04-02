@@ -32,19 +32,20 @@ public class Mod implements Runnable{
 
     @Override
     public void run() {
+        if (this.running) return;
+
         FileHandle mainFile = Gdx.files.absolute(this.modPath + info.getString("main"));
 
         String code = mainFile.readString();
-        //Log.print(TAG, code);
 
         this.engine = EngineFactory.createEngine();
         try {
-
             this.engine.eval(code, this.libContext);
-
+            Log.print(TAG, "Mod：" + this.getModName() + " 运行成功");
             this.running = true;
         } catch (ScriptException e) {
             this.running = false;
+            Log.error(TAG, "Mod：" + this.getModName() + " 出bug了，运行失败！！！");
             throw new RuntimeException(e);
         }
     }
@@ -55,6 +56,10 @@ public class Mod implements Runnable{
             return null;
         }
         return this.engine;
+    }
+
+    public JsonValue getInfo () {
+        return this.info;
     }
 
     public String getModName() {

@@ -12,7 +12,7 @@ import ttk.muxiuesd.audio.SpatialSoundInstance;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Player;
 
@@ -79,7 +79,7 @@ public class SoundEffectSystem extends WorldSystem {
     private void updatePlayerWalkSoundEffect (float delta) {
         if (this.ps.playerMoved()) {
             Player player = this.ps.getPlayer();
-            Vector2 playerCenter = player.getPlayerCenter();
+            Vector2 playerCenter = player.getCenter();
             Block underfootBlock = cs.getBlock(playerCenter.x, playerCenter.y);
             String walkSoundId = underfootBlock.getProperty().getWalkSoundId();
             //检测方块不一样时
@@ -139,7 +139,7 @@ public class SoundEffectSystem extends WorldSystem {
 
     /**
      * 新建一个空间音效
-     * @param id 音效的Id，但是Music
+     * @param id 音效的Id，但必须是Music
      * @param sounder 发出声音的实体
      * */
     public void newSpatialSound (String id, Entity sounder) {

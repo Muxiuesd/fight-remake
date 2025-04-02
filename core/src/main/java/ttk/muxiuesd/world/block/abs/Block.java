@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.block;
+package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;

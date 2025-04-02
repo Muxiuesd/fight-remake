@@ -27,8 +27,12 @@ public class EventEnemyShootBullet extends BulletShootEvent {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()
                 .getSystem("SoundEffectSystem");
+
+            //AudioPlayer.getInstance().playSound("testmod:ignite");
+
             //TODO 不同子弹不同音效，不同实体不同音效
             ses.newSpatialSound(Fight.getId("shoot"), bullet);
+            //ses.newSpatialSound("testmod:ignite", bullet);
 
             ParticleSystem pts = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
             pts.emitParticle(Fight.getId("enemy_shoot"), MathUtils.random(3, 5),

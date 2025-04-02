@@ -29,7 +29,7 @@ public class ModLoader {
 
     private ModLoader() {
         this.checkRoot();
-        ModLibManager.getInstance().loadAllLib();
+        //ModLibManager.getInstance().loadAllLib();
         Log.print(TAG, "模组加载器初始化完毕！");
     }
 
@@ -42,8 +42,10 @@ public class ModLoader {
             Log.print(TAG, modDirs[i].path());
             this.loadMod(modDirs[i]);
         }
+        //注册mod里的事件调用
         ModEventCaller.registryAllEventCaller();
-        Log.print(TAG, "所有模组加载完成！共加载" + ModContainer.getInstance().getAllMods().size() + "个模组");
+
+        Log.print(TAG, "所有模组加载完成！共加载：" + ModContainer.getInstance().getAllMods().size() + " 个模组");
     }
 
     /**
@@ -87,12 +89,15 @@ public class ModLoader {
             Log.print(TAG, "没有加载任何模组，跳过运行");
             return;
         }
+        Log.print(TAG, "开始分析模组之间的依赖关系……");
+        HashMap<String, ModNode> nodeHashMap = ModDependency.analysis();
 
         Log.print(TAG, "开始运行所有的模组……");
-        HashMap<String, Mod> allMods = ModContainer.getInstance().getAllMods();
-        for (Mod mod : allMods.values()) {
-            mod.run();
+        //TODO 更好的算法来确定mod的运行顺序
+        for (ModNode node : nodeHashMap.values()) {
+            node.run();
         }
+        Log.print(TAG, "————所有的模组运行完毕————");
     }
 
     /**

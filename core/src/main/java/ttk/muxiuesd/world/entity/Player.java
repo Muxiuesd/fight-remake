@@ -1,21 +1,20 @@
 package ttk.muxiuesd.world.entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
+import ttk.muxiuesd.world.item.ItemsReg;
 
 /**
  * 玩家
  */
-public class Player extends Entity {
+public class Player extends LivingEntity {
     public TextureRegion body;
     public TextureRegion shield;
     public float maxDefendSpan = 1f;
@@ -30,26 +29,35 @@ public class Player extends Entity {
     }
 
     public Player(float maxHealth, float curHealth) {
-        initialize(Group.player, maxHealth, curHealth);
+        initialize(Group.player, maxHealth, curHealth, 16);
 
         speed = 8;
         curSpeed = speed;
         setSize(1, 1);
 
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player"), "texture/player/player.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player"),
+            Fight.getEntityTexture("player/player.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"), "texture/player/shield.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"),
+            Fight.getEntityTexture("player/shield.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player_shield"), Texture.class);
             this.shield = new TextureRegion(texture);
         });
+
+        backpack.setItemStack(0, ItemsReg.getItem("test_item"));
+        backpack.setItemStack(1, ItemsReg.getItem("stick"));
+        backpack.setItemStack(2, ItemsReg.getItem("test_weapon"));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }
 
     @Override
     public void update(float delta) {
+        super.update(delta);
         setCullingArea(x + 0.1f, y + 0.1f, width - 0.2f, height - 0.2f);
 
         if (!this.isDefend && this.defendSpan < this.maxDefendSpan) {
@@ -79,42 +87,46 @@ public class Player extends Entity {
     }
 
     private void handleInput(float delta) {
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (KeyBindings.PlayerWalkUp.wasPressed()) {
             //this.y = y + curSpeed * delta;
             velY += curSpeed * delta;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (KeyBindings.PlayerWalkDown.wasPressed()) {
             //this.y = y - curSpeed * delta;
             velY -= curSpeed * delta;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (KeyBindings.PlayerWalkLeft.wasPressed()) {
             //this.x = x - curSpeed * delta;
             velX -= curSpeed * delta;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (KeyBindings.PlayerWalkRight.wasPressed()) {
             //this.x = x + curSpeed * delta;
             velX += curSpeed * delta;
         }
 
 
         // 左键发射攻击性子弹
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());
-            getEntitySystem().add(bullet);
-            //AudioPlayer.getInstance().playSound("shoot");
+            //getEntitySystem().add(bullet);
         }
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && this.defendSpan >= 1f) {
+        if (KeyBindings.PlayerShield.wasJustPressed() && this.defendSpan >= 1f) {
             this.isDefend = true;
             this.defendSpan = 0f;
             this.defendDuration = 0f;
         }
-    }
-
-    /**
-     * 获取玩家中心的坐标（世界坐标）
-     * @return 二维坐标
-     */
-    public Vector2 getPlayerCenter () {
-        return new Vector2(x + getWidth() / 2, y + getHeight() / 2);
+        if (KeyBindings.PlayerUseItem.wasJustPressed()) {
+            if (useItem(getEntitySystem().getWorld())){
+                System.out.println("使用成功");
+            }
+        }
+        //头两个物品槽（0号和1号）快捷循环
+        if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
+            if (getHandIndex() == 0) setHandIndex(1);
+            else if (getHandIndex() == 1) setHandIndex(0);
+        }
+        if (KeyBindings.PlayerDropItem.wasJustPressed()) {
+            dropItem(getHandIndex(), 1);
+        }
     }
 }

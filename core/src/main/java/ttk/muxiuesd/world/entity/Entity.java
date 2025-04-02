@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 实体
+ * 基础实体
  */
 public abstract class Entity implements Disposable, Drawable, Updateable {
 
@@ -22,10 +22,8 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
     public final int id;
 
     public Group group;
-    public float maxHealth; // 生命值上限
-    public float curHealth; // 当前生命值
-    public float speed, curSpeed;
 
+    public float speed, curSpeed;
     public float x, y;
     public float velX, velY;
     public float width, height;
@@ -37,7 +35,7 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
 
     public boolean attacked = false;
 
-    private EntitySystem es;
+    private EntitySystem es;    //此实体所属的实体系统
 
     // 动态数据存储
     private Component[] dynamicData = new Component[10]; // 初始大小为10，可以根据需要调整
@@ -50,10 +48,8 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
     /**
      * 延迟初始化
      * */
-    public void initialize(Group group, float maxHealth, float curHealth) {
+    public void initialize(Group group) {
         this.group = group;
-        this.maxHealth = maxHealth;
-        this.curHealth = curHealth;
     }
 
     public void draw(Batch batch) {
@@ -109,6 +105,10 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
             this.width = width;
             this.height = height;
         }
+    }
+
+    public void setSize (Vector2 size) {
+        this.setSize(size.x, size.y);
     }
 
     /**
@@ -182,10 +182,6 @@ public abstract class Entity implements Disposable, Drawable, Updateable {
         if (index >= dynamicData.length) {
             dynamicData = Arrays.copyOf(dynamicData, index + 1);
         }
-    }
-
-    public boolean isDeath () {
-        return this.curHealth <= 0;
     }
 
     public void setEntitySystem(EntitySystem es) {

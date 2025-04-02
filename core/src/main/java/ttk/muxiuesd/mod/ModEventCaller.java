@@ -2,6 +2,7 @@ package ttk.muxiuesd.mod;
 
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.abs.*;
@@ -45,7 +46,7 @@ public class ModEventCaller {
         });
         eventBus.addEvent(EventBus.EventType.EntityDeath, new EntityDeathEvent() {
             @Override
-            public void call (Entity deadEntity) {
+            public void call (LivingEntity deadEntity) {
                 try {
                     invocable.invokeFunction("callEntityDeadEvent", deadEntity);
                 } catch (ScriptException | NoSuchMethodException e) {

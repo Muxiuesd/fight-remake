@@ -1,0 +1,9 @@
+{
+  "name": "C",
+  "namespace": "c",
+  "author": "Muxiuesd",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "main.js",
+  "dependence": []
+}

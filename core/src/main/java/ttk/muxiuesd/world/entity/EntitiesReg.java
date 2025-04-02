@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
 import java.util.function.Supplier;
@@ -12,19 +13,18 @@ import java.util.function.Supplier;
  * TODO mod注册实体
  * */
 public class EntitiesReg {
-    static Registrant<Entity> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Entity.class);
-
+    public static final String TAG = EntitiesReg.class.getName();
+    public static final Registrant<Entity> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Entity.class);
 
     public static void registerAllEntities () {
-        //register("player", Player::new);
-        //register("slime", Slime::new);
+        Log.print(TAG, "游戏方块注册完毕");
     }
 
+    public static final Entity ITEM_ENTITY = register("item_entity", ItemEntity::new);
     public static final Entity PLAYER = register("player", Player::new);
     public static final Entity SLIME = register("slime", Slime::new);
 
-
-    private static Entity register (String name, Supplier<Entity> supplier) {
+    public static Entity register (String name, Supplier<? extends Entity> supplier) {
         return registrant.register(name, supplier);
     }
 

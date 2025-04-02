@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.block.instance;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 
 public class BlockWater extends Block {
     public BlockWater() {
