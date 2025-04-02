@@ -1,24 +1,37 @@
-var Block = Java.extend(Java.type("ttk.muxiuesd.world.block.Block"),{});
-var Property = Java.type("ttk.muxiuesd.world.block.Block.Property");
 
-/**
- * @param property  方块属性
- * @param textureId 方块的贴图id
- * @param texturePath 贴图的路径
- * */
-function newBlock (property, textureId, texturePath) {
-    return new Block(property, textureId, texturePath);
-}
-
-function newBlock (property, textureId) {
-    return new Block(property, textureId);
-}
-
-function newBlockSupplier (func) {
-    var supplier = Java.extend(Java.type("java.util.function.Supplier"), {
-        get: function (){
-            return func;
+var Blocks = {
+    properties: {
+        newProperty: function () {
+            var p = Java.type("ttk.muxiuesd.world.block.abs.Block.Property");
+            return new p;
         }
-    });
-    return new supplier();
+    },
+    getAbstractBlock: function (obj) {
+        return Java.extend(Java.type("ttk.muxiuesd.world.block.abs.Block"), obj);
+    },
+    /**
+     * @param property  方块属性
+     * @param textureId 方块的贴图id，（需要贴图提前加载过）
+     * */
+    newBlock: function (property, textureId) {
+        var Block = this.getAbstractBlock({});
+        return new Block(property, textureId);
+    },
+    /**
+     * @param property  方块属性
+     * @param textureId 方块的贴图id
+     * @param texturePath 贴图的路径
+     * */
+    newBlock: function (property, textureId, texturePath) {
+        var Block = this.getAbstractBlock({});
+        return new Block(property, textureId, texturePath);
+    },
+    newSupplier: function (func) {
+        var supplier = Java.extend(Java.type("ttk.muxiuesd.mod.api.ModSupplier"), {
+            getNew: function (){
+                return func;
+            }
+        });
+        return new supplier();
+    }
 }

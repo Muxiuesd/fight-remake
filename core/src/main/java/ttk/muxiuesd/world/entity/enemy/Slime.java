@@ -8,13 +8,13 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
-public class Slime extends Entity {
+public class Slime extends LivingEntity {
     //public TextureRegion body = new TextureRegion(new Texture("enemy/slime.png"));
     public int generation;  //史莱姆的代数，用于控制史莱姆的分裂次数，分裂次数越多，代数越高
     public float T = 0.5f;
@@ -34,7 +34,9 @@ public class Slime extends Entity {
         speed = 1f;
         this.generation = generation;
 
-        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),"enemy/slime.png", Texture.class, () -> {
+        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),
+            Fight.getEntityTexture("enemy/slime.png"),
+            Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("slime"), Texture.class);
             textureRegion = new TextureRegion(texture);
         });

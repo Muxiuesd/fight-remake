@@ -3,11 +3,11 @@ package ttk.muxiuesd.world.block.instance;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 
 public class BlockGrass extends Block {
     public BlockGrass() {
-        super(new ttk.muxiuesd.world.block.Block.Property()
+        super(new Block.Property()
             .setFriction(1f).setWalkSoundId(Fight.getId("grass_walk")),
             Fight.getId("grass"),
             Fight.getBlockTexture("grass.png"));

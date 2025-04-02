@@ -11,13 +11,16 @@ import java.util.function.Supplier;
  * TODO 注册mod墙体
  * */
 public class Walls {
-    static Registrant<Wall> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Wall.class);
-    static {
-        register("wall_test", WallTest::new);
-        register("wall_smooth_stone", WallSmoothStone::new);
+    public static Registrant<Wall> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Wall.class);
+    public Walls() {
+
     }
-    private static void register (String id, Supplier<Wall> supplier) {
-        registrant.register(id, supplier);
+
+    public static final Wall TEST_WALL = register("wall_test", WallTest::new);
+    public static final Wall SMOOTH_STONE_WALL = register("wall_smooth_stone", WallSmoothStone::new);
+
+    private static Wall register (String id, Supplier<Wall> supplier) {
+        return registrant.register(id, supplier);
     }
 
     public static Wall newWall (String id) {

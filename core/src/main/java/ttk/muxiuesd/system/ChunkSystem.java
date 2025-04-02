@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
@@ -426,7 +426,7 @@ public class ChunkSystem extends WorldSystem {
      * 获取玩家所在的区块编号
      */
     private ChunkPosition getPlayerChunkPosition(Player player) {
-        Vector2 playerCenter = player.getPlayerCenter();
+        Vector2 playerCenter = player.getCenter();
         return this.getChunkPosition(playerCenter.x, playerCenter.y);
     }
 

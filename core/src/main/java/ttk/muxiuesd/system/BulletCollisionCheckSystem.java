@@ -11,6 +11,7 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.EventBus;
@@ -59,7 +60,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                 continue;
             }
             //敌人与玩家子弹
-            for (Entity enemy : es.enemyEntity) {
+            for (LivingEntity enemy : es.enemyEntity) {
                 if (playerBullet.hurtbox.overlaps(enemy.hurtbox)
                     || enemy.hurtbox.overlaps(playerBullet.hurtbox)) {
                     enemy.curHealth -= playerBullet.damage;

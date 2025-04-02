@@ -1,15 +1,14 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.BlockPosition;
@@ -17,7 +16,7 @@ import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.EventGroup;
@@ -28,6 +27,7 @@ import java.util.HashSet;
 
 /**
  * 输入处理系统
+ * 按键状态的更新都在这里面
  * */
 public class HandleInputSystem extends WorldSystem implements InputProcessor {
     public final String TAG = this.getClass().getName();
@@ -44,7 +44,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     public void initialize () {
         MainGameScreen screen = getWorld().getScreen();
         this.cameraController = screen.cameraController;
-        //EntitySystem es = (EntitySystem) getWorld().getSystemManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
         playerSystem = ps;
 
@@ -53,8 +52,10 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void update(float delta) {
-        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
+        //this.updateButtonStates();
+
+        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
@@ -62,18 +63,19 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
         //Log.print(TAG, "鼠标指向世界的方块坐标: (" + this.mouseBlockPosition.getX() + ", " + this.mouseBlockPosition.getY() + ")");
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (KeyBindings.ExitGame.wasPressed()) {
             Log.print(TAG, "游戏退出！");
             Gdx.app.exit();
         }
         // C键控制区块边界是否绘制
-        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+        if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
             cs.chunkEdgeRender = !cs.chunkEdgeRender;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+        if (KeyBindings.WallHitboxDisplay.wasJustPressed()) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+
+        if (KeyBindings.PlayerPositionPrint.wasJustPressed()) {
             BlockPosition pbp = this.getPlayerBlockPosition();
             ChunkPosition pcp = cs.getPlayerChunkPosition();
 
@@ -81,16 +83,11 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Vector2 mouseWorldPosition = this.getMouseWorldPosition();
             Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
             Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
         }
-    }
-
-    @Override
-    public void draw(Batch batch) {
-
     }
 
     @Override
@@ -99,19 +96,12 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     }
 
     @Override
-    public void dispose() {
-
-    }
-
-    @Override
     public boolean keyDown (int keycode) {
-
         return false;
     }
 
     @Override
     public boolean keyUp (int keycode) {
-        //System.out.println("keyUp");
         EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
         HashSet<KeyInputEvent> events = group.getEvents();
         for (KeyInputEvent event : events) {
@@ -157,6 +147,16 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean scrolled (float amountX, float amountY) {
+        //玩家背包物品指针循环
+        Player player = playerSystem.getPlayer();
+        int newIndex = player.getHandIndex() + (int) amountY;
+        if (newIndex >= player.backpack.getSize()) {
+            newIndex -= player.backpack.getSize();
+        }else if (newIndex < 0) {
+            newIndex = player.backpack.getSize() + (int) amountY;
+        }
+        player.setHandIndex(newIndex);
+        System.out.println(newIndex);
         return false;
     }
 
@@ -165,7 +165,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
      */
     public BlockPosition getPlayerBlockPosition() {
         BlockPosition bp = new BlockPosition();
-        Vector2 playerCenter = playerSystem.getPlayer().getPlayerCenter();
+        Vector2 playerCenter = playerSystem.getPlayer().getCenter();
         bp.setX((int) Util.fastRound(playerCenter.x));
         bp.setY((int) Util.fastRound(playerCenter.y));
         return bp;

@@ -5,6 +5,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.*;
 
 import java.util.HashMap;
@@ -18,22 +19,16 @@ public class BlocksReg {
     public static final Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
 
     public static void registerAllBlocks () {
-        /*register("block_test", BlockTest::new);
-        register("grass", BlockGrass::new);
-        register("stone", BlockStone::new);
-        register("sand", BlockSand::new);
-        register("water", BlockWater::new);*/
-
         Log.print(TAG, "游戏方块注册完毕");
     }
 
-    public static final Block TEST_BLOCK = register("block_test", () -> {return new BlockTest();});
+    public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
     public static final Block GRASS = register("grass", BlockGrass::new);
     public static final Block STONE = register("stone", BlockStone::new);
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
 
-    private static Block register (String name, Supplier<Block> supplier) {
+    public static Block register (String name, Supplier<Block> supplier) {
         return registrant.register(name, supplier);
     }
 
@@ -46,7 +41,7 @@ public class BlocksReg {
      * TODO 打印mod里注册的方块
      * */
     public static void printAllBlock () {
-        HashMap<String, Supplier<Block>> map = registrant.getRegedit();
+        HashMap<String, Supplier<? extends Block>> map = registrant.getRegedit();
         Array<String> allBlockName = new Array<>();
         map.keySet().forEach(allBlockName::add);
 

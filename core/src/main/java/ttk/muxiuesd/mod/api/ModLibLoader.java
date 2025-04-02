@@ -6,9 +6,12 @@ import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptException;
+import java.util.Objects;
 
 /**
- *  modlib专用：用来加载mod底层库的类
+ *  modAPI：用来加载mod底层库的类
+ *  <p>
+ *  支持加载游戏内部和外部的js代码
  **/
 public class ModLibLoader {
     public final String TAG = ModLibLoader.class.getName();
@@ -19,8 +22,21 @@ public class ModLibLoader {
         Log.print(TAG, "ModLibLoader初始化完成");
     }
 
-    public void load (String path) {
-        FileHandle libFile = getLibFile(path);
+    /**
+     * 加载执行库代码
+     * @param space 只能为：Internal（游戏内部库）或 External（游戏外部库）
+     * @param path 如果是：Internal（游戏内部库）则填游戏内部资产目录下的路径；若是：External（游戏外部库）则填游戏外部的路径
+     **/
+    public void load (String space, String path) {
+        FileHandle libFile;
+        if (Objects.equals(space, "Internal")) {
+            libFile = this.getInternalLibFile(path);
+        }else if (Objects.equals(space, "External")) {
+            libFile = this.getExternalLibFile(path);
+        }else {
+            Log.error(TAG, "传入的加载空间：" + space + "不正确，只能为：Internal（游戏内部库）或 External（游戏外部库）");
+            return;
+        }
         String code = libFile.readString();
         if (!libFile.exists()) {
             Log.error(TAG, "无法加载：" + path + " ！！！");
@@ -38,7 +54,17 @@ public class ModLibLoader {
         }
     }
 
-    private FileHandle getLibFile (String path) {
+    /**
+     * 游戏源码内的库代码
+     * */
+    private FileHandle getInternalLibFile (String path) {
         return Gdx.files.internal("modlib/" + path);
+    }
+
+    /**
+     * 游戏外部的库代码，比如mod的写的库
+     * */
+    private FileHandle getExternalLibFile (String path) {
+        return Gdx.files.absolute(path);
     }
 }

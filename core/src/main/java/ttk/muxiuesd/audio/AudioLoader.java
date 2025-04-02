@@ -3,10 +3,14 @@ package ttk.muxiuesd.audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.mod.api.ModFileLoader;
 import ttk.muxiuesd.util.Log;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * 声音加载器
@@ -14,18 +18,22 @@ import java.util.LinkedHashMap;
 public class AudioLoader {
     public final String TAG = this.getClass().getName();
 
-    private final String root = "audio/";
+    private final String root;  //可以是游戏内的根，也可以是mod的根
 
-    private final LinkedHashMap<String, Sound> soundCache = new LinkedHashMap<>();
-    private final LinkedHashMap<String, Music> musicCache = new LinkedHashMap<>();
-    private final LinkedHashMap<String, String> soundIdToPath = new LinkedHashMap<>();
-    private final LinkedHashMap<String, String> musicIdToPath = new LinkedHashMap<>();
+    //全局静态缓存这些音频
+    private static final LinkedHashMap<String, Sound> soundCache = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, Music> musicCache = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> soundIdToPath = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> musicIdToPath = new LinkedHashMap<>();
 
-
-    private AudioLoader() {}
-    private static final class Holder {
-        private static final AudioLoader INSTANCE = new AudioLoader();
+    public AudioLoader(String root) {
+        this.root = root;
     }
+
+    private static final class Holder {
+        private static final AudioLoader INSTANCE = new AudioLoader(Fight.AUDIO_ROOT);
+    }
+    //游戏源码调用的实例
     public static AudioLoader getInstance() {
         return AudioLoader.Holder.INSTANCE;
     }
@@ -40,15 +48,26 @@ public class AudioLoader {
             Log.error(TAG, "Id为：" + id + " 的音效已经存在！！！");
             return;
         }
-        AssetsLoader loader = AssetsLoader.getInstance();
+
         String soundPath = this.getPath(path);
         Class<Sound> soundClass = Sound.class;
-        loader.loadAsync(soundPath, soundClass, () -> {
-            Sound sound = loader.get(soundPath, soundClass);
-            getInstance().getSoundCache().put(id, sound);
-        });
-
-        this.soundIdToPath.put(id, soundPath);
+        if (this.inGame(id)) {
+            //游戏内部的音频加载
+            AssetsLoader loader = AssetsLoader.getInstance();
+            loader.loadAsync(id, soundPath, soundClass, () -> {
+                Sound sound = loader.getById(id, soundClass);
+                getInstance().getSoundCache().put(id, sound);
+            });
+        }else {
+            //mod的音频加载
+            ModFileLoader modFileLoader = ModFileLoader.getFileLoader(id.split(":")[0]);
+            modFileLoader.load(id, path, soundClass, () -> {
+                Sound sound = AssetsLoader.getInstance().getById(id, soundClass);
+                getInstance().getSoundCache().put(id, sound);
+            });
+        }
+        //添加映射
+        soundIdToPath.put(id, soundPath);
     }
 
     /**
@@ -61,23 +80,35 @@ public class AudioLoader {
             Log.error(TAG, "Id为：" + id + " 的音乐已经存在！！！");
             return;
         }
-        AssetsLoader loader = AssetsLoader.getInstance();
+
         String musicPath = this.getPath(path);
         Class<Music> musicClass = Music.class;
-        loader.loadAsync(musicPath, musicClass, () -> {
-            Music music = loader.get(musicPath, musicClass);
-            getInstance().getMusicCache().put(id, music);
-        });
+        if (this.inGame(id)) {
+            //游戏内部的音频加载
+            AssetsLoader loader = AssetsLoader.getInstance();
 
-        this.musicIdToPath.put(id, musicPath);
+            loader.loadAsync(id, musicPath, musicClass, () -> {
+                Music music = loader.getById(id, musicClass);
+                getInstance().getMusicCache().put(id, music);
+            });
+        }else {
+            //mod的音频加载
+            ModFileLoader modFileLoader = ModFileLoader.getFileLoader(id.split(":")[0]);
+            modFileLoader.load(id, path, musicClass, () -> {
+                Music music = AssetsLoader.getInstance().getById(id, musicClass);
+                getInstance().getMusicCache().put(id, music);
+            });
+        }
+        //添加映射
+        musicIdToPath.put(id, musicPath);
     }
 
     public LinkedHashMap<String, Sound> getSoundCache () {
-        return this.soundCache;
+        return soundCache;
     }
 
     public LinkedHashMap<String, Music> getMusicCache () {
-        return this.musicCache;
+        return musicCache;
     }
 
     /**
@@ -98,29 +129,47 @@ public class AudioLoader {
      * 新建一个sound
      * */
     public Sound newSound (String id) {
-        String path = this.soundIdToPath.get(id);
+        String path = soundIdToPath.get(id);
         if (path == null) {
             Log.error(TAG, "Id为：" + id + " 的sound不存在！！！");
             return null;
         }
         //return AssetsLoader.getInstance().get(path, Sound.class);
-        return Gdx.audio.newSound(Gdx.files.internal(path));
+        return Gdx.audio.newSound(this.getFileHandle(id, path));
     }
 
     /**
      * 新建一个music
      * */
     public Music newMusic (String id) {
-        String path = this.musicIdToPath.get(id);
+        String path = musicIdToPath.get(id);
         if (path == null) {
             Log.error(TAG, "Id为：" + id + " 的music不存在！！！");
             return null;
         }
         //return AssetsLoader.getInstance().get(path, Music.class);
-        return Gdx.audio.newMusic(Gdx.files.internal(path));
+        return Gdx.audio.newMusic(this.getFileHandle(id, path));
+    }
+
+    /**
+     * 根据不同的命名空间来区别游戏内和mod的文件处理
+     * */
+    public FileHandle getFileHandle(String id, String path) {
+        if (this.inGame(id)) {
+            return Gdx.files.internal(path);
+        }
+        return Gdx.files.absolute(path);
     }
 
     public String getPath (String path) {
         return this.root + path;
+    }
+
+    /**
+     * id命名空间是否是游戏内部的
+     * */
+    public boolean inGame (String id) {
+        String[] split = id.split(":");
+        return Objects.equals(split[0], Fight.NAMESPACE);
     }
 }

@@ -2,8 +2,9 @@ package ttk.muxiuesd.registrant;
 
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class RegistrantGroup {
     public static final int BLOCK  = 1;
 
     enum Type {
-        OTHER, ENTITY, BLOCK, WALL
+        OTHER, ENTITY, BLOCK, WALL, ITEM
     }
     //总和
     private static final HashMap<Type, HashMap> res = new HashMap<>();
@@ -29,16 +30,16 @@ public class RegistrantGroup {
     private static final HashMap<String, Registrant<? extends Entity>> entityRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Block>> blockRegistrants = new HashMap<>();
     private static final HashMap<String, Registrant<? extends Wall>> wallRegistrants = new HashMap<>();
+    private static final HashMap<String, Registrant<? extends Item>> itemRegistrants = new HashMap<>();
 
-
-    public RegistrantGroup () {
+    public static void init () {
         res.put(Type.OTHER, testRegistrants);
         res.put(Type.ENTITY, entityRegistrants);
         res.put(Type.BLOCK, blockRegistrants);
         res.put(Type.WALL, wallRegistrants);
+        res.put(Type.ITEM, itemRegistrants);
         Log.print(TAG, "注册器组管理器初始化完成！");
     }
-
     /**
      * 获取指定命名空间的注册器，没有则新建一个
      * @param nameSpace 注册器的命名空间
@@ -72,7 +73,9 @@ public class RegistrantGroup {
         if (clazzType.isAssignableFrom(Test.class)) {
             return Type.OTHER;
         }
-
+        if (clazzType.isAssignableFrom(Item.class)) {
+            return Type.ITEM;
+        }
         return Type.OTHER;
     }
 
@@ -80,19 +83,22 @@ public class RegistrantGroup {
      * 新建一个注册器
      * */
     private static <C> void newRegistrant(String namespace, Class<C> clazzType) {
-        Registrant registrant = null;
+        Registrant<C> registrant = null;
         Type type = getRegistrantType(clazzType);
         if (clazzType.isAssignableFrom(Entity.class)) {
-            registrant = new Registrant<>(namespace);
+            registrant = new Registrant<C>(namespace);
         }
         if (clazzType.isAssignableFrom(Block.class)) {
-            registrant = new Registrant<>(namespace);
+            registrant = new Registrant<C>(namespace);
         }
         if (clazzType.isAssignableFrom(Wall.class)) {
-            registrant = new Registrant<>(namespace);
+            registrant = new Registrant<C>(namespace);
+        }
+        if (clazzType.isAssignableFrom(Item.class)) {
+            registrant = new Registrant<C>(namespace);
         }
         if (clazzType.isAssignableFrom(Test.class)) {
-            registrant = new Registrant<>(namespace);
+            registrant = new Registrant<C>(namespace);
         }
         //先获取种类
         HashMap registrants = res.get(type);
@@ -127,7 +133,19 @@ public class RegistrantGroup {
         }
         printAll(allName, "注册的实体有：");
     }
-
+    /**
+     * 打印出所有注册的物品
+     */
+    public static void printAllItems () {
+        Array<String> allName = new Array<>();
+        for (Registrant<? extends Item> registrant : itemRegistrants.values()) {
+            HashMap<String, ? extends Supplier<? extends Item>> r = registrant.getRegedit();
+            for (String name : r.keySet()) {
+                allName.add(registrant.getId(name) + "::" + r.get(name).get().getClass().getName());
+            }
+        }
+        printAll(allName, "注册的物品有：");
+    }
     private static void printAll (Array<String> allName, String msg) {
         Log.print(TAG, msg);
         for (int i = 0; i < allName.size; i++) {

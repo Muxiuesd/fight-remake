@@ -44,8 +44,8 @@ public class Util {
      * 获取两个实体之间的距离
      * */
     public static float getDistance (Entity entity1, Entity entity2) {
-        float xd = entity1.getPosition().x - entity2.getPosition().x;
-        float yd = entity1.getPosition().y - entity2.getPosition().y;
+        float xd = entity1.getCenter().x - entity2.getCenter().x;
+        float yd = entity1.getCenter().y - entity2.getCenter().y;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
     }
 
@@ -53,8 +53,8 @@ public class Util {
      * 计算实体与一个指定坐标的距离
      * */
     public static float getDistance (Entity entity, float x, float y) {
-        float xd = entity.getPosition().x - x;
-        float yd = entity.getPosition().y - y;
+        float xd = entity.getCenter().x - x;
+        float yd = entity.getCenter().y - y;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
     }
 

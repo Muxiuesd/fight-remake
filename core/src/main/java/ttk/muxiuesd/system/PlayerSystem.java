@@ -4,16 +4,20 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.registrant.Registrant;
+import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.Block;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.EventGroup;
 import ttk.muxiuesd.world.event.abs.PlayerDeathEvent;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 玩家系统
@@ -69,6 +73,13 @@ public class PlayerSystem extends WorldSystem {
         }else if (this.span < this.maxSpan) {
             this.span += delta;
         }
+    }
+
+    public void setItemStack (int index, String itemId) {
+        String[] parts = itemId.split(":");
+        Registrant<Item> otherReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
+        ItemStack stack = new ItemStack(otherReg.get(parts[1]));
+        this.player.backpack.setItemStack(index, stack);
     }
 
     /**
