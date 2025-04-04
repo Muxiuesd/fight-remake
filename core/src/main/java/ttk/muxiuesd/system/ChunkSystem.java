@@ -360,14 +360,14 @@ public class ChunkSystem extends WorldSystem {
         int ny = (int) Util.fastRound(wy);
 
         BlockPosition blockPosition = new BlockPosition(nx, ny);
-        ChunkPosition chunkPosition = this.getChunkPosition(wx, wy);
+        ChunkPosition chunkPosition = this.getChunkPosition(nx, ny);
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        Block block = chunk.seekBlock(blockPosition.getX(), blockPosition.getY());
+        Block block = chunk.seekBlock(nx, ny);
         // 如果在当前区块找不到的话
         if (block == null) {
             // 在临近区块寻找
@@ -439,9 +439,10 @@ public class ChunkSystem extends WorldSystem {
      */
     public ChunkPosition getChunkPosition(float wx, float wy) {
         ChunkPosition cp = new ChunkPosition();
-
-        cp.setX((int) (Math.abs(Util.fastRound(wx)) / Chunk.ChunkWidth));
-        cp.setY((int) (Math.abs(Util.fastRound(wy)) / Chunk.ChunkHeight));
+        float x = Util.fastRound(wx + 1);
+        float y = Util.fastRound(wy + 1);
+        cp.setX((int) (Math.abs(x) / Chunk.ChunkWidth));
+        cp.setY((int) (Math.abs(y) / Chunk.ChunkHeight));
 
         if (wx < 0) {
             cp.setX(-1 * cp.getX() - 1);
