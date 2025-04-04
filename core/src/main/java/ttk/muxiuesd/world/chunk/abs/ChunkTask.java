@@ -1,7 +1,8 @@
-package ttk.muxiuesd.world.chunk;
+package ttk.muxiuesd.world.chunk.abs;
 
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.world.chunk.Chunk;
 
 import java.util.concurrent.Callable;
 
