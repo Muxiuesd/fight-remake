@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
+import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -26,7 +26,7 @@ import ttk.muxiuesd.world.wall.Walls;
  * 一个区块
  * 一行一行更新绘制
  * */
-public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRenderable {
+public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
     public final String TAG = this.getClass().getName();
 
     public static final int ChunkWidth = 16;
@@ -50,37 +50,28 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     private Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
     private Wall[][]  walls;
+    private int[][] heights;
 
     public Chunk(ChunkSystem chunkSystem) {
         this.chunkSystem = chunkSystem;
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
+        this.heights = new int[ChunkHeight][ChunkWidth];
     }
 
     /**
      * 初始化区块中的方块数据
      * */
     public void initBlock() {
-        /*for (int y = 0; y < ChunkHeight; y++) {
-            for (int x = 0; x < ChunkWidth; x++) {
-                //计算方块相在世界中的坐标
-                float wx = this.getWorldX(x);
-                float wy = this.getWorldY(y);
-
-                Block block = this.chooseBlock(generateTerrain(wx, wy));
-                block.setPosition(wx, wy);
-                this.setBlock(block, x, y);
-            }
-        }*/
-
         this.traversal((x, y) -> {
             //计算方块相在世界中的坐标
             float wx = this.getWorldX(x);
             float wy = this.getWorldY(y);
-
-            Block block = this.chooseBlock(generateTerrain(wx, wy));
+            int height = this.generateTerrain(wx, wy);
+            Block block = this.chooseBlock(height);
             block.setPosition(wx, wy);
             this.setBlock(block, x, y);
+            this.heights[y][x] = height;
         });
     }
 
@@ -90,14 +81,14 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     public void initWall () {
         this.traversal((x, y) -> {
             //水上不生成墙体
-            if (blocks[y][x] instanceof BlockWater) {
+            if (this.blocks[y][x] instanceof BlockWater) {
                 return;
             }
             int random = MathUtils.random(0, 10);
             if (random < 1) {
                 Wall wall = Walls.newWall("wall_smooth_stone");
                 wall.setPosition(this.getWorldX(x), this.getWorldY(y));
-                walls[y][x] = wall;
+                this.walls[y][x] = wall;
             }
         });
     }
@@ -109,7 +100,6 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
      * @return 返回地形高度
      */
     private int generateTerrain(float wx, float wy) {
-        //double v = SimplexNoise2D.noise(wx/ ChunksManager.Slope, wy/ChunksManager.Slope);
         WorldMapNoise noise = this.chunkSystem.getNoise();
         double v = noise.noise(wx/ ChunkSystem.Slope, wy/ ChunkSystem.Slope);
         return (int)SimplexNoise2D.map(v, -1f, 1f, LowestHeight, HighestHeight);
@@ -167,16 +157,17 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
 
     @Override
     public void draw(Batch batch) {
+        ChunkPosition cp = this.chunkPosition;
         this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (block != null) {
-                block.draw(batch);
+                block.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
         this.traversal((x, y) -> {
             Wall wall = walls[y][x];
             if (wall != null) {
-                wall.draw(batch);
+                wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
     }

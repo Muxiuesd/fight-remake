@@ -43,10 +43,10 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
     }
 
     @Override
-    public void draw(Batch batch) {
+    public void draw(Batch batch, float x, float y) {
         if (this.textureIsValid()) {
             batch.draw(this.textureRegion,
-                this.x, this.y,
+                x, y,
                 this.originX, this.originY,
                 this.width, this.height,
                 this.scaleX, this.scaleY,

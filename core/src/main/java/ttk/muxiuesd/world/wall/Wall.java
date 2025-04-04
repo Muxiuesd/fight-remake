@@ -29,7 +29,7 @@ public abstract class Wall extends Block implements ShapeRenderable {
     }
 
     public Rectangle getHitbox() {
-        return hitbox;
+        return this.hitbox;
     }
 
     /**
