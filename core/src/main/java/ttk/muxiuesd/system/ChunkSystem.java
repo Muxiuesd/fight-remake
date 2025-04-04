@@ -371,8 +371,8 @@ public class ChunkSystem extends WorldSystem {
         // 如果在当前区块找不到的话
         if (block == null) {
             // 在临近区块寻找
-            for (int chunkY = -1; chunkY < 2; chunkY++) {
-                for (int chunkX = -1; chunkX < 2; chunkX++) {
+            for (int chunkY = -1; chunkY < 1; chunkY++) {
+                for (int chunkX = -1; chunkX < 1; chunkX++) {
                     int cx = chunkPosition.getX() + chunkX;
                     int cy = chunkPosition.getY() + chunkY;
                     ChunkPosition chunkPosition1 = new ChunkPosition(cx, cy);
