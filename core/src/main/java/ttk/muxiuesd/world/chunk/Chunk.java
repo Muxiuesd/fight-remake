@@ -238,7 +238,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * @param wy
      * @returnp
      */
-    public Block seekBlock (int wx, int wy) {
+    public Block seekBlock (float wx, float wy) {
 
         final Block[] targetBlock = new Block[1];
         this.traversal((x, y) -> {
