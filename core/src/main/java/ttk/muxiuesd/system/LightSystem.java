@@ -103,7 +103,6 @@ public class LightSystem extends WorldSystem {
         }
     }
 
-
     private void useLight (PointLight light) {
         //在这一帧里收集调用该方法的y所有光源数据
         if(this.lightSize < MAX_LIGHTS) {
