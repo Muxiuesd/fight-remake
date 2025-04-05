@@ -358,48 +358,24 @@ public class ChunkSystem extends WorldSystem {
     public Block getBlock(float wx, float wy) {
         int nx = (int) Util.fastRound(wx);
         int ny = (int) Util.fastRound(wy);
-
         BlockPosition blockPosition = new BlockPosition(nx, ny);
-        ChunkPosition chunkPosition = this.getChunkPosition(nx, ny);
+        ChunkPosition chunkPosition = this.getChunkPosition(nx, ny);//像你那样猎奇的想法应该这样（我不知道我在说啥
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        Block block = chunk.seekBlock(nx, ny);
+        Block block = chunk.seekBlock(nx, ny);//像你那样猎奇的想法应该这样（我不知道我在说啥
         // 如果在当前区块找不到的话
         if (block == null) {
-            // 在临近区块寻找
-            for (int chunkY = -1; chunkY < 1; chunkY++) {
-                for (int chunkX = -1; chunkX < 1; chunkX++) {
-                    int cx = chunkPosition.getX() + chunkX;
-                    int cy = chunkPosition.getY() + chunkY;
-                    ChunkPosition chunkPosition1 = new ChunkPosition(cx, cy);
-                    // 跳过已寻找过的区块
-                    if (chunkPosition1.equals(chunkPosition)) {
-                        continue;
-                    }
-
-                    Chunk chunk1 = this.getChunk(chunkPosition1);
-                    // 有可能是还未加载的区块
-                    if (chunk1 == null) {
-                        // TODO 解决在还未加载的区块中查找方块
-                        Log.print(TAG, chunkPosition1.toString() + "区块尚未加载！！！");
-                        continue;
-                    }
-                    Block block1 = chunk1.seekBlock(blockPosition.getX(), blockPosition.getY());
-                    if (block1 != null) {
-                        return block1;
-                    }
-                }
-            }
-
-            Log.print(TAG, "尽力了");
+            Log.print(TAG, "没尽力");
         }
         // 运行到这里应该就是查找到方块了
         return block;
     }
+
+
 
     public Chunk getChunk(int chunkX, int chunkY) {
         return this.getChunk(new ChunkPosition(chunkX, chunkY));
@@ -439,18 +415,12 @@ public class ChunkSystem extends WorldSystem {
      */
     public ChunkPosition getChunkPosition(float wx, float wy) {
         ChunkPosition cp = new ChunkPosition();
-        float x = Util.fastRound(wx + 1);
-        float y = Util.fastRound(wy + 1);
-        cp.setX((int) (Math.abs(x) / Chunk.ChunkWidth));
-        cp.setY((int) (Math.abs(y) / Chunk.ChunkHeight));
+        float x = Util.fastRound(wx);
+        float y = Util.fastRound(wy);
+        cp.setX((int)Util.fastRound((x / Chunk.ChunkWidth)));
+        cp.setY((int) Util.fastRound((y / Chunk.ChunkHeight)));
+         return cp;
 
-        if (wx < 0) {
-            cp.setX(-1 * cp.getX() - 1);
-        }
-        if (wy < 0) {
-            cp.setY(-1 * cp.getY() - 1);
-        }
-        return cp;
     }
 
     /**
