@@ -17,7 +17,7 @@ import ttk.muxiuesd.util.SimplexNoise2D;
 import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.instance.*;
+import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.wall.Wall;
 import ttk.muxiuesd.world.wall.Walls;
 
@@ -115,22 +115,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             case 0:
             case 1:
             case 2:{
-                return new BlockWater();
+                return BlocksReg.newBlock("water");
             }
             case 3:{
-                return new BlockSand();
+                return BlocksReg.newBlock("sand");
             }
             case 4:{
-                return new BlockStone();
+                return BlocksReg.newBlock("stone");
             }
             case 5:
             case 6:
             case 7:{
-                return new BlockGrass();
+                return BlocksReg.newBlock("grass");
             }
         }
         //错误的高度则返回测试用方块
-        return new BlockTest();
+        return BlocksReg.newBlock("block_test");
     }
 
     /**
@@ -210,7 +210,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * */
     public void setBlock (Block block, int cx, int cy) {
         //TODO 判断方块是否存在
-        //this.blockGroup.get(Math.abs(x) % ChunkWidth).add(Math.abs(y) % ChunkHeight, block);
         this.blocks[cy][cx] = block;
     }
 
@@ -239,7 +238,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * @returnp
      */
     public Block seekBlock (float wx, float wy) {
-
         final Block[] targetBlock = new Block[1];
         this.traversal((x, y) -> {
             Block block = blocks[y][x];
@@ -313,7 +311,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     }
 
     /**
-     *
      * @param cx 方块在区块里的横坐标
      * @return  方块的世界坐标
      */

@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.*;
+import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
@@ -358,15 +361,14 @@ public class ChunkSystem extends WorldSystem {
     public Block getBlock(float wx, float wy) {
         int nx = (int) Util.fastRound(wx);
         int ny = (int) Util.fastRound(wy);
-        BlockPosition blockPosition = new BlockPosition(nx, ny);
-        ChunkPosition chunkPosition = this.getChunkPosition(nx, ny);//像你那样猎奇的想法应该这样（我不知道我在说啥
+        ChunkPosition chunkPosition = this.getChunkPosition(nx, ny);
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        Block block = chunk.seekBlock(nx, ny);//像你那样猎奇的想法应该这样（我不知道我在说啥
+        Block block = chunk.seekBlock(nx, ny);
         // 如果在当前区块找不到的话
         if (block == null) {
             Log.print(TAG, "没尽力");
@@ -417,15 +419,13 @@ public class ChunkSystem extends WorldSystem {
         ChunkPosition cp = new ChunkPosition();
         float x = Util.fastRound(wx);
         float y = Util.fastRound(wy);
-        cp.setX((int)Util.fastRound((x / Chunk.ChunkWidth)));
+        cp.setX((int) Util.fastRound((x / Chunk.ChunkWidth)));
         cp.setY((int) Util.fastRound((y / Chunk.ChunkHeight)));
-         return cp;
-
+        return cp;
     }
 
     /**
      * 对外开放的方法：获取玩家目前所在区块的编号（区块坐标）
-     *
      * @return
      */
     public ChunkPosition getPlayerChunkPosition() {
