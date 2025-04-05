@@ -298,6 +298,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
         if (!new Rectangle(startX, startY, ChunkWidth, ChunkHeight).contains(wx, wy)) {
             Log.error(TAG, "传入的坐标(" + wx + "," + wy +")不在区块" + getChunkPosition().toString() + "内！！！");
+            Log.error(TAG, "区块" + getChunkPosition().toString() + ", x:"+startX+
+                ", y:"+startY+", w:"+ChunkWidth+", h:"+ChunkHeight);
             return NotInChunk;
         }
 
