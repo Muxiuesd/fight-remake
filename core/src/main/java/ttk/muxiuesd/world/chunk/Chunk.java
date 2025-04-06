@@ -47,10 +47,10 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private ChunkPosition chunkPosition;
 
     //储存一个区块里的方块
-    private Block[][] blocks;
+    private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
-    private Wall[][]  walls;
-    private int[][] heights;
+    private final Wall[][]  walls;
+    private final int[][] heights;
 
     public Chunk(ChunkSystem chunkSystem) {
         this.chunkSystem = chunkSystem;
