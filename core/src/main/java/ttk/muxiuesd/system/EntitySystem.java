@@ -179,7 +179,7 @@ public class EntitySystem extends WorldSystem {
             //跳过这个物品实体的 其他操作
             return;
         }
-
+        //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > 3f) {
             float distance = Util.getDistance(itemEntity, this.getPlayer());
             if (distance <= 2f ) {
@@ -198,7 +198,7 @@ public class EntitySystem extends WorldSystem {
 
     @Override
     public void draw(Batch batch) {
-        for (Entity entity : drawableEntity) {
+        for (Entity entity : this.drawableEntity) {
             entity.draw(batch);
         }
     }
