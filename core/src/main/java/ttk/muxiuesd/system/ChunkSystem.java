@@ -368,7 +368,7 @@ public class ChunkSystem extends WorldSystem {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        Block block = chunk.seekBlock(nx, ny);
+        Block block = chunk.seekBlock((float) Math.floor(wx), (float) Math.floor(wy));
         // 如果在当前区块找不到的话
         if (block == null) {
             Log.print(TAG, "没尽力");

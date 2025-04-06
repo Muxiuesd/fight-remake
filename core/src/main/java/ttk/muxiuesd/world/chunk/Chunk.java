@@ -238,14 +238,31 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * @returnp
      */
     public Block seekBlock (float wx, float wy) {
-        final Block[] targetBlock = new Block[1];
+        int cx;
+        int cy;
+        if (wx < 0) {
+            cx = ChunkWidth + (int)(wx % ChunkWidth);
+            cx %= ChunkWidth;
+        }else {
+            cx = (int) (wx % ChunkWidth);
+        }
+        if (wy < 0) {
+            cy = ChunkHeight + (int)(wy % ChunkHeight);
+            cy %= ChunkHeight;
+        }else {
+            cy = (int) (wy % ChunkHeight);
+        }
+
+        return this.getBlock(cx, cy);
+
+        /*final Block[] targetBlock = new Block[1];
         this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (wx == block.x && wy == block.y) {
                 targetBlock[0] = block;
             }
         });
-        return targetBlock[0];
+        return targetBlock[0];*/
     }
 
     @Override
