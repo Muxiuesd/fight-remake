@@ -77,8 +77,8 @@ public class PlayerSystem extends WorldSystem {
 
     public void setItemStack (int index, String itemId) {
         String[] parts = itemId.split(":");
-        Registrant<Item> otherReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
-        ItemStack stack = new ItemStack(otherReg.get(parts[1]));
+        Registrant<Item> itemReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
+        ItemStack stack = new ItemStack(itemReg.get(parts[1]));
         this.player.backpack.setItemStack(index, stack);
     }
 

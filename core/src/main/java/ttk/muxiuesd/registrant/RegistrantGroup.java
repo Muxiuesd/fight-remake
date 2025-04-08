@@ -1,6 +1,7 @@
 package ttk.muxiuesd.registrant;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Entity;
@@ -47,7 +48,7 @@ public class RegistrantGroup {
      * @return
      * @param <C>
      */
-    public static <C> Registrant<C> getRegistrant (String nameSpace, Class<C> clazzType) {
+    public static <C extends ID> Registrant<C> getRegistrant (String nameSpace, Class<C> clazzType) {
         Type type = getRegistrantType(clazzType);
 
         HashMap map = res.get(type);
@@ -82,7 +83,7 @@ public class RegistrantGroup {
     /**
      * 新建一个注册器
      * */
-    private static <C> void newRegistrant(String namespace, Class<C> clazzType) {
+    private static <C extends ID> void newRegistrant(String namespace, Class<C> clazzType) {
         Registrant<C> registrant = null;
         Type type = getRegistrantType(clazzType);
         if (clazzType.isAssignableFrom(Entity.class)) {
@@ -156,17 +157,4 @@ public class RegistrantGroup {
             }
         }
     }
-
-    /*public static void main(String[] args) {
-        new RegistrantGroup();
-        Registrant<Test> registrant = RegistrantGroup.getRegistrant("fight", Test.class);
-        registrant.register("Water", new TestObj1());
-        registrant.register("Stone", new Test());
-        TestObj1 water = (TestObj1) registrant.get("Water");
-        water.id = "1";
-        Test stone = (Test) registrant.get("Stone");
-        stone.id = "2";
-        System.out.println(water.id + " " + water.name);
-        System.out.println(stone + stone.id);
-    }*/
 }

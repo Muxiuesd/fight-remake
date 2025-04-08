@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -359,16 +360,16 @@ public class ChunkSystem extends WorldSystem {
      * @return
      */
     public Block getBlock(float wx, float wy) {
-        int nx = (int) Util.fastRound(wx);
-        int ny = (int) Util.fastRound(wy);
-        ChunkPosition chunkPosition = this.getChunkPosition(nx, ny);
+        Vector2 floor = Util.fastFloor(wx, wy);
+        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        Block block = chunk.seekBlock((float) Math.floor(wx), (float) Math.floor(wy));
+        //Block block = chunk.seekBlock((float) Math.floor(wx), (float) Math.floor(wy));
+        Block block = chunk.seekBlock(floor.x, floor.y);
         // 如果在当前区块找不到的话
         if (block == null) {
             Log.print(TAG, "没尽力");
@@ -377,8 +378,25 @@ public class ChunkSystem extends WorldSystem {
         return block;
     }
 
+    /**
+     * 替换某个位置的方块
+     * @return 被替换下来的方块
+     * */
+    public Block replaceBlock(Block newBlock, float wx, float wy) {
+        Block oldBlock = this.getBlock(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
 
+        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
+        Chunk chunk = this.getChunk(chunkPosition);
+        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
+        chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
 
+        return oldBlock;
+    }
+
+    /**
+     * 获取区块
+     */
     public Chunk getChunk(int chunkX, int chunkY) {
         return this.getChunk(new ChunkPosition(chunkX, chunkY));
     }
@@ -416,12 +434,9 @@ public class ChunkSystem extends WorldSystem {
      * @return
      */
     public ChunkPosition getChunkPosition(float wx, float wy) {
-        ChunkPosition cp = new ChunkPosition();
-        float x = Util.fastRound(wx);
-        float y = Util.fastRound(wy);
-        cp.setX((int) Util.fastRound((x / Chunk.ChunkWidth)));
-        cp.setY((int) Util.fastRound((y / Chunk.ChunkHeight)));
-        return cp;
+        Vector2 floor = Util.fastFloor(wx, wy);
+        Vector2 chunkPos = Util.fastFloor(floor.x / Chunk.ChunkWidth, floor.y / Chunk.ChunkHeight);
+        return new ChunkPosition((int) chunkPos.x, (int) chunkPos.y);
     }
 
     /**

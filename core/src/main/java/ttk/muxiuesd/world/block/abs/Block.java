@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
+import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Updateable;
 
 import java.util.Objects;
@@ -14,9 +15,10 @@ import java.util.Objects;
 /**
  * 方块
  * */
-public abstract class Block implements Updateable, BlockDrawable, Disposable {
+public abstract class Block implements ID, Updateable, BlockDrawable, Disposable {
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
+    private String id;
     public TextureRegion textureRegion;
 
     public float x, y;
@@ -87,6 +89,15 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
 
     public boolean textureIsValid() {
         return this.textureRegion != null;
+    }
+
+    @Override
+    public String getID () {
+        return this.id;
+    }
+    @Override
+    public void setID (String id) {
+        this.id = id;
     }
 
     /**方块属性

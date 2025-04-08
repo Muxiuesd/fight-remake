@@ -21,6 +21,10 @@ public class ItemsReg {
     public static final Item STICK = register("stick", ItemStick::new);
     public static final Item TEST_WEAPON = register("test_weapon", WeaponTest::new);
 
+    public static void registerAllItem () {
+
+    }
+
     public static Item register (String name, Supplier<? extends Item> supplier) {
         return registrant.register(name, supplier);
     }

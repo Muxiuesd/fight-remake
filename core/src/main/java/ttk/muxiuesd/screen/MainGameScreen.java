@@ -24,6 +24,7 @@ import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.entity.EntitiesReg;
+import ttk.muxiuesd.world.item.ItemsReg;
 
 /**
  * 主游戏屏幕
@@ -50,6 +51,7 @@ public class MainGameScreen implements Screen {
 
         //手动注册游戏内的元素
         AudioReg.registerAllAudios();
+        ItemsReg.registerAllItem();
         BlocksReg.registerAllBlocks();
         EntitiesReg.registerAllEntities();
 
