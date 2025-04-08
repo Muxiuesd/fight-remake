@@ -52,9 +52,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void update(float delta) {
-
-        //this.updateButtonStates();
-
         ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getCenter();
@@ -202,9 +199,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                 0.8f,
                 0.8f);
             batch.setColor(Color.WHITE);
-            //batch.set(ShapeRenderer.ShapeType.Line);
         }
     }
-
-
 }

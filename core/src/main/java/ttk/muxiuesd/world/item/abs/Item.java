@@ -23,6 +23,9 @@ public abstract class Item {
     public Property property;
     public TextureRegion texture;
 
+
+    public Item () {
+    }
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
     }
