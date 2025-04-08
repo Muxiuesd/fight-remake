@@ -66,7 +66,7 @@ public class ChunkSystem extends WorldSystem {
         this.activeChunks = new ArrayList<>();
 
         // 预加载一次
-        this.update(0);
+        this.update(-1);
         Log.print(TAG, "ChunkSystem初始化完成！");
     }
 
@@ -78,12 +78,13 @@ public class ChunkSystem extends WorldSystem {
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
 
-        if (delta == 0) {
+        if (delta == -1) {
             // 预加载
             // 先强制加载一次玩家所在的区块
             ChunkPosition playerChunkPosition = this.getPlayerChunkPosition();
             Chunk chunk = this.initChunk(playerChunkPosition.getX(), playerChunkPosition.getY());
             this.activeChunks.add(chunk);
+            return;
         }
 
         // 检查线程池里的区块是否加载完成
@@ -124,14 +125,15 @@ public class ChunkSystem extends WorldSystem {
                 this.chunkUnloadingTasks.put(chunk.getChunkPosition(), future);
             }
             this.activeChunks.removeAll(this._unloadChunks);
-            // System.out.println(this.activeChunks.size());
-            // this._unloadChunks.clear();
         }
 
         // 更新正在活跃的区块
+        //Log.print(TAG, "____________");
         for (Chunk chunk : this.activeChunks) {
             chunk.update(delta);
+            //Log.print(TAG, chunk.getChunkPosition().toString());
         }
+        //Log.print(TAG, "____________");
 
         if (span >= loadChunkTick && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
@@ -143,6 +145,7 @@ public class ChunkSystem extends WorldSystem {
             // 防止玩家停止太久导致span超出最大值
             span += delta;
         }
+
     }
 
     @Override
@@ -187,7 +190,6 @@ public class ChunkSystem extends WorldSystem {
             for (int x = -2; x < 3; x++) {
                 int newChunkX = playerChunkX + x;
                 int newChunkY = playerChunkY + y;
-
                 float distance = Util.getDistance(
                     this.player.x + this.player.width / 2,
                     this.player.y + this.player.height / 2,
