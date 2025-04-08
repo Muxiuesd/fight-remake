@@ -10,6 +10,9 @@ public class Fight {
     public static final float HEARING_RANGE = 16f;  //玩家的听觉范围，单位：世界中的1米
     public static final float MAX_ITEM_ENTITY_LIVING_TIME = 120f;   //物品实体最大存活时间，单位：秒
 
+    public static final float PICKUP_RANGE = 1.3f;
+    public static final float ITEM_ENTITY_PICKUP_SPAN = 3f;
+
     public static String getId (String name) {
         return NAMESPACE + ":" + name;
     }

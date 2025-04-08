@@ -51,6 +51,7 @@ public class Player extends LivingEntity {
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
         backpack.setItemStack(1, ItemsReg.getItem("stick", 16));
         backpack.setItemStack(2, ItemsReg.getItem("test_weapon"));
+        backpack.setItemStack(3, ItemsReg.getItem("block_test", 1));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }

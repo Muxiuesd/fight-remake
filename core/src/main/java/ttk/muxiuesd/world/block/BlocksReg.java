@@ -30,8 +30,9 @@ public class BlocksReg {
 
     public static Block register (String name, final Supplier<Block> supplier) {
         Block block = registrant.register(name, supplier);
+        String id = Fight.getId(name);
         //注册方块物品
-        ItemsReg.register(name, () -> new BlockItem(supplier, Fight.getId(name)));
+        ItemsReg.register(name, () -> new BlockItem(id, id));
         return block;
     }
 

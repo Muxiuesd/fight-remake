@@ -180,9 +180,9 @@ public class EntitySystem extends WorldSystem {
             return;
         }
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
-        if (itemEntity.getLivingTime() > 3f) {
+        if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN) {
             float distance = Util.getDistance(itemEntity, this.getPlayer());
-            if (distance <= 2f ) {
+            if (distance <= Fight.PICKUP_RANGE) {
                 ItemStack itemStack = itemEntity.getItemStack();
                 ItemPickUpState state = this.getPlayer().pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {

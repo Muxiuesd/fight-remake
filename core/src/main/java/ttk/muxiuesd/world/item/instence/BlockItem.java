@@ -1,8 +1,7 @@
 package ttk.muxiuesd.world.item.instence;
 
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.registrant.Registrant;
-import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.world.World;
@@ -13,21 +12,19 @@ import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
-import java.util.function.Supplier;
-
 /**
  * 方块物品
  * */
 public class BlockItem extends Item {
-    final Supplier<Block> supplier;
+    final String blockId;
 
-    public BlockItem(Supplier<Block> supplier, String textureId) {
-        this(supplier, new Property().setMaxCount(64), textureId);
+    public BlockItem(String blockId, String textureId) {
+        this(blockId, new Property().setMaxCount(64), textureId);
     }
 
-    public BlockItem(Supplier<Block> supplier, Property property, String textureId) {
+    public BlockItem(String blockId, Property property, String textureId) {
         super(Type.CONSUMPTION, property, textureId);
-        this.supplier = supplier;
+        this.blockId = blockId;
     }
 
     @Override
@@ -36,18 +33,14 @@ public class BlockItem extends Item {
         Vector2 worldPosition = his.getMouseWorldPosition();
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
 
-        Block replacedBlock = cs.replaceBlock(supplier.get(), worldPosition.x, worldPosition.y);
+        Block replacedBlock = cs.replaceBlock(Gets.block(blockId), worldPosition.x, worldPosition.y);
 
-        String id = replacedBlock.getID();
-        String[] split = id.split(":");
-        Registrant<Item> itemReg = RegistrantGroup.getRegistrant(split[0], Item.class);
-        Item item = itemReg.get(split[1]);
-        ItemStack stack = new ItemStack(item);
+        ItemStack stack = new ItemStack(Gets.item(replacedBlock.getID()), 1);
 
         ItemEntity itemEntity = (ItemEntity) EntitiesReg.get("item_entity");
         itemEntity.setItemStack(stack);
         itemEntity.setPosition(worldPosition.x, worldPosition.y);
-
+        itemEntity.setSize(replacedBlock.width / 2, replacedBlock.height / 2);
         user.getEntitySystem().add(itemEntity);
 
         return super.use(world, user);
