@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.instence;
 
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.HandleInputSystem;
@@ -32,15 +33,17 @@ public class BlockItem extends Item {
         HandleInputSystem his = (HandleInputSystem) world.getSystemManager().getSystem("HandleInputSystem");
         Vector2 worldPosition = his.getMouseWorldPosition();
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
-
+        //替换鼠标点到的方块
         Block replacedBlock = cs.replaceBlock(Gets.block(blockId), worldPosition.x, worldPosition.y);
 
         ItemStack stack = new ItemStack(Gets.item(replacedBlock.getID()), 1);
 
+        //把替换下来的方块编程方块物品并且变成物品实体形式掉落在世界上
         ItemEntity itemEntity = (ItemEntity) EntitiesReg.get("item_entity");
         itemEntity.setItemStack(stack);
         itemEntity.setPosition(worldPosition.x, worldPosition.y);
         itemEntity.setSize(replacedBlock.width / 2, replacedBlock.height / 2);
+        itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
         user.getEntitySystem().add(itemEntity);
 
         return super.use(world, user);
