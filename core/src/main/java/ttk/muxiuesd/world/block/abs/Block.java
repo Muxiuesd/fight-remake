@@ -9,6 +9,7 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.world.block.BlockSoundsID;
 
 import java.util.Objects;
 
@@ -105,7 +106,11 @@ public abstract class Block implements ID, Updateable, BlockDrawable, Disposable
      * */
     public static class Property {
         private float friction;
+        private BlockSoundsID sounds;
+
         private String walkSoundId;
+        private String putSoundId;
+        private String destroySoundId;
 
         public Property() {
         }
@@ -116,6 +121,19 @@ public abstract class Block implements ID, Updateable, BlockDrawable, Disposable
 
         public Property setFriction(float friction) {
             this.friction = friction;
+            return this;
+        }
+
+        public BlockSoundsID getSounds() {
+            if (this.sounds == null) {
+                //默认音效
+                this.sounds = BlockSoundsID.DEFAULT;
+            }
+            return this.sounds;
+        }
+
+        public Property setSounds(BlockSoundsID sounds) {
+            this.sounds = sounds;
             return this;
         }
 

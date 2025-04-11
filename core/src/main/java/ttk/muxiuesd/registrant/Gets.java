@@ -10,15 +10,15 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class Gets {
 
-    public static Item item(String id) {
+    public static Item ITEM (String id) {
         return get(id, Item.class);
     }
 
-    public static Block block(String id) {
+    public static Block BLOCK (String id) {
         return get(id, Block.class);
     }
 
-    public static Entity entity(String id) {
+    public static Entity ENTITY (String id) {
         return get(id, Entity.class);
     }
 

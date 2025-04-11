@@ -2,16 +2,15 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.audio.SoundInstance;
 import ttk.muxiuesd.audio.SpatialSoundInstance;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Player;
@@ -30,9 +29,10 @@ public class SoundEffectSystem extends WorldSystem {
     private EntitySystem es;
 
     private LinkedHashMap<String, SoundInstance> activeSounds;  //正在播放的音效
-    private Array<SpatialSoundInstance> activeSpatialSounds;//正在播放的空间音效
+    private Array<SpatialSoundInstance> activeSpatialSounds;    //正在播放的空间音效
 
     private String curWalkSoundId;
+    private SpatialSoundInstance curWalkSound;
 
     public SoundEffectSystem (World world) {
         super(world);
@@ -46,6 +46,7 @@ public class SoundEffectSystem extends WorldSystem {
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.es = (EntitySystem) getManager().getSystem("EntitySystem");
+
 
         String[] devices = Gdx.audio.getAvailableOutputDevices();
         StringBuilder deviceName = new StringBuilder();
@@ -81,40 +82,36 @@ public class SoundEffectSystem extends WorldSystem {
             Player player = this.ps.getPlayer();
             Vector2 playerCenter = player.getCenter();
             Block underfootBlock = cs.getBlock(playerCenter.x, playerCenter.y);
-            String walkSoundId = underfootBlock.getProperty().getWalkSoundId();
-            //检测方块不一样时
+            String walkSoundId = underfootBlock.getProperty().getSounds().getID(BlockSoundsID.Type.WALK);
+            //检测方块不一样时curWalkSoundId
             if ((this.curWalkSoundId != null) && (!Objects.equals(this.curWalkSoundId, walkSoundId))) {
                 //先停止先前的音效
                 this.stopPlayerWalkSound();
-                //Log.print(TAG, "脚下方块变换");
                 //再播放新的音效
                 this.startPlayerWalkSound(walkSoundId);
             }
-            if (!this.activeSounds.containsKey(Fight.getId("player_walk"))) {
+            if (!this.activeSpatialSounds.contains(this.curWalkSound, true)) {
                 this.startPlayerWalkSound(walkSoundId);
             }
-        }else if (!this.ps.playerMoved() && this.activeSounds.containsKey(Fight.getId("player_walk"))) {
+        }else if (!this.ps.playerMoved() && this.activeSpatialSounds.contains(this.curWalkSound, true)) {
             //如果玩家停止了，但是音效在播放
             this.stopPlayerWalkSound();
             this.curWalkSoundId = null;
         }
+        //System.out.println(this.activeSpatialSounds.size);
     }
 
     private void startPlayerWalkSound (String walkSoundId) {
-        Sound sound = AudioLoader.getInstance().newSound(walkSoundId);
-        SoundInstance instance = new SoundInstance(
-            sound,
-            SoundInstance.LOOPING,
-            1.5f,
-            1.5f,
-            0);
-        this.activeSounds.put(Fight.getId("player_walk"), instance);
+        Music sound = AudioLoader.getInstance().getMusic(walkSoundId);
+        this.curWalkSound = new SpatialSoundInstance(sound, ps.getPlayer(), ps.getPlayer());
+        this.activeSpatialSounds.add(this.curWalkSound);
         this.curWalkSoundId = walkSoundId;
     }
 
     private void stopPlayerWalkSound () {
-        SoundInstance playerWalkSound = this.activeSounds.remove(Fight.getId("player_walk"));
-        playerWalkSound.stop();
+        this.curWalkSound.stop();
+        this.activeSpatialSounds.removeValue(this.curWalkSound, true);
+        this.curWalkSound = null;
     }
 
     /**
@@ -132,9 +129,7 @@ public class SoundEffectSystem extends WorldSystem {
         for (SpatialSoundInstance instance : this.activeSpatialSounds) {
             instance.update(delta);
             //TODO 音效播放完后移除
-
         }
-        //System.out.println(this.activeSpatialSounds.size);
     }
 
     /**
