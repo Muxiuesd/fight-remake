@@ -14,8 +14,6 @@ import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.EventGroup;
-import ttk.muxiuesd.world.event.abs.PlayerDeathEvent;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -46,10 +44,11 @@ public class PlayerSystem extends WorldSystem {
     @Override
     public void update (float delta) {
         if (this.player.isDeath()) {
-            EventGroup<PlayerDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.PlayerDeath);
+            /*EventGroup<PlayerDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.PlayerDeath);
             for (PlayerDeathEvent event : eventGroup.getEvents()) {
                 event.call(getWorld(), this.player);
-            }
+            }*/
+            EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, player);
             this.remakePlayer();
             return;
         }

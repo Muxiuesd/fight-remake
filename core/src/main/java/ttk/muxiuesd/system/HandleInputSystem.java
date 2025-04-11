@@ -19,11 +19,6 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.EventGroup;
-import ttk.muxiuesd.world.event.abs.ButtonInputEvent;
-import ttk.muxiuesd.world.event.abs.KeyInputEvent;
-
-import java.util.HashSet;
 
 /**
  * 输入处理系统
@@ -99,11 +94,12 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean keyUp (int keycode) {
-        EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
+        /*EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
         HashSet<KeyInputEvent> events = group.getEvents();
         for (KeyInputEvent event : events) {
             event.call(keycode);
-        }
+        }*/
+        EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
         return false;
     }
 
@@ -119,11 +115,12 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-        EventGroup<ButtonInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.ButtonInput);
+        /*EventGroup<ButtonInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.ButtonInput);
         HashSet<ButtonInputEvent> events = group.getEvents();
         for (ButtonInputEvent event : events) {
             event.call(screenX, screenY, pointer, button);
-        }
+        }*/
+        EventBus.getInstance().callEvent(EventBus.EventType.ButtonInput, screenX, screenY, pointer, button);
         return false;
     }
 

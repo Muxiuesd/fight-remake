@@ -1,11 +1,13 @@
 package ttk.muxiuesd.world.event;
 
+import ttk.muxiuesd.interfaces.Event;
+
 import java.util.HashSet;
 
 /**
  * 事件组，同种类型的事件放在一组里
  * */
-public class EventGroup<T> {
+public class EventGroup<T extends Event> {
     private final HashSet<T> events;
 
     public EventGroup () {

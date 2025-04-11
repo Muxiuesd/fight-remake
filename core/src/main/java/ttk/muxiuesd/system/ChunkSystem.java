@@ -16,6 +16,7 @@ import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.event.EventBus;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -385,6 +386,9 @@ public class ChunkSystem extends WorldSystem {
      * @return 被替换下来的方块
      * */
     public Block replaceBlock(Block newBlock, float wx, float wy) {
+        if (newBlock == null) {
+            throw new NullPointerException("newBlock 不能为null！！！");
+        }
         Block oldBlock = this.getBlock(wx, wy);
         Vector2 floor = Util.fastFloor(wx, wy);
 
@@ -392,9 +396,10 @@ public class ChunkSystem extends WorldSystem {
         Chunk chunk = this.getChunk(chunkPosition);
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
         chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
-
+        EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, oldBlock, newBlock, wx, wy);
         return oldBlock;
     }
+
 
     /**
      * 获取区块

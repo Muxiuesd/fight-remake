@@ -5,8 +5,6 @@ import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.EventGroup;
-import ttk.muxiuesd.world.event.abs.WorldTickUpdateEvent;
 
 /**
  * 时间系统
@@ -66,7 +64,8 @@ public class TimeSystem extends WorldSystem implements Tickable {
         //更新所有的tick
         this.tickUpdates.forEach(t -> t.tick(delta));
 
-        this.callWorldTickEvent(delta);
+        //this.callWorldTickEvent(delta);
+        EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
     }
 
     /**
@@ -87,10 +86,10 @@ public class TimeSystem extends WorldSystem implements Tickable {
      * 调用相关事件
      * */
     public void callWorldTickEvent  (float delta) {
-        EventGroup<WorldTickUpdateEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.TickUpdate);
+        /*EventGroup<WorldTickUpdateEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.TickUpdate);
         eventGroup.getEvents().forEach(e -> {
             e.tick(getWorld(), delta);
-        });
+        });*/
     }
 
     /**
