@@ -4,14 +4,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.block.BlockSoundsID;
-
-import java.util.Objects;
 
 /**
  * 方块
@@ -108,10 +105,6 @@ public abstract class Block implements ID, Updateable, BlockDrawable, Disposable
         private float friction;
         private BlockSoundsID sounds;
 
-        private String walkSoundId;
-        private String putSoundId;
-        private String destroySoundId;
-
         public Property() {
         }
 
@@ -134,16 +127,6 @@ public abstract class Block implements ID, Updateable, BlockDrawable, Disposable
 
         public Property setSounds(BlockSoundsID sounds) {
             this.sounds = sounds;
-            return this;
-        }
-
-        public String getWalkSoundId () {
-            //为null则返回默认情况
-            return Objects.requireNonNullElse(walkSoundId, Fight.getId("grass_walk"));
-        }
-
-        public Property setWalkSoundId (String walkSoundId) {
-            this.walkSoundId = walkSoundId;
             return this;
         }
     }

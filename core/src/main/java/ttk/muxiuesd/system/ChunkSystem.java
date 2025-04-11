@@ -396,7 +396,9 @@ public class ChunkSystem extends WorldSystem {
         Chunk chunk = this.getChunk(chunkPosition);
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
         chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
-        EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, oldBlock, newBlock, wx, wy);
+
+        EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
+
         return oldBlock;
     }
 

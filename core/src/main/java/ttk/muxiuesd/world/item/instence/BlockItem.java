@@ -5,7 +5,6 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.HandleInputSystem;
-import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.EntitiesReg;
@@ -39,17 +38,13 @@ public class BlockItem extends Item {
 
         ItemStack stack = new ItemStack(Gets.ITEM(replacedBlock.getID()), 1);
 
-        //把替换下来的方块编程方块物品并且变成物品实体形式掉落在世界上
+        //把替换下来的方块变成方块物品并且变成物品实体形式掉落在世界上
         ItemEntity itemEntity = (ItemEntity) EntitiesReg.get("item_entity");
         itemEntity.setItemStack(stack);
         itemEntity.setPosition(worldPosition.x, worldPosition.y);
         itemEntity.setSize(replacedBlock.width / 2, replacedBlock.height / 2);
         itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
         user.getEntitySystem().add(itemEntity);
-
-        String useSoundId = property.getUseSoundId();
-        SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
-        ses.newSpatialSound(useSoundId, user);
 
         return true;
     }

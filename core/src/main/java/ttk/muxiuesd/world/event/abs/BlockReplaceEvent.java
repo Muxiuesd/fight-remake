@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.event.abs;
 
 import ttk.muxiuesd.interfaces.Event;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 
 /**
@@ -8,8 +9,8 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public abstract class BlockReplaceEvent implements Event {
     public void call (Object... args) {
-        this.callback((Block) args[0], (Block) args[1], (float) args[2], (float) args[3]);
+        this.callback((World) args[0], (Block) args[1], (Block) args[2], (float) args[3], (float) args[4]);
     }
 
-    public abstract void callback (Block newBlock, Block oldBlock, float wx, float wy);
+    public abstract void callback (World world, Block newBlock, Block oldBlock, float wx, float wy);
 }
