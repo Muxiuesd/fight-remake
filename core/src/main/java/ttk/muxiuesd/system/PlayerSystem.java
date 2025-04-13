@@ -31,7 +31,6 @@ public class PlayerSystem extends WorldSystem {
 
     public PlayerSystem(World world) {
         super(world);
-
     }
 
     @Override
@@ -44,10 +43,6 @@ public class PlayerSystem extends WorldSystem {
     @Override
     public void update (float delta) {
         if (this.player.isDeath()) {
-            /*EventGroup<PlayerDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.PlayerDeath);
-            for (PlayerDeathEvent event : eventGroup.getEvents()) {
-                event.call(getWorld(), this.player);
-            }*/
             EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
             this.remakePlayer();
             return;

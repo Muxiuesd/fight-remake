@@ -2,6 +2,7 @@ package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
@@ -93,10 +94,15 @@ public class ModLoader {
         HashMap<String, ModNode> nodeHashMap = ModDependency.analysis();
 
         Log.print(TAG, "开始运行所有的模组……");
-        //TODO 更好的算法来确定mod的运行顺序
+
+        Array<ModNode> firstRun = new Array<>();
         for (ModNode node : nodeHashMap.values()) {
-            node.run();
+            //node.run();
+            //找到顶层mod，添加进先加载的数组
+            if (node.getParents().isEmpty()) firstRun.add(node);
         }
+        firstRun.forEach(ModNode::run);
+
         Log.print(TAG, "————所有的模组运行完毕————");
     }
 
