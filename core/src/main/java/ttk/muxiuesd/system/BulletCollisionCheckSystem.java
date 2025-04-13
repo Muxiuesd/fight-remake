@@ -15,12 +15,9 @@ import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.EventGroup;
-import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * 子弹碰撞系统
@@ -315,11 +312,12 @@ public class BulletCollisionCheckSystem extends WorldSystem {
      * 调用实体受攻击的事件
      * */
     private void callEntityAttackedEvent (Entity attackedObject, Entity victim) {
-        EventGroup<EntityAttackedEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityAttacked);
+        /*EventGroup<EntityAttackedEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityAttacked);
         HashSet<EntityAttackedEvent> events = eventGroup.getEvents();
         for (EntityAttackedEvent event :events) {
             event.call(attackedObject, victim);
-        }
+        }*/
+        EventBus.getInstance().callEvent(EventBus.EventType.EntityAttacked, attackedObject, victim);
     }
 
     @Override

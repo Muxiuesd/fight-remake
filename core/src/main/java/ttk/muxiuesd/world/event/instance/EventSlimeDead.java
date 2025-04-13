@@ -21,7 +21,7 @@ public class EventSlimeDead extends EntityDeathEvent {
     }
 
     @Override
-    public void call (LivingEntity deadEntity) {
+    public void callback (LivingEntity deadEntity) {
         if (deadEntity instanceof Slime) {
             EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
             Slime mom = (Slime) deadEntity;

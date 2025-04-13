@@ -4,19 +4,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
+import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Updateable;
-
-import java.util.Objects;
+import ttk.muxiuesd.world.block.BlockSoundsID;
 
 /**
  * 方块
  * */
-public abstract class Block implements Updateable, BlockDrawable, Disposable {
+public abstract class Block implements ID, Updateable, BlockDrawable, Disposable {
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
+    private String id;
     public TextureRegion textureRegion;
 
     public float x, y;
@@ -43,10 +43,10 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
     }
 
     @Override
-    public void draw(Batch batch) {
+    public void draw(Batch batch, float x, float y) {
         if (this.textureIsValid()) {
             batch.draw(this.textureRegion,
-                this.x, this.y,
+                x, y,
                 this.originX, this.originY,
                 this.width, this.height,
                 this.scaleX, this.scaleY,
@@ -89,12 +89,21 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
         return this.textureRegion != null;
     }
 
+    @Override
+    public String getID () {
+        return this.id;
+    }
+    @Override
+    public void setID (String id) {
+        this.id = id;
+    }
+
     /**方块属性
      * 使用构建者模式
      * */
     public static class Property {
         private float friction;
-        private String walkSoundId;
+        private BlockSoundsID sounds;
 
         public Property() {
         }
@@ -108,13 +117,16 @@ public abstract class Block implements Updateable, BlockDrawable, Disposable {
             return this;
         }
 
-        public String getWalkSoundId () {
-            //为null则返回默认情况
-            return Objects.requireNonNullElse(walkSoundId, Fight.getId("grass_walk"));
+        public BlockSoundsID getSounds() {
+            if (this.sounds == null) {
+                //默认音效
+                this.sounds = BlockSoundsID.DEFAULT;
+            }
+            return this.sounds;
         }
 
-        public Property setWalkSoundId (String walkSoundId) {
-            this.walkSoundId = walkSoundId;
+        public Property setSounds(BlockSoundsID sounds) {
+            this.sounds = sounds;
             return this;
         }
     }

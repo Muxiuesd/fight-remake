@@ -3,22 +3,24 @@ package ttk.muxiuesd.world.block.instance;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioReg;
 import ttk.muxiuesd.world.block.abs.Block;
 
+/**
+ * 草方块
+ * */
 public class BlockGrass extends Block {
     public BlockGrass() {
         super(new Block.Property()
-            .setFriction(1f).setWalkSoundId(Fight.getId("grass_walk")),
+            .setFriction(1f).setSounds(AudioReg.GRASS),
             Fight.getId("grass"),
             Fight.getBlockTexture("grass.png"));
-            //Fight.getBlockTexture("grass_2.jpg"));
-        //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/grass.png", Texture.class));
     }
 
     @Override
-    public void draw(Batch batch) {
+    public void draw(Batch batch, float x, float y) {
         batch.setColor(new Color(0f, 0.7f, 0.2f, 1f));
-        super.draw(batch);
+        super.draw(batch, x, y);
         batch.setColor(Color.WHITE);
     }
 }

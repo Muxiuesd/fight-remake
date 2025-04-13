@@ -2,16 +2,21 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.*;
+import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.event.EventBus;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -62,7 +67,7 @@ public class ChunkSystem extends WorldSystem {
         this.activeChunks = new ArrayList<>();
 
         // 预加载一次
-        this.update(0);
+        this.update(-1);
         Log.print(TAG, "ChunkSystem初始化完成！");
     }
 
@@ -74,12 +79,13 @@ public class ChunkSystem extends WorldSystem {
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
 
-        if (delta == 0) {
+        if (delta == -1) {
             // 预加载
             // 先强制加载一次玩家所在的区块
             ChunkPosition playerChunkPosition = this.getPlayerChunkPosition();
             Chunk chunk = this.initChunk(playerChunkPosition.getX(), playerChunkPosition.getY());
             this.activeChunks.add(chunk);
+            return;
         }
 
         // 检查线程池里的区块是否加载完成
@@ -120,14 +126,15 @@ public class ChunkSystem extends WorldSystem {
                 this.chunkUnloadingTasks.put(chunk.getChunkPosition(), future);
             }
             this.activeChunks.removeAll(this._unloadChunks);
-            // System.out.println(this.activeChunks.size());
-            // this._unloadChunks.clear();
         }
 
         // 更新正在活跃的区块
+        //Log.print(TAG, "____________");
         for (Chunk chunk : this.activeChunks) {
             chunk.update(delta);
+            //Log.print(TAG, chunk.getChunkPosition().toString());
         }
+        //Log.print(TAG, "____________");
 
         if (span >= loadChunkTick && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
@@ -139,6 +146,7 @@ public class ChunkSystem extends WorldSystem {
             // 防止玩家停止太久导致span超出最大值
             span += delta;
         }
+
     }
 
     @Override
@@ -183,7 +191,6 @@ public class ChunkSystem extends WorldSystem {
             for (int x = -2; x < 3; x++) {
                 int newChunkX = playerChunkX + x;
                 int newChunkY = playerChunkY + y;
-
                 float distance = Util.getDistance(
                     this.player.x + this.player.width / 2,
                     this.player.y + this.player.height / 2,
@@ -356,51 +363,49 @@ public class ChunkSystem extends WorldSystem {
      * @return
      */
     public Block getBlock(float wx, float wy) {
-        int nx = (int) Util.fastRound(wx);
-        int ny = (int) Util.fastRound(wy);
-
-        BlockPosition blockPosition = new BlockPosition(nx, ny);
-        ChunkPosition chunkPosition = this.getChunkPosition(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
+        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        Block block = chunk.seekBlock(blockPosition.getX(), blockPosition.getY());
+        //Block block = chunk.seekBlock((float) Math.floor(wx), (float) Math.floor(wy));
+        Block block = chunk.seekBlock(floor.x, floor.y);
         // 如果在当前区块找不到的话
         if (block == null) {
-            // 在临近区块寻找
-            for (int chunkY = -1; chunkY < 2; chunkY++) {
-                for (int chunkX = -1; chunkX < 2; chunkX++) {
-                    int cx = chunkPosition.getX() + chunkX;
-                    int cy = chunkPosition.getY() + chunkY;
-                    ChunkPosition chunkPosition1 = new ChunkPosition(cx, cy);
-                    // 跳过已寻找过的区块
-                    if (chunkPosition1.equals(chunkPosition)) {
-                        continue;
-                    }
-
-                    Chunk chunk1 = this.getChunk(chunkPosition1);
-                    // 有可能是还未加载的区块
-                    if (chunk1 == null) {
-                        // TODO 解决在还未加载的区块中查找方块
-                        Log.print(TAG, chunkPosition1.toString() + "区块尚未加载！！！");
-                        continue;
-                    }
-                    Block block1 = chunk1.seekBlock(blockPosition.getX(), blockPosition.getY());
-                    if (block1 != null) {
-                        return block1;
-                    }
-                }
-            }
-
-            Log.print(TAG, "尽力了");
+            Log.print(TAG, "没尽力");
         }
         // 运行到这里应该就是查找到方块了
         return block;
     }
 
+    /**
+     * 替换某个位置的方块
+     * @return 被替换下来的方块
+     * */
+    public Block replaceBlock(Block newBlock, float wx, float wy) {
+        if (newBlock == null) {
+            throw new NullPointerException("newBlock 不能为null！！！");
+        }
+        Block oldBlock = this.getBlock(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
+
+        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
+        Chunk chunk = this.getChunk(chunkPosition);
+        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
+        chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
+
+        EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
+
+        return oldBlock;
+    }
+
+
+    /**
+     * 获取区块
+     */
     public Chunk getChunk(int chunkX, int chunkY) {
         return this.getChunk(new ChunkPosition(chunkX, chunkY));
     }
@@ -438,23 +443,13 @@ public class ChunkSystem extends WorldSystem {
      * @return
      */
     public ChunkPosition getChunkPosition(float wx, float wy) {
-        ChunkPosition cp = new ChunkPosition();
-
-        cp.setX((int) (Math.abs(Util.fastRound(wx)) / Chunk.ChunkWidth));
-        cp.setY((int) (Math.abs(Util.fastRound(wy)) / Chunk.ChunkHeight));
-
-        if (wx < 0) {
-            cp.setX(-1 * cp.getX() - 1);
-        }
-        if (wy < 0) {
-            cp.setY(-1 * cp.getY() - 1);
-        }
-        return cp;
+        Vector2 floor = Util.fastFloor(wx, wy);
+        Vector2 chunkPos = Util.fastFloor(floor.x / Chunk.ChunkWidth, floor.y / Chunk.ChunkHeight);
+        return new ChunkPosition((int) chunkPos.x, (int) chunkPos.y);
     }
 
     /**
      * 对外开放的方法：获取玩家目前所在区块的编号（区块坐标）
-     *
      * @return
      */
     public ChunkPosition getPlayerChunkPosition() {

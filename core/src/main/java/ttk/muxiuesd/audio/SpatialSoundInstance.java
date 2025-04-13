@@ -53,37 +53,17 @@ public class SpatialSoundInstance extends MusicInstance implements Updateable {
 
     /**
      * 计算方位
-     * 控制左右声道来确定方位
+     * 通过方位控制左右声道音量大小
      * */
     public float calculatePan () {
         Vector2 sp = this.sounder.getPosition();
         Vector2 rp = this.receiver.getPosition();
         //TODO 目前先这么写吧
         float deg = MathUtils.atan2Deg360(sp.y - rp.y, sp.x - rp.x);
-        /*if (this.inRange(deg, 0f, 60f)) {
-            this.isFront = true;
-            return 0.7f;
-        }
-        if (this.inRange(deg, 60f, 120f)) {
-            this.isFront = true;
-            return 0f;
-        }
-        if (this.inRange(deg, 120f, 180f)) {
-            this.isFront = true;
-            return -0.7f;
-        }
-        if (this.inRange(deg, 180f, 140f)) {
-            this.isFront = false;
-            return -0.7f;
-        }
-        if (this.inRange(deg, 240f, 300f)) {
-            this.isFront = false;
-            return 0f;
-        }*/
         float v = MathUtils.cosDeg(deg);
         //判断前后
         this.isFront = !this.inRange(deg, 240f, 360f);
-        return v;
+        return inRange(v, -0.1f, 0.1f)? v : 0;
     }
 
     private boolean inRange(float value, float start, float end) {

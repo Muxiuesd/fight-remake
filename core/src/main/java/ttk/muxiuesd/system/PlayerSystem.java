@@ -14,8 +14,6 @@ import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.EventGroup;
-import ttk.muxiuesd.world.event.abs.PlayerDeathEvent;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -33,7 +31,6 @@ public class PlayerSystem extends WorldSystem {
 
     public PlayerSystem(World world) {
         super(world);
-
     }
 
     @Override
@@ -46,10 +43,7 @@ public class PlayerSystem extends WorldSystem {
     @Override
     public void update (float delta) {
         if (this.player.isDeath()) {
-            EventGroup<PlayerDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.PlayerDeath);
-            for (PlayerDeathEvent event : eventGroup.getEvents()) {
-                event.call(getWorld(), this.player);
-            }
+            EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
             this.remakePlayer();
             return;
         }
@@ -77,8 +71,8 @@ public class PlayerSystem extends WorldSystem {
 
     public void setItemStack (int index, String itemId) {
         String[] parts = itemId.split(":");
-        Registrant<Item> otherReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
-        ItemStack stack = new ItemStack(otherReg.get(parts[1]));
+        Registrant<Item> itemReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
+        ItemStack stack = new ItemStack(itemReg.get(parts[1]));
         this.player.backpack.setItemStack(index, stack);
     }
 

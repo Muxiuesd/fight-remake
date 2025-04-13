@@ -22,7 +22,7 @@ public class EventEnemyShootBullet extends BulletShootEvent {
     }
 
     @Override
-    public void call (Entity shooter, Bullet bullet) {
+    public void callback (Entity shooter, Bullet bullet) {
         if (shooter.group == Group.enemy) {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()

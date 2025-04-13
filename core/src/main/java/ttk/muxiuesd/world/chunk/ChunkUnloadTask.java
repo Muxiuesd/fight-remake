@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.chunk;
 
 import ttk.muxiuesd.system.ChunkSystem;
+import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 
 /**
  * 多线程卸载区块任务

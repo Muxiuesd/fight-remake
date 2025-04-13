@@ -100,6 +100,13 @@ public class Util {
         return value;
     }
 
+    /**
+     * 快速向下取整
+     * */
+    public static Vector2 fastFloor (float x, float y) {
+        return new Vector2((float) Math.floor(x), (float) Math.floor(y));
+    }
+
     public static String position2Sting(float x, float y) {
         return "x: " + x + " y: " + y;
     }

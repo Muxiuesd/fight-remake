@@ -5,6 +5,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.event.abs.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * 事件总线
@@ -15,6 +16,7 @@ public class EventBus {
     public enum EventType {
         RegistryBlock, RegistryWall,RegistryEntity,
         BulletShoot, EntityAttacked, EntityDeath, PlayerDeath,
+        BlockReplaceEvent,
         TickUpdate,
         KeyInput, ButtonInput
     }
@@ -29,6 +31,7 @@ public class EventBus {
         eventGroups.put(EventType.EntityAttacked, new EventGroup<EntityAttackedEvent>());
         eventGroups.put(EventType.EntityDeath, new EventGroup<EntityDeathEvent>());
         eventGroups.put(EventType.PlayerDeath, new EventGroup<PlayerDeathEvent>());
+        eventGroups.put(EventType.BlockReplaceEvent, new EventGroup<BlockReplaceEvent>());
         eventGroups.put(EventType.TickUpdate, new EventGroup<WorldTickUpdateEvent>());
         eventGroups.put(EventType.KeyInput, new EventGroup<KeyInputEvent>());
         eventGroups.put(EventType.ButtonInput, new EventGroup<ButtonInputEvent>());
@@ -54,13 +57,25 @@ public class EventBus {
     /**
      * 获取事件组
      * */
-    public EventGroup getEventGroup (EventType eventType) {
+    public EventGroup<? extends Event> getEventGroup (EventType eventType) {
         if (this.eventGroups.containsKey(eventType)) {
             return this.eventGroups.get(eventType);
         }
         Log.error(TAG, "EventType：" + eventType.name() + " 不存在！！！");
         throw new IllegalArgumentException("不存在的事件类型：" + eventType);
     }
+
+    /**
+     * 执行事件
+     * */
+    public void callEvent (EventType eventType, Object... args) {
+        EventGroup<? extends Event> eventGroup = getEventGroup(eventType);
+        HashSet<? extends Event> events = eventGroup.getEvents();
+        for (Event event : events) {
+            event.call(args);
+        }
+    }
+
 
     public static EventBus getInstance () {
         if (instance == null) {

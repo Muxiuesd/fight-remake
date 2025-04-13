@@ -18,7 +18,7 @@ public class EventSlimeAttacked extends EntityAttackedEvent {
     }
 
     @Override
-    public void call (Entity attackObject, Entity victim) {
+    public void callback (Entity attackObject, Entity victim) {
         if (victim instanceof Slime) {
             //AudioPlayer.getInstance().playMusic(Fight.getId("hurt_3"));
             SoundEffectSystem ses = (SoundEffectSystem) world

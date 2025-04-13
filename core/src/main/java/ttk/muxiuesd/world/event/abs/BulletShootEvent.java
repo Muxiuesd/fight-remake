@@ -5,5 +5,10 @@ import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 
 public abstract class BulletShootEvent implements Event {
-    public abstract void call (Entity shooter, Bullet bullet);
+    @Override
+    public void call (Object... args) {
+        this.callback((Entity) args[0], (Bullet) args[1]);
+    }
+
+    public abstract void callback (Entity shooter, Bullet bullet);
 }
