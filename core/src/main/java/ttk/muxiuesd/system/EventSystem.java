@@ -37,5 +37,7 @@ public class EventSystem extends WorldSystem {
 
         bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
         bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));
+
+        bus.addEvent(EventBus.EventType.BlockReplaceEvent, new EventBlockReplace());
     }
 }

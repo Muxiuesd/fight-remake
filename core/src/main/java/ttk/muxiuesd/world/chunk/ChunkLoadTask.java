@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.chunk;
 
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 
 /**异步加载Chunk的任务
  * */

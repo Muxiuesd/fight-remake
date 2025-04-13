@@ -86,7 +86,7 @@
 
 ## 五、特别鸣谢：
 - ### [zqll](https://gitee.com/zqll4) （优化游戏代码架构）
-- ### [拯救世界中](https://gitee.com/wabrara) （解决草地渲染与着色器问题）
+- ### [wabrara](https://gitee.com/wabrara) （解决草地渲染与着色器问题、解决区块问题、解决区块方块查找问题）
 - ### LibGDX吧官方交流群的各位 （群号：1051955354）
 
 

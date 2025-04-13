@@ -12,7 +12,7 @@ public class EventPlayerDead extends PlayerDeathEvent {
     public final String TAG = this.getClass().getName();
 
     @Override
-    public void call (World world, Player player) {
+    public void callback (World world, Player player) {
         Log.print(TAG, "位于世界："+ world +" 的玩家" + player + "死亡");
     }
 }

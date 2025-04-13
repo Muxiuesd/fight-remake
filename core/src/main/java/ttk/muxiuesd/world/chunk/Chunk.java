@@ -3,11 +3,12 @@ package ttk.muxiuesd.world.chunk;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
+import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -17,7 +18,7 @@ import ttk.muxiuesd.util.SimplexNoise2D;
 import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.instance.*;
+import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.wall.Wall;
 import ttk.muxiuesd.world.wall.Walls;
 
@@ -26,7 +27,7 @@ import ttk.muxiuesd.world.wall.Walls;
  * 一个区块
  * 一行一行更新绘制
  * */
-public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRenderable {
+public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
     public final String TAG = this.getClass().getName();
 
     public static final int ChunkWidth = 16;
@@ -47,40 +48,31 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     private ChunkPosition chunkPosition;
 
     //储存一个区块里的方块
-    private Block[][] blocks;
+    private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
-    private Wall[][]  walls;
+    private final Wall[][]  walls;
+    private final int[][] heights;
 
     public Chunk(ChunkSystem chunkSystem) {
         this.chunkSystem = chunkSystem;
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
+        this.heights = new int[ChunkHeight][ChunkWidth];
     }
 
     /**
      * 初始化区块中的方块数据
      * */
     public void initBlock() {
-        /*for (int y = 0; y < ChunkHeight; y++) {
-            for (int x = 0; x < ChunkWidth; x++) {
-                //计算方块相在世界中的坐标
-                float wx = this.getWorldX(x);
-                float wy = this.getWorldY(y);
-
-                Block block = this.chooseBlock(generateTerrain(wx, wy));
-                block.setPosition(wx, wy);
-                this.setBlock(block, x, y);
-            }
-        }*/
-
         this.traversal((x, y) -> {
             //计算方块相在世界中的坐标
             float wx = this.getWorldX(x);
             float wy = this.getWorldY(y);
-
-            Block block = this.chooseBlock(generateTerrain(wx, wy));
+            int height = this.generateTerrain(wx, wy);
+            Block block = this.chooseBlock(height);
             block.setPosition(wx, wy);
             this.setBlock(block, x, y);
+            this.heights[y][x] = height;
         });
     }
 
@@ -90,14 +82,14 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     public void initWall () {
         this.traversal((x, y) -> {
             //水上不生成墙体
-            if (blocks[y][x] instanceof BlockWater) {
+            if (this.blocks[y][x] instanceof BlockWater) {
                 return;
             }
             int random = MathUtils.random(0, 10);
             if (random < 1) {
                 Wall wall = Walls.newWall("wall_smooth_stone");
                 wall.setPosition(this.getWorldX(x), this.getWorldY(y));
-                walls[y][x] = wall;
+                this.walls[y][x] = wall;
             }
         });
     }
@@ -109,7 +101,6 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
      * @return 返回地形高度
      */
     private int generateTerrain(float wx, float wy) {
-        //double v = SimplexNoise2D.noise(wx/ ChunksManager.Slope, wy/ChunksManager.Slope);
         WorldMapNoise noise = this.chunkSystem.getNoise();
         double v = noise.noise(wx/ ChunkSystem.Slope, wy/ ChunkSystem.Slope);
         return (int)SimplexNoise2D.map(v, -1f, 1f, LowestHeight, HighestHeight);
@@ -125,22 +116,22 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
             case 0:
             case 1:
             case 2:{
-                return new BlockWater();
+                return BlocksReg.newBlock("water");
             }
             case 3:{
-                return new BlockSand();
+                return BlocksReg.newBlock("sand");
             }
             case 4:{
-                return new BlockStone();
+                return BlocksReg.newBlock("stone");
             }
             case 5:
             case 6:
             case 7:{
-                return new BlockGrass();
+                return BlocksReg.newBlock("grass");
             }
         }
         //错误的高度则返回测试用方块
-        return new BlockTest();
+        return BlocksReg.newBlock("block_test");
     }
 
     /**
@@ -167,16 +158,17 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
 
     @Override
     public void draw(Batch batch) {
+        ChunkPosition cp = this.chunkPosition;
         this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (block != null) {
-                block.draw(batch);
+                block.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
         this.traversal((x, y) -> {
             Wall wall = walls[y][x];
             if (wall != null) {
-                wall.draw(batch);
+                wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
     }
@@ -219,10 +211,8 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
      * */
     public void setBlock (Block block, int cx, int cy) {
         //TODO 判断方块是否存在
-        //this.blockGroup.get(Math.abs(x) % ChunkWidth).add(Math.abs(y) % ChunkHeight, block);
         this.blocks[cy][cx] = block;
     }
-
     /**
      * 获取区块中的方块
      * @param cx    方块在区块中的横坐标
@@ -247,16 +237,32 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
      * @param wy
      * @returnp
      */
-    public Block seekBlock (int wx, int wy) {
+    public Block seekBlock (float wx, float wy) {
+        int cx;
+        int cy;
+        if (wx < 0) {
+            cx = ChunkWidth + (int)(wx % ChunkWidth);
+            cx %= ChunkWidth;
+        }else {
+            cx = (int) (wx % ChunkWidth);
+        }
+        if (wy < 0) {
+            cy = ChunkHeight + (int)(wy % ChunkHeight);
+            cy %= ChunkHeight;
+        }else {
+            cy = (int) (wy % ChunkHeight);
+        }
 
-        final Block[] targetBlock = new Block[1];
+        return this.getBlock(cx, cy);
+
+        /*final Block[] targetBlock = new Block[1];
         this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (wx == block.x && wy == block.y) {
                 targetBlock[0] = block;
             }
         });
-        return targetBlock[0];
+        return targetBlock[0];*/
     }
 
     @Override
@@ -307,6 +313,8 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
 
         if (!new Rectangle(startX, startY, ChunkWidth, ChunkHeight).contains(wx, wy)) {
             Log.error(TAG, "传入的坐标(" + wx + "," + wy +")不在区块" + getChunkPosition().toString() + "内！！！");
+            Log.error(TAG, "区块" + getChunkPosition().toString() + ", x:"+startX+
+                ", y:"+startY+", w:"+ChunkWidth+", h:"+ChunkHeight);
             return NotInChunk;
         }
 
@@ -320,7 +328,6 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
     }
 
     /**
-     *
      * @param cx 方块在区块里的横坐标
      * @return  方块的世界坐标
      */
@@ -398,5 +405,27 @@ public class Chunk implements Disposable, Updateable, BlockDrawable, ShapeRender
                 job.execute(x, y);
             }
         }
+    }
+
+    /**
+     * 将传入的世界坐标转换为这个区块里的方块数组坐标
+     * @param wx 向下取整过的世界横坐标
+     * @param wy 向下取整过的世界纵坐标
+     * */
+    public GridPoint2 worldToChunk (float wx, float wy) {
+        GridPoint2 cp = new GridPoint2();
+        if (wx < 0) {
+            cp.x = ChunkWidth + (int)(wx % ChunkWidth);
+            cp.x %= ChunkWidth;
+        }else {
+            cp.x = (int) (wx % ChunkWidth);
+        }
+        if (wy < 0) {
+            cp.y = ChunkHeight + (int)(wy % ChunkHeight);
+            cp.y %= ChunkHeight;
+        }else {
+            cp.y = (int) (wy % ChunkHeight);
+        }
+        return cp;
     }
 }

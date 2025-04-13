@@ -12,13 +12,8 @@ import ttk.muxiuesd.world.entity.*;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.EventGroup;
-import ttk.muxiuesd.world.event.abs.BulletShootEvent;
-import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
-
-import java.util.HashSet;
 
 /**
  * 实体系统
@@ -179,10 +174,10 @@ public class EntitySystem extends WorldSystem {
             //跳过这个物品实体的 其他操作
             return;
         }
-
-        if (itemEntity.getLivingTime() > 3f) {
+        //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
+        if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN) {
             float distance = Util.getDistance(itemEntity, this.getPlayer());
-            if (distance <= 2f ) {
+            if (distance <= Fight.PICKUP_RANGE) {
                 ItemStack itemStack = itemEntity.getItemStack();
                 ItemPickUpState state = this.getPlayer().pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
@@ -198,7 +193,7 @@ public class EntitySystem extends WorldSystem {
 
     @Override
     public void draw(Batch batch) {
-        for (Entity entity : drawableEntity) {
+        for (Entity entity : this.drawableEntity) {
             entity.draw(batch);
         }
     }
@@ -219,19 +214,11 @@ public class EntitySystem extends WorldSystem {
      * 调用事件
      * */
     public void callBulletShootEvent (Entity shooter, Bullet bullet) {
-        EventGroup<BulletShootEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.BulletShoot);
-        HashSet<BulletShootEvent> events = eventGroup.getEvents();
-        for (BulletShootEvent event :events) {
-            event.call(shooter, bullet);
-        }
+        EventBus.getInstance().callEvent(EventBus.EventType.BulletShoot, shooter, bullet);
     }
 
     public void callEntityDeadEvent (LivingEntity deadEntity) {
-        EventGroup<EntityDeathEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityDeath);
-        HashSet<EntityDeathEvent> events = eventGroup.getEvents();
-        for (EntityDeathEvent event :events) {
-            event.call(deadEntity);
-        }
+        EventBus.getInstance().callEvent(EventBus.EventType.EntityDeath, deadEntity);
     }
 
     public Player getPlayer() {

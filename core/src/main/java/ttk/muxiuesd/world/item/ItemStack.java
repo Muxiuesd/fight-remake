@@ -8,9 +8,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.abs.Weapon;
-import ttk.muxiuesd.world.item.stack.behaviour.CommonItemStackBehaviour;
-import ttk.muxiuesd.world.item.stack.behaviour.ConsumptionItemStackBehaviour;
-import ttk.muxiuesd.world.item.stack.behaviour.EquipmentItemStackBehaviour;
+import ttk.muxiuesd.world.item.stack.behaviour.ItemStackBehaviourFactory;
 
 /**
  * 物品堆栈
@@ -22,29 +20,23 @@ public class ItemStack implements Updateable {
     private float useSpan;
     private IItemStackBehaviour behaviour;
 
-    public ItemStack(Item item) {
-        //默认直接最大堆叠值
+    public ItemStack (Item item) {
         this(item, item.property.getMaxCount());
         try {
             this.property = ClassReflection.newInstance(getItem().property.getClass());
         } catch (ReflectionException e) {
             throw new RuntimeException(e);
         }
-        //根据不同的物品类型来注入行为
-        if (this.getItem().type == Item.Type.COMMON) {
-            this.behaviour = new CommonItemStackBehaviour();
-        }else if (this.getItem().type == Item.Type.CONSUMPTION) {
-            this.behaviour = new ConsumptionItemStackBehaviour();
-        }else if (this.getItem().type == Item.Type.WEAPON) {
-            this.behaviour = new WeaponItemStackBehaviour();
-        } else if (this.getItem().type == Item.Type.EQUIPMENT) {
-            this.behaviour = new EquipmentItemStackBehaviour();
-        }
     }
     public ItemStack (Item item, int amount) {
+        this(item, amount, ItemStackBehaviourFactory.create(item.type));
+    }
+    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour) {
         this.item = item;
         this.amount = amount;
+        this.behaviour = behaviour;
     }
+
 
     /**
      * 使用

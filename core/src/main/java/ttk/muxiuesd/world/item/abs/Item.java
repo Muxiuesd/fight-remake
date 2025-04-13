@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -18,11 +19,16 @@ import java.util.Objects;
 /**
  * 物品
  * */
-public abstract class Item {
+public abstract class Item implements ID {
+    private String id;
+
     public Type type;
     public Property property;
     public TextureRegion texture;
 
+
+    public Item () {
+    }
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
     }
@@ -87,6 +93,15 @@ public abstract class Item {
             Texture texture = AssetsLoader.getInstance().getById(id, Texture.class);
             this.texture = new TextureRegion(texture);
         });
+    }
+
+    @Override
+    public String getID () {
+        return this.id;
+    }
+    @Override
+    public void setID (String id) {
+        this.id = id;
     }
 
     /**

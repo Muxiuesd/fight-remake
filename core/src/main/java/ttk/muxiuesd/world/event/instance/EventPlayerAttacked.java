@@ -11,7 +11,7 @@ import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
  * */
 public class EventPlayerAttacked extends EntityAttackedEvent {
     @Override
-    public void call (Entity attackObject, Entity victim) {
+    public void callback (Entity attackObject, Entity victim) {
         if (victim instanceof Player) {
             Player player = (Player) victim;
             AudioPlayer.getInstance().playMusic(Fight.getId("hurt_1"));

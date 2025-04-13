@@ -115,7 +115,7 @@ public class AssetsLoader implements Disposable {
      */
     private <T> T get(String filePath, Class<T> type) {
         if (!this.gameAssetManager.isLoaded(filePath, type)) {
-            throw new IllegalStateException("资源未加载: " + filePath);
+            throw new IllegalStateException("类型为："+ type.getName() + " 的资源未加载: " + filePath);
         }
         return this.gameAssetManager.get(filePath, type);
     }

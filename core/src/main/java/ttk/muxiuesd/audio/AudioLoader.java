@@ -131,8 +131,8 @@ public class AudioLoader {
     public Sound newSound (String id) {
         String path = soundIdToPath.get(id);
         if (path == null) {
-            Log.error(TAG, "Id为：" + id + " 的sound不存在！！！");
-            return null;
+            Log.error(TAG, "Id为：" + id + " 的Sound不存在！！！");
+            throw new IllegalStateException("Id为：" + id + " 的Sound不存在！！！");
         }
         //return AssetsLoader.getInstance().get(path, Sound.class);
         return Gdx.audio.newSound(this.getFileHandle(id, path));
@@ -144,8 +144,8 @@ public class AudioLoader {
     public Music newMusic (String id) {
         String path = musicIdToPath.get(id);
         if (path == null) {
-            Log.error(TAG, "Id为：" + id + " 的music不存在！！！");
-            return null;
+            Log.error(TAG, "Id为：" + id + " 的Music不存在！！！");
+            throw new IllegalStateException("Id为：" + id + " 的Music不存在！！！");
         }
         //return AssetsLoader.getInstance().get(path, Music.class);
         return Gdx.audio.newMusic(this.getFileHandle(id, path));

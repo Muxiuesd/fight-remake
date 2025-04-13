@@ -26,7 +26,7 @@ public class ModEventCaller {
         Invocable invocable = (Invocable) libEngine;
         eventBus.addEvent(EventBus.EventType.BulletShoot, new BulletShootEvent() {
             @Override
-            public void call (Entity shooter, Bullet bullet) {
+            public void callback (Entity shooter, Bullet bullet) {
                 try {
                     invocable.invokeFunction("callBulletShootEvent", shooter, bullet);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -36,7 +36,7 @@ public class ModEventCaller {
         });
         eventBus.addEvent(EventBus.EventType.EntityAttacked, new EntityAttackedEvent() {
             @Override
-            public void call (Entity attackObject, Entity victim) {
+            public void callback (Entity attackObject, Entity victim) {
                 try {
                     invocable.invokeFunction("callEntityAttackedEvent",  attackObject, victim);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -46,7 +46,7 @@ public class ModEventCaller {
         });
         eventBus.addEvent(EventBus.EventType.EntityDeath, new EntityDeathEvent() {
             @Override
-            public void call (LivingEntity deadEntity) {
+            public void callback (LivingEntity deadEntity) {
                 try {
                     invocable.invokeFunction("callEntityDeadEvent", deadEntity);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -56,7 +56,7 @@ public class ModEventCaller {
         });
         eventBus.addEvent(EventBus.EventType.KeyInput, new KeyInputEvent() {
             @Override
-            public void call (int key) {
+            public void callback (int key) {
                 try {
                     invocable.invokeFunction("callWorldKeyInputEvent", key);
                 } catch (ScriptException | NoSuchMethodException e) {
@@ -66,7 +66,7 @@ public class ModEventCaller {
         });
         eventBus.addEvent(EventBus.EventType.ButtonInput, new ButtonInputEvent() {
             @Override
-            public void call (int screenX, int screenY, int pointer, int button) {
+            public void callback (int screenX, int screenY, int pointer, int button) {
                 try {
                     invocable.invokeFunction("callWorldButtonInputEvent", screenX, screenY, pointer, button);
                 } catch (ScriptException | NoSuchMethodException e) {
