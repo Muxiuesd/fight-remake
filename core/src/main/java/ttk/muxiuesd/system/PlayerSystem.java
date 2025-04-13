@@ -48,7 +48,7 @@ public class PlayerSystem extends WorldSystem {
             for (PlayerDeathEvent event : eventGroup.getEvents()) {
                 event.call(getWorld(), this.player);
             }*/
-            EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, player);
+            EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
             this.remakePlayer();
             return;
         }
