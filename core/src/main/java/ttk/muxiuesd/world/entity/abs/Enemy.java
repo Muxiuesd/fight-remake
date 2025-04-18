@@ -1,8 +1,13 @@
 package ttk.muxiuesd.world.entity.abs;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 
@@ -17,11 +22,23 @@ public abstract class Enemy extends LivingEntity {
     private float attackSpan;   //攻击时间间隔
     private float span = 0f;
 
-    public Enemy () {}
-    public Enemy (float visionRange, float attackRange, float attackSpan) {
+
+    public Enemy (String textureId,float maxHealth, float curHealth,
+                  float visionRange, float attackRange, float attackSpan, float speed) {
+        this(maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
+        this.loadBodyTextureRegion(textureId, null);
+    }
+
+    public Enemy (float maxHealth, float curHealth,
+                  float visionRange, float attackRange, float attackSpan, float speed) {
+        initialize(Group.enemy, maxHealth, curHealth);
+
         this.visionRange = visionRange;
         this.attackRange = attackRange;
         this.attackSpan = attackSpan;
+        this.speed = speed;
+
+        setSize(1f, 1f);
     }
 
     @Override
@@ -80,7 +97,7 @@ public abstract class Enemy extends LivingEntity {
             return;
         }
         //在攻击范围内就要攻击
-        Bullet bullet = this.createBullet(new Direction(target.x - x, target.y - y));
+        Bullet bullet = this.createBullet(this, new Direction(target.x - x, target.y - y));
         getEntitySystem().add(bullet);
         this.span = 0;
     }
@@ -89,8 +106,29 @@ public abstract class Enemy extends LivingEntity {
      * 自定义发射的子弹
      * @param direction 子弹的运动方向
      * */
-    public abstract Bullet createBullet (Direction direction);
+    public abstract Bullet createBullet (Entity owner, Direction direction);
 
+    /**
+     * 加载身体材质
+     * */
+    public void loadBodyTextureRegion (String textureId, String texturePath) {
+        textureRegion = this.loadTextureRegion(textureId, texturePath);
+    }
+
+    /**
+     * 加载纹理区域
+     * @param textureId 纹理材质id
+     * @param texturePath 路径，当此为null时则默认之前手动加载过
+     * */
+    public TextureRegion loadTextureRegion (String textureId, String texturePath) {
+        if (texturePath == null) {
+            return new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
+        }
+
+        AssetsLoader.getInstance().loadAsync(textureId, Fight.getEntityTexture(texturePath), Texture.class, () -> {});
+        Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
+        return new TextureRegion(texture);
+    }
 
     public Entity getCurTarget () {
         return curTarget;

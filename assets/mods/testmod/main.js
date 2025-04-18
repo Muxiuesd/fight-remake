@@ -37,6 +37,22 @@ itemRegister.register("sword", Items.newSupplier(function () {
 
 //实体注册
 var entityRegister = ModRegistrant.getEntityRegister(namespace);
+entityRegister.register("zombie", Entity.newSupplier(function () {
+    var Zombie = Entity.getAbstractEnemy();
+    //虽然语法报错，但就是这么写的
+    var zombie = new Zombie("testmod:grass", 5, 5, 20, 15, 1, 2){
+        createBullet: function (owner, direction) {
+            var Bullet = Java.extend(Java.type("ttk.muxiuesd.world.entity.bullet.BulletFire"), {});
+            var bullet = new Bullet(owner);
+            bullet.setSize(0.5, 0.5);
+            bullet.setPosition(owner.x + (owner.width - bullet.width)/2, owner.y + (owner.height - bullet.height)/2);
+            bullet.setDirection(direction.getxDirection(), direction.getyDirection());
+            bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
+            return bullet;
+        }
+    };
+    return zombie;
+}));
 
 
 World.event.add("entityAttacked", function (attackObject, victim) {

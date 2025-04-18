@@ -19,11 +19,15 @@ var Entity = {
         }
         return undefined;
     },
+    getAbstractEnemy: function () {
+        return Java.extend(Java.type("ttk.muxiuesd.world.entity.abs.Enemy"));
+    },
     newBullet: function () {
 
     },
-    newEnemy: function () {
-
+    newEnemy: function (textureId, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed) {
+        var Enemy = this.getAbstractEnemy({});
+        return new Enemy(textureId, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
     },
     newSupplier: function (func) {
         var supplier = Java.extend(Java.type("ttk.muxiuesd.mod.api.ModSupplier"), {

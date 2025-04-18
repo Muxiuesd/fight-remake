@@ -14,7 +14,6 @@ import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
-import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -48,13 +47,6 @@ public class EntitySystem extends WorldSystem {
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
         this.add(player);
-
-        Slime slime = new Slime();
-        slime.setEntitySystem(this);
-        slime.setBounds((float) (player.x + 5 * Math.cos(Util.randomRadian())),
-            (float) (player.y + 5 * Math.sin(Util.randomRadian())),
-            1, 1);
-        this.add(slime);
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }

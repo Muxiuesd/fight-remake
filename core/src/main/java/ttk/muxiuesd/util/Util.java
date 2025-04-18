@@ -111,4 +111,7 @@ public class Util {
         return "x: " + x + " y: " + y;
     }
 
+    public static String[] splitID (String id) {
+        return id.split(":");
+    }
 }

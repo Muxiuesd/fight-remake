@@ -1,14 +1,11 @@
 package ttk.muxiuesd.world.entity.enemy;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.abs.Enemy;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
@@ -21,26 +18,18 @@ public class Slime extends Enemy {
     }
 
     public Slime(int generation) {
-        super(13, 10, 1);
-        initialize(Group.enemy, 10, 10);
-
-        setSize(1, 1);
-        speed = 1f;
+        super(10f, 10f, 16f, 16f, 1f, 1f);
+        //setSize(1, 1);
         this.generation = generation;
-
-        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),
+        /*AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),
             Fight.getEntityTexture("enemy/slime.png"),
             Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("slime"), Texture.class);
             textureRegion = new TextureRegion(texture);
-        });
+        });*/
+        loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
 
         Log.print(this.getClass().getName(), "Slime 初始化完成");
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
     }
 
     @Override
@@ -66,7 +55,7 @@ public class Slime extends Enemy {
      * @param direction 子弹的运动方向
      */
     @Override
-    public Bullet createBullet (Direction direction) {
+    public Bullet createBullet (Entity owner, Direction direction) {
         BulletFire bullet = new BulletFire(this);
         bullet.setSize(
             (float) (bullet.width * Math.pow(this.factor, this.generation)),
