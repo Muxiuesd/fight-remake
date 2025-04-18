@@ -2,12 +2,14 @@ var TAG = "Muxiuesd的mod";
 var namespace = "mymod";
 
 World.event.add("bulletShoot", function (shooter, bullet) {
-    var group = getGroup(shooter);
-    var soundEffectSystem = World.systems.get("SoundEffectSystem");
-    soundEffectSystem.newSpatialSound("testmod:ignite", shooter);
+    var group = Entity.getGroup(shooter);
+    if (group === "Enemy") {
+        var soundEffectSystem = World.systems.get("SoundEffectSystem");
+        soundEffectSystem.newSpatialSound("testmod:ignite", shooter);
+    }
 });
 World.event.add("entityDead", function (deadEntity) {
-    var group = getGroup(deadEntity);
+    var group = Entity.getGroup(deadEntity);
 
 });
 World.event.add("buttonInput", function (screenX, screenY, pointer, button) {

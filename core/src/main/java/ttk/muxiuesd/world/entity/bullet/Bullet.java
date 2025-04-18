@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.bullet;
 
 
+import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.world.entity.Entity;
 
 /**
@@ -13,6 +14,9 @@ public abstract class Bullet extends Entity {
     public float speed;
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
+
+    public Bullet () {
+    }
 
     public Bullet(Entity owner) {
         this.owner = owner;
@@ -48,8 +52,9 @@ public abstract class Bullet extends Entity {
         // 调整旋转原点
         setOrigin(width / 2, height / 2);
         // 计算旋转角度
-        double v = Math.atan2(velX, velY);
-        this.rotation = (float) Math.toDegrees(v);
+        /*double v = Math.atan2(velY, velX);
+        this.rotation = (float) Math.toDegrees(v);*/
+        this.rotation = MathUtils.atan2Deg(velY, velX);
     }
 
 }

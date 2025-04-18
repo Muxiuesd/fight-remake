@@ -12,8 +12,8 @@ fileLoader.load(
     })
 );
 
+//方块注册
 var blockReg = ModRegistrant.getBlockRegister(namespace);
-
 blockReg.register("test_block", Blocks.newSupplier(function () {
     return Blocks.newBlock(Blocks.properties.newProperty().setFriction(1.0), "testmod:grass");
 }));
@@ -29,11 +29,14 @@ fileLoader.load(
         Log.print(TAG, "资源" + file + "加载完成！");
     })
 );
-
+//物品注册
 var itemRegister = ModRegistrant.getItemRegister(namespace);
 itemRegister.register("sword", Items.newSupplier(function () {
     return Items.newItem(Items.types.COMMON, Items.properties.newProperty(), "testmod:sword");
 }));
+
+//实体注册
+var entityRegister = ModRegistrant.getEntityRegister(namespace);
 
 
 World.event.add("entityAttacked", function (attackObject, victim) {
