@@ -22,7 +22,7 @@ var Entity = {
     newBullet: function () {
 
     },
-    newLivingEntity: function () {
+    newEnemy: function () {
 
     },
     newSupplier: function (func) {

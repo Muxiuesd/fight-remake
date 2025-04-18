@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity;
 
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 

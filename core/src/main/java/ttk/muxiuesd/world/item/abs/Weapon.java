@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.item.abs;
 
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
 /**
  * 武器类

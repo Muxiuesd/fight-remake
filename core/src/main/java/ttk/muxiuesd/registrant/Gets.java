@@ -2,7 +2,7 @@ package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**

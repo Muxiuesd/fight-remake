@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.entity;
+package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -9,6 +9,7 @@ import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.world.entity.Group;
 
 /**
  * 基础实体

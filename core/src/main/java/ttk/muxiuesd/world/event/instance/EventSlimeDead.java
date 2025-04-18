@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.event.abs.EntityDeathEvent;
 

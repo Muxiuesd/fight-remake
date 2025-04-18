@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.entity.bullet;
 
 
 import com.badlogic.gdx.math.MathUtils;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 子弹
@@ -52,8 +52,6 @@ public abstract class Bullet extends Entity {
         // 调整旋转原点
         setOrigin(width / 2, height / 2);
         // 计算旋转角度
-        /*double v = Math.atan2(velY, velX);
-        this.rotation = (float) Math.toDegrees(v);*/
         this.rotation = MathUtils.atan2Deg(velY, velX);
     }
 

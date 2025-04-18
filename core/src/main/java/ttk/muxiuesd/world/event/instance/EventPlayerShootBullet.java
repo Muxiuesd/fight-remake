@@ -5,8 +5,8 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.abs.BulletShootEvent;
 

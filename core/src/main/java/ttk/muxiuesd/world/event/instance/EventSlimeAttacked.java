@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.event.instance;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
 

@@ -2,8 +2,8 @@ package ttk.muxiuesd.world.event.instance;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
-import ttk.muxiuesd.world.entity.Entity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.event.abs.EntityAttackedEvent;
 
 /**

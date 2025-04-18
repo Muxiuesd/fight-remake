@@ -8,6 +8,7 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.item.ItemsReg;
 

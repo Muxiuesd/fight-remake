@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -10,7 +11,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 掉落在地上的物品以实体形式存在
  * */
-public class ItemEntity extends Entity{
+public class ItemEntity extends Entity {
     private ItemStack itemStack;
     private Vector2 positionOffset;
     private float cycle;

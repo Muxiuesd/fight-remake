@@ -2,7 +2,7 @@ package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 项目的工具类

@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.event.abs;
 
 import ttk.muxiuesd.interfaces.Event;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
 /**
  * 实体死亡事件

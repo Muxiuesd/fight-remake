@@ -1,7 +1,11 @@
-package ttk.muxiuesd.world.entity;
+package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.Backpack;
+import ttk.muxiuesd.world.entity.EntitiesReg;
+import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 

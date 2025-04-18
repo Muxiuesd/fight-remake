@@ -4,6 +4,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
 import java.util.function.Supplier;

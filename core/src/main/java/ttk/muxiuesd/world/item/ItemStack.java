@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import ttk.muxiuesd.interfaces.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.abs.Weapon;
 import ttk.muxiuesd.world.item.stack.behaviour.ItemStackBehaviourFactory;

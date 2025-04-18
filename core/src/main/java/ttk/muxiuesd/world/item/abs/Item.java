@@ -12,7 +12,7 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
 import java.util.Objects;
 

@@ -8,7 +8,7 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Entity;
 
 public class CameraFollowSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
