@@ -66,8 +66,8 @@ public class EntitySystem extends WorldSystem {
      * @param entity 实体
      */
     private void _add(Entity entity) {
-        if (entity instanceof Bullet) {
-            Bullet bullet = (Bullet) entity;
+        if (entity instanceof Bullet bullet) {
+            //Bullet bullet = (Bullet) entity;
             if (bullet.group == Group.player) {
                 this.playerBulletEntity.add(bullet);
                 this.callBulletShootEvent(this.getPlayer(), bullet);
@@ -79,8 +79,8 @@ public class EntitySystem extends WorldSystem {
         }else if (entity.group == Group.enemy) {
             this.enemyEntity.add((LivingEntity) entity);
         }
-        if (entity instanceof ItemEntity) {
-            this.itemEntity.add((ItemEntity) entity);
+        if (entity instanceof ItemEntity itemEntity) {
+            this.itemEntity.add(itemEntity);
         }
 
         this.updatableEntity.add(entity);
@@ -96,27 +96,26 @@ public class EntitySystem extends WorldSystem {
     private void _remove(Entity entity) {
         //优先进行实体组类型判断
         if (entity.group == Group.enemy) {
-            //绝大部分移除调用都是敌人相关的实体
-            if (entity instanceof Bullet) {
+            //绝大部分移除调用都是敌人相关的子弹实体
+            if (entity instanceof Bullet bullet) {
                 //大部分是子弹
-                Bullet bullet = (Bullet) entity;
+                //Bullet bullet = (Bullet) entity;
                 this.enemyBulletEntity.removeValue(bullet, true);
-            }else {
-                this.enemyEntity.removeValue((LivingEntity) entity, true);
+            }else if (entity instanceof LivingEntity livingEntity) {
+                this.enemyEntity.removeValue(livingEntity, true);
             }
-        }
-        if (entity.group == Group.player) {
+        } else if (entity.group == Group.player) {
             //其次是玩家相关的实体
-            if (entity instanceof Bullet) {
+            if (entity instanceof Bullet bullet) {
                 //大部分是子弹
-                Bullet bullet = (Bullet) entity;
+                //Bullet bullet = (Bullet) entity;
                 this.playerBulletEntity.removeValue(bullet, true);
             }else {
                 //TODO 暂时不能移除玩家
             }
-        }
-        if (entity instanceof ItemEntity) {
-            this.itemEntity.removeValue((ItemEntity) entity, true);
+        } else if (entity instanceof ItemEntity itemEntity) {
+            //剩下就是物品实体
+            this.itemEntity.removeValue(itemEntity, true);
         }
 
         this.updatableEntity.removeValue(entity, true);
@@ -145,12 +144,12 @@ public class EntitySystem extends WorldSystem {
             entity.update(delta);
             //细化实体更新
             //对于活物实体
-            if (entity instanceof LivingEntity) {
-                this.updateLivingEntity((LivingEntity) entity, delta);
+            if (entity instanceof LivingEntity livingEntity) {
+                this.updateLivingEntity(livingEntity, delta);
             }
             //对于物品实体
-            else if (entity instanceof ItemEntity) {
-                this.updateItemEntity((ItemEntity) entity, delta);
+            else if (entity instanceof ItemEntity itemEntity) {
+                this.updateItemEntity(itemEntity, delta);
             }
         }
     }
