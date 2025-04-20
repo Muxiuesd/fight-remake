@@ -11,6 +11,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.Bullet;
@@ -29,7 +30,7 @@ public class EntitySystem extends WorldSystem {
 
     private final Array<Entity> entities = new Array<>();
 
-    public Array<LivingEntity> enemyEntity = new Array<>();
+    public Array<Enemy> enemyEntity = new Array<>();
     public Array<Bullet> playerBulletEntity = new Array<>();
     public Array<Bullet> enemyBulletEntity = new Array<>();
     public Array<ItemEntity> itemEntity = new Array<>();
@@ -66,21 +67,28 @@ public class EntitySystem extends WorldSystem {
      * @param entity 实体
      */
     private void _add(Entity entity) {
-        if (entity instanceof Bullet bullet) {
+        //优先进行实体组类型判断
+        if (entity.group == Group.player) {
+            //玩家组
             //Bullet bullet = (Bullet) entity;
-            if (bullet.group == Group.player) {
+            if (entity instanceof Bullet bullet) {
                 this.playerBulletEntity.add(bullet);
-                this.callBulletShootEvent(this.getPlayer(), bullet);
+                this.callBulletShootEvent(bullet.owner, bullet);
+            } else if (entity instanceof Player player) {
+                //TODO
             }
-            if (bullet.group == Group.enemy) {
+        } else if (entity.group == Group.enemy) {
+            //敌人组
+            if (entity instanceof Enemy enemy) {
+                this.enemyEntity.add(enemy);
+            } else if (entity instanceof Bullet bullet) {
                 this.enemyBulletEntity.add(bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             }
-        }else if (entity.group == Group.enemy) {
-            this.enemyEntity.add((LivingEntity) entity);
-        }
-        if (entity instanceof ItemEntity itemEntity) {
+        } else if (entity instanceof ItemEntity itemEntity) {
             this.itemEntity.add(itemEntity);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity type: " + entity.getClass().getName());
         }
 
         this.updatableEntity.add(entity);
@@ -101,8 +109,8 @@ public class EntitySystem extends WorldSystem {
                 //大部分是子弹
                 //Bullet bullet = (Bullet) entity;
                 this.enemyBulletEntity.removeValue(bullet, true);
-            }else if (entity instanceof LivingEntity livingEntity) {
-                this.enemyEntity.removeValue(livingEntity, true);
+            }else if (entity instanceof Enemy enemy) {
+                this.enemyEntity.removeValue(enemy, true);
             }
         } else if (entity.group == Group.player) {
             //其次是玩家相关的实体
