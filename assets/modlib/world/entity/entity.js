@@ -19,15 +19,27 @@ var Entity = {
         }
         return undefined;
     },
+    /**
+     * 用于之后的extend扩展
+     * */
     getEnemyJavaType: function () {
         return Java.type("ttk.muxiuesd.world.entity.abs.Enemy");
     },
+    /**
+     * 无扩展继承
+     * */
     getAbstractEnemy: function () {
         return Java.extend(this.getEnemyJavaType(), {});
     },
+    /**
+     * 用于之后的extend扩展
+     * */
     getBulletJavaType: function () {
         return Java.type("ttk.muxiuesd.world.entity.abs.Bullet");
     },
+    /**
+     * 无扩展继承
+     * */
     getAbstractBullet: function () {
         return Java.extend(this.getBulletJavaType(), {});
     },

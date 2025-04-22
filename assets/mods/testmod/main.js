@@ -38,7 +38,6 @@ itemRegister.register("sword", Items.newSupplier(function () {
 //实体注册
 var entityRegister = ModRegistrant.getEntityRegister(namespace);
 entityRegister.register("zombie", Entity.newSupplier(function () {
-    //var Zombie = Entity.getAbstractEnemy();
     //扩展
     var Zombie = Java.extend(Entity.getEnemyJavaType(), {
         createBullet: function (owner, direction) {

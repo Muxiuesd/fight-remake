@@ -17,16 +17,24 @@ var Items = {
             return new wp;
         }
     },
-    getAbstractItem: function (obj) {
-        return Java.extend(Java.type("ttk.muxiuesd.world.item.abs.Item"), obj);
+    /**
+     * 用于之后的extend扩展
+     * */
+    getItemJavaType: function () {
+        return Java.type("ttk.muxiuesd.world.item.abs.Item");
+    },
+    /**
+     * 无扩展继承
+     * */
+    getAbstractItem: function () {
+        return Java.extend(this.getItemJavaType(), {});
     },
     newItem: function (type, property, textureId, texturePath) {
-        var Item = this.getAbstractItem({});
-        Log.print("Items", Item);
+        var Item = this.getAbstractItem();
         return new Item(type, property, textureId, texturePath);
     },
     newItem: function (type, property, textureId) {
-        var Item = this.getAbstractItem({});
+        var Item = this.getAbstractItem();
         return new Item(type, property, textureId);
     },
     newSupplier: function (func) {
