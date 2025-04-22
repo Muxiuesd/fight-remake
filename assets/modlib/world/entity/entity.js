@@ -19,14 +19,24 @@ var Entity = {
         }
         return undefined;
     },
-    getAbstractEnemy: function () {
-        return Java.extend(Java.type("ttk.muxiuesd.world.entity.abs.Enemy"));
+    getEnemyJavaType: function () {
+        return Java.type("ttk.muxiuesd.world.entity.abs.Enemy");
     },
-    newBullet: function () {
-
+    getAbstractEnemy: function () {
+        return Java.extend(this.getEnemyJavaType(), {});
+    },
+    getBulletJavaType: function () {
+        return Java.type("ttk.muxiuesd.world.entity.abs.Bullet");
+    },
+    getAbstractBullet: function () {
+        return Java.extend(this.getBulletJavaType(), {});
+    },
+    newBullet: function (textureId, damage, speed, maxLiveTime, initLiveTime) {
+        var Bullet = this.getAbstractBullet();
+        return new Bullet(textureId, damage, speed, maxLiveTime, initLiveTime);
     },
     newEnemy: function (textureId, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed) {
-        var Enemy = this.getAbstractEnemy({});
+        var Enemy = this.getAbstractEnemy();
         return new Enemy(textureId, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
     },
     newSupplier: function (func) {

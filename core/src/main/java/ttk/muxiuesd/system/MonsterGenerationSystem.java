@@ -8,7 +8,6 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
-import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
 /**
@@ -77,7 +76,7 @@ public class MonsterGenerationSystem extends WorldSystem {
             slime.setBounds(genX, genY, 1, 1);
             this.es.add(slime);*/
 
-            Enemy modEnemy = (Enemy) Gets.get("testmod:zombie", Entity.class);
+            Enemy modEnemy = Gets.ENEMY("testmod:zombie");
             modEnemy.setEntitySystem(this.es);
             modEnemy.setPosition(genX, genY);
             this.es.add(modEnemy);

@@ -2,6 +2,8 @@ package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.entity.abs.Bullet;
+import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -20,6 +22,14 @@ public class Gets {
 
     public static Entity ENTITY (String id) {
         return get(id, Entity.class);
+    }
+
+    public static Enemy ENEMY (String id) {
+        return (Enemy) ENTITY(id);
+    }
+
+    public static Bullet BULLET (String id) {
+        return (Bullet) ENTITY(id);
     }
 
     public static <C extends ID> C get (String id, Class<C> clazz) {

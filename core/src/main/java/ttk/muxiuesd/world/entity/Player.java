@@ -1,15 +1,13 @@
 package ttk.muxiuesd.world.entity;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.item.ItemsReg;
 
 /**
@@ -35,19 +33,20 @@ public class Player extends LivingEntity {
         speed = 8;
         curSpeed = speed;
         setSize(1, 1);
-
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player"),
+        textureRegion = loadTextureRegion(Fight.getId("player"), "player/player.png");
+        /*AssetsLoader.getInstance().loadAsync(Fight.getId("player"),
             Fight.getEntityTexture("player/player.png"),
             Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player"), Texture.class);
             textureRegion = new TextureRegion(texture);
-        });
-        AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"),
+        });*/
+        this.shield = loadTextureRegion(Fight.getId("player_shield"), "player/shield.png");
+        /*AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"),
             Fight.getEntityTexture("player/shield.png"),
             Texture.class, () -> {
             Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player_shield"), Texture.class);
             this.shield = new TextureRegion(texture);
-        });
+        });*/
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
         backpack.setItemStack(1, ItemsReg.getItem("stick", 16));

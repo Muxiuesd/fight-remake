@@ -1,12 +1,13 @@
 package ttk.muxiuesd.world.entity.enemy;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
 public class Slime extends Enemy {
@@ -19,14 +20,7 @@ public class Slime extends Enemy {
 
     public Slime(int generation) {
         super(10f, 10f, 16f, 16f, 1f, 1f);
-        //setSize(1, 1);
         this.generation = generation;
-        /*AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),
-            Fight.getEntityTexture("enemy/slime.png"),
-            Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("slime"), Texture.class);
-            textureRegion = new TextureRegion(texture);
-        });*/
         loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
 
         Log.print(this.getClass().getName(), "Slime 初始化完成");
@@ -35,20 +29,6 @@ public class Slime extends Enemy {
     @Override
     public void updateTarget (float delta, EntitySystem es) {
         super.updateTarget(delta, es);
-        /*Player player = es.getPlayer();
-        Direction direction = new Direction(player.x - x, player.y - y);
-        this.x = x + direction.getxDirection() * speed * delta;
-        this.y = y + direction.getyDirection() * speed * delta;*/
-        //与玩家接近一定的距离才会开始攻击
-        /*if (Util.getDistance(this, player) <= this.attackRange) {
-            if (span >= T) {
-                Bullet bullet = this.createBullet(new Direction(player.x - x, player.y - y));
-                es.add(bullet);
-                span = 0;
-            } else {
-                span += delta;
-            }
-        }*/
     }
 
     /**
@@ -56,7 +36,9 @@ public class Slime extends Enemy {
      */
     @Override
     public Bullet createBullet (Entity owner, Direction direction) {
-        BulletFire bullet = new BulletFire(this);
+        //BulletFire bullet = new BulletFire(this);
+        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
+        bullet.setOwner(owner);
         bullet.setSize(
             (float) (bullet.width * Math.pow(this.factor, this.generation)),
             (float) (bullet.height * Math.pow(this.factor, this.generation)));

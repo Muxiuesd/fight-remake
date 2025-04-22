@@ -38,22 +38,24 @@ itemRegister.register("sword", Items.newSupplier(function () {
 //实体注册
 var entityRegister = ModRegistrant.getEntityRegister(namespace);
 entityRegister.register("zombie", Entity.newSupplier(function () {
-    var Zombie = Entity.getAbstractEnemy();
-    //虽然语法报错，但就是这么写的
-    var zombie = new Zombie("testmod:grass", 5, 5, 20, 15, 1, 2){
+    //var Zombie = Entity.getAbstractEnemy();
+    var Zombie = Java.extend(Entity.getEnemyJavaType(), {
         createBullet: function (owner, direction) {
-            var Bullet = Java.extend(Java.type("ttk.muxiuesd.world.entity.bullet.BulletFire"), {});
-            var bullet = new Bullet(owner);
+            var bullet = Gets.BULLET("testmod:bullet_sword");
+            bullet.setOwner(owner);
             bullet.setSize(0.5, 0.5);
             bullet.setPosition(owner.x + (owner.width - bullet.width)/2, owner.y + (owner.height - bullet.height)/2);
             bullet.setDirection(direction.getxDirection(), direction.getyDirection());
             bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
             return bullet;
         }
-    };
-    return zombie;
+    });
+    return new Zombie("testmod:grass", 5, 5, 20, 15, 1, 2);
 }));
 
+entityRegister.register("bullet_sword", Entity.newSupplier(function () {
+    return Entity.newBullet("testmod:sword",5.0, 10.5, 10.0, 0.0);
+}));
 
 World.event.add("entityAttacked", function (attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);
@@ -76,7 +78,7 @@ World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
 Library.export("Fun", {
     count: 0,
     say: function () {
-        Log.print(TAG, "Hello other Mod!" + this.count);
+        Log.print(TAG, "Hello other Mod! " + this.count);
         this.count++;
     }
 });

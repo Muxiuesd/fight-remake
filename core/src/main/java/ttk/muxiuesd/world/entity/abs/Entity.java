@@ -1,10 +1,13 @@
 package ttk.muxiuesd.world.entity.abs;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -67,6 +70,24 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
         if (this.textureRegion != null) {
             this.textureRegion = null;
         }
+    }
+
+    public float getSpeed () {
+        return speed;
+    }
+
+    public Entity setSpeed (float speed) {
+        this.speed = speed;
+        return this;
+    }
+
+    public float getCurSpeed () {
+        return curSpeed;
+    }
+
+    public Entity setCurSpeed (float curSpeed) {
+        this.curSpeed = curSpeed;
+        return this;
     }
 
     public void setOrigin(float originX, float originY) {
@@ -143,6 +164,15 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
         return new Vector2(this.scaleX, this.scaleY);
     }
 
+    public float getRotation () {
+        return rotation;
+    }
+
+    public Entity setRotation (float rotation) {
+        this.rotation = rotation;
+        return this;
+    }
+
     public void setEntitySystem(EntitySystem es) {
         this.es = es;
     }
@@ -158,5 +188,20 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
     @Override
     public void setID (String id) {
         this.id = id;
+    }
+
+    /**
+     * 加载纹理区域
+     * @param textureId 纹理材质id
+     * @param texturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
+     * */
+    public TextureRegion loadTextureRegion (String textureId, String texturePath) {
+        if (texturePath == null) {
+            return new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
+        }
+
+        AssetsLoader.getInstance().loadAsync(textureId, Fight.getEntityTexture(texturePath), Texture.class, () -> {});
+        Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
+        return new TextureRegion(texture);
     }
 }

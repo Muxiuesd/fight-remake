@@ -1,9 +1,9 @@
 package ttk.muxiuesd.mod;
 
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.abs.*;
 

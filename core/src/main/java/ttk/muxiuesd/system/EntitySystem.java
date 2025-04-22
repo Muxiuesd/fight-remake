@@ -11,10 +11,10 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -88,7 +88,7 @@ public class EntitySystem extends WorldSystem {
         } else if (entity instanceof ItemEntity itemEntity) {
             this.itemEntity.add(itemEntity);
         } else {
-            throw new IllegalArgumentException("Unsupported entity type: " + entity.getClass().getName());
+            throw new IllegalArgumentException("无法识别的实体类型或者实体组：" + entity.getClass().getName());
         }
 
         this.updatableEntity.add(entity);

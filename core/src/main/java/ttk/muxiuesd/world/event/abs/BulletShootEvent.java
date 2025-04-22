@@ -1,8 +1,8 @@
 package ttk.muxiuesd.world.event.abs;
 
 import ttk.muxiuesd.interfaces.Event;
+import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
 
 public abstract class BulletShootEvent implements Event {
     @Override
