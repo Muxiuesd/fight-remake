@@ -1,10 +1,13 @@
 package ttk.muxiuesd.world.entity.abs;
 
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
 /**
  * 敌人实体抽象类
@@ -101,7 +104,14 @@ public abstract class Enemy extends LivingEntity {
      * 自定义发射的子弹
      * @param direction 子弹的运动方向
      * */
-    public abstract Bullet createBullet (Entity owner, Direction direction);
+    public Bullet createBullet (Entity owner, Direction direction) {
+        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
+        bullet.setOwner(owner);
+        bullet.setSize(0.5f, 0.5f);
+        bullet.setPosition(x + (getWidth() - bullet.getWidth())/2, y + (getHeight() - bullet.getHeight())/2);
+        bullet.setDirection(direction.getxDirection(), direction.getyDirection());
+        return bullet;
+    }
 
     /**
      * 加载身体材质
