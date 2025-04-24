@@ -37,6 +37,12 @@ var Items = {
         var Item = this.getAbstractItem();
         return new Item(type, property, textureId);
     },
+    newWeapon: function () {
+
+    },
+    newEquipment: function () {
+
+    },
     newSupplier: function (func) {
         var supplier = Java.extend(Java.type("ttk.muxiuesd.mod.api.ModSupplier"), {
             getNew: function (){
