@@ -27,8 +27,8 @@ public abstract class Item implements ID {
     public TextureRegion texture;
 
 
-    public Item () {
-    }
+    /*public Item () {
+    }*/
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
     }
