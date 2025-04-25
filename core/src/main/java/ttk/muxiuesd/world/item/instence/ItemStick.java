@@ -10,6 +10,6 @@ public class ItemStick extends Item {
     public ItemStick () {
         super(Type.CONSUMPTION, new Property().setMaxCount(64),
             Fight.getId("stick"),
-            Fight.getItemTexture("stick.png"));
+            Fight.ItemTexturePath("stick.png"));
     }
 }

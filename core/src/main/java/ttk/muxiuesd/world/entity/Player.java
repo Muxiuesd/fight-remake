@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.ItemsReg;
 
 /**
@@ -34,24 +36,16 @@ public class Player extends LivingEntity {
         curSpeed = speed;
         setSize(1, 1);
         textureRegion = loadTextureRegion(Fight.getId("player"), "player/player.png");
-        /*AssetsLoader.getInstance().loadAsync(Fight.getId("player"),
-            Fight.getEntityTexture("player/player.png"),
-            Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player"), Texture.class);
-            textureRegion = new TextureRegion(texture);
-        });*/
+
         this.shield = loadTextureRegion(Fight.getId("player_shield"), "player/shield.png");
-        /*AssetsLoader.getInstance().loadAsync(Fight.getId("player_shield"),
-            Fight.getEntityTexture("player/shield.png"),
-            Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("player_shield"), Texture.class);
-            this.shield = new TextureRegion(texture);
-        });*/
+
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
-        backpack.setItemStack(1, ItemsReg.getItem("stick", 16));
-        backpack.setItemStack(2, ItemsReg.getItem("test_weapon"));
+        backpack.setItemStack(1, ItemsReg.getItem("test_weapon"));
+        backpack.setItemStack(2, ItemsReg.getItem("stick", 16));
         backpack.setItemStack(3, ItemsReg.getItem("block_test", 1));
+        backpack.setItemStack(4, new ItemStack(Gets.ITEM(Fight.getId("fish_pole"))));
+        backpack.setItemStack(5, new ItemStack(Gets.ITEM(Fight.getId("bait"))));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }

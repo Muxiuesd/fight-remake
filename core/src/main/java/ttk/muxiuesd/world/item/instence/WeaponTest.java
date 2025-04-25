@@ -15,7 +15,7 @@ public class WeaponTest extends Weapon {
     public WeaponTest () {
         super(new WeaponProperties().setDamage(7f).setUseSpan(0.8f).setDuration(500),
             Fight.getId("test_weapon"),
-            Fight.getItemTexture("weapon.png"));
+            Fight.ItemTexturePath("weapon.png"));
     }
 
     @Override

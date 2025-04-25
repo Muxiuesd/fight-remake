@@ -200,7 +200,7 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
             return new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
         }
 
-        AssetsLoader.getInstance().loadAsync(textureId, Fight.getEntityTexture(texturePath), Texture.class, () -> {});
+        AssetsLoader.getInstance().loadAsync(textureId, Fight.EntityTexturePath(texturePath), Texture.class, () -> {});
         Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
         return new TextureRegion(texture);
     }

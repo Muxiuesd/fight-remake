@@ -18,9 +18,10 @@ public class ItemStack implements Updateable {
     private Item.Property property;
     private int amount;
     private float useSpan;
-    private IItemStackBehaviour behaviour;
+    private final IItemStackBehaviour behaviour;
 
     public ItemStack (Item item) {
+        //不指定数量就默认这个物品的最大数量
         this(item, item.property.getMaxCount());
         try {
             this.property = ClassReflection.newInstance(getItem().property.getClass());

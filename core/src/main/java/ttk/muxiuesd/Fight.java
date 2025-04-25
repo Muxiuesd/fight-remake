@@ -20,15 +20,15 @@ public class Fight {
     /**
      * 从方块的材质根路径中获取方块的材质
      * */
-    public static String getBlockTexture (String path) {
+    public static String BlockTexturePath (String path) {
         return BLOCK_TEXTURE_ROOT + path;
     }
 
-    public static String getEntityTexture (String path) {
+    public static String EntityTexturePath (String path) {
         return ENTITY_TEXTURE_ROOT + path;
     }
 
-    public static String getItemTexture (String path) {
+    public static String ItemTexturePath (String path) {
         return ITEM_TEXTURE_ROOT + path;
     }
 }

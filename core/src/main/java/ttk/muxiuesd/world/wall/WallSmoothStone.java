@@ -6,6 +6,6 @@ public class WallSmoothStone extends Wall {
     public WallSmoothStone () {
         super(new Property().setFriction(1f),
             Fight.getId("smooth_stone"),
-            Fight.getBlockTexture("smooth_stone.png"));
+            Fight.BlockTexturePath("smooth_stone.png"));
     }
 }
