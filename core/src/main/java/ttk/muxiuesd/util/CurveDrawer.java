@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 
 /**
  * 向下凹的曲线绘制
+ * <p>
+ * 例子：鱼线绘制
  * */
 public class CurveDrawer {
     private static final int SEGMENTS = 50; // 曲线平滑度

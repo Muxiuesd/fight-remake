@@ -9,6 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
+import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -21,7 +22,7 @@ import java.util.Objects;
 /**
  * 物品
  * */
-public abstract class Item implements ID, ShapeRenderable {
+public abstract class Item implements ID, Updateable,ShapeRenderable {
     private String id;
 
     public Type type;
@@ -67,6 +68,10 @@ public abstract class Item implements ID, ShapeRenderable {
                 itemEntity.width, itemEntity.height,
                 itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
         }
+    }
+
+    @Override
+    public void update (float delta) {
     }
 
     @Override

@@ -47,16 +47,39 @@ public class ItemFishPole extends Item {
 
             //TODO 鱼钩运动一段距离后停止
 
-            //this.owner = user;
-            this.hook = fishingHook;
-            this.isCasting = true;
+            this.throwHook(fishingHook);
         }else {
-            this.hook.removeSelf();
-            this.hook = null;
-            this.isCasting = false;
             //TODO 收起鱼钩
+            this.pullHook();
         }
         return super.use(world, user);
+    }
+
+    @Override
+    public void update (float delta) {
+        if (this.isCasting) {
+            //鱼钩与使用者距离太远自动收回
+            if (Util.getDistance(this.hook, this.hook.getOwner()) > 16f) {
+                this.pullHook();
+            }
+        }
+    }
+
+    /**
+     * 抛出鱼钩
+     * */
+    public void throwHook (EntityFishingHook fishingHook) {
+        this.hook = fishingHook;
+        this.isCasting = true;
+    }
+
+    /**
+     * 收起鱼钩
+     * */
+    public void pullHook () {
+        this.hook.removeSelf();
+        this.hook = null;
+        this.isCasting = false;
     }
 
     @Override
@@ -116,4 +139,7 @@ public class ItemFishPole extends Item {
         if (ownerPos.x <= hookPos.x) CurveDrawer.drawCurve(batch, ownerPos, hookPos, -0.5f);
         else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);
     }
+
+
+
 }

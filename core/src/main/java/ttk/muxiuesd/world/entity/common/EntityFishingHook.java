@@ -22,9 +22,8 @@ public class EntityFishingHook extends Entity {
         return this.owner;
     }
 
-    public EntityFishingHook setOwner (LivingEntity owner) {
+    public void setOwner (LivingEntity owner) {
         this.owner = owner;
-        return this;
     }
 
     public void removeSelf () {

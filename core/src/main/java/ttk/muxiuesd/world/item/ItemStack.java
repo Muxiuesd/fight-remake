@@ -48,6 +48,8 @@ public class ItemStack implements Updateable {
 
     @Override
     public void update (float delta) {
+        this.getItem().update(delta);
+
         if (this.getItem() instanceof Weapon) {
             Weapon weapon = (Weapon) this.getItem();
             this.useSpan += delta;
