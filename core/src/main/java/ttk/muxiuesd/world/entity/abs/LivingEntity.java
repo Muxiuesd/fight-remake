@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntitiesReg;
@@ -45,6 +46,14 @@ public abstract class LivingEntity extends Entity {
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
             itemStack.getItem().drawOnHand(batch, this);
+        }
+    }
+
+    @Override
+    public void renderShape (ShapeRenderer batch) {
+        ItemStack itemStack = this.getHandItemStack();
+        if (itemStack != null) {
+            itemStack.getItem().renderShape(batch);
         }
     }
 

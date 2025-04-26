@@ -203,12 +203,14 @@ public class EntitySystem extends WorldSystem {
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-
+        for (Entity entity : this.getEntities()) {
+            entity.renderShape(batch);
+        }
     }
 
     @Override
     public void dispose() {
-        for (Entity entity : this.entities) {
+        for (Entity entity : this.getEntities()) {
             entity.dispose();
         }
     }

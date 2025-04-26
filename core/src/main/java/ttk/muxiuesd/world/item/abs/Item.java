@@ -3,10 +3,12 @@ package ttk.muxiuesd.world.item.abs;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -19,7 +21,7 @@ import java.util.Objects;
 /**
  * 物品
  * */
-public abstract class Item implements ID {
+public abstract class Item implements ID, ShapeRenderable {
     private String id;
 
     public Type type;
@@ -65,6 +67,10 @@ public abstract class Item implements ID {
                 itemEntity.width, itemEntity.height,
                 itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
         }
+    }
+
+    @Override
+    public void renderShape (ShapeRenderer batch) {
     }
 
     /**

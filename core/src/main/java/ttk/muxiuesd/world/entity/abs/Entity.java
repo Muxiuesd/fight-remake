@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -10,6 +11,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.entity.Group;
@@ -17,7 +19,7 @@ import ttk.muxiuesd.world.entity.Group;
 /**
  * 基础实体
  */
-public abstract class Entity implements ID, Disposable, Drawable, Updateable {
+public abstract class Entity implements ID, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
 
     public Group group;
@@ -60,6 +62,11 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
 
     public void update(float delta) {
         this.setCullingArea(x, y, this.getWidth(), this.getHeight());
+    }
+
+    @Override
+    public void renderShape (ShapeRenderer batch) {
+
     }
 
     public void setCullingArea(float x, float y, float width, float height) {
