@@ -6,13 +6,14 @@ import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
+import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.entity.creature.EntityFish;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
 import java.util.function.Supplier;
 
 /**
  * 实体注册
- * TODO mod注册实体
  * */
 public class EntitiesReg {
     public static final String TAG = EntitiesReg.class.getName();
@@ -26,6 +27,8 @@ public class EntitiesReg {
     public static final Entity PLAYER = register("player", Player::new);
     public static final Entity SLIME = register("slime", Slime::new);
     public static final Entity BULLET_FIRE = register("bullet_fire", BulletFire::new);
+    public static final Entity FISH = register("fish", EntityFish::new);
+    public static final Entity FISHING_HOOK = register("fishing_hook", EntityFishingHook::new);
 
     public static Entity register (String name, Supplier<? extends Entity> supplier) {
         return registrant.register(name, supplier);

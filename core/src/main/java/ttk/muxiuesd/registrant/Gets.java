@@ -1,6 +1,7 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -18,6 +19,16 @@ public class Gets {
 
     public static Block BLOCK (String id) {
         return get(id, Block.class);
+    }
+
+    /**
+     * 已知实体系统获取新实体，自动设置所属的实体系统
+     * */
+    public static Entity ENTITY (String id, EntitySystem entitySystem) {
+        Entity entity = get(id, Entity.class);
+        entity.setEntitySystem(entitySystem);
+        entitySystem.add(entity);
+        return entity;
     }
 
     public static Entity ENTITY (String id) {

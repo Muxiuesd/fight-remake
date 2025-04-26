@@ -35,9 +35,9 @@ public class Player extends LivingEntity {
         speed = 8;
         curSpeed = speed;
         setSize(1, 1);
-        textureRegion = loadTextureRegion(Fight.getId("player"), "player/player.png");
+        bodyTexture = getTextureRegion(Fight.getId("player"), "player/player.png");
 
-        this.shield = loadTextureRegion(Fight.getId("player_shield"), "player/shield.png");
+        this.shield = getTextureRegion(Fight.getId("player_shield"), "player/shield.png");
 
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));

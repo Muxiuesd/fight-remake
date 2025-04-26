@@ -28,7 +28,7 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
     public float originX, originY;
     public float scaleX = 1, scaleY = 1;
     public float rotation;
-    public TextureRegion textureRegion;
+    public TextureRegion bodyTexture;
     public Rectangle hurtbox = new Rectangle();
 
     public boolean attacked = false;
@@ -47,8 +47,8 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
             // 受到攻击变红
             batch.setColor(255, 0, 0, 255);
         }
-        if (textureRegion != null) {
-            batch.draw(textureRegion, x, y,
+        if (bodyTexture != null) {
+            batch.draw(bodyTexture, x, y,
                 originX, originY,
                 width, height,
                 scaleX, scaleY, rotation);
@@ -67,8 +67,8 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
     }
 
     public void dispose() {
-        if (this.textureRegion != null) {
-            this.textureRegion = null;
+        if (this.bodyTexture != null) {
+            this.bodyTexture = null;
         }
     }
 
@@ -195,12 +195,12 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable {
      * @param textureId 纹理材质id
      * @param texturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
      * */
-    public TextureRegion loadTextureRegion (String textureId, String texturePath) {
+    public TextureRegion getTextureRegion (String textureId, String texturePath) {
         if (texturePath == null) {
             return new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
         }
 
-        AssetsLoader.getInstance().loadAsync(textureId, Fight.EntityTexturePath(texturePath), Texture.class, () -> {});
+        AssetsLoader.getInstance().loadAsync(textureId, Fight.EntityTexturePath(texturePath), Texture.class, null);
         Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
         return new TextureRegion(texture);
     }

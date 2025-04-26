@@ -4,9 +4,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -30,11 +33,15 @@ public class ItemFishPole extends Item {
     @Override
     public boolean use (World world, LivingEntity user) {
         if (!this.isCasting) {
-            this.isCasting = true;
+            EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+            Entity fishingHook = Gets.ENTITY(Fight.getId("fishing_hook"), es);
+            fishingHook.setPosition(user.getPosition());
+            //TODO 鱼钩运动一段距离后停止
 
+            this.isCasting = true;
         }else {
             this.isCasting = false;
-
+            //TODO 收起鱼钩
         }
         return super.use(world, user);
     }

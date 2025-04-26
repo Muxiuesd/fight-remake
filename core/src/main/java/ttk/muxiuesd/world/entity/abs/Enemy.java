@@ -117,7 +117,7 @@ public abstract class Enemy extends LivingEntity {
      * 加载身体材质
      * */
     public void loadBodyTextureRegion (String textureId, String texturePath) {
-        textureRegion = this.loadTextureRegion(textureId, texturePath);
+        bodyTexture = this.getTextureRegion(textureId, texturePath);
     }
 
     public Entity getCurTarget () {

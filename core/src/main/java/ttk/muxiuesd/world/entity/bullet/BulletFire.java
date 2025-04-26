@@ -18,6 +18,6 @@ public class BulletFire extends Bullet {
         setMaxLiveTime(3f);
         setLiveTime(0f);
         speed = 15f;
-        textureRegion = loadTextureRegion(Fight.getId("bullet_fire"), "bullet/flame.png");
+        bodyTexture = getTextureRegion(Fight.getId("bullet_fire"), "bullet/flame.png");
     }
 }
