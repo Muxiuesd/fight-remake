@@ -80,7 +80,12 @@ public abstract class Item implements ID {
         return true;
     }
 
-
+    /**
+     * 获取材质
+     * <p>
+     * 有返回值，以便于有多个材质的物品使用
+     * @param texturePath 当此为null时默认之前加载过
+     * */
     public TextureRegion getTextureRegion (String id, String texturePath) {
         if (texturePath == null) {
             texturePath = AssetsLoader.getInstance().getPath(id);
@@ -90,14 +95,11 @@ public abstract class Item implements ID {
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
 
+    /**
+     * 直接把物品的texture加载并赋值
+     * */
     public void loadTextureRegion (String id, String texturePath) {
-        if (texturePath == null) {
-            texturePath = AssetsLoader.getInstance().getPath(id);
-        }
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(id, Texture.class);
-            this.texture = new TextureRegion(texture);
-        });
+        this.texture = this.getTextureRegion(id, texturePath);
     }
 
     @Override
