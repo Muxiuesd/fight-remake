@@ -53,7 +53,6 @@ public class Player extends LivingEntity {
     @Override
     public void update(float delta) {
         super.update(delta);
-        setCullingArea(x + 0.1f, y + 0.1f, width - 0.2f, height - 0.2f);
 
         if (!this.isDefend && this.defendSpan < this.maxDefendSpan) {
             this.defendSpan += delta;
@@ -68,6 +67,7 @@ public class Player extends LivingEntity {
             }
         }
         this.handleInput(delta);
+        setCullingArea(x + 0.1f, y + 0.1f, width - 0.2f, height - 0.2f);
     }
 
     @Override

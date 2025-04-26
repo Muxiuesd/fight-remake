@@ -46,11 +46,12 @@ public class AssetsLoader implements Disposable {
      */
     public <T> void loadAsync(String id, String filePath, Class<T> type, Runnable callback) {
         if (this.containsId(id)) {
-            //已存在则直接执行回调中的加载
-            Gdx.app.postRunnable(callback);
+            if (callback != null) {
+                //已存在则直接执行回调中的加载
+                Gdx.app.postRunnable(callback);
+            }
             return;
         }
-        //this.loadAsync(filePath, type, callback);
 
         AssetManager curManager = this.gameAssetManager;
         String[] split = Util.splitID(id);
@@ -62,9 +63,9 @@ public class AssetsLoader implements Disposable {
             curManager.load(filePath, type);
             curManager.finishLoading();
 
-            if (curManager.isLoaded(filePath, type) && callback != null) {
+            if (curManager.isLoaded(filePath, type)) {
                 this.idToPath.put(id, filePath);
-                callback.run();
+                if (callback != null) callback.run();
             } else {
                 throw new IllegalStateException("资源加载失败: " + filePath);
             }

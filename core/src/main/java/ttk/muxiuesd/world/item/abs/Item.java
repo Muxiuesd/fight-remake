@@ -81,8 +81,13 @@ public abstract class Item implements ID {
     }
 
 
-    public void loadTextureRegion (String id) {
-        this.texture = new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    public TextureRegion getTextureRegion (String id, String texturePath) {
+        if (texturePath == null) {
+            texturePath = AssetsLoader.getInstance().getPath(id);
+        }
+
+        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
+        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
 
     public void loadTextureRegion (String id, String texturePath) {
