@@ -4,11 +4,13 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import ttk.muxiuesd.interfaces.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.abs.Weapon;
 import ttk.muxiuesd.world.item.stack.behaviour.ItemStackBehaviourFactory;
+import ttk.muxiuesd.world.item.stack.behaviour.WeaponItemStackBehaviour;
 
 /**
  * 物品堆栈
@@ -19,6 +21,8 @@ public class ItemStack implements Updateable {
     private int amount;
     private float useSpan;
     private final IItemStackBehaviour behaviour;
+    public Timer useTimer;  //使用计时器
+
 
     public ItemStack (Item item) {
         //不指定数量就默认这个物品的最大数量
@@ -36,6 +40,10 @@ public class ItemStack implements Updateable {
         this.item = item;
         this.amount = amount;
         this.behaviour = behaviour;
+        if (behaviour instanceof WeaponItemStackBehaviour) {
+            Weapon weapon = (Weapon) item;
+            this.useTimer = new Timer(weapon.getProperties().getUseSpan());
+        }
     }
 
 
@@ -48,16 +56,18 @@ public class ItemStack implements Updateable {
 
     @Override
     public void update (float delta) {
+        //更新物品
         this.getItem().update(delta);
+        if (this.useTimer != null) this.useTimer.update(delta);
 
-        if (this.getItem() instanceof Weapon) {
-            Weapon weapon = (Weapon) this.getItem();
+        //武器冷却时间更新
+        /*if (this.getItem() instanceof Weapon weapon) {
             this.useSpan += delta;
             float maxSpan = weapon.getProperties().getUseSpan();
             if (this.useSpan > maxSpan) {
                 this.useSpan = maxSpan + 1f;
             }
-        }
+        }*/
     }
 
     public Item getItem () {
@@ -81,12 +91,7 @@ public class ItemStack implements Updateable {
         if (amount > 0) this.amount = amount;
     }
 
-    public float getUseSpan () {
-        return this.useSpan;
-    }
-
-    public ItemStack setUseSpan (float useSpan) {
-        this.useSpan = useSpan;
-        return this;
+    public boolean isReady () {
+        return this.useTimer != null && this.useTimer.isReady();
     }
 }

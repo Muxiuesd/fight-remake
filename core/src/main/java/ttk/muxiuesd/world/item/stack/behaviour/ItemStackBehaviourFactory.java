@@ -1,7 +1,6 @@
 package ttk.muxiuesd.world.item.stack.behaviour;
 
 import ttk.muxiuesd.interfaces.IItemStackBehaviour;
-import ttk.muxiuesd.world.item.WeaponItemStackBehaviour;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
