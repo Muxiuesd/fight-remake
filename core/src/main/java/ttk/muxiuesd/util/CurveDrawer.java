@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
  * 例子：鱼线绘制
  * */
 public class CurveDrawer {
-    private static final int SEGMENTS = 50; // 曲线平滑度
+    private static final int SEGMENTS = 30; // 曲线平滑度
 
     /**
      * 绘制可调曲率的二次贝塞尔曲线

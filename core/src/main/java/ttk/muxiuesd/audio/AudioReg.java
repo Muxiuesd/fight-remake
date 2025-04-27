@@ -16,6 +16,9 @@ public class AudioReg {
         registerSoundAsMusic("hurt_1",  "entity/damage/hit_1.ogg");
         registerSoundAsMusic("hurt_2",  "entity/damage/hit_2.ogg");
         registerSoundAsMusic("hurt_3",  "entity/damage/hit_3.ogg");
+        registerSoundAsMusic("eat_1",  "entity/eat/eat1.ogg");
+        registerSoundAsMusic("eat_2",  "entity/eat/eat2.ogg");
+        registerSoundAsMusic("eat_3",  "entity/eat/eat3.ogg");
 
         //玩家
         registerSoundAsMusic("shoot", "player/shoot.wav");

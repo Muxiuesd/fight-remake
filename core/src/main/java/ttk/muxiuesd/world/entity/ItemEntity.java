@@ -12,6 +12,8 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 掉落在地上的物品以实体形式存在
  * */
 public class ItemEntity extends Entity {
+    public static final Vector2 DEFAULT_SIZE = new Vector2(1f, 1f);
+
     private ItemStack itemStack;
     private Vector2 positionOffset;
     private float cycle;
@@ -20,6 +22,7 @@ public class ItemEntity extends Entity {
     public ItemEntity () {
         initialize(Group.item);
         this.positionOffset = new Vector2();
+        setSize(DEFAULT_SIZE);
     }
 
     @Override

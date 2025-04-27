@@ -7,13 +7,18 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
@@ -22,11 +27,8 @@ import ttk.muxiuesd.world.item.abs.Item;
  * 能抛出的钓鱼钩
  * */
 public class ItemFishPole extends Item {
-
     public TextureRegion castTexture;
-    //public LivingEntity owner;
     public EntityFishingHook hook;
-
     public boolean isCasting = false; //是否抛竿
 
     public ItemFishPole () {
@@ -38,18 +40,32 @@ public class ItemFishPole extends Item {
 
     @Override
     public boolean use (World world, LivingEntity user) {
-        if (!this.isCasting) {
-            EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
-
+        if (!this.isCasting) {//抛出鱼钩
+            EntitySystem es = user.getEntitySystem();
+            //获取鱼钩
             EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
             fishingHook.setPosition(user.getPosition());
             fishingHook.setOwner(user);
+            fishingHook.setDirection(Util.getDirection());
+            //TODO 鼠标控制鱼钩抛出速度
+            fishingHook.setSpeed(10f);
 
-            //TODO 鱼钩运动一段距离后停止
+            //TODO 鱼钩向抛出方向运动一段距离后停止
 
             this.throwHook(fishingHook);
-        }else {
-            //TODO 收起鱼钩
+        }else {//收起鱼钩
+            Vector2 hookPos = this.hook.getCenter();
+            ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
+            Block block = cs.getBlock(hookPos.x, hookPos.y);
+            if (block instanceof BlockWater) {
+                //需要鱼钩在水中才能钓到鱼
+                ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
+                itemEntity.setPosition(hookPos);
+                itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+                itemEntity.setItemStack(new ItemStack(Gets.ITEM(Fight.getId("fish")), 1));
+            }
+
+            //TODO 收起鱼钩的运动动画
             this.pullHook();
         }
         return super.use(world, user);
@@ -134,7 +150,7 @@ public class ItemFishPole extends Item {
         ownerPos.add(xOffset, yOffset);
 
         Vector2 hookPos = this.hook.getCenter();
-        hookPos.add(0, this.hook.getHeight() / 2 - 0.05f);
+        hookPos.add(0, this.hook.getHeight() / 2 - 0.07f);
 
         if (ownerPos.x <= hookPos.x) CurveDrawer.drawCurve(batch, ownerPos, hookPos, -0.5f);
         else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);

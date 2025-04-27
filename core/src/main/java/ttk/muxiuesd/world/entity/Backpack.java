@@ -4,6 +4,7 @@ import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * 实体所拥有的物品背包
@@ -59,8 +60,8 @@ public class Backpack implements Updateable {
         for (int i = 0; i < this.maxCapacity; ++i) {
             ItemStack stack = this.itemStacks.get(i);
             if (stack != null) {
-                //同类型物品合并
-                if (stack.getItem().equals(itemStack.getItem())) {
+                //同类型物品合并，（目前只检测Id是否相同）
+                if (Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {
                     int newAmount = stack.getAmount() + itemStack.getAmount();
                     int maxCount = stack.getItem().property.getMaxCount();
                     if (newAmount <= maxCount) {
