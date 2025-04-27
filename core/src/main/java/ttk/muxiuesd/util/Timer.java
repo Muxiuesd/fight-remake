@@ -19,7 +19,7 @@ public class Timer implements Updateable{
     }
 
     /**
-     * 检查是否到时间
+     * 检查是否到时间，如果到时间时返回true并且自动归零
      * */
     public boolean isReady () {
         if (this.curSpan == this.maxSpan) {

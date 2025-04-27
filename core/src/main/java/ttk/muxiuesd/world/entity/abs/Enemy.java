@@ -4,6 +4,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
@@ -14,12 +15,9 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
  * */
 public abstract class Enemy extends LivingEntity {
     private Entity curTarget;   //敌人当前需要攻击的目标
-
+    private Timer attackTimer;
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
-    private float attackSpan;   //攻击时间间隔
-    private float span = 0f;
-
 
     public Enemy (String textureId,float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
@@ -33,14 +31,15 @@ public abstract class Enemy extends LivingEntity {
 
         this.visionRange = visionRange;
         this.attackRange = attackRange;
-        this.attackSpan = attackSpan;
         this.speed = speed;
+        this.attackTimer = new Timer(attackSpan);
 
         setSize(1f, 1f);
     }
 
     @Override
     public void update (float delta) {
+        //this.attackTimer.update(delta);
         //先更新目标
         this.updateTarget(delta, getEntitySystem());
         //更新位置
@@ -83,21 +82,21 @@ public abstract class Enemy extends LivingEntity {
      * 攻击行为
      * */
     public void attack (float delta, EntitySystem es) {
-        this.span += delta;
-        //攻击间隔没到就不攻击
-        if (this.span <= this.getAttackSpan()) {
-            return;
-        }
+        this.attackTimer.update(delta);
+
         Entity target = this.getCurTarget();
         float distance = Util.getDistance(this, target);
         //在攻击范围之外不攻击
         if (distance > getAttackRange()) {
             return;
         }
-        //在攻击范围内就要攻击
+        //攻击间隔没到就不攻击
+        if (!this.attackTimer.isReady()) {
+            return;
+        }
+        //在攻击范围之内且攻击间隔到了就要攻击
         Bullet bullet = this.createBullet(this, new Direction(target.x - x, target.y - y));
         getEntitySystem().add(bullet);
-        this.span = 0;
     }
 
     /**
@@ -144,15 +143,6 @@ public abstract class Enemy extends LivingEntity {
 
     public Enemy setAttackRange (float attackRange) {
         this.attackRange = attackRange;
-        return this;
-    }
-
-    public float getAttackSpan () {
-        return attackSpan;
-    }
-
-    public Enemy setAttackSpan (float attackSpan) {
-        this.attackSpan = attackSpan;
         return this;
     }
 }
