@@ -47,6 +47,7 @@ public class ItemFishPole extends Item {
             fishingHook.setPosition(user.getPosition());
             fishingHook.setOwner(user);
             fishingHook.setDirection(Util.getDirection());
+            fishingHook.setChunkSystem((ChunkSystem) world.getSystemManager().getSystem("ChunkSystem"));
             //TODO 鼠标控制鱼钩抛出速度
             fishingHook.setSpeed(10f);
 
@@ -150,12 +151,11 @@ public class ItemFishPole extends Item {
         ownerPos.add(xOffset, yOffset);
 
         Vector2 hookPos = this.hook.getCenter();
-        hookPos.add(0, this.hook.getHeight() / 2 - 0.07f);
+        //让鱼线绘制在钩子上方
+        hookPos.add(0, this.hook.getHeight() / 2 - 0.07f + this.hook.getPositionOffset().y);
 
         if (ownerPos.x <= hookPos.x) CurveDrawer.drawCurve(batch, ownerPos, hookPos, -0.5f);
         else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);
     }
-
-
 
 }
