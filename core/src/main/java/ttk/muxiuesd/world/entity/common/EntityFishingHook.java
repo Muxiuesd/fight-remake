@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.ChunkSystem;
+import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.block.instance.BlockWater;
@@ -19,7 +20,9 @@ public class EntityFishingHook extends Entity {
     private LivingEntity owner;
     private Direction direction;
     private ChunkSystem cs;
+    private ParticleSystem pts;
     private Timer moveTimer;
+    private Timer bubbleEmitTimer;
     private Vector2 positionOffset;
     private float cycle;
 
@@ -30,6 +33,7 @@ public class EntityFishingHook extends Entity {
         setSize(0.7f, 0.7f);
         bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");
         this.moveTimer = new Timer(0.7f);
+        this.bubbleEmitTimer = new Timer(0.6f, 0.3f);
         this.positionOffset = new Vector2();
     }
 
@@ -44,10 +48,20 @@ public class EntityFishingHook extends Entity {
             this.moveTimer = null;
 
             if (this.cs.getBlock(x, y) instanceof BlockWater) {
-                //只有鱼钩在水中才上下漂浮
+                //只有鱼钩在水中才上下漂浮和产生气泡粒子
                 this.cycle += delta / 2;
                 if (this.cycle > 1f) this.cycle -= 1f;
                 this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.15f);
+                //鱼钩在水中产生气泡粒子
+                this.bubbleEmitTimer.update(delta);
+                if (this.bubbleEmitTimer.isReady() && this.getParticleSystem() != null) {
+                    this.pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(2, 5),
+                        getCenter().add(0, - getHeight() / 2),
+                        new Vector2(MathUtils.random(0.5f, 1.2f), 0),
+                        getOrigin(),
+                        getSize().scl(0.3f), getSize().scl(0.06f),
+                        getScale(), MathUtils.random(0, 360), 1.5f);
+                }
             }
         }
         super.update(delta);
@@ -72,35 +86,48 @@ public class EntityFishingHook extends Entity {
     }
 
     public LivingEntity getOwner () {
-        return this.owner;
+        return owner;
     }
 
-    public void setOwner (LivingEntity owner) {
+    public EntityFishingHook setOwner (LivingEntity owner) {
         this.owner = owner;
+        return this;
     }
 
     public Direction getDirection () {
-        return this.direction;
+        return direction;
     }
 
-    public void setDirection (Direction direction) {
+    public EntityFishingHook setDirection (Direction direction) {
         this.direction = direction;
+        return this;
     }
 
     public ChunkSystem getChunkSystem () {
-        return this.cs;
+        return cs;
     }
 
-    public void setChunkSystem (ChunkSystem cs) {
+    public EntityFishingHook setChunkSystem (ChunkSystem cs) {
         this.cs = cs;
+        return this;
+    }
+
+    public ParticleSystem getParticleSystem () {
+        return pts;
+    }
+
+    public EntityFishingHook setParticleSystem (ParticleSystem pts) {
+        this.pts = pts;
+        return this;
     }
 
     public Vector2 getPositionOffset () {
-        return this.positionOffset;
+        return positionOffset;
     }
 
-    public void setPositionOffset (Vector2 positionOffset) {
+    public EntityFishingHook setPositionOffset (Vector2 positionOffset) {
         this.positionOffset = positionOffset;
+        return this;
     }
 
     /**

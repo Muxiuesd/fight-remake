@@ -8,6 +8,7 @@ import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
@@ -26,8 +27,7 @@ public class PlayerSystem extends WorldSystem {
     private Player player;
     private Vector2 playerLastPosition;
 
-    public float maxSpan = 0.5f;
-    public float span = 0;
+    private Timer bubbleEmitTimer;  //气泡粒子发射计时器
 
     public PlayerSystem(World world) {
         super(world);
@@ -37,11 +37,14 @@ public class PlayerSystem extends WorldSystem {
     public void initialize () {
         this.player = (Player) EntitiesReg.get("player");
         this.playerLastPosition = this.player.getPosition();
+        this.bubbleEmitTimer = new Timer(0.5f);
         Log.print(TAG, "PlayerSystem初始化完成！");
     }
 
     @Override
     public void update (float delta) {
+        this.bubbleEmitTimer.update(delta);
+
         if (this.player.isDeath()) {
             EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
             this.remakePlayer();
@@ -54,7 +57,7 @@ public class PlayerSystem extends WorldSystem {
         player.curSpeed = player.speed * block.getProperty().getFriction();
 
         //玩家游泳
-        if (this.span >= this.maxSpan && block instanceof BlockWater) {
+        if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
             //发射气泡粒子
             ParticleSystem pts = (ParticleSystem) getManager().getSystem("ParticleSystem");
             pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(3, 7),
@@ -63,9 +66,6 @@ public class PlayerSystem extends WorldSystem {
                 this.player.getOrigin(),
                 this.player.getSize().scl(0.2f), this.player.getSize().scl(0.05f),
                 this.player.getScale(), MathUtils.random(0, 360), 2f);
-            this.span = 0;
-        }else if (this.span < this.maxSpan) {
-            this.span += delta;
         }
     }
 

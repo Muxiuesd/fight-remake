@@ -9,6 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -45,9 +46,10 @@ public class ItemFishPole extends Item {
             //获取鱼钩
             EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
             fishingHook.setPosition(user.getPosition());
-            fishingHook.setOwner(user);
-            fishingHook.setDirection(Util.getDirection());
-            fishingHook.setChunkSystem((ChunkSystem) world.getSystemManager().getSystem("ChunkSystem"));
+            fishingHook.setOwner(user)
+                .setDirection(Util.getDirection())
+                .setChunkSystem((ChunkSystem) world.getSystemManager().getSystem("ChunkSystem"))
+                .setParticleSystem((ParticleSystem) world.getSystemManager().getSystem("ParticleSystem"));
             //TODO 鼠标控制鱼钩抛出速度
             fishingHook.setSpeed(10f);
 
