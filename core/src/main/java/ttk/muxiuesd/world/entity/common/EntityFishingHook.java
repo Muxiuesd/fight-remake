@@ -7,6 +7,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.Group;
@@ -32,8 +33,18 @@ public class EntityFishingHook extends Entity {
         setSpeed(0);
         setSize(0.7f, 0.7f);
         bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");
-        this.moveTimer = new Timer(0.7f);
-        this.bubbleEmitTimer = new Timer(0.6f, 0.3f);
+
+        this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
+        this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
+            if (this.getParticleSystem() == null) return;
+            this.pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(2, 5),
+                getCenter().add(0, - getHeight() / 2),
+                new Vector2(MathUtils.random(0.5f, 1.2f), 0),
+                getOrigin(),
+                getSize().scl(0.3f), getSize().scl(0.06f),
+                getScale(), MathUtils.random(0, 360), 1.5f);
+        });
+
         this.positionOffset = new Vector2();
     }
 
@@ -44,9 +55,6 @@ public class EntityFishingHook extends Entity {
             this.move(delta);
             this.moveTimer.update(delta);
         }else {
-            //移动计时器使用完了就丢掉
-            this.moveTimer = null;
-
             if (this.cs.getBlock(x, y) instanceof BlockWater) {
                 //只有鱼钩在水中才上下漂浮和产生气泡粒子
                 this.cycle += delta / 2;
@@ -54,14 +62,6 @@ public class EntityFishingHook extends Entity {
                 this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.15f);
                 //鱼钩在水中产生气泡粒子
                 this.bubbleEmitTimer.update(delta);
-                if (this.bubbleEmitTimer.isReady() && this.getParticleSystem() != null) {
-                    this.pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(2, 5),
-                        getCenter().add(0, - getHeight() / 2),
-                        new Vector2(MathUtils.random(0.5f, 1.2f), 0),
-                        getOrigin(),
-                        getSize().scl(0.3f), getSize().scl(0.06f),
-                        getScale(), MathUtils.random(0, 360), 1.5f);
-                }
             }
         }
         super.update(delta);

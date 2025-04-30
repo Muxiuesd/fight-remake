@@ -9,6 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
@@ -17,6 +18,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.ItemEntity;
+import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -31,6 +33,8 @@ public class ItemFishPole extends Item {
     public TextureRegion castTexture;
     public EntityFishingHook hook;
     public boolean isCasting = false; //是否抛竿
+    public float castSpeed = 10f;
+
 
     public ItemFishPole () {
         super(Type.COMMON, new Property().setMaxCount(1),
@@ -47,15 +51,11 @@ public class ItemFishPole extends Item {
             EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
             fishingHook.setPosition(user.getPosition());
             fishingHook.setOwner(user)
-                .setDirection(Util.getDirection())
+                .setDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
                 .setChunkSystem((ChunkSystem) world.getSystemManager().getSystem("ChunkSystem"))
                 .setParticleSystem((ParticleSystem) world.getSystemManager().getSystem("ParticleSystem"));
-            //TODO 鼠标控制鱼钩抛出速度
-            fishingHook.setSpeed(10f);
 
-            //TODO 鱼钩向抛出方向运动一段距离后停止
-
-            this.throwHook(fishingHook);
+            this.throwHook(world, fishingHook);
         }else {//收起鱼钩
             Vector2 hookPos = this.hook.getCenter();
             ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
@@ -87,7 +87,20 @@ public class ItemFishPole extends Item {
     /**
      * 抛出鱼钩
      * */
-    public void throwHook (EntityFishingHook fishingHook) {
+    public void throwHook (World world, EntityFishingHook fishingHook) {
+        LivingEntity owner = fishingHook.getOwner();
+        if (owner instanceof Player player) {
+            //玩家抛竿
+            Vector2 ownerPos = player.getCenter();
+            HandleInputSystem his = (HandleInputSystem) world.getSystemManager().getSystem("HandleInputSystem");
+            Vector2 mwp = his.getMouseWorldPosition();
+            float distance = Util.getDistance(ownerPos.x, owner.y, mwp.x, mwp.y);
+            fishingHook.setSpeed(Math.min(distance, this.castSpeed));
+        }else {
+            //TODO 其他生物抛竿的抛竿方向，速度方向
+            fishingHook.setSpeed(this.castSpeed);
+        }
+
         this.hook = fishingHook;
         this.isCasting = true;
     }

@@ -61,7 +61,7 @@ public class Util {
     /**
      * 计算两个坐标之间的距离
      * */
-    public static float getDistance (float x1, float y1,float x2, float y2) {
+    public static float getDistance (float x1, float y1, float x2, float y2) {
         float xd = x1 - x2;
         float yd = y1 - y2;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
