@@ -22,6 +22,8 @@ public class ItemsReg {
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new);
     public static final Item BAIT = register("bait", ItemBait::new);
     public static final Item FISH = register("fish", ItemFish::new);
+    public static final Item RUBBISH = register("rubbish", ItemRubbish::new);
+
 
     public static void registerAllItem () {
         Log.print(ItemsReg.class.getName(), "物品注册完成");

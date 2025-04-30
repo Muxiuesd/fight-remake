@@ -17,7 +17,8 @@ public class FishingLootTable {
     private static final LinkedHashMap<String, Supplier<? extends ItemStack>> lootTable = new LinkedHashMap<>();
 
     static {
-        register(Fight.getId("fish"), () -> new ItemStack(Gets.ITEM(Fight.getId("fish")), 2));
+        register(Fight.getId("fish"), () -> new ItemStack(Gets.ITEM(Fight.getId("fish")), 1));
+        register(Fight.getId("rubbish"), () -> new ItemStack(Gets.ITEM(Fight.getId("rubbish")), 2));
     }
 
 
