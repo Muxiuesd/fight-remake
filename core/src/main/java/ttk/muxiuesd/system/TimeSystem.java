@@ -18,7 +18,7 @@ public class TimeSystem extends WorldSystem implements Tickable {
     public static final float TickMaxSpan = 1f / TicksPerSecond;
 
     private float tickSpan = 0f;
-    private float gameTime = 5f;    //游戏内的时间
+    private float gameTime = 0f;    //游戏内的时间
 
     private final Array<Tickable> tickUpdates;
     private final Array<Tickable> delayAdd;

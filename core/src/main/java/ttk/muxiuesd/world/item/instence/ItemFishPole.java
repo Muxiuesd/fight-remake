@@ -52,6 +52,7 @@ public class ItemFishPole extends Item {
             //获取鱼钩
             EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
             fishingHook.setPosition(user.getPosition());
+            fishingHook.setOnGround(false);
             fishingHook.setOwner(user)
                 .setPole(this)
                 .setThrowDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
@@ -76,7 +77,7 @@ public class ItemFishPole extends Item {
                 itemEntity.setCurSpeed(this.pullSpeed);
                 itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
                 itemEntity.setOnGround(false);
-                itemEntity.setOnAirTimer(new TaskTimer(0.2f, 0, () -> {
+                itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
                     itemEntity.setOnAirTimer(null);
                 }));
             }
@@ -124,6 +125,7 @@ public class ItemFishPole extends Item {
      * */
     public void pullHook () {
         this.hook.isReturning = true;
+        this.hook.setOnGround(false);
         this.hook.setSpeed(this.pullSpeed);
         //this.isCasting = false;
     }

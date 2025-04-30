@@ -96,14 +96,14 @@ public class Player extends LivingEntity {
         itemEntity.setItemStack(itemStack);
         itemEntity.setVelocity(Util.getDirection());
         itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(new TaskTimer(0.5f, 0, () -> {
+        itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
             itemEntity.setOnAirTimer(null);
         }));
 
         HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
         Vector2 mwp = his.getMouseWorldPosition();
         float distance = Util.getDistance(x, y, mwp.x, mwp.y);
-        float v = Math.min(distance, 3f);
+        float v = Math.min(distance, 4f);
         itemEntity.setSpeed(v);
         itemEntity.setCurSpeed(v);
         return true;

@@ -28,13 +28,6 @@ public class DaynightSystem extends WorldSystem {
         this.timeSystem = (TimeSystem) getManager().getSystem("TimeSystem");
     }
 
-    @Override
-    public void draw (Batch batch) {
-        //到这里结束日夜着色
-        //this.end();
-        //batch.end();
-    }
-
     public void begin() {
         Batch batch = getWorld().getScreen().batch;
         ShaderProgram shader = ShaderScheduler.getInstance().begin(ShaderReg.DAYNIGHT_SHADER, batch);

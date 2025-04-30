@@ -259,8 +259,7 @@ public class EntitySystem extends WorldSystem {
         //float v = entity.speed * entity.speed - delta * delta * 3600;
         float v = curSpeed;
         if (v < 0) v = 0;
-        //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.7f);
-        entity.setSpeed(entity.getSpeed() *(1 - (float) Math.pow(Math.E, - entity.getSpeed())));
+        entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
     }
 
 

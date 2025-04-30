@@ -58,6 +58,7 @@ public class EntityFishingHook extends Entity {
             this.throwMovement(delta);
             this.moveTimer.update(delta);
         }else {
+            setOnGround(true);
             if (this.cs.getBlock(x, y) instanceof BlockWater) {
                 //只有鱼钩在水中才上下漂浮和产生气泡粒子
                 this.cycle += delta / 2;
