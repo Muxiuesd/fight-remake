@@ -138,13 +138,22 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
         return new Vector2(this.x, this.y);
     }
 
+    public void setPosition(Vector2 vector2) {
+        this.x = vector2.x;
+        this.y = vector2.y;
+    }
+
     public Vector2 getVelocity() {
         return new Vector2(this.velX, this.velY);
     }
 
-    public void setPosition(Vector2 vector2) {
-        this.x = vector2.x;
-        this.y = vector2.y;
+    public void setVelocity(Vector2 velocity) {
+        this.setVelocity(velocity.x, velocity.y);
+    }
+
+    public void setVelocity(float x, float y) {
+        this.velX = x;
+        this.velY = y;
     }
 
     public Vector2 getSize () {

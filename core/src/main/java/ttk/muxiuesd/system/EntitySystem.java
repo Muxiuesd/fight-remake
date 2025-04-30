@@ -2,12 +2,15 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
@@ -149,6 +152,10 @@ public class EntitySystem extends WorldSystem {
 
         for (Entity entity : this.updatableEntity) {
             //先把所有实体更新一次
+            if (!(entity instanceof ItemEntity)) {
+                //对于物品实体进行当前速度更新
+                this.calculateEntityCurSpeed(entity, (ChunkSystem) getManager().getSystem("ChunkSystem"), delta);
+            }
             entity.update(delta);
             //细化实体更新
             //对于活物实体
@@ -177,12 +184,21 @@ public class EntitySystem extends WorldSystem {
             //跳过这个物品实体的 其他操作
             return;
         }
+        Player player = this.getPlayer();
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN) {
-            float distance = Util.getDistance(itemEntity, this.getPlayer());
+            float distance = Util.getDistance(itemEntity, player);
             if (distance <= Fight.PICKUP_RANGE) {
+                //在捡起范围内，让物品实体朝向玩家运动
+                Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
+                itemEntity.setVelocity(direction);
+                itemEntity.setSpeed(16f);
+            }
+
+            //当物品实体与玩家的碰撞箱相碰就是捡起
+            if (itemEntity.hurtbox.overlaps(player.hurtbox)) {
                 ItemStack itemStack = itemEntity.getItemStack();
-                ItemPickUpState state = this.getPlayer().pickUpItem(itemStack);
+                ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
                 }else if (state == ItemPickUpState.PARTIAL) {
@@ -192,7 +208,55 @@ public class EntitySystem extends WorldSystem {
                 //捡起失败则什么也没发生
             }
         }
+
+        this.calculateItemEntityCurSpeed(itemEntity, (ChunkSystem) getManager().getSystem("ChunkSystem"), delta);
     }
+
+    /**
+     * 对实体进行当前速度计算
+     * */
+    private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
+        //对于速度为0的实体不进行速度更新
+        if (entity.getSpeed() <= 0) return;
+
+        //计算脚下方块摩擦对速度的影响
+        Vector2 center = entity.getCenter();
+        Block block = cs.getBlock(center.x, center.y);
+        if (block == null) return;
+        float friction = block.getProperty().getFriction();
+        float curSpeed = entity.getSpeed() * friction;
+        //速度过小直接为0
+        if (curSpeed < 0.0000001) {
+            entity.setSpeed(0);
+            entity.setCurSpeed(0);
+            return;
+        }
+        entity.setCurSpeed(curSpeed);
+    }
+
+    /**
+     * 对物品实体进行当前速度计算
+     * */
+    private void calculateItemEntityCurSpeed (ItemEntity entity, ChunkSystem cs, float delta) {
+        //对于速度为0的实体不进行速度更新
+        if (entity.getSpeed() <= 0) return;
+
+        //计算脚下方块摩擦对速度的影响
+        Vector2 center = entity.getCenter();
+        Block block = cs.getBlock(center.x, center.y);
+        if (block == null) return;
+        float friction = block.getProperty().getFriction();
+        float curSpeed = entity.getSpeed() * friction;
+        //速度过小直接为0
+        if (curSpeed < 0.0000001) {
+            entity.setSpeed(0);
+            entity.setCurSpeed(0);
+            return;
+        }
+        entity.setCurSpeed(curSpeed);
+        entity.setSpeed(entity.getSpeed() - delta * 0.8f);
+    }
+
 
     @Override
     public void draw(Batch batch) {

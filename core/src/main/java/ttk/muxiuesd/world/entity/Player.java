@@ -6,6 +6,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -18,12 +19,10 @@ import ttk.muxiuesd.world.item.ItemsReg;
 public class Player extends LivingEntity {
     public TextureRegion body;
     public TextureRegion shield;
-    public float maxDefendSpan = 1f;
-    public float defendSpan = 0f;   //防御的间隔
-    public float maxDefendDuration = 0.3f;
-    public float defendDuration = 0f;   //防御状态的持续时间
+    public Timer defendCDTimer; //防御状态冷却计时器
+    public Timer defendDurationTimer; //防御状态持续计时器
     public boolean isDefend = false;
-    public float defenseRadius = 1.23f;
+    public float defenseRadius = 1.23f; //防御半径
 
     public Player () {
         this(10, 10);
@@ -38,7 +37,8 @@ public class Player extends LivingEntity {
         bodyTexture = getTextureRegion(Fight.getId("player"), "player/player.png");
 
         this.shield = getTextureRegion(Fight.getId("player_shield"), "player/shield.png");
-
+        this.defendCDTimer = new Timer(2f, 0);
+        this.defendDurationTimer = new Timer(0.3f, 0);
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
         backpack.setItemStack(1, ItemsReg.getItem("test_weapon"));
@@ -54,16 +54,17 @@ public class Player extends LivingEntity {
     public void update(float delta) {
         super.update(delta);
 
-        if (!this.isDefend && this.defendSpan < this.maxDefendSpan) {
-            this.defendSpan += delta;
-        }
-        if (this.isDefend) {
-            if (this.defendDuration > this.maxDefendDuration) {
+        if (!this.isDefend) {
+            //不在防御状态就计时
+            this.defendCDTimer.update(delta);
+        } else {
+            //防御状态下
+            if (this.defendDurationTimer.isReady()) {
+                //到时间了就取消防御状态
                 this.isDefend = false;
-                this.defendDuration = 0f;
-            }
-            if (this.defendDuration <= this.maxDefendDuration) {
-                this.defendDuration += delta;
+            }else {
+                //没到时间就继续计时
+                this.defendDurationTimer.update(delta);
             }
         }
         this.handleInput(delta);
@@ -79,6 +80,22 @@ public class Player extends LivingEntity {
                 width, height,
                 scaleX, scaleY, rotation);
         }
+    }
+
+    @Override
+    public boolean dropItem (int index, int amount) {
+        ItemStack itemStack = this.backpack.dropItem(index, amount);
+        if (itemStack == null) return false;
+
+        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), getEntitySystem());
+        itemEntity.setPosition(getPosition());
+        itemEntity.setSize(getSize());
+        itemEntity.setItemStack(itemStack);
+        itemEntity.setVelocity(Util.getDirection());
+        itemEntity.setSpeed(2f);
+        getEntitySystem().add(itemEntity);
+
+        return true;
     }
 
     private void handleInput(float delta) {
@@ -99,16 +116,13 @@ public class Player extends LivingEntity {
             velX += curSpeed * delta;
         }
 
-
         // 左键发射攻击性子弹
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Bullet bullet = Factory.createBullet(this, Util.getDirection());
             //getEntitySystem().add(bullet);
         }
-        if (KeyBindings.PlayerShield.wasJustPressed() && this.defendSpan >= 1f) {
+        if (KeyBindings.PlayerShield.wasJustPressed() && this.defendCDTimer.isReady()) {
             this.isDefend = true;
-            this.defendSpan = 0f;
-            this.defendDuration = 0f;
         }
         if (KeyBindings.PlayerUseItem.wasJustPressed()) {
             useItem(getEntitySystem().getWorld());

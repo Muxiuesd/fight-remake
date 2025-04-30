@@ -31,6 +31,10 @@ public class ItemEntity extends Entity {
         this.cycle += delta / 2;
         if (cycle > 1f) cycle -= 1f;
         this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.3f);
+
+        x += delta * getCurSpeed() * velX;
+        y += delta * getCurSpeed() * velY;
+
         super.update(delta);
     }
 

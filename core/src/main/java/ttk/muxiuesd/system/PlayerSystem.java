@@ -50,11 +50,11 @@ public class PlayerSystem extends WorldSystem {
             this.remakePlayer();
             return;
         }
-
+        //玩家速度计算
         ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         Vector2 playerCenter = this.player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
-        player.curSpeed = player.speed * block.getProperty().getFriction();
+        //player.curSpeed = player.speed * block.getProperty().getFriction();
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {

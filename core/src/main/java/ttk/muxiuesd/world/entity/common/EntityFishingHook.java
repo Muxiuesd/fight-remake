@@ -82,8 +82,10 @@ public class EntityFishingHook extends Entity {
      * 抛钩移动
      * */
     private void move (float delta) {
-        x += delta * speed * direction.x;
-        y += delta * speed * direction.y;
+        velX = direction.x * delta;
+        velY = direction.y * delta;
+        x += speed * velX;
+        y += speed * velY;
     }
 
     public LivingEntity getOwner () {

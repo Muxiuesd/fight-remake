@@ -67,8 +67,10 @@ public class ItemFishPole extends Item {
                 itemEntity.setPosition(hookPos);
                 itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
                 ItemStack lootStack = FishingLootTable.generate(Fight.getId("fish"));
-                ItemStack lootStack1 = FishingLootTable.generate(Fight.getId("rubbish"));
+                //ItemStack lootStack1 = FishingLootTable.generate(Fight.getId("rubbish"));
                 itemEntity.setItemStack(lootStack);
+                itemEntity.setSpeed(this.castSpeed);
+                itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
             }
 
             //TODO 收起鱼钩的运动动画

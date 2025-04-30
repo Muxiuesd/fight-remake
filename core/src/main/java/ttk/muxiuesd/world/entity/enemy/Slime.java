@@ -19,7 +19,7 @@ public class Slime extends Enemy {
     }
 
     public Slime(int generation) {
-        super(10f, 10f, 16f, 16f, 1f, 1f);
+        super(10f, 10f, 16f, 16f, 1f, 1.2f);
         this.generation = generation;
         loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
 

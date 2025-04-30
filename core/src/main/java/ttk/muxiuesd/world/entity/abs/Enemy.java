@@ -58,8 +58,8 @@ public abstract class Enemy extends LivingEntity {
         Entity target = getCurTarget();
         if (target != null) {
             Direction direction = new Direction(target.x - x, target.y - y);
-            this.x = x + direction.getxDirection() * speed * delta;
-            this.y = y + direction.getyDirection() * speed * delta;
+            this.x += direction.getxDirection() * curSpeed * delta;
+            this.y += direction.getyDirection() * curSpeed * delta;
         }
         //TODO 敌人没有目标时随意游走
     }

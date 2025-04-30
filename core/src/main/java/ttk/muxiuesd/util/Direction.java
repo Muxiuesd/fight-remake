@@ -10,7 +10,7 @@ public class Direction extends Vector2 {
     /**
      * 默认方向：当前游戏窗口中心到鼠标的方向
      */
-    public Direction() {
+    public Direction () {
         Vector2 mouse = Util.getMousePosition();
         float mouseX = mouse.x;
         float mouseY = mouse.y;
@@ -19,7 +19,11 @@ public class Direction extends Vector2 {
         y = (mouseY) / length;
     }
 
-    public Direction(float xDirection, float yDirection) {
+    public Direction (Vector2 from, Vector2 to) {
+        this(to.x - from.x, to.y - from.y);
+    }
+
+    public Direction (float xDirection, float yDirection) {
         float length = (float) Math.sqrt(Math.pow(xDirection, 2) + Math.pow(yDirection, 2));
         x = xDirection / length;
         y = yDirection / length;
