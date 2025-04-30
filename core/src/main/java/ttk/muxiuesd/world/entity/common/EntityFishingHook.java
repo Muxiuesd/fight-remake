@@ -62,6 +62,7 @@ public class EntityFishingHook extends Entity {
                 this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.15f);
                 //鱼钩在水中产生气泡粒子
                 this.bubbleEmitTimer.update(delta);
+                this.bubbleEmitTimer.isReady();
             }
         }
         super.update(delta);

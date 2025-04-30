@@ -23,6 +23,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.loottable.FishingLootTable;
 
 /**
  * 钓鱼竿
@@ -65,7 +66,9 @@ public class ItemFishPole extends Item {
                 ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
                 itemEntity.setPosition(hookPos);
                 itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
-                itemEntity.setItemStack(new ItemStack(Gets.ITEM(Fight.getId("fish")), 1));
+                ItemStack lootStack = FishingLootTable.generate(Fight.getId("fish"));
+
+                itemEntity.setItemStack(lootStack);
             }
 
             //TODO 收起鱼钩的运动动画
