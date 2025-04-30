@@ -34,7 +34,7 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
     public Rectangle hurtbox = new Rectangle();
 
     public boolean attacked = false;
-
+    private boolean onGround = true;
     private EntitySystem es;    //此实体所属的实体系统
 
     /**
@@ -84,7 +84,9 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
     }
 
     public Entity setSpeed (float speed) {
-        this.speed = speed;
+        if (this.speed >= 0) {
+            this.speed = speed;
+        }
         return this;
     }
 
@@ -219,5 +221,13 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
         AssetsLoader.getInstance().loadAsync(textureId, Fight.EntityTexturePath(texturePath), Texture.class, null);
         Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
         return new TextureRegion(texture);
+    }
+
+    public boolean isOnGround () {
+        return onGround;
+    }
+
+    public void setOnGround (boolean onGround) {
+        this.onGround = onGround;
     }
 }

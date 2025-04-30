@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -13,11 +14,12 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class ItemEntity extends Entity {
     public static final Vector2 DEFAULT_SIZE = new Vector2(0.7f, 0.7f);
-
     private ItemStack itemStack;
     private Vector2 positionOffset;
+    private Timer onAirTimer;
     private float cycle;
     private float livingTime;   //存在时间
+
 
     public ItemEntity () {
         initialize(Group.item);
@@ -27,6 +29,12 @@ public class ItemEntity extends Entity {
 
     @Override
     public void update (float delta) {
+        if (this.onAirTimer != null) {
+            this.onAirTimer.update(delta);
+            if(this.onAirTimer.isReady()) {
+                setOnGround(true);
+            }
+        }
         this.livingTime += delta;
         this.cycle += delta / 4;
         if (cycle > 1f) cycle %= 1f;
@@ -65,5 +73,13 @@ public class ItemEntity extends Entity {
 
     public void setLivingTime (float livingTime) {
         this.livingTime = livingTime;
+    }
+
+    public Timer getOnAirTimer () {
+        return onAirTimer;
+    }
+
+    public void setOnAirTimer (Timer onAirTimer) {
+        this.onAirTimer = onAirTimer;
     }
 }

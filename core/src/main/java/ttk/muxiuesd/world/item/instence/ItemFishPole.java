@@ -13,6 +13,7 @@ import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -35,6 +36,7 @@ public class ItemFishPole extends Item {
     public EntityFishingHook hook;
     public boolean isCasting = false; //是否抛竿
     public float castSpeed = 10f;
+    public float pullSpeed = castSpeed * 2;
 
     public ItemFishPole () {
         super(Type.COMMON, new Property().setMaxCount(1),
@@ -58,7 +60,7 @@ public class ItemFishPole extends Item {
 
             this.throwHook(world, fishingHook);
             return super.use(world, user);
-        }else if (!this.hook.onCasting() && !this.hook.isReturning){//鱼钩实体不在抛竿途中则可以收起鱼钩
+        }else if (!this.hook.onCasting() && !this.hook.isReturning){//鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
             Vector2 hookPos = this.hook.getCenter();
             ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
             Block block = cs.getBlock(hookPos.x, hookPos.y);
@@ -70,11 +72,15 @@ public class ItemFishPole extends Item {
                 ItemStack lootStack = FishingLootTable.generate(Fight.getId("fish"));
                 //ItemStack lootStack1 = FishingLootTable.generate(Fight.getId("rubbish"));
                 itemEntity.setItemStack(lootStack);
-                itemEntity.setSpeed(16);
+                itemEntity.setSpeed(this.pullSpeed);
+                itemEntity.setCurSpeed(this.pullSpeed);
                 itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
+                itemEntity.setOnGround(false);
+                itemEntity.setOnAirTimer(new TaskTimer(0.2f, 0, () -> {
+                    itemEntity.setOnAirTimer(null);
+                }));
             }
 
-            //TODO 收起鱼钩的运动动画
             this.pullHook();
             return super.use(world, user);
         }
@@ -118,7 +124,7 @@ public class ItemFishPole extends Item {
      * */
     public void pullHook () {
         this.hook.isReturning = true;
-        this.hook.setSpeed(this.castSpeed * 2f);
+        this.hook.setSpeed(this.pullSpeed);
         //this.isCasting = false;
     }
 

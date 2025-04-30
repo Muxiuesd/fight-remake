@@ -240,12 +240,15 @@ public class EntitySystem extends WorldSystem {
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0) return;
 
-        //计算脚下方块摩擦对速度的影响
-        Vector2 center = entity.getCenter();
-        Block block = cs.getBlock(center.x, center.y);
-        if (block == null) return;
-        float friction = block.getProperty().getFriction();
-        float curSpeed = entity.getSpeed() * friction;
+        float curSpeed = entity.getSpeed();
+        //实体在地面上
+        if (entity.isOnGround()) {
+            //计算脚下方块摩擦对速度的影响
+            Vector2 center = entity.getCenter();
+            Block block = cs.getBlock(center.x, center.y);
+            if (block == null) return;
+            curSpeed *= block.getProperty().getFriction();
+        }
         //速度过小直接为0
         if (curSpeed < 0.0000001) {
             entity.setSpeed(0);
@@ -253,7 +256,11 @@ public class EntitySystem extends WorldSystem {
             return;
         }
         entity.setCurSpeed(curSpeed);
-        entity.setSpeed(entity.getSpeed() - delta * 0.8f);
+        //float v = entity.speed * entity.speed - delta * delta * 3600;
+        float v = curSpeed;
+        if (v < 0) v = 0;
+        //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.7f);
+        entity.setSpeed(entity.getSpeed() *(1 - (float) Math.pow(Math.E, - entity.getSpeed())));
     }
 
 

@@ -2,10 +2,13 @@ package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -92,8 +95,17 @@ public class Player extends LivingEntity {
         itemEntity.setSize(getSize());
         itemEntity.setItemStack(itemStack);
         itemEntity.setVelocity(Util.getDirection());
-        itemEntity.setSpeed(2f);
+        itemEntity.setOnGround(false);
+        itemEntity.setOnAirTimer(new TaskTimer(0.5f, 0, () -> {
+            itemEntity.setOnAirTimer(null);
+        }));
 
+        HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
+        Vector2 mwp = his.getMouseWorldPosition();
+        float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+        float v = Math.min(distance, 3f);
+        itemEntity.setSpeed(v);
+        itemEntity.setCurSpeed(v);
         return true;
     }
 
