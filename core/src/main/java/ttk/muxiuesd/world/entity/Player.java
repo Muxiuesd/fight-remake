@@ -93,7 +93,6 @@ public class Player extends LivingEntity {
         itemEntity.setItemStack(itemStack);
         itemEntity.setVelocity(Util.getDirection());
         itemEntity.setSpeed(2f);
-        getEntitySystem().add(itemEntity);
 
         return true;
     }

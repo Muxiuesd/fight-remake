@@ -36,7 +36,6 @@ public class ItemFishPole extends Item {
     public boolean isCasting = false; //是否抛竿
     public float castSpeed = 10f;
 
-
     public ItemFishPole () {
         super(Type.COMMON, new Property().setMaxCount(1),
             Fight.getId("fish_pole"),
@@ -52,12 +51,14 @@ public class ItemFishPole extends Item {
             EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
             fishingHook.setPosition(user.getPosition());
             fishingHook.setOwner(user)
-                .setDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
+                .setPole(this)
+                .setThrowDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
                 .setChunkSystem((ChunkSystem) world.getSystemManager().getSystem("ChunkSystem"))
                 .setParticleSystem((ParticleSystem) world.getSystemManager().getSystem("ParticleSystem"));
 
             this.throwHook(world, fishingHook);
-        }else {//收起鱼钩
+            return super.use(world, user);
+        }else if (!this.hook.onCasting() && !this.hook.isReturning){//鱼钩实体不在抛竿途中则可以收起鱼钩
             Vector2 hookPos = this.hook.getCenter();
             ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
             Block block = cs.getBlock(hookPos.x, hookPos.y);
@@ -69,14 +70,16 @@ public class ItemFishPole extends Item {
                 ItemStack lootStack = FishingLootTable.generate(Fight.getId("fish"));
                 //ItemStack lootStack1 = FishingLootTable.generate(Fight.getId("rubbish"));
                 itemEntity.setItemStack(lootStack);
-                itemEntity.setSpeed(this.castSpeed);
+                itemEntity.setSpeed(16);
                 itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
             }
 
             //TODO 收起鱼钩的运动动画
             this.pullHook();
+            return super.use(world, user);
         }
-        return super.use(world, user);
+        //到这里就说明在抛竿或者收杆的动作之中，所以是使用失败的
+        return false;
     }
 
     @Override
@@ -114,9 +117,9 @@ public class ItemFishPole extends Item {
      * 收起鱼钩
      * */
     public void pullHook () {
-        this.hook.removeSelf();
-        this.hook = null;
-        this.isCasting = false;
+        this.hook.isReturning = true;
+        this.hook.setSpeed(this.castSpeed * 2f);
+        //this.isCasting = false;
     }
 
     @Override

@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 掉落在地上的物品以实体形式存在
  * */
 public class ItemEntity extends Entity {
-    public static final Vector2 DEFAULT_SIZE = new Vector2(1f, 1f);
+    public static final Vector2 DEFAULT_SIZE = new Vector2(0.7f, 0.7f);
 
     private ItemStack itemStack;
     private Vector2 positionOffset;
@@ -28,8 +28,8 @@ public class ItemEntity extends Entity {
     @Override
     public void update (float delta) {
         this.livingTime += delta;
-        this.cycle += delta / 2;
-        if (cycle > 1f) cycle -= 1f;
+        this.cycle += delta / 4;
+        if (cycle > 1f) cycle %= 1f;
         this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.3f);
 
         x += delta * getCurSpeed() * velX;

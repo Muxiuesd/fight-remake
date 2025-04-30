@@ -57,11 +57,11 @@ public class EntitySystem extends WorldSystem {
 
 
     public void add(Entity entity) {
-        _delayAdd.add(entity);
+        this._delayAdd.add(entity);
     }
 
     public void remove(Entity entity) {
-        _delayRemove.add(entity);
+        this._delayRemove.add(entity);
     }
 
     /**
@@ -110,7 +110,6 @@ public class EntitySystem extends WorldSystem {
             //绝大部分移除调用都是敌人相关的子弹实体
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
-                //Bullet bullet = (Bullet) entity;
                 this.enemyBulletEntity.removeValue(bullet, true);
             }else if (entity instanceof Enemy enemy) {
                 this.enemyEntity.removeValue(enemy, true);
@@ -119,7 +118,6 @@ public class EntitySystem extends WorldSystem {
             //其次是玩家相关的实体
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
-                //Bullet bullet = (Bullet) entity;
                 this.playerBulletEntity.removeValue(bullet, true);
             }else {
                 //TODO 暂时不能移除玩家
@@ -139,7 +137,6 @@ public class EntitySystem extends WorldSystem {
         if (!_delayRemove.isEmpty()) {
             for (Entity entity : this._delayRemove) {
                 _remove(entity);
-
             }
             _delayRemove.clear();
         }
@@ -187,25 +184,27 @@ public class EntitySystem extends WorldSystem {
         Player player = this.getPlayer();
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN) {
-            float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PICKUP_RANGE) {
-                //在捡起范围内，让物品实体朝向玩家运动
-                Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
-                itemEntity.setVelocity(direction);
-                itemEntity.setSpeed(16f);
-            }
-
             //当物品实体与玩家的碰撞箱相碰就是捡起
             if (itemEntity.hurtbox.overlaps(player.hurtbox)) {
                 ItemStack itemStack = itemEntity.getItemStack();
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
+                    //整个捡起来就没必要执行下面的代码了
+                    return;
                 }else if (state == ItemPickUpState.PARTIAL) {
                     //部分捡起时刷新存在时间
                     itemEntity.setLivingTime(0);
                 }
                 //捡起失败则什么也没发生
+            }
+
+            float distance = Util.getDistance(itemEntity, player);
+            if (distance <= Fight.PICKUP_RANGE) {
+                //在捡起范围内，让物品实体朝向玩家运动
+                Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
+                itemEntity.setVelocity(direction);
+                itemEntity.setSpeed(16f);
             }
         }
 

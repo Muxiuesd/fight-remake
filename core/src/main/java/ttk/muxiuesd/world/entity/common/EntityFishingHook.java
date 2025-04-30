@@ -13,20 +13,22 @@ import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.instence.ItemFishPole;
 
 /**
  * 鱼钩实体
  * */
 public class EntityFishingHook extends Entity {
     private LivingEntity owner;
-    private Direction direction;
+    private ItemFishPole pole;
+    private Direction throwDirection;
     private ChunkSystem cs;
     private ParticleSystem pts;
     private Timer moveTimer;
     private Timer bubbleEmitTimer;
     private Vector2 positionOffset;
     private float cycle;
-
+    public boolean isReturning;
 
     public EntityFishingHook() {
         initialize(Group.player);
@@ -46,13 +48,14 @@ public class EntityFishingHook extends Entity {
         });
 
         this.positionOffset = new Vector2();
+        this.isReturning = false;
     }
 
     @Override
     public void update (float delta) {
         if (this.moveTimer != null && !this.moveTimer.isReady()) {
             //抛钩移动
-            this.move(delta);
+            this.throwMovement(delta);
             this.moveTimer.update(delta);
         }else {
             if (this.cs.getBlock(x, y) instanceof BlockWater) {
@@ -65,6 +68,15 @@ public class EntityFishingHook extends Entity {
                 this.bubbleEmitTimer.isReady();
             }
         }
+        if (this.isReturning) {
+            this.returningMovement(delta);
+            if (this.hurtbox.overlaps(this.getOwner().hurtbox)) {
+                this.removeSelf();
+                this.getPole().isCasting = false;
+                return;
+            }
+        }
+
         super.update(delta);
     }
 
@@ -81,11 +93,22 @@ public class EntityFishingHook extends Entity {
     /**
      * 抛钩移动
      * */
-    private void move (float delta) {
-        velX = direction.x * delta;
-        velY = direction.y * delta;
-        x += speed * velX;
-        y += speed * velY;
+    private void throwMovement (float delta) {
+        velX = speed * throwDirection.x * delta;
+        velY = speed * throwDirection.y * delta;
+        x += velX;
+        y += velY;
+    }
+
+    /**
+     * 返回移动
+     * */
+    private void returningMovement (float delta) {
+        Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
+        velX = speed * dir.x * delta;
+        velY = speed * dir.y * delta;
+        x += velX;
+        y += velY;
     }
 
     public LivingEntity getOwner () {
@@ -97,12 +120,21 @@ public class EntityFishingHook extends Entity {
         return this;
     }
 
-    public Direction getDirection () {
-        return direction;
+    public ItemFishPole getPole () {
+        return this.pole;
     }
 
-    public EntityFishingHook setDirection (Direction direction) {
-        this.direction = direction;
+    public EntityFishingHook setPole (ItemFishPole pole) {
+        this.pole = pole;
+        return this;
+    }
+
+    public Direction getThrowDirection () {
+        return throwDirection;
+    }
+
+    public EntityFishingHook setThrowDirection (Direction throwDirection) {
+        this.throwDirection = throwDirection;
         return this;
     }
 
@@ -131,6 +163,13 @@ public class EntityFishingHook extends Entity {
     public EntityFishingHook setPositionOffset (Vector2 positionOffset) {
         this.positionOffset = positionOffset;
         return this;
+    }
+
+    /**
+     * 还在抛竿途中
+     * */
+    public boolean onCasting () {
+        return this.moveTimer != null;
     }
 
     /**
