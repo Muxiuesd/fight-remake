@@ -22,7 +22,6 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
-import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.loottable.FishingLootTable;
 
@@ -67,19 +66,21 @@ public class ItemFishPole extends Item {
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
                 //需要鱼钩在水中才能钓到鱼
-                ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
-                itemEntity.setPosition(hookPos);
-                itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
-                ItemStack lootStack = FishingLootTable.generate(Fight.getId("fish"));
+                FishingLootTable.getInstance().fastGenerate(1000, itemStack -> {
+                    ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
+                    itemEntity.setPosition(hookPos);
+                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+                    itemEntity.setItemStack(itemStack);
+                    itemEntity.setSpeed(this.pullSpeed);
+                    itemEntity.setCurSpeed(this.pullSpeed);
+                    itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
+                    itemEntity.setOnGround(false);
+                    itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
+                        itemEntity.setOnAirTimer(null);
+                    }));
+                });
                 //ItemStack lootStack1 = FishingLootTable.generate(Fight.getId("rubbish"));
-                itemEntity.setItemStack(lootStack);
-                itemEntity.setSpeed(this.pullSpeed);
-                itemEntity.setCurSpeed(this.pullSpeed);
-                itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
-                itemEntity.setOnGround(false);
-                itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
-                    itemEntity.setOnAirTimer(null);
-                }));
+
             }
 
             this.pullHook();
