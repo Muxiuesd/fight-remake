@@ -256,10 +256,8 @@ public class EntitySystem extends WorldSystem {
             return;
         }
         entity.setCurSpeed(curSpeed);
-        //float v = entity.speed * entity.speed - delta * delta * 3600;
-        float v = curSpeed;
-        if (v < 0) v = 0;
-        entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
+        //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
+        entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
 

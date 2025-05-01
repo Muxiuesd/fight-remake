@@ -13,7 +13,6 @@ import ttk.muxiuesd.world.World;
  * */
 public class DaynightSystem extends WorldSystem {
 
-    //private DaynightShader daynightShader;
     private OrthographicCamera camera;
     private TimeSystem timeSystem;
 
