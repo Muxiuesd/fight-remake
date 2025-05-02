@@ -5,11 +5,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.util.WorldMapNoise;
+import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
@@ -22,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.*;
 
+/**
+ * 区块系统
+ * */
 public class ChunkSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
@@ -31,15 +32,16 @@ public class ChunkSystem extends WorldSystem {
     private Player player;
     private Vector2 playerLastPosition;
     private WorldMapNoise noise;
+    private Timer chunkLoadTimer = new Timer(0.5f, 0.5f);
+
 
     public static final float Slope = 100.0f;   // 地形坡度，生成地形时的参数
-    private float visualRange = 64f;
 
     // 线程池
     private ExecutorService executor;
 
     // 当前活跃的线程
-    private ArrayList<Chunk> activeChunks;
+    private ArrayList<Chunk> activeChunks = new ArrayList<>();
     // 加载和卸载区块的延迟队列
     private ArrayList<Chunk> _loadChunks = new ArrayList<>();
     private ArrayList<Chunk> _unloadChunks = new ArrayList<>();
@@ -63,23 +65,14 @@ public class ChunkSystem extends WorldSystem {
 
         this.initPool();
 
-        // 初始化活跃区块队列
-        this.activeChunks = new ArrayList<>();
-
         // 预加载一次
-        this.update(-1);
+        this.update(-1.2f);
         Log.print(TAG, "ChunkSystem初始化完成！");
     }
 
-    private float loadChunkTick = 0.2f;
-    private float span = 0.2f;
-
     @Override
     public void update(float delta) {
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.player = ps.getPlayer();
-
-        if (delta == -1) {
+        if (delta == -1.2f) {
             // 预加载
             // 先强制加载一次玩家所在的区块
             ChunkPosition playerChunkPosition = this.getPlayerChunkPosition();
@@ -88,18 +81,32 @@ public class ChunkSystem extends WorldSystem {
             return;
         }
 
+        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        this.player = ps.getPlayer();
+        this.chunkLoadTimer.update(delta);
+
         // 检查线程池里的区块是否加载完成
         if (!this.chunkLoadingTasks.isEmpty()) {
+            //System.out.println(this.chunkLoadingTasks.size());
             for (ChunkPosition position : this.chunkLoadingTasks.keySet()) {
                 if (this.isChunkLoaded(position)) {
                     // 如果加载完成，则将区块加入活跃队列
                     Chunk chunk = this.getLoadedChunk(position);
                     if (chunk != null) {
-                        this._loadChunks.add(chunk);
+                        boolean exit = false;
+                        for (Chunk loadChunk : this._loadChunks) {
+                            if (loadChunk.getChunkPosition().equals(chunk.getChunkPosition())) {
+                                exit = true;
+                                break;
+                            }
+                        }
+                        if (!exit) this._loadChunks.add(chunk);
                     }
+                    //移除任务
                     this.chunkLoadingTasks.remove(position);
                 }
             }
+            //System.out.println(this._loadChunks.size());
         }
         if (!this.chunkUnloadingTasks.isEmpty()) {
             for (ChunkPosition position : this.chunkUnloadingTasks.keySet()) {
@@ -129,24 +136,19 @@ public class ChunkSystem extends WorldSystem {
         }
 
         // 更新正在活跃的区块
-        //Log.print(TAG, "____________");
+        Log.print(TAG, "____________");
         for (Chunk chunk : this.activeChunks) {
             chunk.update(delta);
-            //Log.print(TAG, chunk.getChunkPosition().toString());
+            Log.print(TAG, chunk.getChunkPosition().toString());
         }
-        //Log.print(TAG, "____________");
+        Log.print(TAG, "____________");
 
-        if (span >= loadChunkTick && this.playerMoved()) {
+        if (this.chunkLoadTimer.isReady() && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
             this.calculateNeedUnloadedChunk();
-            span = 0;
             this.playerLastPosition.set(this.player.x, this.player.y);
             // Log.print(TAG, "计算需要加载和卸载的区块");
-        } else if (span <= loadChunkTick) {
-            // 防止玩家停止太久导致span超出最大值
-            span += delta;
         }
-
     }
 
     @Override
@@ -184,6 +186,7 @@ public class ChunkSystem extends WorldSystem {
         ChunkPosition chunkPosition = this.getPlayerChunkPosition(this.player);
         int playerChunkX = chunkPosition.getX();
         int playerChunkY = chunkPosition.getY();
+        Vector2 playerCenter = this.player.getCenter();
 
         // System.out.println("("+ player.x+ "," + player.y +")" + "("+ playerChunkX + "," + playerChunkY +")");
         // TODO 实现更好的循环
@@ -192,12 +195,11 @@ public class ChunkSystem extends WorldSystem {
                 int newChunkX = playerChunkX + x;
                 int newChunkY = playerChunkY + y;
                 float distance = Util.getDistance(
-                    this.player.x + this.player.width / 2,
-                    this.player.y + this.player.height / 2,
+                    playerCenter.x, playerCenter.y,
                     newChunkX * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
                     newChunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f);
 
-                if (distance <= this.visualRange) {
+                if (distance <= Fight.PLAYER_VISUAL_RANGE) {
                     this.loadChunk(newChunkX, newChunkY);
                 }
             }
@@ -212,7 +214,7 @@ public class ChunkSystem extends WorldSystem {
             float distance = Util.getDistance(this.player.x, this.player.y,
                 chunk.getChunkPosition().getX() * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
                 chunk.getChunkPosition().getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f);
-            if (distance > this.visualRange) {
+            if (distance > Fight.PLAYER_VISUAL_RANGE) {
                 this.unloadChunk(chunk);
             }
         }
@@ -222,11 +224,12 @@ public class ChunkSystem extends WorldSystem {
      * 加载区块
      */
     public void loadChunk(int chunkX, int chunkY) {
-        boolean chunkExist = false;
         ChunkPosition loadChunkPosition = new ChunkPosition(chunkX, chunkY);
+        //检查是否加载过或者正在加载这个区块
+        boolean chunkExist = this.chunkExist(loadChunkPosition);
 
         // 检查是否已经在加载队列里
-        for (Chunk chunk : this._loadChunks) {
+        /*for (Chunk chunk : this._loadChunks) {
             ChunkPosition chunkPosition = chunk.getChunkPosition();
             if (chunkPosition.equals(loadChunkPosition)) {
                 // Log.error(TAG, "编号为：(" + chunkX +","+ chunkY +")的区块已加载！！！");
@@ -242,14 +245,12 @@ public class ChunkSystem extends WorldSystem {
                 chunkExist = true;
                 break;
             }
-        }
+        }*/
         if (chunkExist) {
             // TODO 实现如果区块已存在的更多操作，比如加载保存的此区块的数据
             return;
         }
 
-       /* Chunk chunk = this.initChunk(chunkX, chunkY);
-        this._loadChunks.add(chunk);*/
 
         // 生成任务并提交到线程池里加载区块
         ChunkLoadTask task = new ChunkLoadTask(this, loadChunkPosition);
@@ -333,7 +334,27 @@ public class ChunkSystem extends WorldSystem {
         return null;
     }
 
+    /**
+     * 根据区块坐标来判断区块是否已经存在
+     * */
+    private boolean chunkExist(ChunkPosition position) {
+        for (Chunk chunk : this.activeChunks) {
+            if (chunk.getChunkPosition().equals(position)) return true;
+        }
 
+        //在加载任务里面找
+        ConcurrentHashMap.KeySetView<ChunkPosition, Future<Chunk>> chunkPositions = this.chunkLoadingTasks.keySet();
+        for (ChunkPosition chunkPosition : chunkPositions) {
+            if (chunkPosition.equals(position)) return true;
+        }
+
+        //后在加载延迟队列里查找
+        for (Chunk loadChunk : this._loadChunks) {
+            if (loadChunk.getChunkPosition().equals(position)) return true;
+        }
+
+        return this.chunkLoadingTasks.containsKey(position);
+    }
 
     /**
      * 初始化线程池
@@ -341,7 +362,7 @@ public class ChunkSystem extends WorldSystem {
     private void initPool() {
         int coreSize = Runtime.getRuntime().availableProcessors();
         Log.print(TAG, "初始化区块加载线程池，核心线程数：" + coreSize);
-        this.executor = Executors.newFixedThreadPool(coreSize);
+        this.executor = Executors.newFixedThreadPool(48);
         this.chunkLoadingTasks = new ConcurrentHashMap<>();
         this.chunkUnloadingTasks = new ConcurrentHashMap<>();
     }

@@ -13,6 +13,8 @@ public class Fight {
     public static final float PICKUP_RANGE = 1.5f;  //玩家捡起掉落物的范围
     public static final float ITEM_ENTITY_PICKUP_SPAN = 3f;     //掉落物可以被捡起来的cd
 
+    public static float PLAYER_VISUAL_RANGE = 64f;
+
     public static String getId (String name) {
         return NAMESPACE + ":" + name;
     }
