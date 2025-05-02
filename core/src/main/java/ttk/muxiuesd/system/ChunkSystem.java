@@ -93,6 +93,7 @@ public class ChunkSystem extends WorldSystem {
                     // 如果加载完成，则将区块加入活跃队列
                     Chunk chunk = this.getLoadedChunk(position);
                     if (chunk != null) {
+                        //因为有量子幽灵线程，不这么写会导致初始加载的几个区块中的某个位置的区块凭空添加两个实例
                         boolean exit = false;
                         for (Chunk loadChunk : this._loadChunks) {
                             if (loadChunk.getChunkPosition().equals(chunk.getChunkPosition())) {
@@ -136,12 +137,12 @@ public class ChunkSystem extends WorldSystem {
         }
 
         // 更新正在活跃的区块
-        Log.print(TAG, "____________");
+        //Log.print(TAG, "____________");
         for (Chunk chunk : this.activeChunks) {
             chunk.update(delta);
-            Log.print(TAG, chunk.getChunkPosition().toString());
+            //Log.print(TAG, chunk.getChunkPosition().toString());
         }
-        Log.print(TAG, "____________");
+        //Log.print(TAG, "____________");
 
         if (this.chunkLoadTimer.isReady() && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
