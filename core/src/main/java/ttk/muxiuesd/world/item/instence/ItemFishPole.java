@@ -66,7 +66,7 @@ public class ItemFishPole extends Item {
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
                 //需要鱼钩在水中才能钓到鱼
-                FishingLootTable.getInstance().fastGenerate(1000, itemStack -> {
+                FishingLootTable.fastGenerate(100, itemStack -> {
                     ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
                     itemEntity.setPosition(hookPos);
                     itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);

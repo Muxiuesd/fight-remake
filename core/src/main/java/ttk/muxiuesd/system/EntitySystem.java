@@ -185,7 +185,7 @@ public class EntitySystem extends WorldSystem {
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN) {
             //当物品实体与玩家的碰撞箱相碰就是捡起
-            if (itemEntity.hurtbox.overlaps(player.hurtbox)) {
+            if (itemEntity.hitbox.overlaps(player.hitbox)) {
                 ItemStack itemStack = itemEntity.getItemStack();
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {

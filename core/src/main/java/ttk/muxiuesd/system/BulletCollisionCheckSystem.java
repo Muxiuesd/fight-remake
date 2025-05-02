@@ -58,8 +58,8 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             }
             //敌人与玩家子弹
             for (LivingEntity enemy : es.enemyEntity) {
-                if (playerBullet.hurtbox.overlaps(enemy.hurtbox)
-                    || enemy.hurtbox.overlaps(playerBullet.hurtbox)) {
+                if (playerBullet.hitbox.overlaps(enemy.hitbox)
+                    || enemy.hitbox.overlaps(playerBullet.hitbox)) {
                     enemy.curHealth -= playerBullet.damage;
                     enemy.attacked = true;
                     playerBullet.setLiveTime(playerBullet.getMaxLiveTime());
@@ -85,8 +85,8 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                 }
             }
 
-            if (enemyBullet.hurtbox.contains(player.hurtbox)
-                || player.hurtbox.contains(enemyBullet.hurtbox)) {
+            if (enemyBullet.hitbox.contains(player.hitbox)
+                || player.hitbox.contains(enemyBullet.hitbox)) {
                 player.curHealth -= enemyBullet.damage;
                 enemyBullet.setLiveTime(enemyBullet.getMaxLiveTime());
                 player.attacked = true;
@@ -132,7 +132,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             chunk.traversal((cx, cy) -> {
                 Wall wall = chunk.getWall(cx, cy);
                 if (wall != null) {
-                    if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                    if (wall.getHitbox().overlaps(bullet.hitbox)) {
                         //碰撞了，就将墙体加进去
                         collidingWalls.add(wall);
                     }
@@ -158,7 +158,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                             chunkGroup[i].traversal((cx, cy) -> {
                                 Wall wall = chunk.getWall(cx, cy);
                                 if (wall != null) {
-                                    if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                    if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                         //碰撞了，就将墙体加进去
                                         collidingWalls.add(wall);
                                     }
@@ -172,7 +172,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                         downChunk.traversal((cx, cy) -> {
                             Wall wall = chunk.getWall(cx, cy);
                             if (wall != null) {
-                                if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                     //碰撞了，就将墙体加进去
                                     collidingWalls.add(wall);
                                 }
@@ -194,7 +194,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                             chunkGroup[i].traversal((cx, cy) -> {
                                 Wall wall = chunk.getWall(cx, cy);
                                 if (wall != null) {
-                                    if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                    if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                         //碰撞了，就将墙体加进去
                                         collidingWalls.add(wall);
                                     }
@@ -208,7 +208,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                         leftChunk.traversal((cx, cy) -> {
                             Wall wall = chunk.getWall(cx, cy);
                             if (wall != null) {
-                                if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                     //碰撞了，就将墙体加进去
                                     collidingWalls.add(wall);
                                 }
@@ -225,7 +225,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                         rightChunk.traversal((cx, cy) -> {
                             Wall wall = chunk.getWall(cx, cy);
                             if (wall != null) {
-                                if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                     //碰撞了，就将墙体加进去
                                     collidingWalls.add(wall);
                                 }
@@ -247,7 +247,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                             chunkGroup[i].traversal((cx, cy) -> {
                                 Wall wall = chunk.getWall(cx, cy);
                                 if (wall != null) {
-                                    if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                    if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                         //碰撞了，就将墙体加进去
                                         collidingWalls.add(wall);
                                     }
@@ -261,7 +261,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                         upChunk.traversal((cx, cy) -> {
                             Wall wall = chunk.getWall(cx, cy);
                             if (wall != null) {
-                                if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                     //碰撞了，就将墙体加进去
                                     collidingWalls.add(wall);
                                 }
@@ -283,7 +283,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                             chunkGroup[i].traversal((cx, cy) -> {
                                 Wall wall = chunk.getWall(cx, cy);
                                 if (wall != null) {
-                                    if (wall.getHitbox().overlaps(bullet.hurtbox)) {
+                                    if (wall.getHitbox().overlaps(bullet.hitbox)) {
                                         //碰撞了，就将墙体加进去
                                         collidingWalls.add(wall);
                                     }
@@ -326,11 +326,11 @@ public class BulletCollisionCheckSystem extends WorldSystem {
         Array<Bullet> playerBulletEntity = es.playerBulletEntity;
         Array<Bullet> enemyBulletEntity = es.enemyBulletEntity;
         for (Bullet bullet : playerBulletEntity) {
-            Rectangle hurtbox = bullet.hurtbox;
+            Rectangle hurtbox = bullet.hitbox;
             batch.rect(hurtbox.getX(), hurtbox.getY(), hurtbox.getWidth(), hurtbox.getHeight());
         }
         for (Bullet bullet : enemyBulletEntity) {
-            Rectangle hurtbox = bullet.hurtbox;
+            Rectangle hurtbox = bullet.hitbox;
             batch.rect(hurtbox.getX(), hurtbox.getY(), hurtbox.getWidth(), hurtbox.getHeight());
         }
     }

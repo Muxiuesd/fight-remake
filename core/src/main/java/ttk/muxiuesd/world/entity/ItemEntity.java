@@ -16,7 +16,7 @@ public class ItemEntity extends Entity {
     public static final Vector2 DEFAULT_SIZE = new Vector2(0.7f, 0.7f);
     private ItemStack itemStack;
     private Vector2 positionOffset;
-    private Timer onAirTimer;
+    private Timer onAirTimer;   //在空中的计时器，可以自定义物品实体在空中运动的时间
     private float cycle;
     private float livingTime;   //存在时间
 

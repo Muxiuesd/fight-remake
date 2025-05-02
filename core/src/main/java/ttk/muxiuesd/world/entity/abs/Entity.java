@@ -31,10 +31,10 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
     public float scaleX = 1, scaleY = 1;
     public float rotation;
     public TextureRegion bodyTexture;
-    public Rectangle hurtbox = new Rectangle();
+    public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     public boolean attacked = false;
-    private boolean onGround = true;
+    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
     private EntitySystem es;    //此实体所属的实体系统
 
     /**
@@ -45,6 +45,7 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
     }
 
     public void draw(Batch batch) {
+        //TODO 重写这部分
         if (this.attacked) {
             // 受到攻击变红
             batch.setColor(255, 0, 0, 255);
@@ -66,11 +67,10 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-
     }
 
     public void setCullingArea(float x, float y, float width, float height) {
-        this.hurtbox.set(x, y, width, height);
+        this.hitbox.set(x, y, width, height);
     }
 
     public void dispose() {
@@ -104,9 +104,6 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
         this.originY = originY;
     }
 
-    /**
-     * Sets the position of the actor's bottom left corner.
-     */
     public void setPosition(float x, float y) {
         if (this.x != x || this.y != y) {
             this.x = x;
@@ -114,9 +111,6 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
         }
     }
 
-    /**
-     * Sets the width and height.
-     */
     public void setSize(float width, float height) {
         if (this.width != width || this.height != height) {
             this.width = width;
@@ -128,9 +122,6 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
         this.setSize(size.x, size.y);
     }
 
-    /**
-     * Set bounds the x, y, width, and height.
-     */
     public void setBounds(float x, float y, float width, float height) {
         setPosition(x, y);
         setSize(width, height);

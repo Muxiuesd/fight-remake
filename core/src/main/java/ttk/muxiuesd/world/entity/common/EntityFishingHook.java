@@ -71,7 +71,7 @@ public class EntityFishingHook extends Entity {
         }
         if (this.isReturning) {
             this.returningMovement(delta);
-            if (this.hurtbox.overlaps(this.getOwner().hurtbox)) {
+            if (this.hitbox.overlaps(this.getOwner().hitbox)) {
                 this.removeSelf();
                 this.getPole().isCasting = false;
                 return;

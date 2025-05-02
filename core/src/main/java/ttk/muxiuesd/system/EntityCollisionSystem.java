@@ -55,20 +55,20 @@ public class EntityCollisionSystem extends WorldSystem {
         Array<Wall> collidingWalls = new Array<>();
 
         // X轴移动
-        player.hurtbox.x += movement.x;
+        player.hitbox.x += movement.x;
         chunk.traversal((x, y) -> {
             Wall wall = chunk.getWall(x, y);
-            if (wall != null && player.hurtbox.overlaps(wall.getHitbox())) {
+            if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
                 resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(movement.x, 0));
                 collidingWalls.add(wall);
             }
         });
 
         // Y轴移动
-        player.hurtbox.y += movement.y;
+        player.hitbox.y += movement.y;
         chunk.traversal((x, y) -> {
             Wall wall = chunk.getWall(x, y);
-            if (wall != null && player.hurtbox.overlaps(wall.getHitbox())) {
+            if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
                 resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(0, movement.y));
                 collidingWalls.add(wall);
             }
@@ -117,7 +117,7 @@ public class EntityCollisionSystem extends WorldSystem {
     @Override
     public void renderShape (ShapeRenderer batch) {
         Player player = this.es.getPlayer();
-        Rectangle hurtbox = player.hurtbox;
+        Rectangle hurtbox = player.hitbox;
         batch.rect(hurtbox.x, hurtbox.y, hurtbox.getWidth(), hurtbox.getHeight());
     }
 }

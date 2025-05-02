@@ -73,8 +73,8 @@ public class FishingLootTable extends LootTable {
         return LootGenerator.generate(this, luck);
     }
 
-    public void fastGenerate (int luck, Consumer<? super ItemStack> action) {
-        List<ItemStack> itemStackList = generate(luck);
+    public static void fastGenerate (int luck, Consumer<? super ItemStack> action) {
+        List<ItemStack> itemStackList = getInstance().generate(luck);
         itemStackList.forEach(action);
     }
 }
