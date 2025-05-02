@@ -2,9 +2,10 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.item.ItemPickUpState;
@@ -75,15 +76,15 @@ public abstract class LivingEntity extends Entity {
      * */
     public boolean dropItem (int index, int amount) {
         ItemStack itemStack = this.backpack.dropItem(index, amount);
-        if (itemStack == null) {
-            return false;
-        }
+        if (itemStack == null) return false;
 
-        ItemEntity itemEntity = (ItemEntity) EntitiesReg.get("item_entity");
+        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY("item_entity", getEntitySystem());
         itemEntity.setPosition(getPosition());
         itemEntity.setSize(getSize());
+        itemEntity.setOnGround(false);
+        itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
         itemEntity.setItemStack(itemStack);
-        getEntitySystem().add(itemEntity);
+        itemStack.getItem().beDropped(getEntitySystem().getWorld(), this);
 
         return true;
     }

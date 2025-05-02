@@ -92,6 +92,12 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
     }
 
     /**
+     * 当物品被丢弃的时候的行为
+     * */
+    public void beDropped (World world, LivingEntity dropper) {
+    }
+
+    /**
      * 获取材质
      * <p>
      * 有返回值，以便于有多个材质的物品使用

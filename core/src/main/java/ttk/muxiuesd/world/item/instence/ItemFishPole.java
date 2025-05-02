@@ -91,12 +91,23 @@ public class ItemFishPole extends Item {
     }
 
     @Override
-    public void update (float delta) {
+    public void beDropped (World world, LivingEntity dropper) {
+        //钓鱼的时候被丢出来，则直接让鱼钩消失
         if (this.isCasting) {
-            //鱼钩与使用者距离太远自动收回
-            if (Util.getDistance(this.hook, this.hook.getOwner()) > 16f) {
-                this.pullHook();
-            }
+            this.hook.removeSelf();
+            this.hook = null;
+            this.isCasting = false;
+        }
+    }
+
+    @Override
+    public void update (float delta) {
+        if (this.isCasting && Util.getDistance(this.hook, this.hook.getOwner()) > 16f) {
+            //鱼钩与使用者距离太远直接消失
+            //this.pullHook();
+            this.hook.removeSelf();
+            this.hook = null;
+            this.isCasting = false;
         }
     }
 
@@ -128,6 +139,7 @@ public class ItemFishPole extends Item {
         this.hook.isReturning = true;
         this.hook.setOnGround(false);
         this.hook.setSpeed(this.pullSpeed);
+        //抛竿标记变为false在鱼钩逻辑里
         //this.isCasting = false;
     }
 
@@ -169,12 +181,25 @@ public class ItemFishPole extends Item {
     }
 
     @Override
+    public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
+        TextureRegion renderTexture = this.texture;
+        if (this.isCasting) {
+            renderTexture = this.castTexture;
+        }
+        if (renderTexture != null) {
+            batch.draw(renderTexture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
+                itemEntity.originX, itemEntity.originY,
+                itemEntity.width, itemEntity.height,
+                itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
+        }
+    }
+
+    @Override
     public void renderShape (ShapeRenderer batch) {
         if (!this.isCasting) return;
 
         Direction direction = Util.getDirection();
         float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
-
         //绘制鱼线
         LivingEntity hookOwner = this.hook.getOwner();
         Vector2 ownerPos = hookOwner.getCenter();
@@ -185,7 +210,7 @@ public class ItemFishPole extends Item {
         Vector2 hookPos = this.hook.getCenter();
         //让鱼线绘制在钩子上方
         hookPos.add(0, this.hook.getHeight() / 2 - 0.07f + this.hook.getPositionOffset().y);
-
+        //控制鱼线绘制方向
         if (ownerPos.x <= hookPos.x) CurveDrawer.drawCurve(batch, ownerPos, hookPos, -0.5f);
         else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);
     }
