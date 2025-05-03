@@ -7,19 +7,17 @@ import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 
 /**
  * 方块
  * */
-public abstract class Block implements ID, Updateable, BlockDrawable, Disposable {
+public abstract class Block implements ID, BlockDrawable, Disposable {
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
     private String id;
     public TextureRegion textureRegion;
 
-    public float x, y;
     public float width = BlockWidth, height = BlockHeight;
     public float originX = 0, originY = 0;
     public float scaleX = 1, scaleY = 1;
@@ -38,11 +36,6 @@ public abstract class Block implements ID, Updateable, BlockDrawable, Disposable
     }
 
     @Override
-    public void update(float delta) {
-
-    }
-
-    @Override
     public void draw(Batch batch, float x, float y) {
         if (this.textureIsValid()) {
             batch.draw(this.textureRegion,
@@ -52,11 +45,6 @@ public abstract class Block implements ID, Updateable, BlockDrawable, Disposable
                 this.scaleX, this.scaleY,
                 this.rotation);
         }
-    }
-
-    public void setPosition (float x, float y) {
-        this.x = x;
-        this.y = y;
     }
 
     @Override

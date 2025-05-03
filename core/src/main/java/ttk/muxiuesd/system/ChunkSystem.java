@@ -13,6 +13,8 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
+import ttk.muxiuesd.world.chunk.MainWorldChunkGenerator;
+import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
 
@@ -34,8 +36,8 @@ public class ChunkSystem extends WorldSystem {
     private Vector2 playerLastPosition;
     private WorldMapNoise noise;
     private Timer chunkLoadTimer = new Timer(0.5f, 0.5f);
-    //方块实例
-    private ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
+    //方块实例，同一种方块在world里只有一个实例
+    private final ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
 
 
     // 当前活跃的线程
@@ -56,10 +58,9 @@ public class ChunkSystem extends WorldSystem {
     @Override
     public void initialize () {
         this.noise = new WorldMapNoise((int) (Math.random() * 10000));
-        //EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();
-
         this.playerLastPosition = new Vector2(this.player.x + 10000, this.player.y + 10000);
 
         this.initPool();
@@ -372,11 +373,7 @@ public class ChunkSystem extends WorldSystem {
      * （主线程）初始化区块
      */
     public Chunk initChunk(int chunkX, int chunkY) {
-        Chunk chunk = new Chunk(this);
-        chunk.setChunkPosition(new ChunkPosition(chunkX, chunkY));
-        chunk.initBlock();
-        chunk.initWall();
-        return chunk;
+        return this.getChunkGenerator().generate(new ChunkPosition(chunkX, chunkY));
     }
 
     /**
@@ -393,7 +390,7 @@ public class ChunkSystem extends WorldSystem {
             Log.error(TAG, "获取的区块为null！！！");
             throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
         }
-        //Block block = chunk.seekBlock((float) Math.floor(wx), (float) Math.floor(wy));
+
         Block block = chunk.seekBlock(floor.x, floor.y);
         // 如果在当前区块找不到的话
         if (block == null) {
@@ -522,8 +519,19 @@ public class ChunkSystem extends WorldSystem {
             throw new RuntimeException(e);
         }
     }
+
     public WorldMapNoise getNoise() {
         return this.noise;
     }
 
+    /**
+     * 获取区块加载器实例
+     * */
+    public synchronized ChunkGenerator getChunkGenerator() {
+        return new MainWorldChunkGenerator(this);
+    }
+
+    public ConcurrentHashMap<String, Block> getBlockInstancesMap () {
+        return this.blockInstances;
+    }
 }

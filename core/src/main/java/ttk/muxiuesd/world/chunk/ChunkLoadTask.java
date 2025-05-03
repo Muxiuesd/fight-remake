@@ -2,9 +2,11 @@ package ttk.muxiuesd.world.chunk;
 
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 
-/**异步加载Chunk的任务
+/**
+ * 异步加载Chunk的任务
  * */
 public class ChunkLoadTask extends ChunkTask {
     public ChunkLoadTask(ChunkSystem chunkSystem, ChunkPosition chunkPosition) {
@@ -13,11 +15,9 @@ public class ChunkLoadTask extends ChunkTask {
 
     @Override
     public Chunk call() throws Exception {
-        Chunk chunk = new Chunk(getChunkSystem());
-        chunk.setChunkPosition(getChunkPosition());
-        chunk.initBlock();
-        chunk.initWall();
-        return chunk;
+        //TODO 加载保存过的区块
+        ChunkGenerator generator = getChunkSystem().getChunkGenerator();
+        return generator.generate(getChunkPosition());
     }
 }
 

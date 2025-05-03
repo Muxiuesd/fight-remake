@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
@@ -14,13 +13,8 @@ import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.SimplexNoise2D;
-import ttk.muxiuesd.util.WorldMapNoise;
-import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.wall.Wall;
-import ttk.muxiuesd.world.wall.Walls;
 
 
 /**
@@ -60,102 +54,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         this.heights = new int[ChunkHeight][ChunkWidth];
     }
 
-    /**
-     * 初始化区块中的方块数据
-     * */
-    public void initBlock() {
-        this.traversal((x, y) -> {
-            //计算方块相在世界中的坐标
-            float wx = this.getWorldX(x);
-            float wy = this.getWorldY(y);
-            int height = this.generateTerrain(wx, wy);
-            Block block = this.chooseBlock(height);
-            block.setPosition(wx, wy);
-            this.setBlock(block, x, y);
-            this.heights[y][x] = height;
-        });
-    }
-
-    /**
-     * TODO 更好的墙体生成算法、自由放置和移除墙体
-     * */
-    public void initWall () {
-        this.traversal((x, y) -> {
-            //水上不生成墙体
-            if (this.blocks[y][x] instanceof BlockWater) {
-                return;
-            }
-            int random = MathUtils.random(0, 10);
-            if (random < 1) {
-                Wall wall = Walls.newWall("wall_smooth_stone");
-                wall.setPosition(this.getWorldX(x), this.getWorldY(y));
-                this.walls[y][x] = wall;
-            }
-        });
-    }
-
-    /**
-     * 生成地形
-     * @param wx    方块在世界的横坐标
-     * @param wy    方块在世界的纵坐标
-     * @return 返回地形高度
-     */
-    private int generateTerrain(float wx, float wy) {
-        WorldMapNoise noise = this.chunkSystem.getNoise();
-        double v = noise.noise(wx/ ChunkSystem.Slope, wy/ ChunkSystem.Slope);
-        return (int)SimplexNoise2D.map(v, -1f, 1f, LowestHeight, HighestHeight);
-    }
-
-    /**
-     * 依据地形高度返回不同的方块（粗略版）
-     * @param blockHeight
-     * @return  方块
-     */
-    private Block chooseBlock(int blockHeight) {
-        switch (blockHeight) {
-            case 0:
-            case 1:
-            case 2:{
-                return BlocksReg.newBlock("water");
-            }
-            case 3:{
-                return BlocksReg.newBlock("sand");
-            }
-            case 4:{
-                return BlocksReg.newBlock("stone");
-            }
-            case 5:
-            case 6:
-            case 7:{
-                return BlocksReg.newBlock("grass");
-            }
-        }
-        //错误的高度则返回测试用方块
-        return BlocksReg.newBlock("block_test");
-    }
-
-    /**
-     * 依据地形高度返回不同的方块（精确版）
-     * @param height
-     * @return  方块
-     */
-    private Block chooseBlock (double height) {
-        System.out.println(height);
-        if (height <-2){
-            return BlocksReg.newBlock("water");
-        }
-        if (height >=-2 && height <-1){
-            return BlocksReg.newBlock("sand");
-        }
-        if (height >=-1 && height <1){
-            return BlocksReg.newBlock("stone");
-        }
-        if (height >=1 && height <=3){
-            return BlocksReg.newBlock("grass");
-        }
-        return BlocksReg.newBlock("block_test");
-    }
-
     @Override
     public void draw(Batch batch) {
         ChunkPosition cp = this.chunkPosition;
@@ -175,18 +73,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void update(float delta) {
-        this.traversal((x, y) -> {
-            Block block = blocks[y][x];
-            if (block != null) {
-                block.update(delta);
-            }
-        });
-        this.traversal((x, y) -> {
-            Wall wall = walls[y][x];
-            if (wall != null) {
-                wall.update(delta);
-            }
-        });
+        //TODO 需要update的特殊方块
     }
 
     @Override
@@ -194,13 +81,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (block != null) {
-                block.dispose();
                 blocks[y][x] = null;
             }
 
             Wall wall = walls[y][x];
             if (wall != null) {
-                wall.dispose();
                 walls[y][x] = null;
             }
         });
@@ -231,6 +116,17 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         this.walls[cy][cx] = wall;
     }
 
+    public void setHeight (int cx, int cy, int height) {
+        if (height < LowestHeight || height > HighestHeight) {
+            throw new IllegalArgumentException("传入的高度："+ height +" 不合法！！！");
+        }
+        this.heights[cy][cx] = height;
+    }
+
+    public int getHeight (int cx, int cy) {
+        return this.heights[cy][cx];
+    }
+
     /**
      * 查找方块
      * @param wx
@@ -254,15 +150,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         }
 
         return this.getBlock(cx, cy);
-
-        /*final Block[] targetBlock = new Block[1];
-        this.traversal((x, y) -> {
-            Block block = blocks[y][x];
-            if (wx == block.x && wy == block.y) {
-                targetBlock[0] = block;
-            }
-        });
-        return targetBlock[0];*/
     }
 
     @Override
