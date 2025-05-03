@@ -1,19 +1,38 @@
 package ttk.muxiuesd.world.block.abs;
 
+import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 方块实体
  * */
 public abstract class BlockEntity implements Updateable, Tickable {
-    private Block block;
-    private BlockPos blockPos;
+    private Block block;    //方块
+    private BlockPos blockPos;  //方块实体的位置
+    private Inventory inventory;    //方块实体所拥有的容器
+
 
     public BlockEntity () {
     }
 
+    /**
+     * 点击一下方块（手上没东西）
+     * */
+    public void clickBlock (World world, LivingEntity user) {
+
+    }
+
+    /**
+     * 手持物品点击方块
+     * */
+    public void clickBlockWithItem (World world, LivingEntity user, ItemStack handItemStack) {
+
+    }
 
     /**
      * 方块实体每帧更新逻辑
@@ -44,6 +63,15 @@ public abstract class BlockEntity implements Updateable, Tickable {
 
     public BlockEntity setBlockPos (BlockPos blockPos) {
         this.blockPos = blockPos;
+        return this;
+    }
+
+    public Inventory getInventory () {
+        return inventory;
+    }
+
+    public BlockEntity setInventory (Inventory inventory) {
+        this.inventory = inventory;
         return this;
     }
 }
