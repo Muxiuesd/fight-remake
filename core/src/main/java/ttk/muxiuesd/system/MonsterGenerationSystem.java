@@ -41,7 +41,7 @@ public class MonsterGenerationSystem extends WorldSystem {
         slime.setBounds((float) (this.ps.getPlayer().x + 5 * Math.cos(Util.randomRadian())),
             (float) (this.ps.getPlayer().y + 5 * Math.sin(Util.randomRadian())),
             1, 1);
-        this.es.add(slime);
+        //this.es.add(slime);
 
         /*Enemy modEnemy = (Enemy) Gets.get("testmod:zombie", Entity.class);
         modEnemy.setEntitySystem(this.es);

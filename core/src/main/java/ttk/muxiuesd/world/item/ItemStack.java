@@ -25,14 +25,14 @@ public class ItemStack implements Updateable {
     public ItemStack (Item item) {
         //不指定数量就默认这个物品的最大数量
         this(item, item.property.getMaxCount());
+    }
+    public ItemStack (Item item, int amount) {
+        this(item, amount, ItemStackBehaviourFactory.create(item.type));
         try {
             this.property = ClassReflection.newInstance(getItem().property.getClass());
         } catch (ReflectionException e) {
             throw new RuntimeException(e);
         }
-    }
-    public ItemStack (Item item, int amount) {
-        this(item, amount, ItemStackBehaviourFactory.create(item.type));
     }
     public ItemStack (Item item, int amount, IItemStackBehaviour behaviour) {
         this.item = item;
@@ -77,7 +77,7 @@ public class ItemStack implements Updateable {
     }
 
     public void setAmount (int amount) {
-        if (amount > 0) this.amount = amount;
+        if (amount >= 0) this.amount = amount;
     }
 
     public boolean isReady () {

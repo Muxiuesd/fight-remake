@@ -2,6 +2,8 @@ package ttk.muxiuesd.interfaces;
 
 import ttk.muxiuesd.world.item.ItemStack;
 
+import java.util.Objects;
+
 /**
  * 容器接口
  * */
@@ -15,7 +17,7 @@ public interface Inventory {
     /**
      * 添加物品
      * <p>
-     * @return 返回被捡起来后的物品堆叠，若全部被捡起来则返回null
+     * @return 返回被添加后的物品堆叠，若全部被添加则返回null
      * */
     ItemStack addItem (ItemStack itemStack);
 
@@ -48,7 +50,20 @@ public interface Inventory {
         return this.getCapacity() == 0;
     }
 
-    default boolean isFull () {
+    /**
+     * 容器对于一个物品堆叠来说是否算被装满了
+     * */
+    default boolean isFull (ItemStack itemStack) {
+        for (int index = 0; index < this.getSize(); index++) {
+            ItemStack stack = this.getItemStack(index);
+            //还有空位说明没装满
+            if (stack == null) return false;
+            if (Objects.equals(itemStack.getItem().getID(), stack.getItem().getID())
+                && stack.getAmount() < stack.getProperty().getMaxCount()) {
+                //如果有相同的物品堆叠并且容器里的物品堆叠数量并没有达到最大值，就不算满
+                return false;
+            }
+        }
         return this.getCapacity() == this.getSize();
     }
 

@@ -22,6 +22,7 @@ import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.item.ItemClickBlockResult;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -91,7 +92,13 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                 BlockEntity blockEntity = cs.getBlockEntities().get(new BlockPos(Util.fastFloor(mouseWorldPosition.x, mouseWorldPosition.y)));
                 ItemStack handItemStack = player.getHandItemStack();
                 if (handItemStack == null) blockEntity.clickBlock(getWorld(), player);
-                else blockEntity.clickBlockWithItem(getWorld(), player, handItemStack);
+                else {
+                    ItemClickBlockResult result = blockEntity.clickBlockWithItem(getWorld(), player, handItemStack);
+                    if (result == ItemClickBlockResult.SUCCESS && handItemStack.getAmount() == 0) {
+                        //使用成功就检测手持物品是否用完，用完就清除
+                        player.backpack.clear(player.getHandIndex());
+                    }
+                }
             }
         }
     }

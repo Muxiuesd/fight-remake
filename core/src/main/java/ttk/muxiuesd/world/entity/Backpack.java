@@ -54,14 +54,18 @@ public class Backpack implements Inventory, Updateable {
 
     @Override
     public ItemStack addItem (ItemStack itemStack) {
-        if (this.isFull()) return itemStack;
+        if (this.isFull(itemStack)) return itemStack;
 
+        //TODO 解决相同物品不能存放多个堆叠的bug
         boolean[] nullStacks = new boolean[this.size];
         for (int i = 0; i < this.size; ++i) {
             ItemStack stack = this.itemStacks.get(i);
             if (stack != null) {
                 //同类型物品合并，（目前只检测Id是否相同）
                 if (Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {
+                    //堆叠数量达到上限直接跳过
+                    if (stack.getAmount() >= stack.getProperty().getMaxCount()) continue;
+
                     int newAmount = stack.getAmount() + itemStack.getAmount();
                     int maxCount = stack.getItem().property.getMaxCount();
                     if (newAmount <= maxCount) {
@@ -86,7 +90,7 @@ public class Backpack implements Inventory, Updateable {
                 return null;
             }
         }
-        return null;
+        return itemStack;
     }
 
     /**
