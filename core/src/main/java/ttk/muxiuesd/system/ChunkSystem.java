@@ -28,24 +28,23 @@ public class ChunkSystem extends WorldSystem {
 
     public boolean chunkEdgeRender = false;
     public boolean wallHitboxRender = false;
+    public static final float Slope = 100.0f;   // 地形坡度，生成地形时的参数
 
     private Player player;
     private Vector2 playerLastPosition;
     private WorldMapNoise noise;
     private Timer chunkLoadTimer = new Timer(0.5f, 0.5f);
+    //方块实例
+    private ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
 
-
-    public static final float Slope = 100.0f;   // 地形坡度，生成地形时的参数
-
-    // 线程池
-    private ExecutorService executor;
 
     // 当前活跃的线程
     private ArrayList<Chunk> activeChunks = new ArrayList<>();
     // 加载和卸载区块的延迟队列
     private ArrayList<Chunk> _loadChunks = new ArrayList<>();
     private ArrayList<Chunk> _unloadChunks = new ArrayList<>();
-
+    // 线程池
+    private ExecutorService executor;
     private ConcurrentHashMap<ChunkPosition, Future<Chunk>> chunkLoadingTasks;
     private ConcurrentHashMap<ChunkPosition, Future<Chunk>> chunkUnloadingTasks;
 
@@ -339,6 +338,7 @@ public class ChunkSystem extends WorldSystem {
      * 根据区块坐标来判断区块是否已经存在
      * */
     private boolean chunkExist(ChunkPosition position) {
+        //在活跃区块里找
         for (Chunk chunk : this.activeChunks) {
             if (chunk.getChunkPosition().equals(position)) return true;
         }
@@ -354,7 +354,7 @@ public class ChunkSystem extends WorldSystem {
             if (loadChunk.getChunkPosition().equals(position)) return true;
         }
 
-        return this.chunkLoadingTasks.containsKey(position);
+        return false;
     }
 
     /**
@@ -444,7 +444,7 @@ public class ChunkSystem extends WorldSystem {
         }
         // 如果没有这个区块,暂时就这么处理
         Chunk chunk = this.initChunk(chunkPosition.getX(), chunkPosition.getY());
-        this._loadChunks.add(chunk);
+        if (!this.chunkExist(chunkPosition)) this._loadChunks.add(chunk);
         return chunk;
     }
 
