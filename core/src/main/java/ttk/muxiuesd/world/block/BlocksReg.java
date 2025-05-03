@@ -28,6 +28,8 @@ public class BlocksReg {
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
 
+    public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
+
     public static Block register (String name, final Supplier<Block> supplier) {
         Block block = registrant.register(name, supplier);
         String id = Fight.getId(name);

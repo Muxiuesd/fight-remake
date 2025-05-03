@@ -9,7 +9,10 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
@@ -36,9 +39,11 @@ public class ChunkSystem extends WorldSystem {
     private Vector2 playerLastPosition;
     private WorldMapNoise noise;
     private Timer chunkLoadTimer = new Timer(0.5f, 0.5f);
+
     //方块实例，同一种方块在world里只有一个实例
     private final ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
-
+    //方块实体
+    private final ConcurrentHashMap<BlockPos, BlockEntity> blockEntities = new ConcurrentHashMap<>();
 
     // 当前活跃的线程
     private ArrayList<Chunk> activeChunks = new ArrayList<>();
@@ -144,6 +149,12 @@ public class ChunkSystem extends WorldSystem {
         }
         //Log.print(TAG, "____________");
 
+        //更新方块实体
+        for (BlockEntity blockEntity : this.blockEntities.values()) {
+            blockEntity.update(delta);
+        }
+
+
         if (this.chunkLoadTimer.isReady() && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
             this.calculateNeedUnloadedChunk();
@@ -162,6 +173,11 @@ public class ChunkSystem extends WorldSystem {
         for (Chunk chunk : this.activeChunks) {
             chunk.draw(batch);
         }
+        //绘制方块实体
+        this.getBlockEntities().forEach((blockPos, blockEntity1) -> {
+            blockEntity1.draw(batch, blockPos.x, blockPos.y);
+        });
+
     }
 
     @Override
@@ -177,6 +193,26 @@ public class ChunkSystem extends WorldSystem {
             activeChunk.dispose();
         }
         this.shutdownChunkLoadPool();
+    }
+
+    /**
+     * 添加方块实体
+     * */
+    private void addBlockEntity(BlockEntity blockEntity) {
+        if (blockEntity == null) return;
+        TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
+        ts.add(blockEntity);
+        this.getBlockEntities().put(blockEntity.getBlockPos(), blockEntity);
+    }
+
+    /**
+     * 移除方块实体
+     * */
+    private BlockEntity removeBlockEntity(BlockPos blockPos) {
+        BlockEntity removed = this.getBlockEntities().remove(blockPos);
+        TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
+        ts.remove(removed);
+        return removed;
     }
 
     /**
@@ -419,6 +455,18 @@ public class ChunkSystem extends WorldSystem {
             //如果方块实例不存在，就加进去
             instancesMap.put(newBlock.getID(), newBlock);
         }
+
+        //如果旧的方块是带有方块实体的方块
+        if (oldBlock instanceof BlockWithEntity blockWithEntity) {
+            this.removeBlockEntity(new BlockPos(floor));
+        }
+        //如果新的方块是带有方块实体的方块
+        if (newBlock instanceof BlockWithEntity blockWithEntity) {
+
+            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
+            this.addBlockEntity(blockEntity);
+        }
+
         chunk.setBlock(instancesMap.get(newBlock.getID()), chunkBlockPos.x, chunkBlockPos.y);
 
         EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
@@ -538,5 +586,9 @@ public class ChunkSystem extends WorldSystem {
 
     public ConcurrentHashMap<String, Block> getBlockInstancesMap () {
         return this.blockInstances;
+    }
+
+    public ConcurrentHashMap<BlockPos, BlockEntity> getBlockEntities () {
+        return this.blockEntities;
     }
 }

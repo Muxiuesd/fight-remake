@@ -16,9 +16,13 @@ import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 输入处理系统
@@ -75,10 +79,20 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
+
+        Vector2 mouseWorldPosition = this.getMouseWorldPosition();
+        Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            Vector2 mouseWorldPosition = this.getMouseWorldPosition();
-            Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
             Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
+        }
+        if (KeyBindings.PlayerInteract.wasJustPressed()) {
+            if (mouseBlock instanceof BlockWithEntity) {
+                BlockEntity blockEntity = cs.getBlockEntities().get(new BlockPos(Util.fastFloor(mouseWorldPosition.x, mouseWorldPosition.y)));
+                ItemStack handItemStack = player.getHandItemStack();
+                if (handItemStack == null) blockEntity.clickBlock(getWorld(), player);
+                else blockEntity.clickBlockWithItem(getWorld(), player, handItemStack);
+            }
         }
     }
 
@@ -94,11 +108,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean keyUp (int keycode) {
-        /*EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
-        HashSet<KeyInputEvent> events = group.getEvents();
-        for (KeyInputEvent event : events) {
-            event.call(keycode);
-        }*/
+
         EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
         return false;
     }
