@@ -414,7 +414,12 @@ public class ChunkSystem extends WorldSystem {
         ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
         Chunk chunk = this.getChunk(chunkPosition);
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
-        chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
+        ConcurrentHashMap<String, Block> instancesMap = this.getBlockInstancesMap();
+        if (! instancesMap.containsKey(newBlock.getID())) {
+            //如果方块实例不存在，就加进去
+            instancesMap.put(newBlock.getID(), newBlock);
+        }
+        chunk.setBlock(instancesMap.get(newBlock.getID()), chunkBlockPos.x, chunkBlockPos.y);
 
         EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
 
