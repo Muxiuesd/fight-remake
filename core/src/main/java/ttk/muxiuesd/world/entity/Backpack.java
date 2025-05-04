@@ -57,7 +57,7 @@ public class Backpack implements Inventory, Updateable {
         if (this.isFull(itemStack)) return itemStack;
 
         //TODO 解决相同物品不能存放多个堆叠的bug
-        boolean[] nullStacks = new boolean[this.size];
+        /*boolean[] nullStacks = new boolean[this.size];
         for (int i = 0; i < this.size; ++i) {
             ItemStack stack = this.itemStacks.get(i);
             if (stack != null) {
@@ -89,7 +89,35 @@ public class Backpack implements Inventory, Updateable {
                 this.setItemStack(i, itemStack);
                 return null;
             }
+        }*/
+
+        // 尝试合并到已有的堆叠
+        for (int i = 0; i < this.size; ++i) {
+            ItemStack stack = this.itemStacks.get(i);
+            if (stack != null && Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {
+                // 堆叠数量达到上限直接跳过
+                if (stack.getAmount() >= stack.getProperty().getMaxCount()) continue;
+
+                int newAmount = stack.getAmount() + itemStack.getAmount();
+                int maxCount = stack.getItem().property.getMaxCount();
+                if (newAmount <= maxCount) {
+                    stack.setAmount(newAmount);
+                    return null;
+                } else {
+                    stack.setAmount(maxCount);
+                    itemStack.setAmount(newAmount - maxCount);
+                }
+            }
         }
+
+        // 查找空位，然后把物品堆叠放进去
+        for (int i = 0; i < this.size; ++i) {
+            if (this.itemStacks.get(i) == null) {
+                this.setItemStack(i, itemStack);
+                return null;
+            }
+        }
+
         return itemStack;
     }
 

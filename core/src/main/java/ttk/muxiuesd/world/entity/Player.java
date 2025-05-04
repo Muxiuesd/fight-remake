@@ -45,10 +45,11 @@ public class Player extends LivingEntity {
 
         backpack.setItemStack(0, ItemsReg.getItem("test_item"));
         backpack.setItemStack(1, ItemsReg.getItem("test_weapon"));
-        backpack.setItemStack(2, ItemsReg.getItem("stick", 16));
-        backpack.setItemStack(3, ItemsReg.getItem("crafting_table", 1));
-        backpack.setItemStack(4, new ItemStack(Gets.ITEM(Fight.getId("fish_pole"))));
-        backpack.setItemStack(5, new ItemStack(Gets.ITEM(Fight.getId("bait"))));
+        backpack.setItemStack(2, ItemsReg.getItem("stick"));
+        backpack.setItemStack(3, ItemsReg.getItem("stick"));
+        backpack.setItemStack(4, ItemsReg.getItem("crafting_table", 8));
+        backpack.setItemStack(5, new ItemStack(Gets.ITEM(Fight.getId("fish_pole"))));
+        backpack.setItemStack(6, new ItemStack(Gets.ITEM(Fight.getId("bait"))));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }

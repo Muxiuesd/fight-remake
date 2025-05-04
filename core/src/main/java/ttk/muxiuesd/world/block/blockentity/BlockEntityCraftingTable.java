@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import ttk.muxiuesd.interfaces.Inventory;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -42,8 +43,9 @@ public class BlockEntityCraftingTable extends BlockEntity {
             if (itemStack == null) continue;
             System.out.println(i + " : " + itemStack.getItem());
         }
-
-        ItemStack bePutStack = new ItemStack(handItemStack.getItem(), 1);
+        //按住左Shift就是全部放进来
+        int addAmount = KeyBindings.PlayerShift.wasJustPressed() ? 1 : handItemStack.getAmount();
+        ItemStack bePutStack = new ItemStack(handItemStack.getItem(), addAmount);
         int oldAmount = bePutStack.getAmount();
         ItemStack stack = inventory.addItem(bePutStack);
         if (stack != null) {
@@ -52,9 +54,9 @@ public class BlockEntityCraftingTable extends BlockEntity {
                 System.out.println("放不进去哦");
                 return ItemClickBlockResult.FAILURE;
             }
-            handItemStack.setAmount(handItemStack.getAmount() - 1);
+            handItemStack.setAmount(handItemStack.getAmount() - addAmount);
         }else {
-            handItemStack.setAmount(handItemStack.getAmount() - 1);
+            handItemStack.setAmount(handItemStack.getAmount() - addAmount);
         }
 
         for (int i = 0; i < inventory.getCapacity(); i++) {

@@ -48,6 +48,10 @@ public class KeyBindings {
         Fight.getId("key_player_interact"), "key_player_interact",
         KeyBinding.Type.Mouse, Input.Buttons.RIGHT
     ));
+    public static KeyBinding PlayerShift = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_shift"), "key_player_shift",
+        KeyBinding.Type.Keyboard, Input.Keys.SHIFT_LEFT
+    ));
 
     public static KeyBinding ExitGame = InputBinding.registerBinding(new KeyBinding(
         Fight.getId("key_exit_game"), "key_exit_game",

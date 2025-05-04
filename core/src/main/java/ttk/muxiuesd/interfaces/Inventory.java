@@ -60,7 +60,7 @@ public interface Inventory {
             if (stack == null) return false;
             if (Objects.equals(itemStack.getItem().getID(), stack.getItem().getID())
                 && stack.getAmount() < stack.getProperty().getMaxCount()) {
-                //如果有相同的物品堆叠并且容器里的物品堆叠数量并没有达到最大值，就不算满
+                //如果有相同的物品堆叠并且容器里的物品堆叠数量并没有达到最大值，也不算满
                 return false;
             }
         }
