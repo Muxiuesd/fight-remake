@@ -21,10 +21,10 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     private Inventory inventory;    //方块实体所拥有的容器
 
 
-    public BlockEntity (Block block, BlockPos blockPos) {
+    public BlockEntity (Block block, BlockPos blockPos, int inventorySize) {
         this.block = block;
         this.blockPos = blockPos;
-        this.inventory = new Backpack(2);
+        this.inventory = new Backpack(inventorySize);
     }
 
     /**

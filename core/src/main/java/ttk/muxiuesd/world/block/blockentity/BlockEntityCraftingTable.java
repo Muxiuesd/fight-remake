@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.block.blockentity;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.world.World;
@@ -15,7 +16,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class BlockEntityCraftingTable extends BlockEntity {
     public BlockEntityCraftingTable (Block block, BlockPos blockPos) {
-        super(block, blockPos);
+        super(block, blockPos, 9);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         ItemStack itemStack = inventory.getItemStack(index);
         if (itemStack == null) return;
         //按住左Shift就是把这个物品全数取出
-        int outAmount = KeyBindings.PlayerShift.wasJustPressed() ? 1 : itemStack.getAmount();
+        int outAmount = KeyBindings.PlayerShift.wasPressed() ? itemStack.getAmount() : 1;
         int oldAmount = itemStack.getAmount();
         ItemStack stack = user.backpack.addItem(new ItemStack(itemStack.getItem(), outAmount));
 
@@ -52,9 +53,10 @@ public class BlockEntityCraftingTable extends BlockEntity {
     @Override
     public ItemClickBlockResult clickBlockWithItem (World world, LivingEntity user, ItemStack handItemStack) {
         Inventory inventory = getInventory();
-        printInventory(inventory);
+        //printInventory(inventory);
         //按住左Shift就是全部放进来
-        int addAmount = KeyBindings.PlayerShift.wasJustPressed() ? 1 : handItemStack.getAmount();
+        int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
+
         ItemStack bePutStack = new ItemStack(handItemStack.getItem(), addAmount);
         int oldAmount = bePutStack.getAmount();
         ItemStack stack = inventory.addItem(bePutStack);
@@ -78,6 +80,25 @@ public class BlockEntityCraftingTable extends BlockEntity {
         printInventory(user.backpack);
 
         return ItemClickBlockResult.SUCCESS;
+    }
+
+    @Override
+    public void draw (Batch batch, float x, float y) {
+        Inventory inventory = getInventory();
+        int index = 0;
+        for (int j = 0; j < 3; j++) {
+            for (int i = 0; i < 3; i++) {
+                ItemStack itemStack = inventory.getItemStack(index);
+                if (itemStack == null) continue;
+
+                float width  = 0.33f;
+                float height = 0.33f;
+                batch.draw(itemStack.getItem().texture,
+                    x + i * width, y + j * height,
+                    width, height);
+                index++;
+            }
+        }
     }
 
     private void printInventory (Inventory inventory) {
