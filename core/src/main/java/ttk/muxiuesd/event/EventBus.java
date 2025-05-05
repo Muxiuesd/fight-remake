@@ -1,32 +1,31 @@
 package ttk.muxiuesd.event;
 
-import ttk.muxiuesd.event.world.EventBulletShoot;
-import ttk.muxiuesd.event.world.EventPosterBulletShoot;
 import ttk.muxiuesd.util.Log;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventBus {
     public static final String TAG = EventBus.class.getName();
-    private static final ConcurrentHashMap<String, EventGroup> eventHandlersTable = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, EventHandler> eventHandlersTable = new ConcurrentHashMap<>();
 
-    static {
-        register("BulletShoot", new EventGroup<EventBulletShoot, EventPosterBulletShoot>() {
+    /*static {
+        register("BulletShoot", new EventHandler<BulletShootEvent, EventPosterBulletShoot>() {
             @Override
             public void callEvents (EventPosterBulletShoot poster) {
                 getEvents().forEach(event -> event.handle(poster.shooter, poster.bullet));
             }
         });
-    }
+    }*/
 
     /**
      * 注册一种事件类型
      * */
-    public static <T extends Event, P extends EventPoster> void register (String eventType, EventGroup<T, P> eventHandler) {
+    public static <T extends Event, P extends EventPoster> String register (String eventType, EventHandler<T, P> eventHandler) {
         if (eventHandlersTable.containsKey(eventType)) {
             Log.error(TAG, "事件类型：" + eventType + " 已被注册过，执行覆盖！！！");
         }
         eventHandlersTable.put(eventType, eventHandler);
+        return eventType;
     }
 
     public static void unregister (String eventType) {

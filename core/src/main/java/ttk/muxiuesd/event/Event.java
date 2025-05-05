@@ -1,4 +1,4 @@
 package ttk.muxiuesd.event;
 
-public abstract class Event {
+public abstract interface Event {
 }

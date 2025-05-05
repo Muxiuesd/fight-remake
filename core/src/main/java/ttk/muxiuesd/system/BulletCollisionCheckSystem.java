@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -14,7 +17,6 @@ import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.ArrayList;
@@ -312,12 +314,8 @@ public class BulletCollisionCheckSystem extends WorldSystem {
      * 调用实体受攻击的事件
      * */
     private void callEntityAttackedEvent (Entity attackedObject, Entity victim) {
-        /*EventGroup<EntityAttackedEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.EntityAttacked);
-        HashSet<EntityAttackedEvent> events = eventGroup.getEvents();
-        for (EntityAttackedEvent event :events) {
-            event.call(attackedObject, victim);
-        }*/
-        EventBus.getInstance().callEvent(EventBus.EventType.EntityAttacked, attackedObject, victim);
+        //EventBus.getInstance().callEvent(EventBus.EventType.EntityAttacked, attackedObject, victim);
+        EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(attackedObject, victim));
     }
 
     @Override

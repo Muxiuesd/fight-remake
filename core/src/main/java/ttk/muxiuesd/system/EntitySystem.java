@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
-import ttk.muxiuesd.event.world.EventPosterBulletShoot;
+import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;

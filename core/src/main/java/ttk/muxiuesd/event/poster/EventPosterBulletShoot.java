@@ -1,4 +1,4 @@
-package ttk.muxiuesd.event.world;
+package ttk.muxiuesd.event.poster;
 
 import ttk.muxiuesd.event.EventPoster;
 import ttk.muxiuesd.world.entity.abs.Bullet;

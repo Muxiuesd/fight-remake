@@ -1,10 +1,8 @@
 package ttk.muxiuesd.system;
 
-import ttk.muxiuesd.event.world.EventBulletShoot;
+import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.abs.Bullet;
-import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.instance.*;
 
@@ -32,22 +30,21 @@ public class EventSystem extends WorldSystem {
         //添加游戏内事件
         bus.addEvent(EventBus.EventType.TickUpdate, new EventWorldWorldTick());
 
-        bus.addEvent(EventBus.EventType.EntityAttacked, new EventPlayerAttacked());
-        bus.addEvent(EventBus.EventType.EntityAttacked, new EventSlimeAttacked(getWorld()));
+        //bus.addEvent(EventBus.EventType.EntityAttacked, new EventPlayerAttacked());
+        ttk.muxiuesd.event.EventBus.subscribe(EventTypes.ENTITY_HURT, new EventPlayerAttacked());
+        //bus.addEvent(EventBus.EventType.EntityAttacked, new EventSlimeAttacked(getWorld()));
+        ttk.muxiuesd.event.EventBus.subscribe(EventTypes.ENTITY_HURT, new EventSlimeAttacked(getWorld()));
 
         bus.addEvent(EventBus.EventType.PlayerDeath, new EventPlayerDead());
         bus.addEvent(EventBus.EventType.EntityDeath, new EventSlimeDead(getWorld()));
 
         //bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
+        ttk.muxiuesd.event.EventBus.subscribe(EventTypes.BULLET_SHOOT, new EventPlayerShootBullet(getWorld()));
         //bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));
+        ttk.muxiuesd.event.EventBus.subscribe(EventTypes.BULLET_SHOOT, new EventEnemyShootBullet(getWorld()));
 
         bus.addEvent(EventBus.EventType.BlockReplaceEvent, new EventBlockReplace());
 
-        ttk.muxiuesd.event.EventBus.subscribe("BulletShoot", new EventBulletShoot() {
-            @Override
-            public void handle (Entity shooter, Bullet bullet) {
-                System.out.println(shooter + " 射出子弹：" + bullet);
-            }
-        });
+
     }
 }

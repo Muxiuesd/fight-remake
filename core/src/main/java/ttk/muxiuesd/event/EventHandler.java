@@ -1,8 +1,32 @@
 package ttk.muxiuesd.event;
 
+import java.util.HashSet;
+
 /**
- * 事件处理器
+ * 事件组，同一种事件放在一起
  * */
-public interface EventHandler<T extends Event> {
-    void handle(T event);
+public abstract class EventHandler<T extends Event, P extends EventPoster> {
+    private final HashSet<T> events = new HashSet<>();;
+
+    public abstract void callEvents (P poster);
+
+    public boolean addEvent (T event) {
+        if (!this.events.contains(event)) {
+            this.events.add(event);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeEvent (T event) {
+        if (this.events.contains(event)) {
+            this.events.remove(event);
+            return true;
+        }
+        return false;
+    }
+
+    public HashSet<T> getEvents() {
+        return this.events;
+    }
 }
