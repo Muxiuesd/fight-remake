@@ -1,7 +1,10 @@
 package ttk.muxiuesd.system;
 
+import ttk.muxiuesd.event.world.EventBulletShoot;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.Bullet;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.event.instance.*;
 
@@ -35,9 +38,16 @@ public class EventSystem extends WorldSystem {
         bus.addEvent(EventBus.EventType.PlayerDeath, new EventPlayerDead());
         bus.addEvent(EventBus.EventType.EntityDeath, new EventSlimeDead(getWorld()));
 
-        bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
-        bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));
+        //bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
+        //bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));
 
         bus.addEvent(EventBus.EventType.BlockReplaceEvent, new EventBlockReplace());
+
+        ttk.muxiuesd.event.EventBus.subscribe("BulletShoot", new EventBulletShoot() {
+            @Override
+            public void handle (Entity shooter, Bullet bullet) {
+                System.out.println(shooter + " 射出子弹：" + bullet);
+            }
+        });
     }
 }

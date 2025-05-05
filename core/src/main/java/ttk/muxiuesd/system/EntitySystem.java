@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.event.world.EventPosterBulletShoot;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -288,7 +289,8 @@ public class EntitySystem extends WorldSystem {
      * 调用事件
      * */
     public void callBulletShootEvent (Entity shooter, Bullet bullet) {
-        EventBus.getInstance().callEvent(EventBus.EventType.BulletShoot, shooter, bullet);
+        //EventBus.getInstance().callEvent(EventBus.EventType.BulletShoot, shooter, bullet);
+        ttk.muxiuesd.event.EventBus.post("BulletShoot", new EventPosterBulletShoot(shooter, bullet));
     }
 
     public void callEntityDeadEvent (LivingEntity deadEntity) {
