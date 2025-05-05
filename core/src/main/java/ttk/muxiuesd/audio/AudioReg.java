@@ -20,6 +20,8 @@ public class AudioReg {
         registerSoundAsMusic("eat_2",  "entity/eat/eat2.ogg");
         registerSoundAsMusic("eat_3",  "entity/eat/eat3.ogg");
 
+        registerSoundAsMusic("slime_small",  "entity/slime/small.ogg");
+
         //玩家
         registerSoundAsMusic("shoot", "player/shoot.wav");
         registerMusic("player_resurrection", "player_resurrection.mp3");
@@ -35,7 +37,7 @@ public class AudioReg {
         //物品
         registerSoundAsMusic("click", "item/click.ogg");
         registerSound("put", "item/put.ogg");
-
+        registerSound("pop", "item/pop.ogg");
 
         Log.print(AudioReg.class.getName(), "游戏音效注册完成");
     }

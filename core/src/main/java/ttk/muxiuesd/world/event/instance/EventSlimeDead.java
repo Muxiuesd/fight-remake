@@ -1,7 +1,9 @@
 package ttk.muxiuesd.world.event.instance;
 
 import com.badlogic.gdx.math.MathUtils;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -22,6 +24,7 @@ public class EventSlimeDead extends EntityDeathEvent {
 
     @Override
     public void callback (LivingEntity deadEntity) {
+        //史莱姆死亡分裂
         if (deadEntity instanceof Slime) {
             EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
             Slime mom = (Slime) deadEntity;
@@ -29,7 +32,6 @@ public class EventSlimeDead extends EntityDeathEvent {
             if (generation == maxGeneration) {
                 return;
             }
-            //Slime[] children = new Slime[MathUtils.random(generation, generation + 3)];
             for (int i = 0; i < MathUtils.random(generation, generation + 3); i++) {
                 Slime child = new Slime();
                 child.generation = generation + 1;
@@ -41,6 +43,8 @@ public class EventSlimeDead extends EntityDeathEvent {
                 child.setBounds(x, y, width, height);
                 es.add(child);
             }
+            SoundEffectSystem ses = (SoundEffectSystem) world.getSystemManager().getSystem("SoundEffectSystem");
+            ses.newSpatialSound(Fight.getId("slime_small"), deadEntity);
         }
     }
 }

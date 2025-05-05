@@ -38,10 +38,11 @@ public class MonsterGenerationSystem extends WorldSystem {
 
         Slime slime = new Slime();
         slime.setEntitySystem(this.es);
-        slime.setBounds((float) (this.ps.getPlayer().x + 5 * Math.cos(Util.randomRadian())),
-            (float) (this.ps.getPlayer().y + 5 * Math.sin(Util.randomRadian())),
+        double radian = Util.randomRadian();
+        slime.setBounds((float) (this.ps.getPlayer().x + 16 * Math.cos(radian)),
+            (float) (this.ps.getPlayer().y + 16 * Math.sin(radian)),
             1, 1);
-        //this.es.add(slime);
+        this.es.add(slime);
 
         /*Enemy modEnemy = (Enemy) Gets.get("testmod:zombie", Entity.class);
         modEnemy.setEntitySystem(this.es);
@@ -76,10 +77,8 @@ public class MonsterGenerationSystem extends WorldSystem {
             slime.setBounds(genX, genY, 1, 1);
             this.es.add(slime);*/
 
-            Enemy modEnemy = Gets.ENEMY("testmod:zombie");
-            modEnemy.setEntitySystem(this.es);
+            Enemy modEnemy = Gets.ENEMY("testmod:zombie", this.es);
             modEnemy.setPosition(genX, genY);
-            this.es.add(modEnemy);
         }
         //System.out.println("生成怪物");
         //刷怪间隔归零

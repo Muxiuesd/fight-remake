@@ -39,6 +39,10 @@ public class Gets {
         return (Enemy) ENTITY(id);
     }
 
+    public static Enemy ENEMY (String id, EntitySystem entitySystem) {
+        return (Enemy) ENTITY(id, entitySystem);
+    }
+
     public static Bullet BULLET (String id) {
         return (Bullet) ENTITY(id);
     }

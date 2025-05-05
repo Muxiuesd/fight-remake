@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -190,6 +191,7 @@ public class EntitySystem extends WorldSystem {
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
+                    AudioPlayer.getInstance().playSound(Fight.getId("pop"));
                     //整个捡起来就没必要执行下面的代码了
                     return;
                 }else if (state == ItemPickUpState.PARTIAL) {

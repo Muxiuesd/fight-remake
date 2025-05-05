@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.HandleInputSystem;
@@ -106,6 +107,8 @@ public class Player extends LivingEntity {
         float v = Math.min(distance, 4f);
         itemEntity.setSpeed(v);
         itemEntity.setCurSpeed(v);
+
+        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
 
         return true;
     }
