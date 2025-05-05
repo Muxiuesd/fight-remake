@@ -25,7 +25,6 @@ public class AudioReg {
         registerMusic("player_resurrection", "player_resurrection.mp3");
 
         //方块
-        //registerBlockSound("grass_walk", "walk/grass.ogg");
         registerBlockSound("stone_walk_2", "walk/stone.wav");
         registerBlockSound("stone_walk_1", "walk/stone_1.ogg");
 
@@ -35,6 +34,8 @@ public class AudioReg {
 
         //物品
         registerSoundAsMusic("click", "item/click.ogg");
+        registerSound("put", "item/put.ogg");
+
 
         Log.print(AudioReg.class.getName(), "游戏音效注册完成");
     }

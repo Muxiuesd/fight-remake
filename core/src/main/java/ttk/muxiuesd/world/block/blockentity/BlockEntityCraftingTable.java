@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.world.World;
@@ -60,16 +62,14 @@ public class BlockEntityCraftingTable extends BlockEntity {
         ItemStack bePutStack = new ItemStack(handItemStack.getItem(), addAmount);
         int oldAmount = bePutStack.getAmount();
         ItemStack stack = inventory.addItem(bePutStack);
-        if (stack != null) {
-            if (oldAmount == stack.getAmount()) {
-                //数量没变就是满了装不下去
-                System.out.println("放不进去哦");
-                return ItemClickBlockResult.FAILURE;
-            }
-            handItemStack.setAmount(handItemStack.getAmount() - addAmount);
-        }else {
-            handItemStack.setAmount(handItemStack.getAmount() - addAmount);
+        if (stack != null && oldAmount == stack.getAmount()) {
+            //数量没变就是满了装不下去
+            System.out.println("放不进去哦");
+            return ItemClickBlockResult.FAILURE;
+            //handItemStack.setAmount(handItemStack.getAmount() - addAmount);
         }
+        handItemStack.setAmount(handItemStack.getAmount() - addAmount);
+        AudioPlayer.getInstance().playSound(Fight.getId("put"), 2.5f);
 
         for (int i = 0; i < inventory.getCapacity(); i++) {
             ItemStack itemStack = inventory.getItemStack(i);
