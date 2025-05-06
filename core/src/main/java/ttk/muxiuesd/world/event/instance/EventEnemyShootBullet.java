@@ -15,19 +15,13 @@ import ttk.muxiuesd.world.particle.ParticleDefaultConfig;
  * 事件：敌人发射子弹
  * */
 public class EventEnemyShootBullet extends BulletShootEvent {
-    private final World world;
-
-    public EventEnemyShootBullet (World world) {
-        this.world = world;
-    }
-
     /*@Override
     public void callback (Entity shooter, Bullet bullet) {
 
     }*/
 
     @Override
-    public void handle (Entity shooter, Bullet bullet) {
+    public void handle (World world, Entity shooter, Bullet bullet) {
         if (shooter.group == Group.enemy) {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()

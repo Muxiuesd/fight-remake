@@ -315,7 +315,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
      * */
     private void callEntityAttackedEvent (Entity attackedObject, Entity victim) {
         //EventBus.getInstance().callEvent(EventBus.EventType.EntityAttacked, attackedObject, victim);
-        EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(attackedObject, victim));
+        EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(getWorld(), attackedObject, victim));
     }
 
     @Override

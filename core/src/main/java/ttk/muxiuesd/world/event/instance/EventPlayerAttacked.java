@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.event.instance;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.abs.EntityHurtEvent;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -19,7 +20,7 @@ public class EventPlayerAttacked extends EntityHurtEvent {
     }*/
 
     @Override
-    public void handle (Entity attackObject, Entity victim) {
+    public void handle (World world, Entity attackObject, Entity victim) {
         if (victim instanceof Player) {
             Player player = (Player) victim;
             AudioPlayer.getInstance().playMusic(Fight.getId("hurt_1"));

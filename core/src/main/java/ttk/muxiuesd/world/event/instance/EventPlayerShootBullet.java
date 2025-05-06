@@ -14,12 +14,6 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * 事件：玩家发射子弹
  * */
 public class EventPlayerShootBullet extends BulletShootEvent {
-    private final World world;
-
-    public EventPlayerShootBullet (World world) {
-        this.world = world;
-    }
-
     /*@Override
     public void callback (Entity shooter, Bullet bullet) {
         if (shooter.group == Group.player) {
@@ -42,7 +36,7 @@ public class EventPlayerShootBullet extends BulletShootEvent {
     }*/
 
     @Override
-    public void handle (Entity shooter, Bullet bullet) {
+    public void handle (World world, Entity shooter, Bullet bullet) {
         if (shooter.group == Group.player) {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()

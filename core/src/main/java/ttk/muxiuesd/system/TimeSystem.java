@@ -1,10 +1,12 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterWorldTick;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.event.EventBus;
 
 /**
  * 时间系统
@@ -65,7 +67,8 @@ public class TimeSystem extends WorldSystem implements Tickable {
         this.tickUpdates.forEach(t -> t.tick(delta));
 
         //this.callWorldTickEvent(delta);
-        EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
+        //EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
+        EventBus.post(EventTypes.WORLD_TICK, new EventPosterWorldTick(getWorld(), delta));
     }
 
     /**
