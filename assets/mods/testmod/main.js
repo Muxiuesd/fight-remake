@@ -57,10 +57,10 @@ entityRegister.register("bullet_sword", Entity.newSupplier(function () {
     return Entity.newBullet("testmod:sword",5.0, 10.5, 10.0, 0.0);
 }));
 
-World.event.add("entityAttacked", function (attackObject, victim) {
+World.event.add("entityAttacked", function (world, attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);
 });
-World.event.add("keyInput", function (key) {
+World.event.add("keyInput", function (world, key) {
     if (key === Keys.P) {
         Log.print(TAG, "Key is: P");
         var playerSystem = World.systems.get("PlayerSystem");
@@ -68,11 +68,11 @@ World.event.add("keyInput", function (key) {
     }
     Log.print(TAG, "Key: " + key);
 });
-World.event.add("buttonInput", function (screenX, screenY, pointer, button) {
+World.event.add("buttonInput", function (world, screenX, screenY, pointer, button) {
     if (button === Buttons.LEFT) {
         Log.print(TAG, "Button is: 左键");
     }
-    Log.print(TAG, "Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
+    //Log.print(TAG, "Button: " + button + "坐标：(" + screenX + "," + screenY + ")");
 });
 
 Library.export("Fun", {

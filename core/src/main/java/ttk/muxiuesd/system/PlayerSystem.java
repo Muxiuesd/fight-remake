@@ -4,6 +4,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -14,7 +17,6 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -46,7 +48,8 @@ public class PlayerSystem extends WorldSystem {
         this.bubbleEmitTimer.update(delta);
 
         if (this.player.isDeath()) {
-            EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
+            //EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
+            EventBus.post(EventTypes.PLAYER_DEATH, new EventPosterPlayerDeath(getWorld(), this.player));
             this.remakePlayer();
             return;
         }

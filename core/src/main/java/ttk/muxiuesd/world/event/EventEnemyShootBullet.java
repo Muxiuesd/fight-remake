@@ -1,34 +1,31 @@
-package ttk.muxiuesd.world.event.instance;
+package ttk.muxiuesd.world.event;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.event.abs.BulletShootEvent;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
-import ttk.muxiuesd.world.event.abs.BulletShootEvent;
 import ttk.muxiuesd.world.particle.ParticleDefaultConfig;
 
 /**
  * 事件：敌人发射子弹
  * */
 public class EventEnemyShootBullet extends BulletShootEvent {
-    private final World world;
+    /*@Override
+    public void callback (Entity shooter, Bullet bullet) {
 
-    public EventEnemyShootBullet (World world) {
-        this.world = world;
-    }
+    }*/
 
     @Override
-    public void callback (Entity shooter, Bullet bullet) {
+    public void handle (World world, Entity shooter, Bullet bullet) {
         if (shooter.group == Group.enemy) {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()
                 .getSystem("SoundEffectSystem");
-
-            //AudioPlayer.getInstance().playSound("testmod:ignite");
 
             //TODO 不同子弹不同音效，不同实体不同音效
             ses.newSpatialSound(Fight.getId("shoot"), bullet);

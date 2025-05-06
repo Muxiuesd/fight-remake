@@ -1,18 +1,17 @@
-package ttk.muxiuesd.world.event;
-
-import ttk.muxiuesd.interfaces.Event;
+package ttk.muxiuesd.event;
 
 import java.util.HashSet;
 
 /**
- * 事件组，同种类型的事件放在一组里
+ * 事件处理组，同一种事件放在一起
  * */
-public class EventGroup<T extends Event> {
-    private final HashSet<T> events;
+public abstract class EventHandler<T extends Event, P extends EventPoster> {
+    private final HashSet<T> events = new HashSet<>();;
 
-    public EventGroup () {
-        this.events = new HashSet<>();
-    }
+    /**
+     * 实现调用事件的逻辑
+     * */
+    public abstract void callEvents (P poster);
 
     public boolean addEvent (T event) {
         if (!this.events.contains(event)) {

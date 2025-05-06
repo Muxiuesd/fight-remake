@@ -6,6 +6,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
+import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -19,7 +23,6 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -288,11 +291,13 @@ public class EntitySystem extends WorldSystem {
      * 调用事件
      * */
     public void callBulletShootEvent (Entity shooter, Bullet bullet) {
-        EventBus.getInstance().callEvent(EventBus.EventType.BulletShoot, shooter, bullet);
+        //EventBus.getInstance().callEvent(EventBus.EventType.BulletShoot, shooter, bullet);
+        ttk.muxiuesd.event.EventBus.post("BulletShoot", new EventPosterBulletShoot(getWorld(), shooter, bullet));
     }
 
     public void callEntityDeadEvent (LivingEntity deadEntity) {
-        EventBus.getInstance().callEvent(EventBus.EventType.EntityDeath, deadEntity);
+        //EventBus.getInstance().callEvent(EventBus.EventType.EntityDeath, deadEntity);
+        EventBus.post(EventTypes.ENTITY_DEATH, new EventPosterEntityDeath(getWorld(), deadEntity));
     }
 
     public Player getPlayer() {

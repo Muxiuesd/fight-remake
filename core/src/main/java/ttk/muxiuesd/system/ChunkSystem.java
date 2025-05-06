@@ -6,6 +6,9 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
@@ -19,7 +22,6 @@ import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.chunk.MainWorldChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.event.EventBus;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -469,7 +471,8 @@ public class ChunkSystem extends WorldSystem {
 
         chunk.setBlock(instancesMap.get(newBlock.getID()), chunkBlockPos.x, chunkBlockPos.y);
 
-        EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
+        //EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
+        EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
         return oldBlock;
     }
