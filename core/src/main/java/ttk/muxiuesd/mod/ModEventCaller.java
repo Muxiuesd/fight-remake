@@ -2,10 +2,7 @@ package ttk.muxiuesd.mod;
 
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
-import ttk.muxiuesd.event.abs.BulletShootEvent;
-import ttk.muxiuesd.event.abs.EntityDeathEvent;
-import ttk.muxiuesd.event.abs.EntityHurtEvent;
-import ttk.muxiuesd.event.abs.WorldTickEvent;
+import ttk.muxiuesd.event.abs.*;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -67,6 +64,28 @@ public class ModEventCaller {
                 }
             }
         });
+        EventBus.subscribe(EventTypes.WORLD_KEY_INPUT, new WorldKeyInputEvent() {
+            @Override
+            public void process (World world, int key) {
+                try {
+                    invocable.invokeFunction("callWorldKeyInputEvent", world, key);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        EventBus.subscribe(EventTypes.WORLD_BUTTON_INPUT, new WorldButtonInputEvent() {
+            @Override
+            public void process (World world, int screenX, int screenY, int pointer, int button) {
+                try {
+                    invocable.invokeFunction("callWorldButtonInputEvent", world, screenX, screenY, pointer, button);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         /*EventBus eventBus = EventBus.getInstance();
         ScriptEngine libEngine = ModLibManager.getInstance().getLibEngine();
         Invocable invocable = (Invocable) libEngine;

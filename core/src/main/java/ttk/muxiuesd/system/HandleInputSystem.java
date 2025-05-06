@@ -8,6 +8,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
+import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -21,7 +25,6 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.event.EventBus;
 import ttk.muxiuesd.world.item.ItemClickBlockResult;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -115,8 +118,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean keyUp (int keycode) {
-
-        EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
+        //EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
+        EventBus.post(EventTypes.WORLD_KEY_INPUT, new EventPosterWorldKeyInput(getWorld(), keycode));
         return false;
     }
 
@@ -132,12 +135,9 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-        /*EventGroup<ButtonInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.ButtonInput);
-        HashSet<ButtonInputEvent> events = group.getEvents();
-        for (ButtonInputEvent event : events) {
-            event.call(screenX, screenY, pointer, button);
-        }*/
-        EventBus.getInstance().callEvent(EventBus.EventType.ButtonInput, screenX, screenY, pointer, button);
+        //EventBus.getInstance().callEvent(EventBus.EventType.ButtonInput, screenX, screenY, pointer, button);
+        EventBus.post(EventTypes.WORLD_BUTTON_INPUT,
+            new EventPosterWorldButtonInput(getWorld(), screenX, screenY, pointer, button));
         return false;
     }
 

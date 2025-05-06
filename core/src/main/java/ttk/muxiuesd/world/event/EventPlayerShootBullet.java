@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.event.instance;
+package ttk.muxiuesd.world.event;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;

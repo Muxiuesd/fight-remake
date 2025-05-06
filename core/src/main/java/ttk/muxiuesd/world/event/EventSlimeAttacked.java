@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.event.instance;
+package ttk.muxiuesd.world.event;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.abs.EntityHurtEvent;

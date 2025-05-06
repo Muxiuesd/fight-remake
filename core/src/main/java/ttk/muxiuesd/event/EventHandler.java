@@ -3,11 +3,14 @@ package ttk.muxiuesd.event;
 import java.util.HashSet;
 
 /**
- * 事件组，同一种事件放在一起
+ * 事件处理组，同一种事件放在一起
  * */
 public abstract class EventHandler<T extends Event, P extends EventPoster> {
     private final HashSet<T> events = new HashSet<>();;
 
+    /**
+     * 实现调用事件的逻辑
+     * */
     public abstract void callEvents (P poster);
 
     public boolean addEvent (T event) {

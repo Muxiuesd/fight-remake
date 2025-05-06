@@ -4,7 +4,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.event.instance.*;
+import ttk.muxiuesd.world.event.*;
 
 /**
  * 事件系统，隶属于world

@@ -58,15 +58,15 @@ var callEntityDeadEvent = function (world, deadEntity) {
         World.eventGroups.entityDead[i](world, deadEntity);
     }
 }
-var callWorldKeyInputEvent = function (key) {
+var callWorldKeyInputEvent = function (world, key) {
     for (var i = 0; i < World.eventGroups.keyInput.length; i++) {
-        World.eventGroups.keyInput[i](key);
+        World.eventGroups.keyInput[i](world, key);
     }
 }
-var callWorldButtonInputEvent = function (screenX, screenY, pointer, button) {
+var callWorldButtonInputEvent = function (world, screenX, screenY, pointer, button) {
     //屏幕坐标系原点在游戏窗口左上角，y轴向下
     for (var i = 0; i < World.eventGroups.buttonInput.length; i++) {
-        World.eventGroups.buttonInput[i](screenX, screenY, pointer, button);
+        World.eventGroups.buttonInput[i](world, screenX, screenY, pointer, button);
     }
 }
 var callWorldTickEvent = function (world, delta) {

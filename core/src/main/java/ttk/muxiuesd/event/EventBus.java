@@ -57,11 +57,4 @@ public class EventBus {
         }
         eventHandlersTable.get(eventType).addEvent(event);
     }
-
-    /*private static class Holder {
-        public static final EventBus INSTANCE = new EventBus();
-    }
-    public static EventBus getInstance() {
-        return Holder.INSTANCE;
-    }*/
 }

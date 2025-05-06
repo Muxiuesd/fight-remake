@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.event.instance;
+package ttk.muxiuesd.world.event;
 
 import ttk.muxiuesd.event.abs.WorldTickEvent;
 import ttk.muxiuesd.world.World;

@@ -56,4 +56,24 @@ public class EventTypes {
             });
         }
     });
+
+    public static final String WORLD_KEY_INPUT = EventBus.register("WorldKeyInput",
+        new EventHandler<WorldKeyInputEvent, EventPosterWorldKeyInput>() {
+        @Override
+        public void callEvents (EventPosterWorldKeyInput poster) {
+            getEvents().forEach(event -> {
+                event.process(poster.world, poster.key);
+            });
+        }
+    });
+
+    public static final String WORLD_BUTTON_INPUT = EventBus.register("WorldButtonInput",
+        new EventHandler<WorldButtonInputEvent, EventPosterWorldButtonInput>() {
+            @Override
+            public void callEvents (EventPosterWorldButtonInput poster) {
+                getEvents().forEach(event -> {
+                    event.process(poster.world, poster.screenX, poster.screenY, poster.pointer, poster.button);
+                });
+            }
+        });
 }
