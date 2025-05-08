@@ -7,6 +7,9 @@ import ttk.muxiuesd.event.poster.*;
  * 所有类型的事件
  * */
 public class EventTypes {
+    public static void init (){
+    };
+
     public static final String BULLET_SHOOT = EventBus.register("BulletShoot",
         new EventHandler<BulletShootEvent, EventPosterBulletShoot>() {
         @Override

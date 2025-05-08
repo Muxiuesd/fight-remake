@@ -1,11 +1,11 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
+import ttk.muxiuesd.interfaces.IEntityRender;
+import ttk.muxiuesd.interfaces.IWorldChunkRender;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.render.RenderProcessorManager;
+import ttk.muxiuesd.render.RenderProcessorsReg;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 
@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 /**
  * 游戏系统的管理者
  * */
-public class SystemManager implements Updateable, Drawable, ShapeRenderable, Disposable {
+public class SystemManager implements Updateable, Disposable {
     public final String TAG = this.getClass().getName();
 
     private final LinkedHashMap<String, WorldSystem> systems; //使用LinkedHashMap确保初始化的顺序为添加系统时的顺序
@@ -45,11 +45,19 @@ public class SystemManager implements Updateable, Drawable, ShapeRenderable, Dis
     public void initAllSystems() {
         for (WorldSystem system : systems.values()) {
             system.initialize();
+            //识别系统所在的渲染处理器
+            if (system instanceof IWorldChunkRender worldChunkRenderSystem) {
+                RenderProcessorManager.get(RenderProcessorsReg.WORLD_CHUNK).addRenderTask(worldChunkRenderSystem);
+            }else if (system instanceof IEntityRender entityRenderSystem) {
+                RenderProcessorManager.get(RenderProcessorsReg.ENTITY).addRenderTask(entityRenderSystem);
+            }
         }
         Log.print(TAG, "所有系统初始化完毕");
     }
 
-    @Override
+
+
+    /*@Override
     public void draw(Batch batch) {
         this.systems.values().forEach(system -> system.draw(batch));
     }
@@ -57,7 +65,7 @@ public class SystemManager implements Updateable, Drawable, ShapeRenderable, Dis
     @Override
     public void renderShape(ShapeRenderer batch) {
         this.systems.values().forEach(system -> system.renderShape(batch));
-    }
+    }*/
 
     @Override
     public void update(float delta) {

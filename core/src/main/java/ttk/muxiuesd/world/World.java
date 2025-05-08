@@ -1,18 +1,15 @@
 package ttk.muxiuesd.world;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.WorldSystemsManager;
+import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 
 /**世界的基类
  * */
-public abstract class World implements Updateable, Drawable, ShapeRenderable, Disposable {
+public abstract class World implements Updateable, Disposable {
     public final String TAG = this.getClass().getName();
 
     private final MainGameScreen screen;
@@ -22,7 +19,15 @@ public abstract class World implements Updateable, Drawable, ShapeRenderable, Di
         this.screen = screen;
     }
 
-    @Override
+    /**
+     * 添加系统
+     * */
+    public <T extends WorldSystem> World addSystem(String name, T system) {
+        this.getSystemManager().addSystem(name, system);
+        return this;
+    }
+
+    /*@Override
     public void draw(Batch batch) {
         if (this.worldSystemsManager != null) {
             this.getSystemManager().draw(batch);
@@ -34,7 +39,7 @@ public abstract class World implements Updateable, Drawable, ShapeRenderable, Di
         if (this.worldSystemsManager != null) {
             this.getSystemManager().renderShape(batch);
         }
-    }
+    }*/
 
     @Override
     public void update(float delta) {

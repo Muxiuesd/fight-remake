@@ -7,20 +7,20 @@ import ttk.muxiuesd.Fight;
 /**
  * 着色器注册
  * */
-public class ShaderReg {
+public class ShadersReg {
 
-    public static final String DAYNIGHT_SHADER = registry(
+    public static final String DAYNIGHT_SHADER = register(
         Fight.getId("daynight_shader"),
         "shaders/daynight/daynight.vert",
         "shaders/daynight/daynight.frag");
 
-    public static final String PARTICLE_SHADER = registry(
+    public static final String PARTICLE_SHADER = register(
         Fight.getId("particle_1_shader"),
         "shaders/particle/particle.vert",
         "shaders/particle/particle.frag"
     );
 
-    public static final String PARTICLE_2_SHADER = registry(
+    public static final String PARTICLE_2_SHADER = register(
         Fight.getId("particle_shader"),
         "shaders/particle/particle_2.vert",
         "shaders/particle/particle_2.frag"
@@ -30,7 +30,7 @@ public class ShaderReg {
      * 注册
      * @return 注册的id
      * */
-    public static String registry (String id, String vertPath, String fragPath) {
+    public static String register (String id, String vertPath, String fragPath) {
         String vert = Gdx.files.internal(vertPath).readString();
         String frag = Gdx.files.internal(fragPath).readString();
         ShaderProgram shader = new ShaderProgram(vert, frag);

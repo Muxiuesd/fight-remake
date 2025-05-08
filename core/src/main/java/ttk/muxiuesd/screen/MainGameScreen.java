@@ -18,7 +18,12 @@ import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.render.RenderProcessorManager;
+import ttk.muxiuesd.render.RenderProcessorsReg;
+import ttk.muxiuesd.render.instance.EntityRenderProcessor;
+import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.shader.ShaderScheduler;
+import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
@@ -59,6 +64,12 @@ public class MainGameScreen implements Screen {
         ShaderScheduler.init();
 
         this.setWorld(new MainWorld(this));
+
+        RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
+            new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
+        RenderProcessorManager.register(RenderProcessorsReg.ENTITY,
+            new EntityRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+
         this.world.getSystemManager().initAllSystems();
 
         //执行mod代码
@@ -84,16 +95,18 @@ public class MainGameScreen implements Screen {
         camera.update();
         Batch batch = this.batch;
         batch.setProjectionMatrix(camera.combined);
-
+        batch.begin();
         //batch.begin();
         //绘制
-        this.world.draw(batch);
+        //this.world.draw(batch);
         //batch.end();
-
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin();
-        this.world.renderShape(shapeRenderer);
+        //this.world.renderShape(shapeRenderer);
+        RenderProcessorManager.render(batch, shapeRenderer);
+
         shapeRenderer.end();
+        batch.end();
     }
 
     @Override
@@ -121,6 +134,7 @@ public class MainGameScreen implements Screen {
     public void dispose() {
         this.world.dispose();
     }
+
     /**
      * 设置当前世界
      * */

@@ -7,7 +7,7 @@ import ttk.muxiuesd.world.World;
 /**
  * 运行在世界里的系统
  * */
-public abstract class WorldSystem extends FightSystem {
+public abstract class WorldSystem extends GameSystem {
     private World world;
 
     public WorldSystem(World world) {
