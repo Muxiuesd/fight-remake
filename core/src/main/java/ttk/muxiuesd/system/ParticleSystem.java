@@ -3,9 +3,11 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.IParticleRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
@@ -21,7 +23,7 @@ import java.util.LinkedHashMap;
 /**
  * 粒子系统
  **/
-public class ParticleSystem extends WorldSystem {
+public class ParticleSystem extends WorldSystem implements IParticleRender {
     public final String TAG = this.getClass().getName();
 
     private LinkedHashMap<String, ParticleEmitter> emitters;
@@ -88,6 +90,11 @@ public class ParticleSystem extends WorldSystem {
         daynightSystem.end();*/
     }
 
+    @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.draw(batch);
+    }
+
     /**
      * 简单发射粒子，使用默认参数
      * TODO 用id来使用不同的默认参数
@@ -148,4 +155,6 @@ public class ParticleSystem extends WorldSystem {
         this.delayAddEmitters.add(emitter);
         return emitter;
     }
+
+
 }

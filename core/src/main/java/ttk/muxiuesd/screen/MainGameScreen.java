@@ -21,6 +21,7 @@ import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
 import ttk.muxiuesd.render.instance.EntityRenderProcessor;
+import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
 import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.shader.ShadersReg;
@@ -69,6 +70,8 @@ public class MainGameScreen implements Screen {
             new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY,
             new EntityRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+        RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
+            new ParticleRenderProcessor(this.cameraController.camera, ShadersReg.PARTICLE_SHADER, 300, this.world));
 
         this.world.getSystemManager().initAllSystems();
 
