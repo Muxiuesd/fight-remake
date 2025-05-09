@@ -1,12 +1,9 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.IWorldChunkRender;
-import ttk.muxiuesd.interfaces.IWorldEntityRender;
-import ttk.muxiuesd.interfaces.IWorldParticleRender;
+import ttk.muxiuesd.interfaces.IRenderTask;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.render.RenderProcessorManager;
-import ttk.muxiuesd.render.RenderProcessorsReg;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 
@@ -46,14 +43,8 @@ public class SystemManager implements Updateable, Disposable {
     public void initAllSystems() {
         for (WorldSystem system : systems.values()) {
             system.initialize();
-            //识别系统所在的渲染处理器
-            //TODO 渲染处理器识别类，把对应的渲染任务放进对应的渲染处理器
-            if (system instanceof IWorldChunkRender worldChunkRenderSystem) {
-                RenderProcessorManager.get(RenderProcessorsReg.WORLD_CHUNK).addRenderTask(worldChunkRenderSystem);
-            }else if (system instanceof IWorldEntityRender entityRenderSystem) {
-                RenderProcessorManager.get(RenderProcessorsReg.ENTITY).addRenderTask(entityRenderSystem);
-            } else if (system instanceof IWorldParticleRender particleRenderSystem) {
-                RenderProcessorManager.get(RenderProcessorsReg.PARTICLE).addRenderTask(particleRenderSystem);
+            if (system instanceof IRenderTask task) {
+                RenderProcessorManager.addRenderTask(task);
             }
         }
         Log.print(TAG, "所有系统初始化完毕");

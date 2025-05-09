@@ -3,6 +3,8 @@ package ttk.muxiuesd.render.instance;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.interfaces.IRenderTask;
+import ttk.muxiuesd.interfaces.IWorldEntityRender;
 import ttk.muxiuesd.render.abs.WorldRenderProcessor;
 import ttk.muxiuesd.system.DaynightSystem;
 import ttk.muxiuesd.world.World;
@@ -34,5 +36,14 @@ public class EntityRenderProcessor extends WorldRenderProcessor {
         //这里结束日夜着色
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
         daynightSystem.end();
+    }
+
+    @Override
+    public boolean recognize (IRenderTask task) {
+        if (task instanceof IWorldEntityRender) {
+            addRenderTask(task);
+            return true;
+        }
+        return false;
     }
 }

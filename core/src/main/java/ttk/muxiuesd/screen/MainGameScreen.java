@@ -99,13 +99,10 @@ public class MainGameScreen implements Screen {
         Batch batch = this.batch;
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        //batch.begin();
-        //绘制
-        //this.world.draw(batch);
-        //batch.end();
+
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin();
-        //this.world.renderShape(shapeRenderer);
+
         RenderProcessorManager.render(batch, shapeRenderer);
 
         shapeRenderer.end();

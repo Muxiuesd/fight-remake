@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Camera;
 import ttk.muxiuesd.world.World;
 
 /**
- * 世界里的各种元素渲染所用的渲染处理器
+ * 游戏世界相关的渲染处理器的抽象类
+ * <p>
+ * 世界相关的渲染就继承这个
  * */
 public abstract class WorldRenderProcessor extends RenderProcessor {
     private final World world;
