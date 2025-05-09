@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.IParticleRender;
+import ttk.muxiuesd.interfaces.IWorldParticleRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 /**
  * 粒子系统
  **/
-public class ParticleSystem extends WorldSystem implements IParticleRender {
+public class ParticleSystem extends WorldSystem implements IWorldParticleRender {
     public final String TAG = this.getClass().getName();
 
     private LinkedHashMap<String, ParticleEmitter> emitters;
