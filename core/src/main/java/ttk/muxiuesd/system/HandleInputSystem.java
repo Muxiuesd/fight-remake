@@ -20,7 +20,6 @@ import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
@@ -91,8 +90,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
-            if (mouseBlock instanceof BlockWithEntity) {
-                BlockEntity blockEntity = cs.getBlockEntities().get(new BlockPos(Util.fastFloor(mouseWorldPosition.x, mouseWorldPosition.y)));
+            if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
+                BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
                 ItemStack handItemStack = player.getHandItemStack();
                 if (handItemStack == null) blockEntity.interact(getWorld(), player);
                 else {

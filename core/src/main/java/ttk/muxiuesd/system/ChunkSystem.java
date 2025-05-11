@@ -43,10 +43,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     private WorldMapNoise noise;
     private Timer chunkLoadTimer = new Timer(0.5f, 0.5f);
 
-    //方块实例，同一种方块在world里只有一个实例
+    //方块实例，不带有方块实体的同一种方块在world里只有一个实例，带有方块实体的方块都是单独一个实例
     private final ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
-    //方块实体
-    private final ConcurrentHashMap<BlockPos, BlockEntity> blockEntities = new ConcurrentHashMap<>();
+    //方块实体，每一个方块实体都是一个单独的实例
+    private final ConcurrentHashMap<BlockWithEntity, BlockEntity> blockEntities = new ConcurrentHashMap<>();
 
     // 当前活跃的线程
     private ArrayList<Chunk> activeChunks = new ArrayList<>();
@@ -168,17 +168,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void draw(Batch batch) {
-        /*//这里开始日夜着色
-        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
-        daynightSystem.begin();*/
-
-        //batch.setColor(Color.WHITE);
         for (Chunk chunk : this.activeChunks) {
             chunk.draw(batch);
         }
         //绘制方块实体
-        this.getBlockEntities().forEach((blockPos, blockEntity1) -> {
-            blockEntity1.draw(batch, blockPos.x, blockPos.y);
+        this.getBlockEntities().forEach((block, blockEntity) -> {
+            BlockPos pos = blockEntity.getBlockPos();
+            blockEntity.draw(batch, pos.x, pos.y);
         });
 
     }
@@ -210,24 +206,142 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
+     * 添加方块
+     * */
+    public void addBlock (Block block, float wx, float wy) {
+        Vector2 floor = Util.fastFloor(wx, wy);
+        //如果新的方块是带有方块实体的方块
+        if (block instanceof BlockWithEntity blockWithEntity) {
+            //添加方块实体
+            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
+            this.addBlockEntity(blockWithEntity, blockEntity);
+            //TODO 事件：添加方块实体
+        }
+        this.addBlockInstance(block);
+    }
+
+    /**
+     * 移除方块
+     * */
+    public Block removeBlock (float wx, float wy) {
+        Block removed = this.getBlock(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
+
+        Chunk chunk = this.getChunk(this.getChunkPosition(floor.x, floor.y));
+        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
+        chunk.setBlock(null, chunkBlockPos.x, chunkBlockPos.y);
+
+        return removed;
+    }
+
+    /**
+     * 添加方块实例
+     * */
+    private void addBlockInstance (Block block) {
+        //如果是带有方块实体的方块
+        if (block instanceof BlockWithEntity blockWithEntity) {
+            this.blockInstances.put(this.getBlockKey(blockWithEntity), blockWithEntity);
+            return;
+        }
+
+        //普通方块
+        if (! this.blockInstances.containsKey(block.getID())) {
+            this.blockInstances.put(block.getID(), block);
+        }
+    }
+
+    /**
+     * 移除方块实例
+     * */
+    private Block removeBlockInstance (Block block) {
+        //如果是带有方块实体的方块
+        if (block instanceof BlockWithEntity blockWithEntity) {
+            return this.blockInstances.remove(this.getBlockKey(blockWithEntity));
+        }
+
+        //普通方块
+        if (!this.blockInstances.containsKey(block.getID())) {
+            throw new IllegalArgumentException("方块：" + block.getID() + " 的实例从未添加过！！！");
+        }
+
+        return this.blockInstances.remove(block.getID());
+    }
+
+    /**
      * 添加方块实体
      * */
-    private void addBlockEntity(BlockEntity blockEntity) {
-        if (blockEntity == null) return;
+    private void addBlockEntity(BlockWithEntity block, BlockEntity blockEntity) {
+        if (block == null || blockEntity == null) return;
+
         TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
         ts.add(blockEntity);
-        this.getBlockEntities().put(blockEntity.getBlockPos(), blockEntity);
+        this.getBlockEntities().put(block, blockEntity);
+
+        blockEntity.bePlaced(getWorld(), this.player);
     }
 
     /**
      * 移除方块实体
      * */
-    private BlockEntity removeBlockEntity(BlockPos blockPos) {
-        BlockEntity removed = this.getBlockEntities().remove(blockPos);
+    private BlockEntity removeBlockEntity(BlockWithEntity block) {
+        BlockEntity removed = this.getBlockEntities().remove(block);
+        if (removed == null) return null;
+
         TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
         ts.remove(removed);
+        removed.beDestroyed(getWorld(), this.player);
+
         return removed;
     }
+
+    /**
+     * 替换某个位置的方块
+     * @return 被替换下来的方块
+     * */
+    public Block replaceBlock(Block newBlock, float wx, float wy) {
+        if (newBlock == null) {
+            throw new NullPointerException("newBlock 不能为null！！！");
+        }
+        Block oldBlock = this.getBlock(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
+
+        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
+        Chunk chunk = this.getChunk(chunkPosition);
+        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
+
+        /*ConcurrentHashMap<String, Block> instancesMap = this.getBlockInstancesMap();
+        if (! instancesMap.containsKey(newBlock.getID())) {
+            //如果方块实例不存在，就加进去
+            instancesMap.put(newBlock.getID(), newBlock);
+        }*/
+
+        /*//如果新的方块是带有方块实体的方块
+        if (newBlock instanceof BlockWithEntity blockWithEntity) {
+            //添加方块实体
+            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
+            this.addBlockEntity(blockWithEntity, blockEntity);
+            //TODO 事件：添加方块实体
+        }
+        this.addBlockInstance(newBlock);*/
+
+        //如果旧的方块是带有方块实体的方块
+        if (oldBlock instanceof BlockWithEntity blockWithEntity) {
+            this.removeBlockEntity(blockWithEntity);
+            //TODO 事件：移除方块实体
+            //移除对应的方块实例
+            this.removeBlockInstance(oldBlock);
+        }
+
+        this.addBlock(newBlock, wx, wy);
+
+        chunk.setBlock(this.getBlockInstancesMap().get(this.getBlockKey(newBlock)), chunkBlockPos.x, chunkBlockPos.y);
+
+        //EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
+        EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
+
+        return oldBlock;
+    }
+
 
     /**
      * 计算需要被加载的区块
@@ -451,46 +565,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 替换某个位置的方块
-     * @return 被替换下来的方块
-     * */
-    public Block replaceBlock(Block newBlock, float wx, float wy) {
-        if (newBlock == null) {
-            throw new NullPointerException("newBlock 不能为null！！！");
-        }
-        Block oldBlock = this.getBlock(wx, wy);
-        Vector2 floor = Util.fastFloor(wx, wy);
-
-        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
-        Chunk chunk = this.getChunk(chunkPosition);
-        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
-        ConcurrentHashMap<String, Block> instancesMap = this.getBlockInstancesMap();
-        if (! instancesMap.containsKey(newBlock.getID())) {
-            //如果方块实例不存在，就加进去
-            instancesMap.put(newBlock.getID(), newBlock);
-        }
-
-        //如果旧的方块是带有方块实体的方块
-        if (oldBlock instanceof BlockWithEntity blockWithEntity) {
-            this.removeBlockEntity(new BlockPos(floor));
-        }
-        //如果新的方块是带有方块实体的方块
-        if (newBlock instanceof BlockWithEntity blockWithEntity) {
-
-            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
-            this.addBlockEntity(blockEntity);
-        }
-
-        chunk.setBlock(instancesMap.get(newBlock.getID()), chunkBlockPos.x, chunkBlockPos.y);
-
-        //EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
-        EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
-
-        return oldBlock;
-    }
-
-
-    /**
      * 获取区块
      */
     public Chunk getChunk(int chunkX, int chunkY) {
@@ -603,9 +677,17 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.blockInstances;
     }
 
-    public ConcurrentHashMap<BlockPos, BlockEntity> getBlockEntities () {
+    public ConcurrentHashMap<BlockWithEntity, BlockEntity> getBlockEntities () {
         return this.blockEntities;
     }
 
-
+    /**
+     * 获取方块键
+     * */
+    private String getBlockKey (Block block) {
+        if (block instanceof BlockWithEntity blockWithEntity) {
+            return blockWithEntity.getID() + ":" + blockWithEntity.hashCode();
+        }
+        return block.getID();
+    }
 }

@@ -9,6 +9,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.entity.Backpack;
+import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -16,8 +17,8 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 方块实体
  * */
 public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable {
-    private Block block;    //方块
-    private BlockPos blockPos;  //方块实体的位置
+    private Block block;            //方块
+    private BlockPos blockPos;      //方块实体的位置
     private Inventory inventory;    //方块实体所拥有的容器
 
 
@@ -39,6 +40,20 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
      * */
     public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack) {
         return InteractResult.FAILURE;
+    }
+
+    /**
+     * 方块实体被放置
+     * */
+    public void bePlaced (World world, Player player) {
+
+    }
+
+    /**
+     * 方块实体被破坏
+     * */
+    public void beDestroyed (World world, Player destroyer) {
+
     }
 
     /**
