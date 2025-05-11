@@ -93,7 +93,6 @@ public class RenderProcessorManager {
         // 识别系统所在的渲染处理器
         for (RenderProcessor processor : processors.values()) {
             if (processor.recognize(task)) {
-                processor.addRenderTask(task);
                 break;
             }
         }
