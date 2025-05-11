@@ -8,6 +8,8 @@ import ttk.muxiuesd.interfaces.IRenderTaskRecognizer;
 import ttk.muxiuesd.shader.ShaderScheduler;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * 渲染处理器
@@ -15,9 +17,9 @@ import java.util.ArrayList;
  * 每一大类游戏元素的渲染都要一个渲染处理器来完成
  * */
 public abstract class RenderProcessor implements Comparable<RenderProcessor>, IRenderTaskRecognizer {
-    private Camera camera;
-    private String shaderId;
-    private int renderOrder;
+    private Camera camera;      //相机
+    private String shaderId;    //使用的着色器id
+    private int renderOrder;    //这个渲染处理器的渲染顺序
     private final ArrayList<IRenderTask> renderTasks;
 
     public RenderProcessor(Camera camera, String shaderId, int renderOrder) {
@@ -27,13 +29,37 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
         this.renderTasks = new ArrayList<>();
     }
 
+    /**
+     * 处理渲染任务
+     * */
     public abstract void handleRender (Batch batch, ShapeRenderer shapeRenderer);
 
+    /**
+     * 添加渲染任务，自动排序
+     * */
+    public void addRenderTask (IRenderTask renderTask) {
+        this.renderTasks.add(renderTask);
+        this.sortRenderTasks();
+    }
+
+    /**
+     * 对渲染任务进行排序
+     */
+    public void sortRenderTasks() {
+        Collections.sort(this.getRenderTasks(), Comparator.comparingInt(IRenderTask::getRenderPriority));
+    }
+
+    /**
+     * 开始着色器
+     * */
     protected void beginShader(Batch batch) {
         if (this.getShaderId() == null) return;
         ShaderScheduler.getInstance().begin(this.getShaderId(), batch);
     }
 
+    /**
+     * 结束着色器
+     * */
     protected void endShader() {
         if (this.getShaderId() == null) return;
         ShaderScheduler.getInstance().end(this.getShaderId());
@@ -64,15 +90,11 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
     }
 
     public ArrayList<IRenderTask> getRenderTasks () {
-        return renderTasks;
-    }
-
-    public void addRenderTask (IRenderTask renderTask) {
-        this.renderTasks.add(renderTask);
+        return this.renderTasks;
     }
 
     @Override
     public int compareTo (RenderProcessor o) {
-        return this.getRenderOrder();
+        return Integer.compare(this.getRenderOrder(), o.getRenderOrder());
     }
 }

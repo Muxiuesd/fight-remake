@@ -95,6 +95,11 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
         this.draw(batch);
     }
 
+    @Override
+    public int getRenderPriority () {
+        return 100;
+    }
+
     /**
      * 简单发射粒子，使用默认参数
      * TODO 用id来使用不同的默认参数

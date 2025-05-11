@@ -197,6 +197,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     @Override
+    public int getRenderPriority () {
+        return 100;
+    }
+
+    @Override
     public void dispose() {
         for (Chunk activeChunk : this.activeChunks) {
             activeChunk.dispose();

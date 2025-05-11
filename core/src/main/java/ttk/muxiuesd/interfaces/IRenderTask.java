@@ -8,4 +8,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * */
 public interface IRenderTask {
     void render(Batch batch, ShapeRenderer shapeRenderer);
+
+    /**
+     * 渲染优先级，优先级值越小，渲染顺序越靠前（即 1 比 2 先渲染）
+     */
+    int getRenderPriority();
 }

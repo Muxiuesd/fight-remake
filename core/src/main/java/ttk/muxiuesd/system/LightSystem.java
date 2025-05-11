@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
-import ttk.muxiuesd.interfaces.IWorldParticleRender;
+import ttk.muxiuesd.interfaces.IWorldChunkRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.light.PointLight;
@@ -20,7 +20,7 @@ import java.nio.IntBuffer;
 /**
  * 光源系统
  * */
-public class LightSystem extends WorldSystem implements IWorldParticleRender {
+public class LightSystem extends WorldSystem implements IWorldChunkRender {
     public static final int MAX_LIGHTS = 1688;
     // 假设每个光源位置是2个float,第3个是光的强度，一个light占4个，第四个没用，但是为了对齐内存，创建vec3也会要四个内存，glsl内部是vec4好计算
     private float[] lightPos = new float[MAX_LIGHTS * 4];
@@ -98,6 +98,11 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
         this.draw(batch);
     }
 
+    @Override
+    public int getRenderPriority () {
+        return 200;
+    }
+
     /**
      * 收集所有的发光例子的数据
      * */
@@ -125,6 +130,4 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
             this.lightSize++;
         }
     }
-
-
 }

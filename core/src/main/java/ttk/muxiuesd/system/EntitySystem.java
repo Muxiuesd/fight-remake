@@ -288,6 +288,11 @@ public class EntitySystem extends WorldSystem implements IWorldEntityRender {
     }
 
     @Override
+    public int getRenderPriority () {
+        return 100;
+    }
+
+    @Override
     public void dispose() {
         for (Entity entity : this.getEntities()) {
             entity.dispose();
