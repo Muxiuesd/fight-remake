@@ -21,11 +21,11 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.item.ItemClickBlockResult;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -94,10 +94,10 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             if (mouseBlock instanceof BlockWithEntity) {
                 BlockEntity blockEntity = cs.getBlockEntities().get(new BlockPos(Util.fastFloor(mouseWorldPosition.x, mouseWorldPosition.y)));
                 ItemStack handItemStack = player.getHandItemStack();
-                if (handItemStack == null) blockEntity.clickBlock(getWorld(), player);
+                if (handItemStack == null) blockEntity.interact(getWorld(), player);
                 else {
-                    ItemClickBlockResult result = blockEntity.clickBlockWithItem(getWorld(), player, handItemStack);
-                    if (result == ItemClickBlockResult.SUCCESS && handItemStack.getAmount() == 0) {
+                    InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack);
+                    if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
                         //使用成功就检测手持物品是否用完，用完就清除
                         player.backpack.clear(player.getHandIndex());
                     }

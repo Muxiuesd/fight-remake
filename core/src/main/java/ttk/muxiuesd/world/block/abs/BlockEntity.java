@@ -7,9 +7,9 @@ import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.item.ItemClickBlockResult;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -28,17 +28,17 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     }
 
     /**
-     * 点击一下方块（手上没东西）
+     * 空手与方块互动
      * */
-    public void clickBlock (World world, LivingEntity user) {
-
+    public InteractResult interact (World world, LivingEntity user) {
+        return InteractResult.FAILURE;
     }
 
     /**
-     * 手持物品点击方块
+     * 手持物品与方块互动
      * */
-    public ItemClickBlockResult clickBlockWithItem (World world, LivingEntity user, ItemStack handItemStack) {
-        return ItemClickBlockResult.SUCCESS;
+    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack) {
+        return InteractResult.FAILURE;
     }
 
     /**
