@@ -9,6 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
+import ttk.muxiuesd.interfaces.IWorldChunkRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
@@ -30,7 +31,7 @@ import java.util.concurrent.*;
 /**
  * 区块系统
  * */
-public class ChunkSystem extends WorldSystem {
+public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     public final String TAG = this.getClass().getName();
 
     public boolean chunkEdgeRender = false;
@@ -167,9 +168,9 @@ public class ChunkSystem extends WorldSystem {
 
     @Override
     public void draw(Batch batch) {
-        //这里开始日夜着色
+        /*//这里开始日夜着色
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
-        daynightSystem.begin();
+        daynightSystem.begin();*/
 
         //batch.setColor(Color.WHITE);
         for (Chunk chunk : this.activeChunks) {
@@ -187,6 +188,17 @@ public class ChunkSystem extends WorldSystem {
         for (Chunk chunk : this.activeChunks) {
             chunk.renderShape(batch);
         }
+    }
+
+    @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.draw(batch);
+        this.renderShape(shapeRenderer);
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 100;
     }
 
     @Override
@@ -594,4 +606,6 @@ public class ChunkSystem extends WorldSystem {
     public ConcurrentHashMap<BlockPos, BlockEntity> getBlockEntities () {
         return this.blockEntities;
     }
+
+
 }

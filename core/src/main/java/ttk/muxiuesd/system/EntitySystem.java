@@ -10,6 +10,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
+import ttk.muxiuesd.interfaces.IWorldEntityRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -29,7 +30,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 实体系统
  * */
-public class EntitySystem extends WorldSystem {
+public class EntitySystem extends WorldSystem implements IWorldEntityRender {
     public final String TAG = EntitySystem.class.getName();
 
     private final Array<Entity> _delayAdd = new Array<>();
@@ -281,6 +282,17 @@ public class EntitySystem extends WorldSystem {
     }
 
     @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.draw(batch);
+        this.renderShape(shapeRenderer);
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 100;
+    }
+
+    @Override
     public void dispose() {
         for (Entity entity : this.getEntities()) {
             entity.dispose();
@@ -308,4 +320,5 @@ public class EntitySystem extends WorldSystem {
     public Array<Entity> getEntities () {
         return this.entities;
     }
+
 }

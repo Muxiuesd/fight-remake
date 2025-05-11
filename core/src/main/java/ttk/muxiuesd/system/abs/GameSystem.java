@@ -9,7 +9,7 @@ import ttk.muxiuesd.system.SystemManager;
 /**
  * 整个游戏的系统的抽象类
  * */
-public abstract class FightSystem implements Updateable, Drawable, ShapeRenderable, Disposable {
+public abstract class GameSystem implements Updateable, Drawable, ShapeRenderable, Disposable {
     private SystemManager manager;
 
     public SystemManager getManager() {

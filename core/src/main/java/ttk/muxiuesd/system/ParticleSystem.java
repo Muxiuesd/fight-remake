@@ -3,9 +3,11 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.IWorldParticleRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
@@ -21,7 +23,7 @@ import java.util.LinkedHashMap;
 /**
  * 粒子系统
  **/
-public class ParticleSystem extends WorldSystem {
+public class ParticleSystem extends WorldSystem implements IWorldParticleRender {
     public final String TAG = this.getClass().getName();
 
     private LinkedHashMap<String, ParticleEmitter> emitters;
@@ -83,8 +85,19 @@ public class ParticleSystem extends WorldSystem {
         // 恢复默认混合模式
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
+        /*//这里结束日夜着色
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
-        daynightSystem.end();
+        daynightSystem.end();*/
+    }
+
+    @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.draw(batch);
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 100;
     }
 
     /**
@@ -147,4 +160,6 @@ public class ParticleSystem extends WorldSystem {
         this.delayAddEmitters.add(emitter);
         return emitter;
     }
+
+
 }
