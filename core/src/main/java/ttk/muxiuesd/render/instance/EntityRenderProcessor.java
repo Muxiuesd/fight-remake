@@ -28,7 +28,7 @@ public class EntityRenderProcessor extends WorldRenderProcessor {
     protected void beginShader (Batch batch) {
         //这里开始日夜着色
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
-        daynightSystem.begin();
+        daynightSystem.begin(batch);
     }
 
     @Override

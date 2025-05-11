@@ -59,6 +59,7 @@ public class LightSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void draw(Batch batch) {
+        this.initialize();
         //通过ubo的id绑定当前ubo为此ubo，该uboId已经创建ubo，所以不会再创建了
         Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, this.uboId);
         if(this.lightSize !=0)

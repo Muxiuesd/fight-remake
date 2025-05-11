@@ -17,18 +17,18 @@ public class WorldChunkRenderProcessor extends WorldRenderProcessor {
     @Override
     public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
         batch.setProjectionMatrix(getCamera().combined);
-        beginShader(batch);
-        
+        this.beginShader(batch);
+
         getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
 
-        endShader();
+        this.endShader();
     }
 
     @Override
     protected void beginShader (Batch batch) {
         //这里开始日夜着色
         DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
-        daynightSystem.begin();
+        daynightSystem.begin(batch);
     }
 
     @Override
