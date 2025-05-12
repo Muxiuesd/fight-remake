@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
@@ -32,7 +33,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
     }
 
     @Override
-    public InteractResult interact (World world, LivingEntity user) {
+    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
 
@@ -56,7 +57,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
     }
 
     @Override
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack) {
+    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         Inventory inventory = getInventory();
         //printInventory(inventory);
         //按住左Shift就是全部放进来

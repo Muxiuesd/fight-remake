@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ttk.muxiuesd.camera.CameraController;
@@ -20,6 +21,7 @@ import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
@@ -91,15 +93,27 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
             if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
+
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
+                //计算交互区域网格坐标
+                BlockPos blockPos = blockEntity.getBlockPos();
+                GridPoint2 gridSize = blockEntity.getInteractGridSize();
+                int xn = (int) ((mouseWorldPosition.x - blockPos.x) * gridSize.x);
+                int yn = (int) ((mouseWorldPosition.y - blockPos.y) * gridSize.y);
+                GridPoint2 interactGrid = new GridPoint2(xn, yn);
+
+                //System.out.println(interactGrid);
                 ItemStack handItemStack = player.getHandItemStack();
-                if (handItemStack == null) blockEntity.interact(getWorld(), player);
-                else {
-                    InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack);
+                if (handItemStack == null) {
+                    InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);
+                    //TODO 空手交互事件
+                } else {
+                    InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid);
                     if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
                         //使用成功就检测手持物品是否用完，用完就清除
                         player.backpack.clear(player.getHandIndex());
                     }
+                    //TODO 手持物品交互事件
                 }
             }
         }

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
@@ -25,28 +26,33 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 方块实体
  * */
 public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable {
-    private Block block;            //方块
-    private BlockPos blockPos;      //方块实体的位置
-    private Inventory inventory;    //方块实体所拥有的容器
+    private Block block;                    //方块
+    private BlockPos blockPos;              //方块实体的位置
+    private GridPoint2 interactGridSize;    //方块实体的交互网格大小
+    private Inventory inventory;            //方块实体所拥有的容器
 
+    public BlockEntity(Block block, BlockPos blockPos, int inventorySize) {
+        this(block, blockPos, new GridPoint2(16, 16), inventorySize);
+    }
 
-    public BlockEntity (Block block, BlockPos blockPos, int inventorySize) {
+    public BlockEntity (Block block, BlockPos blockPos, GridPoint2 interactGridSize, int inventorySize) {
         this.block = block;
         this.blockPos = blockPos;
+        this.interactGridSize = interactGridSize;
         this.inventory = new Backpack(inventorySize);
     }
 
     /**
      * 空手与方块互动
      * */
-    public InteractResult interact (World world, LivingEntity user) {
+    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
         return InteractResult.FAILURE;
     }
 
     /**
      * 手持物品与方块互动
      * */
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack) {
+    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         return InteractResult.FAILURE;
     }
 
@@ -117,6 +123,14 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     public BlockEntity setBlockPos (BlockPos blockPos) {
         this.blockPos = blockPos;
         return this;
+    }
+
+    public GridPoint2 getInteractGridSize () {
+        return interactGridSize;
+    }
+
+    public void setInteractGridSize (GridPoint2 interactGridSize) {
+        this.interactGridSize = interactGridSize;
     }
 
     public Inventory getInventory () {
