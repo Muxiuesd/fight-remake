@@ -31,6 +31,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlocksReg;
 import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.item.ItemsReg;
+import ttk.muxiuesd.world.wall.WallsReg;
 
 /**
  * 主游戏屏幕
@@ -59,6 +60,7 @@ public class MainGameScreen implements Screen {
         AudioReg.registerAllAudios();
         ItemsReg.registerAllItem();
         BlocksReg.registerAllBlocks();
+        WallsReg.initAllWalls();
         EntitiesReg.registerAllEntities();
 
         //初始化着色器调度器

@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.wall.Wall;
-import ttk.muxiuesd.world.wall.Walls;
+import ttk.muxiuesd.world.wall.WallsReg;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,7 +50,7 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
             }
             int random = MathUtils.random(0, 15);
             if (random < 1) {
-                Wall wall = Walls.newWall("wall_smooth_stone");
+                Wall wall = WallsReg.newWall("wall_smooth_stone");
                 wall.setPosition(chunk.getWorldX(x), chunk.getWorldY(y));
                 chunk.setWall(wall, x, y);
             }

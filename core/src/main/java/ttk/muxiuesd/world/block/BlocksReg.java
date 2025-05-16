@@ -29,6 +29,7 @@ public class BlocksReg {
     public static final Block WATER = register("water", BlockWater::new);
 
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
+    public static final Block FURNACE = register("furnace", BlockFurnace::new);
 
     public static Block register (String name, final Supplier<Block> supplier) {
         Block block = registrant.register(name, supplier);
@@ -41,6 +42,4 @@ public class BlocksReg {
     public static Block newBlock (String name) {
         return registrant.get(name);
     }
-
-
 }

@@ -1,13 +1,12 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 
 /**
  * 带有方块实体的方块
  * */
-public abstract class BlockWithEntity extends Block{
+public abstract class BlockWithEntity extends Block {
     public BlockWithEntity (Property property, String textureId) {
         super(property, textureId);
     }
@@ -20,9 +19,4 @@ public abstract class BlockWithEntity extends Block{
      * 产生方块实体
      * */
     public abstract BlockEntity createBlockEntity(BlockPos blockPos, World world);
-
-    @Override
-    public void draw (Batch batch, float x, float y) {
-        super.draw(batch, x, y);
-    }
 }

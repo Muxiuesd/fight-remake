@@ -66,14 +66,15 @@ public class AssetsLoader implements Disposable {
             if (curManager.isLoaded(filePath, type)) {
                 this.idToPath.put(id, filePath);
                 if (callback != null) callback.run();
+                return;
             } else {
                 throw new IllegalStateException("资源加载失败: " + filePath);
             }
         } else if (callback != null){
             //如果已经加载，直接执行回调
-            this.idToPath.put(id, filePath);
             callback.run();
         }
+        this.idToPath.put(id, filePath);
     }
 
     private <T> void loadAsync(String filePath, Class<T> type, Runnable callback) {

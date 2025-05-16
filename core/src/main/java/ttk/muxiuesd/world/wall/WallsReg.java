@@ -10,10 +10,9 @@ import java.util.function.Supplier;
  * 墙体注册
  * TODO 注册mod墙体
  * */
-public class Walls {
+public class WallsReg {
     public static Registrant<Wall> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Wall.class);
-    public Walls() {
-
+    public static void initAllWalls() {
     }
 
     public static final Wall TEST_WALL = register("wall_test", WallTest::new);

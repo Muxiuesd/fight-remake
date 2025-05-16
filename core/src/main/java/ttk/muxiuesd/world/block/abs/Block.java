@@ -27,12 +27,12 @@ public abstract class Block implements ID, BlockDrawable, Disposable {
 
     public Block (Property property, String textureId) {
         this.setProperty(property);
-        this.loadTextureRegion(textureId);
+        this.textureRegion = this.loadTextureRegion(textureId);
     }
 
     public Block(Property property, String textureId, String texturePath) {
         this.setProperty(property);
-        this.loadTextureRegion(textureId, texturePath);
+        this.textureRegion = this.loadTextureRegion(textureId, texturePath);
     }
 
     @Override
@@ -62,15 +62,23 @@ public abstract class Block implements ID, BlockDrawable, Disposable {
         this.property = property;
     }
 
-    public void loadTextureRegion (String id) {
-        this.textureRegion = new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    public TextureRegion loadTextureRegion (String id) {
+        return this.loadTextureRegion(id, null);
     }
 
-    public void loadTextureRegion (String id, String texturePath) {
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(id, Texture.class);
-            this.textureRegion = new TextureRegion(texture);
-        });
+    /**
+     * 获取材质
+     * <p>
+     * 有返回值，以便于有多个材质的物品使用
+     * @param texturePath 当此为null时默认之前加载过
+     * */
+    public TextureRegion loadTextureRegion (String id, String texturePath) {
+        if (texturePath == null) {
+            texturePath = AssetsLoader.getInstance().getPath(id);
+        }
+
+        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
+        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
 
     public boolean textureIsValid() {
