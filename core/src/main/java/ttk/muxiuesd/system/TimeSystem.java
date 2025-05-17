@@ -52,7 +52,7 @@ public class TimeSystem extends WorldSystem implements Tickable {
         }
 
         if (this.tickSpan >= TickMaxSpan) {
-            this.tick(this.tickSpan);
+            this.tick(getWorld(), this.tickSpan);
             this.tickSpan = 0f;
         }else {
             this.tickSpan += delta;
@@ -62,9 +62,9 @@ public class TimeSystem extends WorldSystem implements Tickable {
     }
 
     @Override
-    public void tick (float delta) {
+    public void tick (World world, float delta) {
         //更新所有的tick
-        this.tickUpdates.forEach(t -> t.tick(delta));
+        this.tickUpdates.forEach(t -> t.tick(world, delta));
 
         //this.callWorldTickEvent(delta);
         //EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);

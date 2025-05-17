@@ -18,12 +18,12 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 工作台方块实体
  * */
 public class BlockEntityCraftingTable extends BlockEntity {
-    public BlockEntityCraftingTable (Block block, BlockPos blockPos) {
-        super(block, blockPos, 9);
+    public BlockEntityCraftingTable (World world, Block block, BlockPos blockPos) {
+        super(world, block, blockPos, 9);
     }
 
     @Override
-    public void tick (float delta) {
+    public void tick (World world, float delta) {
         //System.out.println(10086);
     }
 

@@ -26,16 +26,18 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 方块实体
  * */
 public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable {
+    private World world;                    //方块实体所属的世界
     private Block block;                    //方块
     private BlockPos blockPos;              //方块实体的位置
     private GridPoint2 interactGridSize;    //方块实体的交互网格大小
     private Inventory inventory;            //方块实体所拥有的容器
 
-    public BlockEntity(Block block, BlockPos blockPos, int inventorySize) {
-        this(block, blockPos, new GridPoint2(16, 16), inventorySize);
+    public BlockEntity(World world, Block block, BlockPos blockPos, int inventorySize) {
+        this(world, block, blockPos, new GridPoint2(16, 16), inventorySize);
     }
 
-    public BlockEntity (Block block, BlockPos blockPos, GridPoint2 interactGridSize, int inventorySize) {
+    public BlockEntity (World world, Block block, BlockPos blockPos, GridPoint2 interactGridSize, int inventorySize) {
+        this.world = world;
         this.block = block;
         this.blockPos = blockPos;
         this.interactGridSize = interactGridSize;
@@ -100,11 +102,19 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
      * 方块实体每tick的更新逻辑
      * */
     @Override
-    public void tick (float delta) {
+    public void tick (World world, float delta) {
     }
 
     @Override
     public void draw (Batch batch, float x, float y) {
+    }
+
+    public World getWorld () {
+        return world;
+    }
+
+    public void setWorld (World world) {
+        this.world = world;
     }
 
     public Block getBlock () {

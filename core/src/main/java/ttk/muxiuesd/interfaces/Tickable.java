@@ -1,5 +1,7 @@
 package ttk.muxiuesd.interfaces;
 
+import ttk.muxiuesd.world.World;
+
 /**
  * 能够tick更新的类解释此接口
  * <p>
@@ -9,5 +11,5 @@ public interface Tickable {
     /**
      * @param delta 距离上次tick所间隔的时间
      * */
-    void tick(float delta);
+    void tick(World world, float delta);
 }

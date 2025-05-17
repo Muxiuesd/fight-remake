@@ -42,7 +42,7 @@ public class BlockFurnace extends BlockWithEntity {
 
     @Override
     public BlockEntity createBlockEntity (BlockPos blockPos, World world) {
-        return new BlockEntityFurnace(this, blockPos);
+        return new BlockEntityFurnace(world,this, blockPos);
     }
 
     public boolean isWorking () {

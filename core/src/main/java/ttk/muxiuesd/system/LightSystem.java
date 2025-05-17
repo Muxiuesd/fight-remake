@@ -59,7 +59,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
 
     @Override
     public void draw(Batch batch) {
-        this.initialize();
+        //this.initialize();
         //通过ubo的id绑定当前ubo为此ubo，该uboId已经创建ubo，所以不会再创建了
         Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, this.uboId);
         if(this.lightSize !=0)
@@ -107,7 +107,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
     /**
      * 收集所有的发光例子的数据
      * */
-    public void useLight(Array<? extends Particle> particleArray) {
+    public void useLight (Array<? extends Particle> particleArray) {
         for (Particle particle:particleArray) {
             if(particle instanceof ShinyParticle) {
                 ShinyParticle sp = (ShinyParticle) particle;
@@ -116,7 +116,10 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
         }
     }
 
-    private void useLight (PointLight light) {
+    /**
+     * 应用一个光源
+     * */
+    public void useLight (PointLight light) {
         //在这一帧里收集调用该方法的y所有光源数据
         if(this.lightSize < MAX_LIGHTS) {
             //往数组里传入light的数据

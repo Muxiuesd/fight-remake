@@ -1,11 +1,14 @@
 package ttk.muxiuesd.world.block.blockentity;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
@@ -16,6 +19,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.ItemsReg;
+import ttk.muxiuesd.world.light.PointLight;
 
 /**
  * 熔炉
@@ -25,12 +29,15 @@ public class BlockEntityFurnace extends BlockEntity {
     private Slot inputSlot;
     private Slot outputSlot;
     private Slot fuelSlot;
+    private PointLight light;
 
-    public BlockEntityFurnace (Block block, BlockPos blockPos) {
-        super(block, blockPos, 3);
+    public BlockEntityFurnace (World world, Block block, BlockPos blockPos) {
+        super(world, block, blockPos, 3);
         this.inputSlot = new Slot(new GridPoint2(1, 8), new GridPoint2(6,6), this.getInputSlotIndex());
         this.outputSlot = new Slot(new GridPoint2(9, 8), new GridPoint2(6,6), this.getOutputSlotIndex());
         this.fuelSlot = new Slot(new GridPoint2(5, 0), new GridPoint2(6,6), this.getFuelSlotIndex());
+        this.light = new PointLight(new Color(0.8f, 0.1f, 0.1f, 0.1f), 2.5f);
+        this.light.setPosition(new Vector2(blockPos).add(0.5f, 0.2f));
     }
 
     @Override
@@ -93,7 +100,7 @@ public class BlockEntityFurnace extends BlockEntity {
     }
 
     @Override
-    public void tick (float delta) {
+    public void tick (World world, float delta) {
         //TODO 熔炉的熔炼配方
 
         Inventory inventory = getInventory();
@@ -120,6 +127,14 @@ public class BlockEntityFurnace extends BlockEntity {
             return;
         }
         this.setWorking(false);
+    }
+
+    @Override
+    public void update (float delta) {
+        if (this.isWorking()) {
+            LightSystem lightSystem = (LightSystem) getWorld().getSystemManager().getSystem("LightSystem");
+            lightSystem.useLight(this.light);
+        }
     }
 
     @Override

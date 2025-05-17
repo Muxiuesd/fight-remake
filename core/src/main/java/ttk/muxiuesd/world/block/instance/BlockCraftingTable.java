@@ -20,6 +20,6 @@ public class BlockCraftingTable extends BlockWithEntity {
 
     @Override
     public BlockEntity createBlockEntity (BlockPos blockPos, World world) {
-        return new BlockEntityCraftingTable(this, blockPos);
+        return new BlockEntityCraftingTable(world, this, blockPos);
     }
 }
