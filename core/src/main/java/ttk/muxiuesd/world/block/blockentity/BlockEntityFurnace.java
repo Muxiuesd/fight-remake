@@ -3,12 +3,14 @@ package ttk.muxiuesd.world.block.blockentity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.LightSystem;
+import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
@@ -20,6 +22,7 @@ import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.ItemsReg;
 import ttk.muxiuesd.world.light.PointLight;
+import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 
 /**
  * 熔炉
@@ -103,6 +106,14 @@ public class BlockEntityFurnace extends BlockEntity {
     public void tick (World world, float delta) {
         //TODO 熔炉的熔炼配方
 
+        if (this.isWorking() && MathUtils.random() < 0.05f) {
+            ParticleSystem ps = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
+            ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
+                new Vector2(getBlockPos()).add(0.5f, 0), new Vector2(0, 1.7f), new Vector2(),
+                new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
+                0f, 2.2f);
+        }
+
         Inventory inventory = getInventory();
         ItemStack inputStack = inventory.getItemStack(this.getInputSlotIndex());
         ItemStack fuelStack = inventory.getItemStack(this.getFuelSlotIndex());
@@ -131,6 +142,7 @@ public class BlockEntityFurnace extends BlockEntity {
 
     @Override
     public void update (float delta) {
+        //应用光源
         if (this.isWorking()) {
             LightSystem lightSystem = (LightSystem) getWorld().getSystemManager().getSystem("LightSystem");
             lightSystem.useLight(this.light);

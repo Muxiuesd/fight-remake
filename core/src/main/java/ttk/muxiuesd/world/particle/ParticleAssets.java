@@ -13,6 +13,7 @@ public class ParticleAssets {
     public static void loadAll (){
         loadTexture("spell", "texture/particle/spell.png");
         loadTexture("bubble", "texture/particle/bubble.png");
+        loadTexture("fire", "texture/entity/bullet/flame.png");
     }
 
     private static void loadTexture (String name, String path) {

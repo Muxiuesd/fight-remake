@@ -6,19 +6,15 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.IWorldParticleRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleDefaultConfig;
+import ttk.muxiuesd.world.particle.ParticleEmittersReg;
+import ttk.muxiuesd.world.particle.abs.Particle;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
-import ttk.muxiuesd.world.particle.emitters.EmitterEnemyShootParticle;
-import ttk.muxiuesd.world.particle.emitters.EmitterEntitySwimming;
-import ttk.muxiuesd.world.particle.emitters.EmitterPlayerShootParticle;
-
-import java.util.LinkedHashMap;
 
 /**
  * 粒子系统
@@ -26,11 +22,11 @@ import java.util.LinkedHashMap;
 public class ParticleSystem extends WorldSystem implements IWorldParticleRender {
     public final String TAG = this.getClass().getName();
 
-    private LinkedHashMap<String, ParticleEmitter> emitters;
+    //private LinkedHashMap<String, ParticleEmitter> emitters;
 
-    private Array<ParticleEmitter> activeEmitters;  //活跃的粒子发射器
-    private Array<ParticleEmitter> delayAddEmitters;
-    private Array<ParticleEmitter> delayRemoveEmitters;
+    private Array<ParticleEmitter<? extends Particle>> activeEmitters;  //活跃的粒子发射器
+    private Array<ParticleEmitter<? extends Particle>> delayAddEmitters;
+    private Array<ParticleEmitter<? extends Particle>> delayRemoveEmitters;
 
 
     public ParticleSystem (World world) {
@@ -40,14 +36,14 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
     @Override
     public void initialize () {
         ParticleAssets.loadAll();
-        this.emitters = new LinkedHashMap<>();
+        //this.emitters = new LinkedHashMap<>();
         this.activeEmitters = new Array<>();
         this.delayAddEmitters = new Array<>();
         this.delayRemoveEmitters = new Array<>();
 
-        this.registryEmitter(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
+        /*this.registryEmitter(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
         this.registryEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
-        this.registryEmitter(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());
+        this.registryEmitter(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());*/
         Log.print(TAG, "粒子系统初始化完成");
     }
 
@@ -62,7 +58,7 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
             this.delayRemoveEmitters.clear();
         }
 
-        for (ParticleEmitter emitter : this.activeEmitters) {
+        for (ParticleEmitter<? extends Particle> emitter : this.activeEmitters) {
             //把没有活跃粒子的粒子发射器移出来，跳过更新
             if (emitter.getActiveParticlesCount() <= 0) {
                 this.delayRemoveEmitters.add(emitter);
@@ -127,10 +123,10 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
                               Vector2 position, Vector2 velocity, Vector2 origin,
                               Vector2 startSize, Vector2 endSize, Vector2 scale,
                               float rotation, float duration) {
-        if (!this.emitters.containsKey(emitterId)) {
+        /*if (!this.emitters.containsKey(emitterId)) {
             throw new IllegalArgumentException("id为：" + emitterId + " 的粒子发射器不存在！！！");
-        }
-        ParticleEmitter emitter = this.activateEmitter(emitterId);
+        }*/
+        ParticleEmitter<? extends Particle> emitter = this.activateEmitter(emitterId);
         for (int i = 0; i < count; i++) {
             emitter.summon(position, velocity, origin, startSize, endSize, scale, rotation, duration);
         }
@@ -139,20 +135,20 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
     /**
      * 添加一种粒子发射器
      * */
-    public void registryEmitter (String id, ParticleEmitter emitter) {
+    /*public void registryEmitter (String id, ParticleEmitter<? extends Particle> emitter) {
         if (this.emitters.containsKey(id)) {
             throw new RuntimeException("发射器id：" + id + " 已存在，不可重复添加！！！");
         }
         this.emitters.put(id, emitter);
-    }
+    }*/
 
     /**
      * 激活粒子发射器
      * @return 返回激活的粒子发射器
      * */
-    private ParticleEmitter activateEmitter (String id) {
-        ParticleEmitter emitter = this.emitters.get(id);
-
+    private ParticleEmitter<? extends Particle> activateEmitter (String id) {
+        //ParticleEmitter emitter = this.emitters.get(id);
+        ParticleEmitter<? extends Particle> emitter = ParticleEmittersReg.get(id);
         if (this.activeEmitters.contains(emitter, true)) {
             //Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");
             return emitter;
