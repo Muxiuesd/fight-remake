@@ -109,7 +109,7 @@ public class BlockEntityFurnace extends BlockEntity {
         if (this.isWorking() && MathUtils.random() < 0.05f) {
             ParticleSystem ps = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
             ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
-                new Vector2(getBlockPos()).add(0.5f, 0), new Vector2(0, 1.7f), new Vector2(),
+                new Vector2(getBlockPos()).add(0.45f, 0), new Vector2(0, 1.7f), new Vector2(),
                 new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
                 0f, 2.2f);
         }
