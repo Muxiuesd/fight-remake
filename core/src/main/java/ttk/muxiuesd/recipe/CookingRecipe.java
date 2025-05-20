@@ -1,21 +1,18 @@
 package ttk.muxiuesd.recipe;
 
+import ttk.muxiuesd.interfaces.RecipeOutput;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 烧炼配方
  * */
-public class CookingRecipe {
+public abstract class CookingRecipe implements RecipeOutput {
     private String id;
     private ItemStack input;
-    private ItemStack output;
 
-    public CookingRecipe () {
-    }
-    public CookingRecipe (String id, ItemStack input, ItemStack output) {
+    public CookingRecipe (String id, ItemStack input) {
         this.id = id;
         this.input = input;
-        this.output = output;
     }
 
     public String getId () {
@@ -33,15 +30,6 @@ public class CookingRecipe {
 
     public CookingRecipe setInput (ItemStack input) {
         this.input = input;
-        return this;
-    }
-
-    public ItemStack getOutput () {
-        return output;
-    }
-
-    public CookingRecipe setOutput (ItemStack output) {
-        this.output = output;
         return this;
     }
 }

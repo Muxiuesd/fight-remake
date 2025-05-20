@@ -9,6 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.recipe.FurnaceRecipeTable;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.world.World;
@@ -20,9 +21,10 @@ import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.ItemsReg;
 import ttk.muxiuesd.world.light.PointLight;
 import ttk.muxiuesd.world.particle.ParticleEmittersReg;
+
+import java.util.Objects;
 
 /**
  * 熔炉
@@ -118,7 +120,17 @@ public class BlockEntityFurnace extends BlockEntity {
         ItemStack inputStack = inventory.getItemStack(this.getInputSlotIndex());
         ItemStack fuelStack = inventory.getItemStack(this.getFuelSlotIndex());
         if (inputStack != null && fuelStack != null) {
-            if (this.curTick < 100) {
+            if (! FurnaceRecipeTable.has(inputStack)) {
+                this.setWorking(false);
+                return;
+            }
+            ItemStack outputStack = inventory.getItemStack(this.getOutputSlotIndex());
+            ItemStack resultStack = FurnaceRecipeTable.getOutput(inputStack);
+            if (outputStack != null && outputStack.isFull()) return;
+            if (resultStack == null) return;
+
+            if (this.curTick < 60) {
+                //烧炼进行时
                 this.curTick++;
                 this.setWorking(true);
                 return;
@@ -127,10 +139,10 @@ public class BlockEntityFurnace extends BlockEntity {
             this.curTick = 0;
             inputStack.setAmount(inputStack.getAmount() - 1);
             fuelStack.setAmount(fuelStack.getAmount() - 1);
-            ItemStack outputStack = inventory.getItemStack(this.getOutputSlotIndex());
+
             if (outputStack == null) {
-                inventory.setItemStack(this.getOutputSlotIndex(), new ItemStack(ItemsReg.RUBBISH, 1));
-            }else {
+                inventory.setItemStack(this.getOutputSlotIndex(), resultStack);
+            }else if (Objects.equals(outputStack.getItem().getID(), resultStack.getItem().getID())) {
                 outputStack.setAmount(outputStack.getAmount() + 1);
             }
             if (inputStack.getAmount() == 0) inventory.clear(this.getInputSlotIndex());

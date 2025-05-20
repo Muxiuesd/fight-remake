@@ -80,6 +80,13 @@ public class ItemStack implements Updateable {
         if (amount >= 0) this.amount = amount;
     }
 
+    /**
+     * 堆叠数量是否最大
+     * */
+    public boolean isFull() {
+        return this.getAmount() >= this.getProperty().getMaxCount();
+    }
+
     public boolean isReady () {
         return this.useTimer != null && this.useTimer.isReady();
     }
