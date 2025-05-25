@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
-import ttk.muxiuesd.data.PropertiesData;
+import ttk.muxiuesd.data.PropertiesDataMap;
 import ttk.muxiuesd.data.PropertiesReg;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
@@ -143,18 +143,18 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
      * 物品的属性
      * */
     public static class Property {
-        public static final PropertiesData<?, ?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
+        public static final PropertiesDataMap<?, ?, ?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
             .add(PropertiesReg.ITEM_MAX_COUNT, 64)
             .add(PropertiesReg.ITEM_USE_SOUND_ID, Fight.getId("click"));
 
 
-        private PropertiesData<?, ?> propertiesMap;
+        private PropertiesDataMap<?, ?, ?> propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
         //private int maxCount = 64;
         private String useSoundId;
 
-        public Property () {
-            this.propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
-        }
+        /*public Property () {
+            this.propertiesMap ;
+        }*/
 
         public int getMaxCount () {
             return propertiesMap.get(PropertiesReg.ITEM_MAX_COUNT);
@@ -178,11 +178,11 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
         }
 
 
-        public PropertiesData<?, ?> getPropertiesMap () {
+        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
             return propertiesMap;
         }
 
-        public Property setPropertiesMap (PropertiesData<?, ?> propertiesMap) {
+        public Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
             this.propertiesMap = propertiesMap;
             return this;
         }

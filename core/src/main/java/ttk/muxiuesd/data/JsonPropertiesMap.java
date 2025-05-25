@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 /**
  * Json格式的属性数据
  * */
-public class JsonPropertiesMap extends PropertiesData<Json, Json> {
+public class JsonPropertiesMap extends PropertiesDataMap<Json, Json, JsonPropertiesMap> {
     private LinkedHashMap<PropertyType<?>, Object> propertiesMap;
 
 
@@ -21,13 +21,13 @@ public class JsonPropertiesMap extends PropertiesData<Json, Json> {
     }
 
     @Override
-    public <T> PropertiesData<Json, Json> add (PropertyType<T> type, T value) {
+    public <T> JsonPropertiesMap add (PropertyType<T> type, T value) {
         this.propertiesMap.put(type, value);
         return this;
     }
 
     @Override
-    public <T> PropertiesData<Json, Json> remove (PropertyType<T> type) {
+    public <T> JsonPropertiesMap remove (PropertyType<T> type) {
         this.propertiesMap.remove(type);
         return this;
     }
