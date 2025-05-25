@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.data.JsonPropertiesMap;
+import ttk.muxiuesd.data.PropertiesData;
+import ttk.muxiuesd.data.PropertiesReg;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -139,16 +142,18 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
     }
 
     public static class Property {
+        private PropertiesData<?, ?> properties = new JsonPropertiesMap();
         private int maxCount = 64;
         private String useSoundId;
 
         public int getMaxCount () {
-            return this.maxCount;
+            return properties.get(PropertiesReg.ITEM_MAX_COUNT);
         }
 
         public Property setMaxCount (int maxCount) {
-            if (maxCount > 0 ){
-                this.maxCount = maxCount;
+            if (maxCount > 0){
+                //this.maxCount = maxCount;
+                this.properties.add(PropertiesReg.ITEM_MAX_COUNT, maxCount);
                 return this;
             }
             throw new IllegalArgumentException ("最大堆叠数必须大于0！！！");
@@ -160,6 +165,15 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
 
         public Property setUseSoundId (String useSoundId) {
             this.useSoundId = useSoundId;
+            return this;
+        }
+
+        public PropertiesData<?, ?> getProperties () {
+            return properties;
+        }
+
+        public Property setProperties (PropertiesData<?, ?> properties) {
+            this.properties = properties;
             return this;
         }
     }

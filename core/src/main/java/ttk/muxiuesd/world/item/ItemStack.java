@@ -30,6 +30,7 @@ public class ItemStack implements Updateable {
         this(item, amount, ItemStackBehaviourFactory.create(item.type));
         try {
             this.property = ClassReflection.newInstance(getItem().property.getClass());
+            this.property.setProperties(item.property.getProperties().copy());
         } catch (ReflectionException e) {
             throw new RuntimeException(e);
         }

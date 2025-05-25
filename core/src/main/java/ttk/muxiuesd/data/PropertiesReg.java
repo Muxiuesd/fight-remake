@@ -10,12 +10,12 @@ import java.util.LinkedHashMap;
  * 属性注册
  * */
 public class PropertiesReg {
+    public static final LinkedHashMap<String, Identifier> idMap = new LinkedHashMap<>();
+    public static final LinkedHashMap<Identifier, PropertyType<?>> table = new LinkedHashMap<>();
+
 
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", writer -> {});
 
-
-    public static final LinkedHashMap<String, Identifier> idMap = new LinkedHashMap<>();
-    public static final LinkedHashMap<Identifier, PropertyType<?>> table = new LinkedHashMap<>();
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {
         String id = Fight.getId(name);
