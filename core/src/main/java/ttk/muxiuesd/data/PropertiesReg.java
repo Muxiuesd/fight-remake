@@ -15,7 +15,7 @@ public class PropertiesReg {
 
 
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", writer -> {});
-
+    public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", writer -> {});
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {
         String id = Fight.getId(name);

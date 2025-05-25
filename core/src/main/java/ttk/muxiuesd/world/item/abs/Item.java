@@ -20,8 +20,6 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
-import java.util.Objects;
-
 /**
  * 物品
  * */
@@ -141,39 +139,51 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
         EQUIPMENT       //装备
     }
 
+    /**
+     * 物品的属性
+     * */
     public static class Property {
-        private PropertiesData<?, ?> properties = new JsonPropertiesMap();
-        private int maxCount = 64;
+        public static final PropertiesData<?, ?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
+            .add(PropertiesReg.ITEM_MAX_COUNT, 64)
+            .add(PropertiesReg.ITEM_USE_SOUND_ID, Fight.getId("click"));
+
+
+        private PropertiesData<?, ?> propertiesMap;
+        //private int maxCount = 64;
         private String useSoundId;
 
+        public Property () {
+            this.propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
+        }
+
         public int getMaxCount () {
-            return properties.get(PropertiesReg.ITEM_MAX_COUNT);
+            return propertiesMap.get(PropertiesReg.ITEM_MAX_COUNT);
         }
 
         public Property setMaxCount (int maxCount) {
             if (maxCount > 0){
-                //this.maxCount = maxCount;
-                this.properties.add(PropertiesReg.ITEM_MAX_COUNT, maxCount);
+                this.propertiesMap.add(PropertiesReg.ITEM_MAX_COUNT, maxCount);
                 return this;
             }
             throw new IllegalArgumentException ("最大堆叠数必须大于0！！！");
         }
 
         public String getUseSoundId () {
-            return Objects.requireNonNullElse(useSoundId, Fight.getId("click"));
+            return this.propertiesMap.get(PropertiesReg.ITEM_USE_SOUND_ID);
         }
 
         public Property setUseSoundId (String useSoundId) {
-            this.useSoundId = useSoundId;
+            this.propertiesMap.add(PropertiesReg.ITEM_USE_SOUND_ID, useSoundId);
             return this;
         }
 
-        public PropertiesData<?, ?> getProperties () {
-            return properties;
+
+        public PropertiesData<?, ?> getPropertiesMap () {
+            return propertiesMap;
         }
 
-        public Property setProperties (PropertiesData<?, ?> properties) {
-            this.properties = properties;
+        public Property setPropertiesMap (PropertiesData<?, ?> propertiesMap) {
+            this.propertiesMap = propertiesMap;
             return this;
         }
     }
