@@ -1,8 +1,8 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.id.Identifier;
-import ttk.muxiuesd.interfaces.PropertyType;
 import ttk.muxiuesd.interfaces.Registry;
+import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Entity;

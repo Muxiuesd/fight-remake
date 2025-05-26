@@ -2,6 +2,7 @@ package ttk.muxiuesd.interfaces.data;
 
 /**
  * 数据读取接口
+ * @param <T> 数据读取实现类
  * */
 public interface DataReader<T> {
     int readInt(String key);

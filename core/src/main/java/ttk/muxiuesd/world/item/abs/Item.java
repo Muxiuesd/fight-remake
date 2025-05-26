@@ -12,8 +12,6 @@ import ttk.muxiuesd.data.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.interfaces.data.DataReader;
-import ttk.muxiuesd.interfaces.data.DataWriter;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
@@ -146,12 +144,12 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
      * 物品的属性
      * */
     public static class Property {
-        public static final PropertiesDataMap<? extends DataReader<?>, ? extends DataWriter<?>, ?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
+        public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
             .add(PropertyTypes.ITEM_MAX_COUNT, 64)
             .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
 
 
-        private PropertiesDataMap<?, ?, ?> propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
+        private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
 
         public int getMaxCount () {
             return propertiesMap.get(PropertyTypes.ITEM_MAX_COUNT);
@@ -175,11 +173,11 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
         }
 
 
-        public PropertiesDataMap<? extends DataReader<?>, ? extends DataWriter<?>, ?> getPropertiesMap () {
+        public PropertiesDataMap<?> getPropertiesMap () {
             return this.propertiesMap;
         }
 
-        public Property setPropertiesMap (PropertiesDataMap<? extends DataReader<?>, ? extends DataWriter<?>, ?> propertiesMap) {
+        public Property setPropertiesMap (PropertiesDataMap<?> propertiesMap) {
             this.propertiesMap = propertiesMap;
             return this;
         }

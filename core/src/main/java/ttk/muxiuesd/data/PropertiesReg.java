@@ -2,7 +2,7 @@ package ttk.muxiuesd.data;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
-import ttk.muxiuesd.interfaces.PropertyType;
+import ttk.muxiuesd.property.PropertyType;
 
 import java.util.LinkedHashMap;
 
