@@ -1,22 +1,23 @@
 package ttk.muxiuesd.data;
 
-import com.badlogic.gdx.utils.Json;
 import ttk.muxiuesd.interfaces.PropertyType;
+import ttk.muxiuesd.interfaces.data.DataReader;
+import ttk.muxiuesd.interfaces.data.DataWriter;
 
 import java.util.LinkedHashMap;
 
 /**
- * Json格式的属性数据
+ * Json格式的属性数据映射
  * */
-public class JsonPropertiesMap extends PropertiesDataMap<Json, Json, JsonPropertiesMap> {
-    private LinkedHashMap<PropertyType<?>, Object> propertiesMap;
+public class JsonPropertiesMap extends PropertiesDataMap<JsonDataReader, JsonDataWriter, JsonPropertiesMap> {
+    private final LinkedHashMap<PropertyType, Object> propertiesMap;
 
 
     public JsonPropertiesMap() {
         this.propertiesMap = new LinkedHashMap<>();
     }
 
-    public JsonPropertiesMap(LinkedHashMap<PropertyType<?>, Object> propertiesMap) {
+    public JsonPropertiesMap(LinkedHashMap<PropertyType, Object> propertiesMap) {
         this.propertiesMap = propertiesMap;
     }
 
@@ -39,15 +40,15 @@ public class JsonPropertiesMap extends PropertiesDataMap<Json, Json, JsonPropert
 
     @Override
     public JsonPropertiesMap copy () {
-        return new JsonPropertiesMap((LinkedHashMap<PropertyType<?>, Object>) propertiesMap.clone());
+        return new JsonPropertiesMap((LinkedHashMap<PropertyType, Object>) propertiesMap.clone());
     }
 
     @Override
-    public void read (Json reader) {
+    public  void read (DataReader<?> reader) {
     }
 
     @Override
-    public void write (Json writer) {
-
+    public void write (DataWriter<?> writer) {
+        this.propertiesMap.forEach((propertyType, value) -> propertyType.write(writer, value));
     }
 }
