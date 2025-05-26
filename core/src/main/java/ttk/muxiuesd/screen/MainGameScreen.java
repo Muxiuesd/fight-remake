@@ -19,6 +19,7 @@ import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
@@ -30,7 +31,6 @@ import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.wall.WallsReg;
 
 /**
@@ -63,7 +63,8 @@ public class MainGameScreen implements Screen {
         Blocks.init();
         //BlocksReg.registerAllBlocks();
         WallsReg.initAllWalls();
-        EntitiesReg.registerAllEntities();
+        //EntitiesReg.registerAllEntities();
+        Entities.init();
 
         //初始化着色器调度器
         ShaderScheduler.init();

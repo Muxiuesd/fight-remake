@@ -182,8 +182,9 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this;
     }
 
-    public void setEntitySystem(EntitySystem es) {
+    public Entity setEntitySystem(EntitySystem es) {
         this.es = es;
+        return this;
     }
 
     public EntitySystem getEntitySystem() {

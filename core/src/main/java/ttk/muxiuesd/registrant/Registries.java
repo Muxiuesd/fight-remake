@@ -5,6 +5,7 @@ import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.RegistryKey;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.function.Supplier;
 public class Registries {
     public static final Registry<Supplier<Item>> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Supplier<Block>> BLOCK = create(RegistryKeys.BLOCK);
-
+    public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
 
 
     public static <T> DefaultRegistry<Supplier<T>> create (RegistryKey<Supplier<T>> registryKey) {
