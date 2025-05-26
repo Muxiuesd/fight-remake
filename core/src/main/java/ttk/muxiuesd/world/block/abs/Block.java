@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.block.BlockSoundsID;
 /**
  * 方块
  * */
-public abstract class Block implements ID, BlockDrawable, Disposable {
+public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
     private String id;
@@ -90,8 +90,9 @@ public abstract class Block implements ID, BlockDrawable, Disposable {
         return this.id;
     }
     @Override
-    public void setID (String id) {
+    public Block setID (String id) {
         this.id = id;
+        return this;
     }
 
     /**方块属性

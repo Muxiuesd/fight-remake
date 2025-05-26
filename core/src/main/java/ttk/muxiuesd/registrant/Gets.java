@@ -14,11 +14,12 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class Gets {
 
     public static Item ITEM (String id) {
-        return get(id, Item.class);
+        //return get(id, Item.class);
+        return Registries.ITEM.get(id).get().setID(id);
     }
 
     public static Block BLOCK (String id) {
-        return get(id, Block.class);
+        return Registries.BLOCK.get(id).get().setID(id);
     }
 
     /**

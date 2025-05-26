@@ -23,7 +23,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 /**
  * 物品
  * */
-public abstract class Item implements ID, Updateable,ShapeRenderable {
+public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
     private String id;
 
     public Type type;
@@ -125,8 +125,9 @@ public abstract class Item implements ID, Updateable,ShapeRenderable {
         return this.id;
     }
     @Override
-    public void setID (String id) {
+    public Item setID (String id) {
         this.id = id;
+        return this;
     }
 
     /**

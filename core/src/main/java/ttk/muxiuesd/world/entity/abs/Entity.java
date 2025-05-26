@@ -19,7 +19,7 @@ import ttk.muxiuesd.world.entity.Group;
 /**
  * 基础实体
  */
-public abstract class Entity implements ID, Disposable, Drawable, Updateable, ShapeRenderable {
+public abstract class Entity implements ID<Entity>, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
 
     public Group group;
@@ -195,8 +195,9 @@ public abstract class Entity implements ID, Disposable, Drawable, Updateable, Sh
         return this.id;
     }
     @Override
-    public void setID (String id) {
+    public Entity setID (String id) {
         this.id = id;
+        return this;
     }
 
     /**

@@ -15,25 +15,28 @@ public class Identifier {
         return Pattern.matches(REGEX, input);
     }
 
-    private String id;
+    private final String id;
 
     public Identifier (String namespace, String name) {
         this(namespace + ":" + name);
     }
 
     public Identifier (String id) {
-        this.setId(id);
+        if (!check(id)) {
+            throw new IllegalArgumentException("输入的ID：" + id + " 不合法！！！");
+        }
+        this.id = id;
     }
 
     public String getId () {
         return this.id;
     }
 
-    public Identifier setId (String id) {
+    /*public Identifier setId (String id) {
         if (!check(id)) {
             throw new IllegalArgumentException("输入的ID：" + id + " 不合法！！！");
         }
         this.id = id;
         return this;
-    }
+    }*/
 }
