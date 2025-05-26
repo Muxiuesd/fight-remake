@@ -1,8 +1,8 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.PropertyType;
 import ttk.muxiuesd.interfaces.Registry;
-import ttk.muxiuesd.interfaces.RegistryKey;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -19,9 +19,9 @@ public class Registries {
     public static final Registry<Supplier<Item>> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Supplier<Block>> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
+    public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
 
-
-    public static <T> DefaultRegistry<Supplier<T>> create (RegistryKey<Supplier<T>> registryKey) {
+    public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
         return new DefaultRegistry<>();
     }
 

@@ -9,10 +9,10 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.PropertiesDataMap;
-import ttk.muxiuesd.data.PropertiesReg;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -145,8 +145,8 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
      * */
     public static class Property {
         public static final PropertiesDataMap<?, ?, ?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
-            .add(PropertiesReg.ITEM_MAX_COUNT, 64)
-            .add(PropertiesReg.ITEM_USE_SOUND_ID, Fight.getId("click"));
+            .add(PropertyTypes.ITEM_MAX_COUNT, 64)
+            .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
 
 
         private PropertiesDataMap<?, ?, ?> propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
@@ -158,23 +158,23 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
         }*/
 
         public int getMaxCount () {
-            return propertiesMap.get(PropertiesReg.ITEM_MAX_COUNT);
+            return propertiesMap.get(PropertyTypes.ITEM_MAX_COUNT);
         }
 
         public Property setMaxCount (int maxCount) {
             if (maxCount > 0){
-                this.propertiesMap.add(PropertiesReg.ITEM_MAX_COUNT, maxCount);
+                this.propertiesMap.add(PropertyTypes.ITEM_MAX_COUNT, maxCount);
                 return this;
             }
             throw new IllegalArgumentException ("最大堆叠数必须大于0！！！");
         }
 
         public String getUseSoundId () {
-            return this.propertiesMap.get(PropertiesReg.ITEM_USE_SOUND_ID);
+            return this.propertiesMap.get(PropertyTypes.ITEM_USE_SOUND_ID);
         }
 
         public Property setUseSoundId (String useSoundId) {
-            this.propertiesMap.add(PropertiesReg.ITEM_USE_SOUND_ID, useSoundId);
+            this.propertiesMap.add(PropertyTypes.ITEM_USE_SOUND_ID, useSoundId);
             return this;
         }
 

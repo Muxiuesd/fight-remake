@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package ttk.muxiuesd.registrant;
 
 /**
  * 注册键，目前没啥用
