@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.entity.enemy.Slime;
 
 import java.util.function.Supplier;
 
-public class Entities {
+public final class Entities {
     public static void init () {
         Log.print(Entities.class.getName(), "实体注册完成");
     }

@@ -13,7 +13,7 @@ var Items = {
             return new ip;
         },
         newWeaponProperty: function () {
-            var wp = Java.type("ttk.muxiuesd.world.item.abs.Weapon.WeaponProperties");
+            var wp = Java.type("ttk.muxiuesd.world.item.abs.Weapon.WeaponProperty");
             return new wp;
         }
     },

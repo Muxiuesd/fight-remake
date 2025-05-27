@@ -31,8 +31,6 @@ import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
-import java.io.IOException;
-
 /**
  * 输入处理系统
  * 按键状态的更新都在这里面
@@ -97,17 +95,16 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();
+
             if (handItemStack != null) {
                 //测试
                 Item item = handItemStack.getItem();
                 JsonDataWriter dataWriter = new JsonDataWriter();
+                dataWriter.objStart();
                 item.property.getPropertiesMap().write(dataWriter);
-                try {
-                    dataWriter.getWriter().close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                dataWriter.objEnd();
             }
+
             if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
 
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);

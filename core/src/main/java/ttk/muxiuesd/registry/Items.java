@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.item.instence.*;
 
 import java.util.function.Supplier;
 
-public class Items {
+public final class Items {
     public static void init () {
         Log.print(Items.class.getName(), "物品注册完成");
     }

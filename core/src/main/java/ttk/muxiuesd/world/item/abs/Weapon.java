@@ -1,5 +1,9 @@
 package ttk.muxiuesd.world.item.abs;
 
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.data.JsonPropertiesMap;
+import ttk.muxiuesd.data.PropertiesDataMap;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
@@ -7,7 +11,10 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
  * 武器类
  * */
 public abstract class Weapon extends Item{
-    public Weapon (WeaponProperties property, String textureId, String texturePath) {
+    public static final WeaponProperty DEFAULT_PROPERTY = new WeaponProperty();
+
+
+    public Weapon (WeaponProperty property, String textureId, String texturePath) {
         super(Type.WEAPON, property, textureId, texturePath);
     }
 
@@ -16,47 +23,50 @@ public abstract class Weapon extends Item{
         return super.use(world, user);
     }
 
-    public WeaponProperties getProperties () {
-        return (WeaponProperties) property;
+    public WeaponProperty getProperties () {
+        return (WeaponProperty) property;
     }
 
     /**
      * 武器属性
      */
-    public static class WeaponProperties extends Item.Property {
-        private float damage = 1f;   //基础伤害
-        private int duration = 100; //耐久度
-        private float useSpan = 1f;  //使用间隔
+    public static class WeaponProperty extends Item.Property {
+        public static final PropertiesDataMap<?> DEFAULT_WEAPON_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+            .add(PropertyTypes.ITEM_MAX_COUNT, 1)
+            .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("shoot"))
+            .add(PropertyTypes.WEAPON_DAMAGE, 1f)
+            .add(PropertyTypes.WEAPON_DURATION, 100)
+            .add(PropertyTypes.WEAPON_USE_SAPN, 2f);
 
-        public WeaponProperties () {
-            //默认武器最大只能堆叠一个
-            setMaxCount(1);
+        public WeaponProperty () {
+            //使用默认的数据映射
+            setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy());
         }
 
         public float getDamage () {
-            return this.damage;
+            return getPropertiesMap().get(PropertyTypes.WEAPON_DAMAGE);
         }
 
-        public WeaponProperties setDamage (float damage) {
-            this.damage = damage;
+        public WeaponProperty setDamage (float damage) {
+            getPropertiesMap().add(PropertyTypes.WEAPON_DAMAGE, damage);
             return this;
         }
 
         public int getDuration () {
-            return this.duration;
+            return getPropertiesMap().get(PropertyTypes.WEAPON_DURATION);
         }
 
-        public WeaponProperties setDuration (int duration) {
-            this.duration = duration;
+        public WeaponProperty setDuration (int duration) {
+            getPropertiesMap().add(PropertyTypes.WEAPON_DURATION, duration);
             return this;
         }
 
         public float getUseSpan () {
-            return this.useSpan;
+            return getPropertiesMap().get(PropertyTypes.WEAPON_USE_SAPN);
         }
 
-        public WeaponProperties setUseSpan (float useSpan) {
-            this.useSpan = useSpan;
+        public WeaponProperty setUseSpan (float useSpan) {
+            getPropertiesMap().add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
             return this;
         }
     }

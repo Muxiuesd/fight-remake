@@ -31,8 +31,6 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
     public TextureRegion texture;
 
 
-    /*public Item () {
-    }*/
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
     }
@@ -144,12 +142,12 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
      * 物品的属性
      * */
     public static class Property {
-        public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_MAP = new JsonPropertiesMap()
+        public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
             .add(PropertyTypes.ITEM_MAX_COUNT, 64)
             .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
 
 
-        private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_MAP.copy();
+        private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy();
 
         public int getMaxCount () {
             return propertiesMap.get(PropertyTypes.ITEM_MAX_COUNT);

@@ -13,7 +13,7 @@ public class WeaponItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity user, ItemStack itemStack) {
         Weapon weapon = (Weapon) itemStack.getItem();
-        Weapon.WeaponProperties property = weapon.getProperties();
+        Weapon.WeaponProperty property = weapon.getProperties();
         if (!itemStack.isReady()) {
             //使用CD未冷却完
             return false;
@@ -23,7 +23,7 @@ public class WeaponItemStackBehaviour implements IItemStackBehaviour {
         if (!used) {
             return false;
         }
-        Weapon.WeaponProperties properties = (Weapon.WeaponProperties) itemStack.getProperty();
+        Weapon.WeaponProperty properties = (Weapon.WeaponProperty) itemStack.getProperty();
         //用一次耐久减一
         properties.setDuration(properties.getDuration() - 1);
         return true;

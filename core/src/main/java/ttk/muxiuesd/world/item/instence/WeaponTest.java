@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * */
 public class WeaponTest extends Weapon {
     public WeaponTest () {
-        super(new WeaponProperties().setDamage(7f).setUseSpan(0.8f).setDuration(500),
+        super(Weapon.DEFAULT_PROPERTY,
             Fight.getId("test_weapon"),
             Fight.ItemTexturePath("weapon.png"));
     }

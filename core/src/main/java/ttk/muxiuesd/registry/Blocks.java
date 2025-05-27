@@ -10,7 +10,7 @@ import ttk.muxiuesd.world.item.instence.BlockItem;
 
 import java.util.function.Supplier;
 
-public class Blocks {
+public final class Blocks {
     public static void init () {
         Log.print(Blocks.class.getName(), "游戏方块注册完毕");
     }
