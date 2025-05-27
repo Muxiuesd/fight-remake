@@ -75,6 +75,7 @@ public class JsonDataWriter implements DataWriter<Json> {
 
     @Override
     public JsonDataWriter writeString (String key, String value) {
+
         this.writer.writeValue(key, value);
         return this;
     }
