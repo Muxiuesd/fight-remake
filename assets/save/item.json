@@ -1,0 +1,7 @@
+{
+    item_max_count:1,
+    item_use_sound_id:fight:shoot,
+    weapon_damage:1,
+    weapon_duration:100,
+    weapon_use_span:2
+}

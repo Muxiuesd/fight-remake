@@ -15,6 +15,17 @@ public class Fight {
 
     public static float PLAYER_VISUAL_RANGE = 64f;
 
+    /**
+     * 存档路径常量
+     */
+    public static final String PATH_SAVE = "save/";
+    public static final String PATH_SAVE_WORLD = "world/";
+    public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
+    public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
+
+
+
+
     public static String getId (String name) {
         return NAMESPACE + ":" + name;
     }
@@ -32,5 +43,9 @@ public class Fight {
 
     public static String ItemTexturePath (String path) {
         return ITEM_TEXTURE_ROOT + path;
+    }
+
+    public static String GameSavePath (String name) {
+        return PATH_SAVE + name;
     }
 }

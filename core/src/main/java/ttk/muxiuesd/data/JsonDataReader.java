@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.interfaces.data.DataReader;
 
 /**
- * json数据的读取类
+ * Json格式的数据读取类
  * */
 public class JsonDataReader implements DataReader<JsonReader> {
     private JsonReader reader;
