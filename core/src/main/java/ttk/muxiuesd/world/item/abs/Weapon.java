@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.item.abs;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonPropertiesMap;
-import ttk.muxiuesd.data.PropertiesDataMap;
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;

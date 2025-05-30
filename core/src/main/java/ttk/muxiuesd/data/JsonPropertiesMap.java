@@ -1,5 +1,6 @@
 package ttk.muxiuesd.data;
 
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.data.DataReader;
 import ttk.muxiuesd.interfaces.data.DataWriter;
 import ttk.muxiuesd.property.PropertyType;

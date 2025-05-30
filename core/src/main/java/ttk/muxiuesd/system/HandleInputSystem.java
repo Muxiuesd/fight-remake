@@ -9,7 +9,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import ttk.muxiuesd.camera.CameraController;
-import ttk.muxiuesd.data.JsonDataOutput;
+import ttk.muxiuesd.data.BlockJsonDataOutput;
+import ttk.muxiuesd.data.ItemJsonDataOutput;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -105,9 +106,15 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                 item.property.getPropertiesMap().write(dataWriter);
                 dataWriter.objEnd();
 
-                JsonDataOutput output = new JsonDataOutput();
-                output.output(dataWriter);
+                new ItemJsonDataOutput().output(dataWriter);
             }
+
+            //测试
+            JsonDataWriter dataWriter = new JsonDataWriter();
+            dataWriter.objStart();
+            mouseBlock.getProperty().getPropertiesMap().write(dataWriter);
+            dataWriter.objEnd();
+            new BlockJsonDataOutput().output(dataWriter);
 
             if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
 

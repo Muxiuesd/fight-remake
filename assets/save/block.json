@@ -1,0 +1,8 @@
+{
+"block_friction": 1,
+"block_sounds": {
+	"WALK": "fight:stone_walk",
+	"PUT": "fight:stone_put",
+	"DESTROY": "fight:stone_destroy"
+}
+}

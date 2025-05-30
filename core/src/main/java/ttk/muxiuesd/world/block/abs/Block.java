@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
-import ttk.muxiuesd.data.PropertiesDataMap;
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -111,7 +111,7 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
 
 
         public Property() {
-            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP;
+            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
         }
 
         public float getFriction() {
@@ -129,6 +129,15 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
 
         public Property setSounds(BlockSoundsID sounds) {
             this.propertiesDataMap.add(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
+            return this;
+        }
+
+        public PropertiesDataMap<?> getPropertiesMap () {
+            return propertiesDataMap;
+        }
+
+        public Property setPropertiesMap (PropertiesDataMap<?> propertiesDataMap) {
+            this.propertiesDataMap = propertiesDataMap;
             return this;
         }
     }

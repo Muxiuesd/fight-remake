@@ -3,11 +3,13 @@ package ttk.muxiuesd.data;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.interfaces.data.DataReader;
+import ttk.muxiuesd.util.Log;
 
 /**
  * Json格式的数据读取类
  * */
 public class JsonDataReader implements DataReader<JsonReader> {
+    public static final String TAG = JsonDataReader.class.getName();
     private JsonReader reader;
     private JsonValue parse;
 
@@ -58,7 +60,19 @@ public class JsonDataReader implements DataReader<JsonReader> {
 
     @Override
     public String readString (String key) {
+        if (this.getParse().has(key)) return this.getParse().get(key).toString();
         return this.getParse().getString(key);
+    }
+
+    /**
+     * 读obj
+     * */
+    public JsonValue readObj (String key) {
+        if (!this.getParse().has(key)) {
+            Log.error(TAG, "json中不存在名为：" + key + " 的obj！！！");
+            throw new IllegalArgumentException(key);
+        }
+        return this.getParse().get(key);
     }
 
     public JsonValue getParse() {

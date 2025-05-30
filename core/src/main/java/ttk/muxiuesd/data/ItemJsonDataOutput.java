@@ -2,30 +2,19 @@ package ttk.muxiuesd.data;
 
 import com.badlogic.gdx.utils.Json;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.data.IDataOutput;
+import ttk.muxiuesd.data.abs.JsonDataOutput;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.util.FileUtil;
 
 /**
- * json格式的数据的输出实现类
+ * 物品的json输出类
  * */
-public class JsonDataOutput implements IDataOutput<JsonDataWriter> {
+public class ItemJsonDataOutput extends JsonDataOutput {
     @Override
     public void output (JsonDataWriter writer) {
         //输出测试
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
-        //Gdx.app.log("JsonDataOutput", string);
-
-        /*String storagePath = Gdx.files.getLocalStoragePath();
-        System.out.println(storagePath);
-        String savePath = storagePath + "/save";
-        FileHandle fileHandle = Gdx.files.absolute(savePath);
-        if (!fileHandle.exists()) {
-            //新建文件夹
-            fileHandle.mkdirs();
-        }
-        Gdx.files.absolute(savePath + "/item.json").writeString(string, false);*/
 
         FileUtil.createFile(Fight.PATH_SAVE, "item.json").writeString(json.prettyPrint(string), false);
 

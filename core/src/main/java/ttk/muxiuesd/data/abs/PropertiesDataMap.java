@@ -1,4 +1,4 @@
-package ttk.muxiuesd.data;
+package ttk.muxiuesd.data.abs;
 
 import ttk.muxiuesd.interfaces.data.DataReadable;
 import ttk.muxiuesd.interfaces.data.DataWriteable;

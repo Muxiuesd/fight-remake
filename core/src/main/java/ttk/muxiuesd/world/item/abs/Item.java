@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
-import ttk.muxiuesd.data.PropertiesDataMap;
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -116,6 +116,15 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
      * */
     public void loadTextureRegion (String id, String texturePath) {
         this.texture = this.getTextureRegion(id, texturePath);
+    }
+
+    public Property getProperty () {
+        return this.property;
+    }
+
+    public Item setProperty (Property property) {
+        this.property = property;
+        return this;
     }
 
     @Override
