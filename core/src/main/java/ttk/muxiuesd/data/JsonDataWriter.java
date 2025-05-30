@@ -11,16 +11,25 @@ import java.io.StringWriter;
  * */
 public class JsonDataWriter implements DataWriter<Json> {
     private Json writer;
+    private static final JsonWriter.OutputType outputType = JsonWriter.OutputType.json;
 
     public JsonDataWriter () {
         this.writer = new Json();
         this.writer.setWriter(new JsonWriter(new StringWriter()));
+        this.writer.setOutputType(outputType);
+        this.writer.getWriter().setOutputType(outputType);
     }
 
+    /**
+     * 开始一个json对象
+     * */
     public void objStart () {
         this.writer.writeObjectStart();
     }
 
+    /**
+     * 结束当前的json对象
+     * */
     public void objEnd () {
         this.writer.writeObjectEnd();
     }
