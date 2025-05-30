@@ -21,7 +21,14 @@ public class JsonDataWriter implements DataWriter<Json> {
     }
 
     /**
-     * 开始一个json对象
+     * 开始一个有名称的json对象
+     * */
+    public void objStart (String objName) {
+        this.writer.writeObjectStart(objName);
+    }
+
+    /**
+     * 开始一个无名称的json对象
      * */
     public void objStart () {
         this.writer.writeObjectStart();

@@ -5,14 +5,18 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.data.JsonPropertiesMap;
+import ttk.muxiuesd.data.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.BlockDrawable;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 
 /**
  * 方块
  * */
 public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
+    public static final Property DEFAULT_PROPERTY = new Property();
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
     private String id;
@@ -99,31 +103,32 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
      * 使用构建者模式
      * */
     public static class Property {
-        private float friction;
-        private BlockSoundsID sounds;
+        private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+            .add(PropertyTypes.BLOCK_FRICTON, 1f)
+            .add(PropertyTypes.BLOCK_SOUNDS_ID, BlockSoundsID.DEFAULT);
+
+        private PropertiesDataMap<?> propertiesDataMap;
+
 
         public Property() {
+            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP;
         }
 
         public float getFriction() {
-            return friction;
+            return this.propertiesDataMap.get(PropertyTypes.BLOCK_FRICTON);
         }
 
         public Property setFriction(float friction) {
-            this.friction = friction;
+            if (friction >= 0f) this.propertiesDataMap.add(PropertyTypes.BLOCK_FRICTON, friction);
             return this;
         }
 
         public BlockSoundsID getSounds() {
-            if (this.sounds == null) {
-                //默认音效
-                this.sounds = BlockSoundsID.DEFAULT;
-            }
-            return this.sounds;
+            return this.propertiesDataMap.get(PropertyTypes.BLOCK_SOUNDS_ID);
         }
 
         public Property setSounds(BlockSoundsID sounds) {
-            this.sounds = sounds;
+            this.propertiesDataMap.add(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
             return this;
         }
     }
