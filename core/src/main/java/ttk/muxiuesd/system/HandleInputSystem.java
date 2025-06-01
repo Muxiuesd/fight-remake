@@ -8,21 +8,23 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.data.BlockJsonDataOutput;
 import ttk.muxiuesd.data.ItemJsonDataOutput;
+import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
 import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.BlockPosition;
-import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
@@ -57,6 +59,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
         Gdx.input.setInputProcessor(this);
     }
+
 
     @Override
     public void update(float delta) {
@@ -108,13 +111,23 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
                 new ItemJsonDataOutput().output(dataWriter);
             }
-
-            //测试
+            System.out.println("==============================================");
+            //写入测试
             JsonDataWriter dataWriter = new JsonDataWriter();
             dataWriter.objStart();
+            mouseBlock.writeCAT(mouseBlock.getProperty().getCAT());
             mouseBlock.getProperty().getPropertiesMap().write(dataWriter);
             dataWriter.objEnd();
             new BlockJsonDataOutput().output(dataWriter);
+
+            //读取测试
+            String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "block.json");
+            System.out.println(s);
+            JsonDataReader dataReader = new JsonDataReader(s);
+            JsonValue obj = dataReader.readObj(PropertyTypes.BLOCK_SOUNDS_ID.getName());
+            System.out.println(obj.toJson(JsonWriter.OutputType.json));
+            JsonValue values = dataReader.readObj(PropertyTypes.CAT.getName());
+            mouseBlock.readCAT(values);
 
             if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
 

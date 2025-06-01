@@ -4,18 +4,21 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.BlockDrawable;
+import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.cat.CAT;
 
 /**
  * 方块
  * */
-public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
+public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICAT {
     public static final Property DEFAULT_PROPERTY = new Property();
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
@@ -99,11 +102,36 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
         return this;
     }
 
+    @Override
+    public void writeCAT (CAT cat) {
+        cat.set("id", this.getID());
+        cat.set("width", this.width);
+        cat.set("height", this.height);
+        cat.set("originX", this.originX);
+        cat.set("originY", this.originY);
+        cat.set("scaleX", this.scaleX);
+        cat.set("scaleY", this.scaleY);
+        cat.set("rotation", this.rotation);
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        this.setID(values.getString("id"));
+        this.width = values.getFloat("width");
+        this.height = values.getFloat("height");
+        this.originX = values.getFloat("originX");
+        this.originY = values.getFloat("originY");
+        this.scaleX = values.getFloat("scaleX");
+        this.scaleY = values.getFloat("scaleY");
+        this.rotation = values.getFloat("rotation");
+    }
+
     /**方块属性
      * 使用构建者模式
      * */
     public static class Property {
         private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+            .add(PropertyTypes.CAT, new CAT())
             .add(PropertyTypes.BLOCK_FRICTON, 1f)
             .add(PropertyTypes.BLOCK_SOUNDS_ID, BlockSoundsID.DEFAULT);
 
@@ -112,6 +140,14 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable {
 
         public Property() {
             this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
+        }
+
+        public CAT getCAT () {
+            return this.propertiesDataMap.get(PropertyTypes.CAT);
+        }
+
+        public void setCAT (CAT cat) {
+            this.propertiesDataMap.add(PropertyTypes.CAT, cat);
         }
 
         public float getFriction() {

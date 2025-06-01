@@ -5,12 +5,16 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.property.*;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.cat.CAT;
 
 /**
  * 所有的属性
+ * <p>
+ * 属性的使用方法：定义属性、注册属性、添加属性进物品或方块或实体
  * */
 public final class PropertyTypes {
 
+    public static final PropertyType<CAT> CAT = register("cat", new PropertyCAT());
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
     public static final PropertyType<Float> WEAPON_DAMAGE = register("weapon_damage", new DefaultFloatPropertyType());
