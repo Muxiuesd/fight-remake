@@ -15,7 +15,7 @@ public class WeaponTest extends Weapon {
     public WeaponTest () {
         super(Weapon.DEFAULT_PROPERTY,
             Fight.getId("test_weapon"),
-            Fight.ItemTexturePath("weapon.png"));
+            Fight.ItemTexturePath("diamond_sword.png"));
     }
 
     @Override
