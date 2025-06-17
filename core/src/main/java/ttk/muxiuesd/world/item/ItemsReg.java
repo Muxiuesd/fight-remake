@@ -1,7 +1,6 @@
 package ttk.muxiuesd.world.item;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.IItemStackBehaviour;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
@@ -39,9 +38,5 @@ public class ItemsReg {
 
     public static ItemStack getItem (String name, int amount) {
         return new ItemStack(registrant.get(name), amount);
-    }
-
-    public static ItemStack getItem (String name, int amount, IItemStackBehaviour behaviour) {
-        return new ItemStack(registrant.get(name), amount, behaviour);
     }
 }

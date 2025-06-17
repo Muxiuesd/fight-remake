@@ -11,6 +11,6 @@ public abstract class PropertiesDataMap<D extends PropertiesDataMap> implements 
     public abstract <T> D add (PropertyType<T> type, T value);
     public abstract <T> D remove (PropertyType<T> type);
     public abstract <T> T get (PropertyType<T> type);
-
+    public abstract boolean contain (PropertyType<?> type);
     public abstract D copy ();
 }

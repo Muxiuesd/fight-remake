@@ -11,10 +11,16 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
  * 武器类
  * */
 public abstract class Weapon extends Item{
-    public static final WeaponProperty DEFAULT_PROPERTY = new WeaponProperty();
+    public static final PropertiesDataMap<?> DEFAULT_WEAPON_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+        .add(PropertyTypes.ITEM_MAX_COUNT, 1)
+        .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("shoot"))
+        .add(PropertyTypes.WEAPON_DAMAGE, 1f)
+        .add(PropertyTypes.WEAPON_DURATION, 100)
+        .add(PropertyTypes.WEAPON_USE_SAPN, 2f);
+    //默认的武器物品的属性
+    public static final Property DEFAULT_PROPERTY = new Property().setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP);
 
-
-    public Weapon (WeaponProperty property, String textureId, String texturePath) {
+    public Weapon (Property property, String textureId, String texturePath) {
         super(Type.WEAPON, property, textureId, texturePath);
     }
 
@@ -23,21 +29,14 @@ public abstract class Weapon extends Item{
         return super.use(world, user);
     }
 
-    public WeaponProperty getProperties () {
+    /*public WeaponProperty getProperties () {
         return (WeaponProperty) property;
-    }
+    }*/
 
     /**
      * 武器属性
      */
-    public static class WeaponProperty extends Item.Property {
-        public static final PropertiesDataMap<?> DEFAULT_WEAPON_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-            .add(PropertyTypes.ITEM_MAX_COUNT, 1)
-            .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("shoot"))
-            .add(PropertyTypes.WEAPON_DAMAGE, 1f)
-            .add(PropertyTypes.WEAPON_DURATION, 100)
-            .add(PropertyTypes.WEAPON_USE_SAPN, 2f);
-
+    /*public static class WeaponProperty extends Item.Property {
         public WeaponProperty () {
             //使用默认的数据映射
             setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy());
@@ -69,5 +68,5 @@ public abstract class Weapon extends Item{
             getPropertiesMap().add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
             return this;
         }
-    }
+    }*/
 }

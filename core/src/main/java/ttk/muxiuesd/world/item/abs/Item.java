@@ -24,12 +24,14 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
  * 物品
  * */
 public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
-    private String id;
+    public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+        .add(PropertyTypes.ITEM_MAX_COUNT, 64)
+        .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
 
+    private String id;
     public Type type;
     public Property property;
     public TextureRegion texture;
-
 
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
@@ -39,7 +41,6 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
         this.property = property;
         this.loadTextureRegion(textureId, texturePath);
     }
-
 
     /**
      * 在持有者手上持有时的绘制方法
@@ -151,11 +152,7 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
      * 物品的属性
      * */
     public static class Property {
-        public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-            .add(PropertyTypes.ITEM_MAX_COUNT, 64)
-            .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
-
-
+        //属性映射
         private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy();
 
         public int getMaxCount () {
@@ -179,6 +176,32 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
             return this;
         }
 
+        public float getDamage () {
+            return getPropertiesMap().get(PropertyTypes.WEAPON_DAMAGE);
+        }
+
+        public Property setDamage (float damage) {
+            getPropertiesMap().add(PropertyTypes.WEAPON_DAMAGE, damage);
+            return this;
+        }
+
+        public int getDuration () {
+            return getPropertiesMap().get(PropertyTypes.WEAPON_DURATION);
+        }
+
+        public Property setDuration (int duration) {
+            getPropertiesMap().add(PropertyTypes.WEAPON_DURATION, duration);
+            return this;
+        }
+
+        public float getUseSpan () {
+            return getPropertiesMap().get(PropertyTypes.WEAPON_USE_SAPN);
+        }
+
+        public Property setUseSpan (float useSpan) {
+            getPropertiesMap().add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
+            return this;
+        }
 
         public PropertiesDataMap<?> getPropertiesMap () {
             return this.propertiesMap;

@@ -40,6 +40,11 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap> {
     }
 
     @Override
+    public boolean contain (PropertyType<?> type) {
+        return this.propertiesMap.containsKey(type);
+    }
+
+    @Override
     public JsonPropertiesMap copy () {
         return new JsonPropertiesMap((LinkedHashMap<PropertyType, Object>) propertiesMap.clone());
     }

@@ -1,6 +1,6 @@
 {
 "cat": {
-	"id": "fight:sand",
+	"id": "fight:furnace",
 	"width": 1,
 	"height": 1,
 	"originX": 0,
@@ -9,10 +9,10 @@
 	"scaleY": 1,
 	"rotation": 0
 },
-"block_friction": 0.9,
+"block_friction": 1,
 "block_sounds": {
-	"WALK": "fight:sand_walk",
-	"PUT": "fight:sand_put",
-	"DESTROY": "fight:sand_destroy"
+	"WALK": "fight:stone_walk",
+	"PUT": "fight:stone_put",
+	"DESTROY": "fight:stone_destroy"
 }
 }
