@@ -1,6 +1,7 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.util.Log;
@@ -20,6 +21,8 @@ public class Registries {
     public static final Registry<Supplier<Block>> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
+
+    public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
 
     public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
         return new DefaultRegistry<>();

@@ -6,6 +6,7 @@ import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
@@ -19,7 +20,7 @@ public class ItemFish extends Item {
     }
 
     @Override
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         Log.print(this.toString(), user.getID() + " 在吃鱼");
         //随机吃鱼音效
         String useSoundId = this.property.getUseSoundId() + MathUtils.random(1, 3);

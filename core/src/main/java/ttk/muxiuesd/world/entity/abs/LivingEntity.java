@@ -84,7 +84,7 @@ public abstract class LivingEntity extends Entity {
         itemEntity.setOnGround(false);
         itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
         itemEntity.setItemStack(itemStack);
-        itemStack.getItem().beDropped(getEntitySystem().getWorld(), this);
+        itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
         return true;
     }

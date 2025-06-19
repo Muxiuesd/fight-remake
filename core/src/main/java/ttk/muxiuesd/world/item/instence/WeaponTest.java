@@ -6,6 +6,7 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Factory;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Weapon;
 
 /**
@@ -19,10 +20,10 @@ public class WeaponTest extends Weapon {
     }
 
     @Override
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         EntitySystem entitySystem = user.getEntitySystem();
         entitySystem.add(Factory.createBullet(user, Util.getDirection()));
 
-        return super.use(world, user);
+        return super.use(itemStack, world, user);
     }
 }

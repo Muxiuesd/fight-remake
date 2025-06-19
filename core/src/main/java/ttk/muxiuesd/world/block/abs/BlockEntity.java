@@ -75,7 +75,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
             ItemStack itemStack = this.getInventory().getItemStack(i);
             if (itemStack == null) continue;
 
-            itemStack.getItem().beDropped(world, destroyer);
+            itemStack.getItem().beDropped(itemStack, world, destroyer);
             ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), es);
             itemEntity.setItemStack(itemStack);
             itemEntity.setPosition(getBlockPos());

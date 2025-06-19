@@ -6,6 +6,7 @@ import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 武器类
@@ -25,8 +26,8 @@ public abstract class Weapon extends Item{
     }
 
     @Override
-    public boolean use (World world, LivingEntity user) {
-        return super.use(world, user);
+    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+        return super.use(itemStack, world, user);
     }
 
     /*public WeaponProperty getProperties () {

@@ -28,7 +28,7 @@ public class BlockItem extends Item {
     }
 
     @Override
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         HandleInputSystem his = (HandleInputSystem) world.getSystemManager().getSystem("HandleInputSystem");
         Vector2 worldPosition = his.getMouseWorldPosition();
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");

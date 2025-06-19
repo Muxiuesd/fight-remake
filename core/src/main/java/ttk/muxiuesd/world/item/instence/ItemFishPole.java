@@ -22,6 +22,7 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.loottable.FishingLootTable;
 
@@ -45,7 +46,7 @@ public class ItemFishPole extends Item {
     }
 
     @Override
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         if (!this.isCasting) {//抛出鱼钩
             EntitySystem es = user.getEntitySystem();
             //获取鱼钩
@@ -59,18 +60,18 @@ public class ItemFishPole extends Item {
                 .setParticleSystem((ParticleSystem) world.getSystemManager().getSystem("ParticleSystem"));
 
             this.throwHook(world, fishingHook);
-            return super.use(world, user);
+            return super.use(itemStack, world, user);
         }else if (!this.hook.onCasting() && !this.hook.isReturning){//鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
             Vector2 hookPos = this.hook.getCenter();
             ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
                 //需要鱼钩在水中才能钓到鱼
-                FishingLootTable.fastGenerate(100, itemStack -> {
+                FishingLootTable.fastGenerate(100, genItemStack -> {
                     ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
                     itemEntity.setPosition(hookPos);
                     itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
-                    itemEntity.setItemStack(itemStack);
+                    itemEntity.setItemStack(genItemStack);
                     itemEntity.setSpeed(this.pullSpeed);
                     itemEntity.setCurSpeed(this.pullSpeed);
                     itemEntity.setVelocity(new Direction(this.hook.getCenter(), this.hook.getOwner().getCenter()));
@@ -84,14 +85,14 @@ public class ItemFishPole extends Item {
             }
 
             this.pullHook();
-            return super.use(world, user);
+            return super.use(itemStack, world, user);
         }
         //到这里就说明在抛竿或者收杆的动作之中，所以是使用失败的
         return false;
     }
 
     @Override
-    public void beDropped (World world, LivingEntity dropper) {
+    public void beDropped (ItemStack itemStack, World world, LivingEntity dropper) {
         //钓鱼的时候被丢出来，则直接让鱼钩消失
         if (this.isCasting) {
             this.hook.removeSelf();

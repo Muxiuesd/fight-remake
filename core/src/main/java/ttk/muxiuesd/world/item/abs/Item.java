@@ -19,11 +19,12 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 物品
  * */
-public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
+public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
     public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 64)
         .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
@@ -82,7 +83,7 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
      * 使用此物品
      * @return 是否使用成功
      * */
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         //播放物品使用音效
         String useSoundId = this.property.getUseSoundId();
         SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
@@ -94,7 +95,7 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
     /**
      * 当物品被丢弃的时候的行为
      * */
-    public void beDropped (World world, LivingEntity dropper) {
+    public void beDropped (ItemStack itemStack, World world, LivingEntity dropper) {
     }
 
     /**
@@ -210,6 +211,13 @@ public abstract class Item implements ID<Item>, Updateable,ShapeRenderable {
         public Property setPropertiesMap (PropertiesDataMap<?> propertiesMap) {
             this.propertiesMap = propertiesMap;
             return this;
+        }
+
+        /**
+         * 属性是否相同的判断，判断的是所持有的属性的种类以及值，并不是判断两者是否为同一个实例
+         **/
+        public boolean equal (Property property) {
+            return this.getPropertiesMap().equals(property.getPropertiesMap());
         }
     }
 }

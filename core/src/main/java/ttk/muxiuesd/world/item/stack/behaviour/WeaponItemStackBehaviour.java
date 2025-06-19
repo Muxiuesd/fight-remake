@@ -20,7 +20,7 @@ public class WeaponItemStackBehaviour implements IItemStackBehaviour {
             return false;
         }
 
-        boolean used = weapon.use(world, user);
+        boolean used = weapon.use(itemStack, world, user);
         if (!used) {
             return false;
         }

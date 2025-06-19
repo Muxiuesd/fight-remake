@@ -8,7 +8,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class ConsumptionItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity user, ItemStack itemStack) {
-        boolean used = itemStack.getItem().use(world, user);
+        boolean used = itemStack.getItem().use(itemStack, world, user);
         if (!used) {
             return false;
         }

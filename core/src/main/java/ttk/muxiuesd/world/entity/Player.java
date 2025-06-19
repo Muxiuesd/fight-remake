@@ -98,7 +98,7 @@ public class Player extends LivingEntity {
         itemEntity.setOnGround(false);
         itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
         itemEntity.setVelocity(Util.getDirection());
-        itemStack.getItem().beDropped(getEntitySystem().getWorld(), this);
+        itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
         HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
         Vector2 mwp = his.getMouseWorldPosition();
