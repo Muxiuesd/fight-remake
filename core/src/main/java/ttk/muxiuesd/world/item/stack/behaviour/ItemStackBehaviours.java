@@ -7,7 +7,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
- * 物品使用行为逻辑工厂类
+ * 物品使用行为逻辑(为了代码整洁才抽象出来的)
  * */
 public class ItemStackBehaviours {
     public static final IItemStackBehaviour COMMON = register("common", new CommonItemStackBehaviour());

@@ -22,7 +22,9 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 物品
+ * 物品的模板类
+ * <p>
+ * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
 public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
     public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
@@ -216,7 +218,7 @@ public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
         /**
          * 属性是否相同的判断，判断的是所持有的属性的种类以及值，并不是判断两者是否为同一个实例
          **/
-        public boolean equal (Property property) {
+        public boolean equals (Property property) {
             return this.getPropertiesMap().equals(property.getPropertiesMap());
         }
     }

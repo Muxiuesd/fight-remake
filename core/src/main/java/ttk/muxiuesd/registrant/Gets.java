@@ -13,7 +13,6 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class Gets {
 
     public static Item ITEM (String id) {
-        //return get(id, Item.class);
         return Registries.ITEM.get(id);
     }
 

@@ -13,16 +13,20 @@ import ttk.muxiuesd.world.item.stack.behaviour.WeaponItemStackBehaviour;
 
 /**
  * 物品堆栈
+ * <p>
+ * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
 public class ItemStack implements Updateable {
     //所持有的物品
     private final Item item;
     //物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
     private Item.Property property;
+    //数量
     private int amount;
     //物品堆叠所用的行为，一般来说根据物品的类型来判断
     private final IItemStackBehaviour behaviour;
-    public Timer useTimer;  //使用计时器
+    //使用时间计时器
+    public Timer useTimer;
 
     public ItemStack (Item item) {
         //不指定数量就默认这个物品的最大数量
@@ -87,7 +91,7 @@ public class ItemStack implements Updateable {
         //物品不是一种就无需判断直接false
         if (this.getItem() != stack.getItem()) return false;
         //比较所持有的属性
-        return this.getProperty().equal(stack.getProperty());
+        return this.getProperty().equals(stack.getProperty());
     }
 
 
