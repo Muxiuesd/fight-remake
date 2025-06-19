@@ -109,7 +109,7 @@ public class ItemStack implements Updateable {
     }
 
     public ItemStack setAmount (int amount) {
-        if (amount >= this.getProperty().getMaxCount()) this.setAmount(this.getProperty().getMaxCount());
+        if (amount >= this.getProperty().getMaxCount()) this.amount = this.getProperty().getMaxCount();
         if (amount >= 0) this.amount = amount;
         return this;
     }

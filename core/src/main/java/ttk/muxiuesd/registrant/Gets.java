@@ -14,7 +14,7 @@ public class Gets {
 
     public static Item ITEM (String id) {
         //return get(id, Item.class);
-        return Registries.ITEM.get(id).get().setID(id);
+        return Registries.ITEM.get(id);
     }
 
     public static Block BLOCK (String id) {

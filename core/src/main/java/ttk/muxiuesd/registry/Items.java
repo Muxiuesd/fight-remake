@@ -26,8 +26,6 @@ public final class Items {
     public static Item register(String name, Supplier<Item> factory) {
         String id = Fight.getId(name);
         Identifier identifier = new Identifier(id);
-        Registries.ITEM.register(identifier, factory);
-        Item item = factory.get();
-        return item.setID(id);
+        return Registries.ITEM.register(identifier, factory.get()).setID(id);
     }
 }

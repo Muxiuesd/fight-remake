@@ -5,7 +5,6 @@ import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.LinkedHashMap;
-import java.util.Objects;
 
 /**
  * 实体所拥有的物品背包
@@ -94,9 +93,10 @@ public class Backpack implements Inventory, Updateable {
         // 尝试合并到已有的堆叠
         for (int i = 0; i < this.size; ++i) {
             ItemStack stack = this.itemStacks.get(i);
-            if (stack != null && Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {
+            /*if (stack != null && Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {*/
+            if(stack != null && !stack.isFull() && stack.equals(itemStack)) {
                 // 堆叠数量达到上限直接跳过
-                if (stack.getAmount() >= stack.getProperty().getMaxCount()) continue;
+                /*if (stack.isFull()) continue;*/
 
                 int newAmount = stack.getAmount() + itemStack.getAmount();
                 int maxCount = stack.getItem().property.getMaxCount();

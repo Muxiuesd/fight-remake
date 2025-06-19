@@ -14,10 +14,10 @@ import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 
 /**
- * 所有注册表
+ * 游戏内的所有注册表
  * */
 public class Registries {
-    public static final Registry<Supplier<Item>> ITEM = create(RegistryKeys.ITEM);
+    public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Supplier<Block>> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);

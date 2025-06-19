@@ -56,7 +56,7 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap> {
         AtomicBoolean result = new AtomicBoolean(true);
         this.propertiesMap.forEach((key, value) -> {
             //如果没有这个属性或者有这个属性但值对不上
-            if (!other.contain(key) || other.get(key).equals(value)) result.set(false);
+            if (!other.contain(key) || !other.get(key).equals(value)) result.set(false);
 
         });
 
