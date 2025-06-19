@@ -16,15 +16,15 @@ import ttk.muxiuesd.world.item.abs.Item;
  * 方块物品
  * */
 public class BlockItem extends Item {
-    final String blockId;
+    final Block block;
 
-    public BlockItem(String blockId, String textureId) {
-        this(blockId, new Property().setMaxCount(64), textureId);
+    public BlockItem(Block block, String textureId) {
+        this(block, new Property().setMaxCount(64), textureId);
     }
 
-    public BlockItem(String blockId, Property property, String textureId) {
+    public BlockItem(Block block, Property property, String textureId) {
         super(Type.CONSUMPTION, property, textureId);
-        this.blockId = blockId;
+        this.block = block;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class BlockItem extends Item {
         Vector2 worldPosition = his.getMouseWorldPosition();
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
         //替换鼠标点到的方块
-        Block replacedBlock = cs.replaceBlock(Gets.BLOCK(blockId), worldPosition.x, worldPosition.y);
+        Block replacedBlock = cs.replaceBlock(block, worldPosition.x, worldPosition.y);
         //获取方块所对应的方块物品
         ItemStack stack = new ItemStack(Gets.ITEM(replacedBlock.getID()), 1);
 

@@ -6,8 +6,6 @@ import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.*;
-import ttk.muxiuesd.world.item.ItemsReg;
-import ttk.muxiuesd.world.item.instence.BlockItem;
 
 import java.util.function.Supplier;
 
@@ -35,7 +33,7 @@ public class BlocksReg {
         Block block = registrant.register(name, supplier);
         String id = Fight.getId(name);
         //注册方块物品
-        ItemsReg.register(name, () -> new BlockItem(id, id));
+        //ItemsReg.register(name, () -> new BlockItem(id, id));
         return block;
     }
 

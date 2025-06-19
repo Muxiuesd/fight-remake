@@ -17,7 +17,7 @@ public class Gets {
     }
 
     public static Block BLOCK (String id) {
-        return Registries.BLOCK.get(id).get().setID(id);
+        return Registries.BLOCK.get(id);
     }
 
     /**

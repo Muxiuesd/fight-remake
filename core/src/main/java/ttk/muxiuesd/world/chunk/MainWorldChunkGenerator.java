@@ -32,12 +32,12 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
             float wy = chunk.getWorldY(y);
             int height = generateTerrain(wx, wy);
             String blockId = this.chooseBlock(height);
-            ConcurrentHashMap<String, Block> instancesMap = cs.getBlockInstancesMap();
-            if (!instancesMap.containsKey(blockId)) {
-                //如果不存在这个id的方块实例，就新建一个
-                instancesMap.put(blockId, Gets.BLOCK(blockId));
+            ConcurrentHashMap<String, Block> blockInstancesMap = cs.getBlockInstancesMap();
+            if (!blockInstancesMap.containsKey(blockId)) {
+                //如果区块里不存在这个id的方块实例，就加进来
+                blockInstancesMap.put(blockId, Gets.BLOCK(blockId));
             }
-            Block block = instancesMap.get(blockId);
+            Block block = blockInstancesMap.get(blockId);
             chunk.setBlock(block, x, y);
             chunk.setHeight(x, y, height);
 

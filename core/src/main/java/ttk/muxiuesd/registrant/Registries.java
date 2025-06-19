@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * */
 public class Registries {
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
-    public static final Registry<Supplier<Block>> BLOCK = create(RegistryKeys.BLOCK);
+    public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
 
