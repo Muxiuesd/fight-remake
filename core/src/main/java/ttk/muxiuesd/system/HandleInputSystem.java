@@ -96,7 +96,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
 
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
+            Block mb = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+            Log.print(TAG, "鼠标选中的方块为：" + mb.getClass().getName());
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();

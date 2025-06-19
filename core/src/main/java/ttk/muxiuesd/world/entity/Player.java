@@ -54,8 +54,8 @@ public class Player extends LivingEntity {
         backpack.setItemStack(0, new ItemStack(Items.TEST_ITEM));
         backpack.setItemStack(1, new ItemStack(Items.TEST_WEAPON));
         backpack.setItemStack(2, new ItemStack(Items.STICK));
-        backpack.setItemStack(3, new ItemStack(Gets.ITEM(Fight.getId("furnace"))));
-        backpack.setItemStack(4, new ItemStack(Gets.ITEM(Fight.getId("crafting_table"))));
+        backpack.setItemStack(3, new ItemStack(Items.FURNACE));
+        backpack.setItemStack(4, new ItemStack(Items.CRAFTING_TABLE));
         backpack.setItemStack(5, new ItemStack(Items.FISH_POLE));
         backpack.setItemStack(6, new ItemStack(Items.FISH, 2));
         backpack.setItemStack(7, new ItemStack(Items.FISH, 1));

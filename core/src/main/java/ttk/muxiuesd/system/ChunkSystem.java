@@ -215,9 +215,12 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             //添加方块实体
             BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
             this.addBlockEntity(blockWithEntity, blockEntity);
+            this.addBlockInstance(blockWithEntity);
+
             //TODO 事件：添加方块实体
+        }else {
+            this.addBlockInstance(block);
         }
-        this.addBlockInstance(block);
     }
 
     /**
@@ -332,12 +335,18 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             this.removeBlockInstance(oldBlock);
         }
 
-        this.addBlock(newBlock, wx, wy);
+        //如果新方块是带有方块实体的方块
+        if (newBlock instanceof BlockWithEntity blockWithEntity) {
+            BlockWithEntity self = blockWithEntity.createSelf();
+            this.addBlock(self, wx, wy);
+            chunk.setBlock(self, chunkBlockPos.x, chunkBlockPos.y);
+        }else {
+            this.addBlock(newBlock, wx, wy);
+            chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
+        }
 
-        chunk.setBlock(this.getBlockInstancesMap().get(this.getBlockKey(newBlock)), chunkBlockPos.x, chunkBlockPos.y);
-
-        //EventBus.getInstance().callEvent(EventBus.EventType.BlockReplaceEvent, getWorld(), oldBlock, newBlock, wx, wy);
-        EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
+        //chunk.setBlock(this.getBlockInstancesMap().get(this.getBlockKey(newBlock)), chunkBlockPos.x, chunkBlockPos.y);
+         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
         return oldBlock;
     }

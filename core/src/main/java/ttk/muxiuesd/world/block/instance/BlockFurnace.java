@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
 /**
  * 熔炉方块
  * */
-public class BlockFurnace extends BlockWithEntity {
+public class BlockFurnace extends BlockWithEntity<BlockFurnace> {
     private TextureRegion workingTexture;
     private boolean isWorking = false;
 
@@ -38,6 +38,13 @@ public class BlockFurnace extends BlockWithEntity {
                 this.scaleX, this.scaleY,
                 this.rotation);
         }
+    }
+
+    @Override
+    public BlockFurnace createSelf () {
+        BlockFurnace blockFurnace = new BlockFurnace();
+        blockFurnace.setID(getID());
+        return blockFurnace;
     }
 
     @Override

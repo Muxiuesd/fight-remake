@@ -38,6 +38,9 @@ public final class Items {
         return Registries.ITEM.register(identifier, factory.get()).setID(id);
     }
 
+    /**
+     * 注册方块的方块物品
+     * */
     public static Item register (Block block) {
         String id = block.getID();
         return Registries.ITEM.register(new Identifier(id), new BlockItem(block, id));
