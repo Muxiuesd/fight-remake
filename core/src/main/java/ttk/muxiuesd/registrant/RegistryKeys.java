@@ -1,6 +1,6 @@
 package ttk.muxiuesd.registrant;
 
-import ttk.muxiuesd.interfaces.IItemStackBehaviour;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Entity;

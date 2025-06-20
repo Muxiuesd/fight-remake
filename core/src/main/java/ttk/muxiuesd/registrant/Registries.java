@@ -1,8 +1,8 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.id.Identifier;
-import ttk.muxiuesd.interfaces.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.Registry;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -29,6 +29,9 @@ public class Registries {
     }
 
 
+    /**
+     * 默认的注册表
+     * */
     public static class DefaultRegistry<T> implements Registry<T> {
         private final LinkedHashMap<String, Identifier> idMap = new LinkedHashMap<>();
         private final LinkedHashMap<Identifier, T> regedit = new LinkedHashMap<>();

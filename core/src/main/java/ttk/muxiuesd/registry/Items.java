@@ -14,7 +14,7 @@ public final class Items {
     public static void init () {
         Log.print(Items.class.getName(), "物品注册完成");
     }
-
+    //常规物品
     public static final Item TEST_ITEM = register("test_item", TestItem::new);
     public static final Item STICK = register("stick", ItemStick::new);
     public static final Item TEST_WEAPON = register("test_weapon", WeaponTest::new);
@@ -23,12 +23,14 @@ public final class Items {
     public static final Item FISH = register("fish", ItemFish::new);
     public static final Item RUBBISH = register("rubbish", ItemRubbish::new);
 
+    //方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
     public static final Item GRASS = register(Blocks.GRASS);
     public static final Item STONE = register(Blocks.STONE);
     public static final Item SAND = register(Blocks.SAND);
     public static final Item WATER = register(Blocks.WATER);
 
+    //带有方块实体的方块物品
     public static final Item CRAFTING_TABLE = register(Blocks.CRAFTING_TABLE);
     public static final Item FURNACE = register(Blocks.FURNACE);
 

@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package ttk.muxiuesd.interfaces.world.block;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 

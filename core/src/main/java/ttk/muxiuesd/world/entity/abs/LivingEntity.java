@@ -123,7 +123,10 @@ public abstract class LivingEntity extends Entity {
         if (handIndex >= 0 && handIndex < this.backpack.getSize()) {
             if (this.handIndex != handIndex) {
                 //放下先前的物品堆叠
-                this.getHandItemStack().putDown(this.getEntitySystem().getWorld(), this);
+                ItemStack handItemStack = this.getHandItemStack();
+                if (handItemStack != null) {
+                    handItemStack.putDown(this.getEntitySystem().getWorld(), this);
+                }
                 this.handIndex = handIndex;
             }
         }

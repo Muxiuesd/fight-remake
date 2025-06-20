@@ -1,8 +1,9 @@
 package ttk.muxiuesd.recipe;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 import java.util.LinkedHashMap;
 
@@ -11,13 +12,13 @@ import java.util.LinkedHashMap;
  * */
 public class FurnaceRecipeTable {
     private static final LinkedHashMap<String, CookingRecipe> table = new LinkedHashMap<>();//key为熔炼表ID
-    private static final LinkedHashMap<String, CookingRecipe> map = new LinkedHashMap<>();//key为输入物品ID
+    private static final LinkedHashMap<Item, CookingRecipe> map = new LinkedHashMap<>();//key为输入的物品
 
-    public static final CookingRecipe RUBBISH = register(new CookingRecipe(
-        Fight.getId("recipe_rubbish"), new ItemStack(Gets.ITEM(Fight.getId("stick")), 1)) {
+    public static final CookingRecipe RUBBISH = register(new CookingRecipe(Fight.getId("recipe_rubbish"),
+        new ItemStack(Items.STICK, 1)) {
         @Override
         public ItemStack getOutput () {
-            return new ItemStack(Gets.ITEM(Fight.getId("rubbish")), 1);
+            return new ItemStack(Items.RUBBISH, 1);
         }
     });
 
@@ -30,7 +31,7 @@ public class FurnaceRecipeTable {
             throw new IllegalArgumentException("id为：" + recipe.getId() + " 的熔炼配方已存在！！！");
         }
         table.put(recipe.getId(), recipe);
-        map.put(recipe.getInput().getItem().getID(), recipe);
+        map.put(recipe.getInput().getItem(), recipe);
         return recipe;
     }
 
@@ -49,7 +50,13 @@ public class FurnaceRecipeTable {
         if (!has(inputStack)) {
             return null;
         }
-        return map.get(inputStack.getItem().getID()).getOutput();
+        //判断物品堆叠属性是否符合要求
+        CookingRecipe cookingRecipe = map.get(inputStack.getItem());
+        if (!cookingRecipe.match(inputStack)) {
+            return null;
+        }
+        //到这里应该符合要求了
+        return cookingRecipe.getOutput();
     }
 
     public static boolean contains (String id) {
@@ -57,10 +64,10 @@ public class FurnaceRecipeTable {
     }
 
     /**
-     * 判断是否有这个熔炼输入
+     * 根据输入的物品堆叠的物品判断是否有这个熔炼输入
      * */
     public static boolean has (ItemStack stack) {
         //TODO 复杂物品判断
-        return map.containsKey(stack.getItem().getID());
+        return map.containsKey(stack.getItem());
     }
 }

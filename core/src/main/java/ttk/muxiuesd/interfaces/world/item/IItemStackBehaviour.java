@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package ttk.muxiuesd.interfaces.world.item;
 
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;

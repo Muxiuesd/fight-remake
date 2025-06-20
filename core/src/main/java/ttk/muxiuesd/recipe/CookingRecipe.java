@@ -15,6 +15,13 @@ public abstract class CookingRecipe implements RecipeOutput {
         this.input = input;
     }
 
+    /**
+     * 输入是否匹配
+     * */
+    public boolean match (ItemStack inputStack) {
+        return input.equals(inputStack);
+    }
+
     public String getId () {
         return id;
     }
