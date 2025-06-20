@@ -46,7 +46,8 @@ public abstract class LivingEntity extends Entity {
         //如果手上有物品，则绘制手上的物品
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
-            itemStack.getItem().drawOnHand(batch, this);
+            //itemStack.getItem().drawOnHand(batch, this);
+            itemStack.drawItemOnHand(batch, this);
         }
     }
 
@@ -54,7 +55,7 @@ public abstract class LivingEntity extends Entity {
     public void renderShape (ShapeRenderer batch) {
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
-            itemStack.getItem().renderShape(batch);
+            itemStack.renderShape(batch);
         }
     }
 
@@ -120,7 +121,11 @@ public abstract class LivingEntity extends Entity {
 
     public void setHandIndex (int handIndex) {
         if (handIndex >= 0 && handIndex < this.backpack.getSize()) {
-            this.handIndex = handIndex;
+            if (this.handIndex != handIndex) {
+                //放下先前的物品堆叠
+                this.getHandItemStack().putDown(this.getEntitySystem().getWorld(), this);
+                this.handIndex = handIndex;
+            }
         }
     }
 }

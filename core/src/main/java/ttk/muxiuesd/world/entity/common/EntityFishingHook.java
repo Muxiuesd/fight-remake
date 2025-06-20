@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
@@ -13,14 +14,14 @@ import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.item.instence.ItemFishPole;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 鱼钩实体
  * */
 public class EntityFishingHook extends Entity {
     private LivingEntity owner;
-    private ItemFishPole pole;
+    private ItemStack poleStack;
     private Direction throwDirection;
     private ChunkSystem cs;
     private ParticleSystem pts;
@@ -69,11 +70,13 @@ public class EntityFishingHook extends Entity {
                 this.bubbleEmitTimer.isReady();
             }
         }
+        //在收杆返回途中
         if (this.isReturning) {
             this.returningMovement(delta);
             if (this.hitbox.overlaps(this.getOwner().hitbox)) {
                 this.removeSelf();
-                this.getPole().isCasting = false;
+                //this.getPole().isCasting = false;
+                this.getPole().getProperty().add(PropertyTypes.ITEM_ON_USING, false);
                 return;
             }
         }
@@ -90,7 +93,6 @@ public class EntityFishingHook extends Entity {
                 scaleX, scaleY, rotation);
         }
     }
-
 
 
     /**
@@ -123,12 +125,12 @@ public class EntityFishingHook extends Entity {
         return this;
     }
 
-    public ItemFishPole getPole () {
-        return this.pole;
+    public ItemStack getPole () {
+        return this.poleStack;
     }
 
-    public EntityFishingHook setPole (ItemFishPole pole) {
-        this.pole = pole;
+    public EntityFishingHook setPole (ItemStack poleStack) {
+        this.poleStack = poleStack;
         return this;
     }
 

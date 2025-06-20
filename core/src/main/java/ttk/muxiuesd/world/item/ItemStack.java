@@ -1,8 +1,12 @@
 package ttk.muxiuesd.world.item;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.IItemStackBehaviour;
+import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -16,7 +20,7 @@ import ttk.muxiuesd.world.item.stack.behaviour.WeaponItemStackBehaviour;
  * <p>
  * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
-public class ItemStack implements Updateable {
+public class ItemStack implements Updateable, ShapeRenderable {
     //所持有的物品
     private final Item item;
     //物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
@@ -58,11 +62,30 @@ public class ItemStack implements Updateable {
         return this.behaviour.use(world, user, this);
     }
 
+    /**
+     * 这个物品堆叠从手上换下来
+     * */
+    public void putDown (World world, LivingEntity holder) {
+        this.getItem().putDown(this, world, holder);
+    }
+
     @Override
     public void update (float delta) {
         //更新物品
-        this.getItem().update(delta);
+        this.getItem().update(delta, this);
         if (this.useTimer != null) this.useTimer.update(delta);
+    }
+
+    /**
+     * 物品在手上的绘制
+     * */
+    public void drawItemOnHand (Batch batch, LivingEntity holder) {
+        this.getItem().drawOnHand(batch, holder, this);
+    }
+
+    @Override
+    public void renderShape (ShapeRenderer batch) {
+        this.getItem().renderShape(batch, this);
     }
 
     /**
@@ -92,6 +115,13 @@ public class ItemStack implements Updateable {
         if (this.getItem() != stack.getItem()) return false;
         //比较所持有的属性
         return this.getProperty().equals(stack.getProperty());
+    }
+
+    /**
+     * 物品是否在使用中
+     * */
+    public boolean onUsing () {
+        return this.getProperty().get(PropertyTypes.ITEM_ON_USING);
     }
 
 
@@ -128,4 +158,6 @@ public class ItemStack implements Updateable {
     public boolean isReady () {
         return this.useTimer != null && this.useTimer.isReady();
     }
+
+
 }

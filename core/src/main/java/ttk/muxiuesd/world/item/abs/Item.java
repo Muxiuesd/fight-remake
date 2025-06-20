@@ -10,8 +10,10 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.world.item.ItemRenderable;
+import ttk.muxiuesd.interfaces.world.item.ItemShapeRenderable;
+import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
+import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
@@ -26,9 +28,10 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
-public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
+public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, ItemShapeRenderable {
     public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 64)
+        .add(PropertyTypes.ITEM_ON_USING, false)
         .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
 
     private String id;
@@ -49,7 +52,8 @@ public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
      * 在持有者手上持有时的绘制方法
      * TODO 不同类型的物品不同的绘制方式
      * */
-    public void drawOnHand (Batch batch, LivingEntity holder) {
+    @Override
+    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
         if (this.texture != null) {
             Direction direction = Util.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection()) - 45;
@@ -64,6 +68,7 @@ public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
      * 在掉落物形式下的绘制方法
      * @param itemEntity 所属的物品实体
      * */
+    @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
         if (this.texture != null) {
             batch.draw(this.texture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
@@ -74,11 +79,11 @@ public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
     }
 
     @Override
-    public void update (float delta) {
+    public void update (float delta, ItemStack itemStack) {
     }
 
     @Override
-    public void renderShape (ShapeRenderer batch) {
+    public void renderShape (ShapeRenderer batch, ItemStack itemStack) {
     }
 
     /**
@@ -92,6 +97,12 @@ public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
         ses.newSpatialSound(useSoundId, user);
 
         return true;
+    }
+
+    /**
+     * 物品被放下来（从手持变成非手持）
+     * */
+    public void putDown (ItemStack itemStack, World world, LivingEntity holder) {
     }
 
     /**
@@ -158,51 +169,60 @@ public abstract class Item implements ID<Item>, Updateable, ShapeRenderable {
         //属性映射
         private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy();
 
+        public <T> T get (PropertyType<T> propertyType) {
+            return getPropertiesMap().get(propertyType);
+        }
+
+        public <T> Property add (PropertyType<T> propertyType, T value) {
+            getPropertiesMap().add(propertyType, value);
+            return this;
+        }
+
         public int getMaxCount () {
-            return propertiesMap.get(PropertyTypes.ITEM_MAX_COUNT);
+            return get(PropertyTypes.ITEM_MAX_COUNT);
         }
 
         public Property setMaxCount (int maxCount) {
             if (maxCount > 0){
-                this.propertiesMap.add(PropertyTypes.ITEM_MAX_COUNT, maxCount);
+                add(PropertyTypes.ITEM_MAX_COUNT, maxCount);
                 return this;
             }
             throw new IllegalArgumentException ("最大堆叠数必须大于0！！！");
         }
 
         public String getUseSoundId () {
-            return this.propertiesMap.get(PropertyTypes.ITEM_USE_SOUND_ID);
+            return get(PropertyTypes.ITEM_USE_SOUND_ID);
         }
 
         public Property setUseSoundId (String useSoundId) {
-            this.propertiesMap.add(PropertyTypes.ITEM_USE_SOUND_ID, useSoundId);
+            add(PropertyTypes.ITEM_USE_SOUND_ID, useSoundId);
             return this;
         }
 
         public float getDamage () {
-            return getPropertiesMap().get(PropertyTypes.WEAPON_DAMAGE);
+            return get(PropertyTypes.WEAPON_DAMAGE);
         }
 
         public Property setDamage (float damage) {
-            getPropertiesMap().add(PropertyTypes.WEAPON_DAMAGE, damage);
+            add(PropertyTypes.WEAPON_DAMAGE, damage);
             return this;
         }
 
         public int getDuration () {
-            return getPropertiesMap().get(PropertyTypes.WEAPON_DURATION);
+            return get(PropertyTypes.WEAPON_DURATION);
         }
 
         public Property setDuration (int duration) {
-            getPropertiesMap().add(PropertyTypes.WEAPON_DURATION, duration);
+            add(PropertyTypes.WEAPON_DURATION, duration);
             return this;
         }
 
         public float getUseSpan () {
-            return getPropertiesMap().get(PropertyTypes.WEAPON_USE_SAPN);
+            return get(PropertyTypes.WEAPON_USE_SAPN);
         }
 
         public Property setUseSpan (float useSpan) {
-            getPropertiesMap().add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
+            add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
             return this;
         }
 

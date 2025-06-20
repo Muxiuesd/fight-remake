@@ -6,6 +6,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
@@ -21,7 +22,7 @@ public class ItemBait extends Item {
     }
 
     @Override
-    public void drawOnHand (Batch batch, LivingEntity holder) {
+    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
         if (texture != null) {
             Direction direction = Util.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());

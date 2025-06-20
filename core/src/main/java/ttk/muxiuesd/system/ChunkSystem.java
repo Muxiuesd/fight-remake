@@ -337,6 +337,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         //如果新方块是带有方块实体的方块
         if (newBlock instanceof BlockWithEntity blockWithEntity) {
+            //需要新建一个实例再添加
             BlockWithEntity self = blockWithEntity.createSelf();
             this.addBlock(self, wx, wy);
             chunk.setBlock(self, chunkBlockPos.x, chunkBlockPos.y);
