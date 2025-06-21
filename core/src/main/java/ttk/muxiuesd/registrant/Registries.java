@@ -4,6 +4,7 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.recipe.CookingRecipe;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -23,11 +24,12 @@ public class Registries {
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
 
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
+    public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);
+
 
     public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
         return new DefaultRegistry<>();
     }
-
 
     /**
      * 默认的注册表

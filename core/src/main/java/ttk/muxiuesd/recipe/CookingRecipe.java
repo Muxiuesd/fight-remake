@@ -7,7 +7,9 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 烧炼配方
  * */
 public abstract class CookingRecipe implements RecipeOutput {
+    //这个配方的id
     private String id;
+    //需要的物品输入，用于匹配
     private ItemStack input;
 
     public CookingRecipe (String id, ItemStack input) {

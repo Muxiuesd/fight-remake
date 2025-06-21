@@ -9,7 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.recipe.FurnaceRecipeTable;
+import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.world.World;
@@ -120,12 +120,12 @@ public class BlockEntityFurnace extends BlockEntity {
         ItemStack inputStack = inventory.getItemStack(this.getInputSlotIndex());
         ItemStack fuelStack = inventory.getItemStack(this.getFuelSlotIndex());
         if (inputStack != null && fuelStack != null) {
-            if (! FurnaceRecipeTable.has(inputStack)) {
+            if (! FurnaceRecipes.has(inputStack)) {
                 this.setWorking(false);
                 return;
             }
             ItemStack outputStack = inventory.getItemStack(this.getOutputSlotIndex());
-            ItemStack resultStack = FurnaceRecipeTable.getOutput(inputStack);
+            ItemStack resultStack = FurnaceRecipes.getOutput(inputStack);
             if (outputStack != null && outputStack.isFull()) return;
             if (resultStack == null) return;
 
