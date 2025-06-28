@@ -4,7 +4,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Factory;
+import ttk.muxiuesd.world.entity.EntityFactory;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Weapon;
@@ -12,8 +12,8 @@ import ttk.muxiuesd.world.item.abs.Weapon;
 /**
  * 测试武器
  * */
-public class WeaponTest extends Weapon {
-    public WeaponTest () {
+public class WeaponDiamondSword extends Weapon {
+    public WeaponDiamondSword () {
         super(Weapon.DEFAULT_PROPERTY,
             Fight.getId("test_weapon"),
             Fight.ItemTexturePath("diamond_sword.png"));
@@ -22,7 +22,7 @@ public class WeaponTest extends Weapon {
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         EntitySystem entitySystem = user.getEntitySystem();
-        entitySystem.add(Factory.createBullet(user, Util.getDirection()));
+        entitySystem.add(EntityFactory.createFireBullet(user, Util.getDirection()));
 
         return super.use(itemStack, world, user);
     }

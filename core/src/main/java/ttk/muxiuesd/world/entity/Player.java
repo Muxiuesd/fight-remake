@@ -144,7 +144,7 @@ public class Player extends LivingEntity {
 
         // 左键发射攻击性子弹
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            Bullet bullet = Factory.createBullet(this, Util.getDirection());
+            Bullet bullet = EntityFactory.createFireBullet(this, Util.getDirection());
             //getEntitySystem().add(bullet);
         }
         if (KeyBindings.PlayerShield.wasJustPressed() && this.defendCDTimer.isReady()) {

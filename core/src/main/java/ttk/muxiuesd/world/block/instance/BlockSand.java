@@ -14,6 +14,5 @@ public class BlockSand extends Block {
                 .setSounds(AudioReg.SAND),
             Fight.getId("sand"),
             Fight.BlockTexturePath("sand.png"));
-        //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/sand.png", Texture.class));
     }
 }

@@ -14,21 +14,25 @@ public final class Blocks {
         Log.print(Blocks.class.getName(), "游戏方块注册完毕");
     }
 
+    //普通方块
     public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
     public static final Block GRASS = register("grass", BlockGrass::new);
     public static final Block STONE = register("stone", BlockStone::new);
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
+    public static final Block GLASS = register("glass", BlockGlass::new);
 
+
+    //带有方块实体的方块
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
     public static final Block FURNACE = register("furnace", BlockFurnace::new);
 
-
+    /**
+     * 方块注册的基本方法
+     * */
     public static Block register (String name, Supplier<Block> factory) {
         String id = Fight.getId(name);
         Identifier identifier = new Identifier(id);
-        //注册方块物品
-        //Items.register(name, () -> new BlockItem(id, id));
         return Registries.BLOCK.register(identifier, factory.get().setID(id));
     }
 }

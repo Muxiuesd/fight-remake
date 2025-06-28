@@ -16,6 +16,8 @@ public final class FurnaceRecipes {
     private static final LinkedHashMap<Item, CookingRecipe> map = new LinkedHashMap<>();//key为输入的物品
 
     public static final CookingRecipe RUBBISH = register("recipe_rubbish", Items.STICK, Items.RUBBISH);
+    public static final CookingRecipe GLASS = register("recipe_glass", Items.SAND, Items.GLASS);
+
 
     /**
      * 普通的配方注册，输入一个就输出一个
