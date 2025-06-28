@@ -1,7 +1,6 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -211,36 +210,6 @@ public class BlockEntityFurnace extends BlockEntity {
             LightSystem lightSystem = (LightSystem) getWorld().getSystemManager().getSystem("LightSystem");
             lightSystem.useLight(this.light);
         }
-    }
-
-    @Override
-    public void draw (Batch batch, float x, float y) {
-        Inventory inventory = getInventory();
-        if (inventory.isEmpty()) return;
-        this.drawAllSlots(batch, x, y);
-    }
-
-    public void drawAllSlots (Batch batch, float x, float y) {
-        for (Slot slot: getSlots()) {
-            if (slot.getItemStack() != null) {
-                drawSlot(batch, slot, x, y);
-            }
-        }
-    }
-
-    /**
-     * 绘制指定的槽位
-     * */
-    private void drawSlot (Batch batch, Slot slot, float x, float y) {
-        GridPoint2 interactGridSize = getInteractGridSize();
-        GridPoint2 startPos = slot.getStartPos();
-        GridPoint2 size = slot.getSize();
-
-        float slotX = x + (float) startPos.x / interactGridSize.x;
-        float slotY = y + (float) startPos.y / interactGridSize.y;
-        float slotWidth  = (float) size.x / interactGridSize.x;
-        float slotHeight = (float) size.y / interactGridSize.y;
-        batch.draw(slot.getItemStack().getItem().texture, slotX, slotY, slotWidth, slotHeight);
     }
 
     public int getCurTick () {

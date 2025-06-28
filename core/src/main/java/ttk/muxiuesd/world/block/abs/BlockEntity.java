@@ -149,6 +149,34 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
 
     @Override
     public void draw (Batch batch, float x, float y) {
+        //槽位不为空就渲染
+        if (!this.slots.isEmpty()) this.drawAllSlots(batch, x, y);
+    }
+
+    /**
+     * 绘制所有槽位
+     * */
+    public void drawAllSlots (Batch batch, float x, float y) {
+        for (Slot slot: getSlots()) {
+            if (slot.getItemStack() != null) {
+                drawSlot(batch, slot, x, y);
+            }
+        }
+    }
+
+    /**
+     * 绘制指定的槽位
+     * */
+    public void drawSlot (Batch batch, Slot slot, float x, float y) {
+        GridPoint2 interactGridSize = getInteractGridSize();
+        GridPoint2 startPos = slot.getStartPos();
+        GridPoint2 size = slot.getSize();
+
+        float slotX = x + (float) startPos.x / interactGridSize.x;
+        float slotY = y + (float) startPos.y / interactGridSize.y;
+        float slotWidth  = (float) size.x / interactGridSize.x;
+        float slotHeight = (float) size.y / interactGridSize.y;
+        batch.draw(slot.getItemStack().getItem().texture, slotX, slotY, slotWidth, slotHeight);
     }
 
     public World getWorld () {
@@ -195,7 +223,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     }
 
     public List<Slot> getSlots () {
-        return slots;
+        return this.slots;
     }
 
     public BlockEntity setSlots (List<Slot> slots) {

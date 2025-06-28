@@ -140,7 +140,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                 int yn = (int) ((mouseWorldPosition.y - blockPos.y) * gridSize.y);
                 GridPoint2 interactGrid = new GridPoint2(xn, yn);
 
-                //System.out.println(interactGrid);
+                System.out.println(interactGrid);
 
                 if (handItemStack == null) {
                     InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);

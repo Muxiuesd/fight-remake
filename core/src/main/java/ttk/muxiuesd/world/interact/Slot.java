@@ -79,4 +79,8 @@ public class Slot {
     public ItemStack getItemStack () {
         return this.inventory.getItemStack(this.getIndex());
     }
+
+    public void setItemStack (ItemStack stack) {
+        this.inventory.setItemStack(this.getIndex(), stack);
+    }
 }

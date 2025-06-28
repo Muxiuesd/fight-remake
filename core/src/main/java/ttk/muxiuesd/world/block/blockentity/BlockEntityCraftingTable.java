@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.block.blockentity;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
@@ -12,6 +11,7 @@ import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -20,89 +20,63 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class BlockEntityCraftingTable extends BlockEntity {
     public BlockEntityCraftingTable (World world, Block block, BlockPos blockPos) {
         super(world, block, blockPos, 9);
-    }
-
-    @Override
-    public void tick (World world, float delta) {
-        //System.out.println(10086);
-    }
-
-    @Override
-    public void update (float delta) {
-        super.update(delta);
+        setInteractGridSize(new GridPoint2(9, 9));
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                addSlot(x + y * 3, x * 3, y * 3, 3, 3);
+            }
+        }
+        System.out.println('a');
     }
 
     @Override
     public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
+        //空手交互就是取出物品
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
 
-        //空手交互就是取出物品，后进先出
-        int index = inventory.getCapacity() - 1;
-        ItemStack itemStack = inventory.getItemStack(index);
-        if (itemStack == null) return InteractResult.FAILURE;
-
+        Slot slot = this.getSlot(interactGridPos);
+        //没有物品就跳过
+        if (slot.getItemStack() == null) return InteractResult.FAILURE;
+        ItemStack slotItemStack = slot.getItemStack();
         //按住左Shift就是把这个物品全数取出
-        int outAmount = KeyBindings.PlayerShift.wasPressed() ? itemStack.getAmount() : 1;
-        int oldAmount = itemStack.getAmount();
-        ItemStack stack = user.backpack.addItem(new ItemStack(itemStack.getItem(), outAmount));
+        int outAmount = KeyBindings.PlayerShift.wasPressed() ? slotItemStack.getAmount() : 1;
+        ItemStack outStack = slotItemStack.split(outAmount);
+        user.setHandItemStack(outStack);
+        inventory.clear();
 
-        itemStack.setAmount(oldAmount - outAmount);
-        if (itemStack.getAmount() == 0) inventory.clear(index);
-
-        /*printInventory(inventory);
-        System.out.println("玩家：");
-        printInventory(user.backpack);*/
+        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
         return InteractResult.SUCCESS;
     }
 
     @Override
     public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
-        Inventory inventory = getInventory();
-        //printInventory(inventory);
-        //按住左Shift就是全部放进来
-        int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
-
-        ItemStack bePutStack = new ItemStack(handItemStack.getItem(), addAmount);
-        int oldAmount = bePutStack.getAmount();
-        ItemStack stack = inventory.addItem(bePutStack);
-        if (stack != null && oldAmount == stack.getAmount()) {
-            //数量没变就是满了装不下去
-            System.out.println("放不进去哦");
-            return InteractResult.FAILURE;
-            //handItemStack.setAmount(handItemStack.getAmount() - addAmount);
+        //手持物品放入
+        Slot slot = this.getSlot(interactGridPos);
+        ItemStack slotItemStack = slot.getItemStack();
+        if (slotItemStack == null) {
+            //交互的槽位上本来没有物品
+            int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
+            slot.setItemStack(handItemStack.split(addAmount));
+        }else {
+            //到这里就是槽位上本来有物品
+            //检测交互槽位的物品是否与手持物品一致
+            if (! handItemStack.equals(slotItemStack)) return InteractResult.FAILURE;
+            //按住左Shift就是全部放进来
+            int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
+            int afterAmount = addAmount + slotItemStack.getAmount();
+            int maxCount = slotItemStack.getProperty().getMaxCount();
+            //检查假如把手持的数量全部加进去是否超出限制，超过就重新设为上限值，没超过则还是原本的值
+            if (afterAmount > maxCount) addAmount = maxCount;
+            //按照指定数量增减
+            handItemStack.decrease(addAmount);
+            slotItemStack.increase(addAmount);
         }
-        handItemStack.setAmount(handItemStack.getAmount() - addAmount);
+        //记得清理
+        user.backpack.clear();
+
         AudioPlayer.getInstance().playSound(Fight.getId("put"), 2.5f);
-
-        /*for (int i = 0; i < inventory.getCapacity(); i++) {
-            ItemStack itemStack = inventory.getItemStack(i);
-            System.out.println("在：" + i + " 上有物品：" + itemStack.getItem() + " 数量：" + itemStack.getAmount());
-        }
-
-        System.out.println("玩家：");
-        printInventory(user.backpack);*/
-
         return InteractResult.SUCCESS;
-    }
-
-    @Override
-    public void draw (Batch batch, float x, float y) {
-        Inventory inventory = getInventory();
-        int index = 0;
-        for (int j = 0; j < 3; j++) {
-            for (int i = 0; i < 3; i++) {
-                ItemStack itemStack = inventory.getItemStack(index);
-                if (itemStack == null) continue;
-
-                float width  = 0.33f;
-                float height = 0.33f;
-                batch.draw(itemStack.getItem().texture,
-                    x + i * width, y + j * height,
-                    width, height);
-                index++;
-            }
-        }
     }
 
     private void printInventory (Inventory inventory) {
