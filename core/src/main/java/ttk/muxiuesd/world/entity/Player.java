@@ -105,7 +105,6 @@ public class Player extends LivingEntity {
 
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), getEntitySystem());
         itemEntity.setPosition(getPosition());
-        itemEntity.setSize(getSize());
         itemEntity.setItemStack(itemStack);
         itemEntity.setOnGround(false);
         itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));

@@ -99,7 +99,18 @@ public class BlockEntityFurnace extends BlockEntity {
     public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
-        //取出物品
+        //获取交互槽位
+        Slot interactSlot = this.getSlot(interactGridPos);
+        //没有交互到槽位
+        if (interactSlot == null) return InteractResult.FAILURE;
+        //到这里说明交互到了槽位
+        ItemStack interactStack = inventory.getItemStack(interactSlot.getIndex());
+        int outAmount = KeyBindings.PlayerShift.wasPressed() ? interactStack.getAmount() : 1;
+        //丢出物品
+        ItemStack outStack = inventory.dropItem(interactSlot.getIndex(), outAmount);
+
+        user.setHandItemStack(outStack);
+        inventory.clear();
 
         return InteractResult.SUCCESS;
     }

@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 掉落在地上的物品以实体形式存在
  * */
 public class ItemEntity extends Entity {
-    public static final Vector2 DEFAULT_SIZE = new Vector2(0.7f, 0.7f);
+    public static final Vector2 DEFAULT_SIZE = new Vector2(0.5f, 0.5f);
     private ItemStack itemStack;
     private Vector2 positionOffset;
     private Timer onAirTimer;   //在空中的计时器，可以自定义物品实体在空中运动的时间

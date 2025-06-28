@@ -81,7 +81,6 @@ public abstract class LivingEntity extends Entity {
 
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY("item_entity", getEntitySystem());
         itemEntity.setPosition(getPosition());
-        itemEntity.setSize(getSize());
         itemEntity.setOnGround(false);
         itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
         itemEntity.setItemStack(itemStack);
@@ -113,6 +112,10 @@ public abstract class LivingEntity extends Entity {
 
     public ItemStack getHandItemStack () {
         return this.backpack.getItemStack(this.handIndex);
+    }
+
+    public void setHandItemStack (ItemStack itemStack) {
+        this.backpack.setItemStack(this.getHandIndex(), itemStack);
     }
 
     public int getHandIndex () {
