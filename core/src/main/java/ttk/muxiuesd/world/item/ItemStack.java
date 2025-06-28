@@ -89,11 +89,23 @@ public class ItemStack implements Updateable, ShapeRenderable {
     }
 
     /**
-     * 指定数量的复制
+     * 指定数量的复制，数量最少为1
      * <p>
-     * 复制过后的物品堆叠所持有的属性与原来的相同
+     * 复制过后的物品堆叠所持有的属性与原来的相同，原物品堆叠数量不减少
      * */
     public ItemStack copy (int amount) {
+        int newAmount = Math.max(amount, 1);
+        if (amount > this.getProperty().getMaxCount()) newAmount = this.getProperty().getMaxCount();
+
+        return new ItemStack(this.getItem(), newAmount, this.behaviour, this.property.getPropertiesMap());
+    }
+
+    /**
+     * 分开物品堆叠
+     * <p>
+     * 分离出指定数量，原物品堆叠数量会减少
+     * */
+    public ItemStack split (int amount) {
         if (amount <= 0) return null;
         //超过或者等于最大数量
         if (amount >= this.getAmount()) {
@@ -102,7 +114,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
         }
         //没达到最大数量
         ItemStack newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
-        this.setAmount(this.getAmount() - amount);
+        this.decrease(amount);
         return newStack;
     }
 
@@ -146,6 +158,34 @@ public class ItemStack implements Updateable, ShapeRenderable {
         if (amount >= this.getProperty().getMaxCount()) this.amount = this.getProperty().getMaxCount();
         if (amount >= 0) this.amount = amount;
         return this;
+    }
+
+    /**
+     * 减少指定数量
+     * */
+    public void decrease (int amount) {
+        this.setAmount(this.getAmount() - amount);
+    }
+
+    /**
+     * 增加指定数量
+     * */
+    public void increase (int amount) {
+        this.setAmount(this.getAmount() + amount);
+    }
+
+    /**
+     * 快速减少一个数量
+     * */
+    public void fastDecrease () {
+        this.decrease(1);
+    }
+
+    /**
+     * 快速增加一个数量
+     * */
+    public void fastIncrease () {
+        this.increase(1);
     }
 
     /**

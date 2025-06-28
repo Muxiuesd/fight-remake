@@ -27,6 +27,18 @@ public interface Inventory {
     ItemStack clear (int index);
 
     /**
+     * 清除数量为零的物品堆叠
+     * */
+    default void clear () {
+        for (int i = 0;i < this.getSize();i++){
+            ItemStack itemStack = this.getItemStack(i);
+            if (itemStack != null && itemStack.getAmount() == 0){
+                clear(i);
+            }
+        }
+    }
+
+    /**
      * 获取物品堆叠
      * */
     ItemStack getItemStack (int index);
