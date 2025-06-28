@@ -31,16 +31,18 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 public class BlockEntityFurnace extends BlockEntity {
     private int curEnergy = 0;  //能量，每tick减1
     private int curTick = 0;
-    private Slot inputSlot;
-    private Slot outputSlot;
-    private Slot fuelSlot;
+    private final Slot inputSlot;
+    private final Slot outputSlot;
+    private final Slot fuelSlot;
     private PointLight light;
 
     public BlockEntityFurnace (World world, Block block, BlockPos blockPos) {
         super(world, block, blockPos, 3);
-        this.inputSlot = new Slot(new GridPoint2(1, 8), new GridPoint2(6,6), this.getInputSlotIndex());
-        this.outputSlot = new Slot(new GridPoint2(9, 8), new GridPoint2(6,6), this.getOutputSlotIndex());
-        this.fuelSlot = new Slot(new GridPoint2(5, 0), new GridPoint2(6,6), this.getFuelSlotIndex());
+
+        this.inputSlot = addSlot(this.getInputSlotIndex(), 1, 8, 6, 6);
+        this.outputSlot = addSlot(this.getOutputSlotIndex(), 9, 8, 6, 6);
+        this.fuelSlot = addSlot(this.getFuelSlotIndex(), 5, 0, 6, 6);
+
         this.light = new PointLight(new Color(0.8f, 0.1f, 0.1f, 0.1f), 2.5f);
         this.light.setPosition(new Vector2(blockPos).add(0.5f, 0.2f));
     }
@@ -49,7 +51,7 @@ public class BlockEntityFurnace extends BlockEntity {
     public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //TODO 根据物品类型或者配方来判断是否可以把东西放进来当原料或者燃料
 
-        Slot interactSlot = this.getSlot(interactGridPos);
+        Slot interactSlot = getSlot(interactGridPos);
         //没碰到任何槽位
         if (interactSlot == null) return InteractResult.FAILURE;
         System.out.println("交互槽位：" + interactSlot.getIndex());
@@ -100,7 +102,7 @@ public class BlockEntityFurnace extends BlockEntity {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
         //获取交互槽位
-        Slot interactSlot = this.getSlot(interactGridPos);
+        Slot interactSlot = getSlot(interactGridPos);
         //没有交互到槽位
         if (interactSlot == null) return InteractResult.FAILURE;
         //到这里说明交互到了槽位
@@ -215,38 +217,30 @@ public class BlockEntityFurnace extends BlockEntity {
     public void draw (Batch batch, float x, float y) {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return;
-        GridPoint2 interactGridSize = getInteractGridSize();
-        ItemStack inputStack = inventory.getItemStack(getInputSlotIndex());
-        if (inputStack != null) {
-            GridPoint2 startPos = this.inputSlot.getStartPos();
-            GridPoint2 size = this.inputSlot.getSize();
+        this.drawAllSlots(batch, x, y);
+    }
 
-            float slotX = x + (float) startPos.x / interactGridSize.x;
-            float slotY = y + (float) startPos.y / interactGridSize.y;
-            float slotWidth  = (float) size.x / interactGridSize.x;
-            float slotHeight = (float) size.y / interactGridSize.y;
-            batch.draw(inputStack.getItem().texture, slotX, slotY, slotWidth, slotHeight);
+    public void drawAllSlots (Batch batch, float x, float y) {
+        for (Slot slot: getSlots()) {
+            if (slot.getItemStack() != null) {
+                drawSlot(batch, slot, x, y);
+            }
         }
-        ItemStack outputStack = inventory.getItemStack(getOutputSlotIndex());
-        if (outputStack != null) {
-            GridPoint2 startPos = this.outputSlot.getStartPos();
-            GridPoint2 size = this.outputSlot.getSize();
-            float slotX = x + (float) startPos.x / interactGridSize.x;
-            float slotY = y + (float) startPos.y / interactGridSize.y;
-            float slotWidth  = (float) size.x / interactGridSize.x;
-            float slotHeight = (float) size.y / interactGridSize.y;
-            batch.draw(outputStack.getItem().texture, slotX, slotY, slotWidth, slotHeight);
-        }
-        ItemStack fuelStack = inventory.getItemStack(getFuelSlotIndex());
-        if (fuelStack != null) {
-            GridPoint2 startPos = this.fuelSlot.getStartPos();
-            GridPoint2 size = this.fuelSlot.getSize();
-            float slotX = x + (float) startPos.x / interactGridSize.x;
-            float slotY = y + (float) startPos.y / interactGridSize.y;
-            float slotWidth  = (float) size.x / interactGridSize.x;
-            float slotHeight = (float) size.y / interactGridSize.y;
-            batch.draw(fuelStack.getItem().texture, slotX, slotY, slotWidth, slotHeight);
-        }
+    }
+
+    /**
+     * 绘制指定的槽位
+     * */
+    private void drawSlot (Batch batch, Slot slot, float x, float y) {
+        GridPoint2 interactGridSize = getInteractGridSize();
+        GridPoint2 startPos = slot.getStartPos();
+        GridPoint2 size = slot.getSize();
+
+        float slotX = x + (float) startPos.x / interactGridSize.x;
+        float slotY = y + (float) startPos.y / interactGridSize.y;
+        float slotWidth  = (float) size.x / interactGridSize.x;
+        float slotHeight = (float) size.y / interactGridSize.y;
+        batch.draw(slot.getItemStack().getItem().texture, slotX, slotY, slotWidth, slotHeight);
     }
 
     public int getCurTick () {
@@ -269,13 +263,13 @@ public class BlockEntityFurnace extends BlockEntity {
         return 2;
     }
 
-    public Slot getSlot (GridPoint2 interactGridPos) {
+    /*public Slot getSlot (GridPoint2 interactGridPos) {
         if (interactGridPos == null) return null;
         if (this.inputSlot.touch(interactGridPos)) return this.inputSlot;
         if (this.outputSlot.touch(interactGridPos)) return this.outputSlot;
         if (this.fuelSlot.touch(interactGridPos)) return this.fuelSlot;
         return null;
-    }
+    }*/
 
     public boolean isWorking () {
         BlockFurnace furnace = (BlockFurnace) getBlock();

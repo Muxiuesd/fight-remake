@@ -20,7 +20,11 @@ import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 方块实体
@@ -31,6 +35,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     private BlockPos blockPos;              //方块实体的位置
     private GridPoint2 interactGridSize;    //方块实体的交互网格大小
     private Inventory inventory;            //方块实体所拥有的容器
+    private List<Slot> slots;               //交互槽位
 
     public BlockEntity(World world, Block block, BlockPos blockPos, int inventorySize) {
         this(world, block, blockPos, new GridPoint2(16, 16), inventorySize);
@@ -42,6 +47,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
         this.blockPos = blockPos;
         this.interactGridSize = interactGridSize;
         this.inventory = new Backpack(inventorySize);
+        this.slots = new ArrayList<>();
     }
 
     /**
@@ -89,6 +95,42 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
 
             this.getInventory().clear(i);
         }
+    }
+
+    /**
+     * 添加slot
+     * */
+    public Slot addSlot (int index, int x, int y, int width, int height) {
+        return this.addSlot(new Slot(new GridPoint2(x, y), new GridPoint2(width, height), index));
+    }
+
+    /**
+     * 添加一个slot
+     * */
+    public Slot addSlot (Slot slot) {
+        if (!this.slots.contains(slot)) {
+            this.slots.add(slot);
+            slot.setInventory(this.inventory);
+        }
+        return slot;
+    }
+
+    /**
+     * 移除slot
+     * */
+    public BlockEntity removeSlot (Slot slot) {
+        this.slots.remove(slot);
+        return this;
+    }
+
+    /**
+     * 获取slot
+     * */
+    public Slot getSlot (GridPoint2 interactGridPos) {
+        for (Slot slot : this.slots) {
+            if (slot.touch(interactGridPos)) return slot;
+        }
+        return null;
     }
 
     /**
@@ -149,6 +191,15 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
 
     public BlockEntity setInventory (Inventory inventory) {
         this.inventory = inventory;
+        return this;
+    }
+
+    public List<Slot> getSlots () {
+        return slots;
+    }
+
+    public BlockEntity setSlots (List<Slot> slots) {
+        this.slots = slots;
         return this;
     }
 }

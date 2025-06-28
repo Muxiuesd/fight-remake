@@ -2,6 +2,8 @@ package ttk.muxiuesd.world.interact;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
+import ttk.muxiuesd.interfaces.Inventory;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 物品交互槽位
@@ -11,6 +13,7 @@ public class Slot {
     private GridPoint2 size;
     private Rectangle rect; //交互区域
     private int index;
+    private Inventory inventory;
 
     public Slot (int sx, int sy, int ex, int ey, int index) {
         this(new GridPoint2(sx, sy), new GridPoint2(ex, ey), index);
@@ -64,5 +67,16 @@ public class Slot {
 
     public void setIndex (int index) {
         this.index = index;
+    }
+
+    public void setInventory (Inventory inventory) {
+        if (inventory == null) {
+            throw new NullPointerException("传入的容器是null！！！");
+        }
+        this.inventory = inventory;
+    }
+
+    public ItemStack getItemStack () {
+        return this.inventory.getItemStack(this.getIndex());
     }
 }
