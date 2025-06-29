@@ -20,7 +20,7 @@ public class CameraController {
 
     public void setPosition(float x, float y) {
         this.camera.position.set(x, y, 1.5f);
-        this.camera.zoom = 1.0f;
+        //this.camera.zoom = 1.0f;
         this.camera.update();
     }
 
