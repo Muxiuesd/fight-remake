@@ -19,7 +19,12 @@ import ttk.muxiuesd.world.cat.CAT;
  * 方块
  * */
 public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICAT {
-    public static final Property DEFAULT_PROPERTY = new Property();
+    private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+        .add(PropertyTypes.CAT, new CAT())
+        .add(PropertyTypes.BLOCK_FRICTON, 1f)
+        .add(PropertyTypes.BLOCK_SOUNDS_ID, BlockSoundsID.DEFAULT);
+    //public static final Property DEFAULT_PROPERTY = new Property();
+
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
     private String id;
@@ -130,10 +135,7 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
      * 使用构建者模式
      * */
     public static class Property {
-        private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-            .add(PropertyTypes.CAT, new CAT())
-            .add(PropertyTypes.BLOCK_FRICTON, 1f)
-            .add(PropertyTypes.BLOCK_SOUNDS_ID, BlockSoundsID.DEFAULT);
+
 
         private PropertiesDataMap<?> propertiesDataMap;
 

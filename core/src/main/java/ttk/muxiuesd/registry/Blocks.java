@@ -21,11 +21,18 @@ public final class Blocks {
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
     public static final Block GLASS = register("glass", BlockGlass::new);
-
+    public static final Block COAL_ORE = register("coal_ore");
 
     //带有方块实体的方块
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
     public static final Block FURNACE = register("furnace", BlockFurnace::new);
+
+    /**
+     * 注册一个非常普通的方块
+     * */
+    public static Block register (String name) {
+        return register(name, () -> new CommonBlock(name));
+    }
 
     /**
      * 方块注册的基本方法

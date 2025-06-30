@@ -16,7 +16,7 @@ public class BlockFurnace extends BlockWithEntity<BlockFurnace, BlockEntityFurna
     private boolean isWorking = false;
 
     public BlockFurnace () {
-        super(new Property().setFriction(1f), Fight.getId("furnace"), Fight.BlockTexturePath("furnace.png"));
+        super(new Property().setFriction(0.5f), Fight.getId("furnace"), Fight.BlockTexturePath("furnace.png"));
         this.workingTexture = loadTextureRegion(Fight.getId("furnace_on"), Fight.BlockTexturePath("furnace_on.png"));
     }
 

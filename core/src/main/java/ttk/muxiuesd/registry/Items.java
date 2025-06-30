@@ -31,6 +31,7 @@ public final class Items {
     public static final Item SAND = register(Blocks.SAND);
     public static final Item WATER = register(Blocks.WATER);
     public static final Item GLASS = register(Blocks.GLASS);
+    public static final Item COAL_ORE = register(Blocks.COAL_ORE);
 
     //带有方块实体的方块物品
     public static final Item CRAFTING_TABLE = register(Blocks.CRAFTING_TABLE);

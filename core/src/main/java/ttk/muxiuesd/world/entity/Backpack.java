@@ -172,7 +172,8 @@ public class Backpack implements Inventory, Updateable {
     @Override
     public void update (float delta) {
         this.itemStacks.forEach((index, itemStack) -> {
-           itemStack.update(delta);
+            if (itemStack != null) itemStack.update(delta);
+            else this.itemStacks.remove(index);
         });
     }
 }
