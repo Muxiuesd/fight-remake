@@ -180,7 +180,7 @@ public class ItemFishPole extends Item {
         if (!itemStack.onUsing()) {
             if (this.texture == null) return;
             //没抛竿渲染
-            Direction direction = Util.getDirection();
+            Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
@@ -196,7 +196,7 @@ public class ItemFishPole extends Item {
         }else {
             if (this.castTexture == null) return;
             //抛竿渲染
-            Direction direction = Util.getDirection();
+            Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(this.castTexture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,

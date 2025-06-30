@@ -9,10 +9,7 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.system.HandleInputSystem;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.TaskTimer;
-import ttk.muxiuesd.util.Timer;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -115,6 +112,11 @@ public class Player extends LivingEntity {
         AudioPlayer.getInstance().playSound(Fight.getId("pop"));
 
         return true;
+    }
+
+    @Override
+    public Direction getDirection () {
+        return Util.getDirection();
     }
 
     private void handleInput(float delta) {

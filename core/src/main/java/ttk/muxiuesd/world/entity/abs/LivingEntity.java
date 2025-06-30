@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
@@ -133,5 +134,12 @@ public abstract class LivingEntity extends Entity {
                 this.handIndex = handIndex;
             }
         }
+    }
+
+    /**
+     * 获取当前实体的朝向
+     * */
+    public Direction getDirection () {
+        return new Direction(velX, velY);
     }
 }
