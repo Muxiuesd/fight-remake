@@ -3,8 +3,8 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import ttk.muxiuesd.shader.ShaderReg;
 import ttk.muxiuesd.shader.ShaderScheduler;
+import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 
@@ -13,7 +13,6 @@ import ttk.muxiuesd.world.World;
  * */
 public class DaynightSystem extends WorldSystem {
 
-    //private DaynightShader daynightShader;
     private OrthographicCamera camera;
     private TimeSystem timeSystem;
 
@@ -28,23 +27,16 @@ public class DaynightSystem extends WorldSystem {
         this.timeSystem = (TimeSystem) getManager().getSystem("TimeSystem");
     }
 
-    @Override
-    public void draw (Batch batch) {
-        //到这里结束日夜着色
-        //this.end();
-        //batch.end();
-    }
-
-    public void begin() {
-        Batch batch = getWorld().getScreen().batch;
-        ShaderProgram shader = ShaderScheduler.getInstance().begin(ShaderReg.DAYNIGHT_SHADER, batch);
+    public void begin(Batch batch) {
+        //Batch batch = getWorld().getScreen().batch;
+        ShaderProgram shader = ShaderScheduler.getInstance().begin(ShadersReg.DAYNIGHT_SHADER, batch);
         shader.setUniformMatrix("u_projTrans", camera.combined);
         //转换为0 ~ 1.0
         shader.setUniformf("u_time", this.getGameTime() / 24f);
     }
 
     public void end() {
-        ShaderScheduler.getInstance().end(ShaderReg.DAYNIGHT_SHADER);
+        ShaderScheduler.getInstance().end(ShadersReg.DAYNIGHT_SHADER);
     }
 
     public float getGameTime () {

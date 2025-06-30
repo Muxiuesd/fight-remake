@@ -14,7 +14,7 @@ public class BlockGrass extends Block {
         super(new Block.Property()
             .setFriction(1f).setSounds(AudioReg.GRASS),
             Fight.getId("grass"),
-            Fight.getBlockTexture("grass.png"));
+            Fight.BlockTexturePath("grass.png"));
     }
 
     @Override

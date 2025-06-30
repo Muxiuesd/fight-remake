@@ -2,11 +2,12 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
 /**
@@ -18,7 +19,7 @@ public class MonsterGenerationSystem extends WorldSystem {
     private EntitySystem es;
     private ChunkSystem cs;
 
-    private float maxGenSpan = 5f;      //生成怪物时间间隔，现实秒
+    private float maxGenSpan = 2f;      //生成怪物时间间隔，现实秒
     private float genSpan    = 0f;
 
     private float minGenRange = 12f;    //小于这个范围不生怪
@@ -34,6 +35,18 @@ public class MonsterGenerationSystem extends WorldSystem {
         this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.es = (EntitySystem) getManager().getSystem("EntitySystem");
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+
+        Slime slime = new Slime();
+        slime.setEntitySystem(this.es);
+        double radian = Util.randomRadian();
+        slime.setBounds((float) (this.ps.getPlayer().x + 16 * Math.cos(radian)),
+            (float) (this.ps.getPlayer().y + 16 * Math.sin(radian)),
+            1, 1);
+        this.es.add(slime);
+
+        /*Enemy modEnemy = (Enemy) Gets.get("testmod:zombie", Entity.class);
+        modEnemy.setEntitySystem(this.es);
+        this.es.add(modEnemy);*/
     }
 
     @Override
@@ -44,9 +57,7 @@ public class MonsterGenerationSystem extends WorldSystem {
         }
 
         this.genSpan += delta;
-        if (this.genSpan >= this.maxGenRange) {
-            this.genSpan = this.maxGenRange;
-        }else {
+        if (this.genSpan <= this.maxGenRange) {
             //没到生成时间不刷怪
             return;
         }
@@ -61,10 +72,13 @@ public class MonsterGenerationSystem extends WorldSystem {
             float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
             float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
             //生成怪物
-            Slime slime = (Slime) EntitiesReg.get("slime");
+            /*Slime slime = (Slime) EntitiesReg.get("slime");
             slime.setEntitySystem(this.es);
             slime.setBounds(genX, genY, 1, 1);
-            this.es.add(slime);
+            this.es.add(slime);*/
+
+            Enemy modEnemy = Gets.ENEMY("testmod:zombie", this.es);
+            modEnemy.setPosition(genX, genY);
         }
         //System.out.println("生成怪物");
         //刷怪间隔归零

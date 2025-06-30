@@ -7,6 +7,6 @@ public class TestItem extends Item {
     public TestItem () {
         super(Type.COMMON, new Property().setMaxCount(1),
             Fight.getId("test_item"),
-            Fight.getItemTexture("iron_sword.png"));
+            Fight.ItemTexturePath("iron_sword.png"));
     }
 }

@@ -1,10 +1,12 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterWorldTick;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.event.EventBus;
 
 /**
  * 时间系统
@@ -18,28 +20,28 @@ public class TimeSystem extends WorldSystem implements Tickable {
     public static final float TickMaxSpan = 1f / TicksPerSecond;
 
     private float tickSpan = 0f;
-    private float gameTime = 5f;    //游戏内的时间
+    private float gameTime = 0f;    //游戏内的时间
 
     private final Array<Tickable> tickUpdates;
-    private final Array<Tickable> delayAdd;
-    private final Array<Tickable> delayRemove;
+    private final Array<Tickable> _delayAdd;
+    private final Array<Tickable> _delayRemove;
 
     public TimeSystem (World world) {
         super(world);
         this.tickUpdates = new Array<>();
-        this.delayAdd = new Array<>();
-        this.delayRemove = new Array<>();
+        this._delayAdd = new Array<>();
+        this._delayRemove = new Array<>();
     }
 
     @Override
     public void update (float delta) {
-        if (this.delayAdd.size > 0) {
-            this.tickUpdates.addAll(this.delayAdd);
-            this.delayAdd.clear();
+        if (!this._delayAdd.isEmpty()) {
+            this.tickUpdates.addAll(this._delayAdd);
+            this._delayAdd.clear();
         }
-        if (this.delayRemove.size > 0) {
-            this.tickUpdates.removeAll(this.delayRemove, true);
-            this.delayRemove.clear();
+        if (!this._delayRemove.isEmpty()) {
+            this.tickUpdates.removeAll(this._delayRemove, true);
+            this._delayRemove.clear();
         }
 
         // 累计游戏时间（delta为现实时间秒）
@@ -50,7 +52,7 @@ public class TimeSystem extends WorldSystem implements Tickable {
         }
 
         if (this.tickSpan >= TickMaxSpan) {
-            this.tick(this.tickSpan);
+            this.tick(getWorld(), this.tickSpan);
             this.tickSpan = 0f;
         }else {
             this.tickSpan += delta;
@@ -60,36 +62,27 @@ public class TimeSystem extends WorldSystem implements Tickable {
     }
 
     @Override
-    public void tick (float delta) {
+    public void tick (World world, float delta) {
         //更新所有的tick
-        this.tickUpdates.forEach(t -> t.tick(delta));
+        this.tickUpdates.forEach(t -> t.tick(world, delta));
 
         //this.callWorldTickEvent(delta);
-        EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
+        //EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
+        EventBus.post(EventTypes.WORLD_TICK, new EventPosterWorldTick(getWorld(), delta));
     }
 
     /**
      * 添加tick更新
      * */
-    public void add(Tickable tickable) {
-        this.delayAdd.add(tickable);
+    public void add (Tickable tickable) {
+        this._delayAdd.add(tickable);
     }
 
     /**
      * 移除tick更新
      * */
-    public void remove(Tickable tickable) {
-        this.delayRemove.add(tickable);
-    }
-
-    /**
-     * 调用相关事件
-     * */
-    public void callWorldTickEvent  (float delta) {
-        /*EventGroup<WorldTickUpdateEvent> eventGroup = EventBus.getInstance().getEventGroup(EventBus.EventType.TickUpdate);
-        eventGroup.getEvents().forEach(e -> {
-            e.tick(getWorld(), delta);
-        });*/
+    public void remove (Tickable tickable) {
+        this._delayRemove.add(tickable);
     }
 
     /**

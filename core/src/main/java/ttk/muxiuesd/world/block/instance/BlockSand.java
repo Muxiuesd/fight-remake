@@ -13,7 +13,6 @@ public class BlockSand extends Block {
                 .setFriction(0.9f)
                 .setSounds(AudioReg.SAND),
             Fight.getId("sand"),
-            Fight.getBlockTexture("sand.png"));
-        //textureRegion = new TextureRegion(AssetsLoader.getInstance().get("block/sand.png", Texture.class));
+            Fight.BlockTexturePath("sand.png"));
     }
 }

@@ -3,6 +3,9 @@ package ttk.muxiuesd.camera;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+/**
+ * 相机管理
+ * */
 public class CameraController {
     public float viewportWidth = 16f;
     public float viewportHeight = 16f;
@@ -17,7 +20,7 @@ public class CameraController {
 
     public void setPosition(float x, float y) {
         this.camera.position.set(x, y, 1.5f);
-        this.camera.zoom = 2.5f;
+        //this.camera.zoom = 1.0f;
         this.camera.update();
     }
 

@@ -6,41 +6,42 @@ import com.badlogic.gdx.math.Vector2;
  * 方向
  * 单位向量
  */
-public class Direction {
-    private float xDirection;
-    private float yDirection;
-
+public class Direction extends Vector2 {
     /**
      * 默认方向：当前游戏窗口中心到鼠标的方向
      */
-    public Direction() {
+    public Direction () {
         Vector2 mouse = Util.getMousePosition();
         float mouseX = mouse.x;
         float mouseY = mouse.y;
         float length = (float) Math.sqrt(Math.pow((mouseX), 2) + Math.pow((mouseY), 2));
-        this.xDirection = (mouseX) / length;
-        this.yDirection = (mouseY) / length;
+        x = (mouseX) / length;
+        y = (mouseY) / length;
     }
 
-    public Direction(float xDirection, float yDirection) {
+    public Direction (Vector2 from, Vector2 to) {
+        this(to.x - from.x, to.y - from.y);
+    }
+
+    public Direction (float xDirection, float yDirection) {
         float length = (float) Math.sqrt(Math.pow(xDirection, 2) + Math.pow(yDirection, 2));
-        this.xDirection = xDirection / length;
-        this.yDirection = yDirection / length;
+        x = xDirection / length;
+        y = yDirection / length;
     }
 
     public float getxDirection() {
-        return this.xDirection;
+        return x;
     }
 
-    public void setxDirection(float xDirection) {
-        this.xDirection = xDirection;
+    public void setxDirection(float x) {
+        this.x = x;
     }
 
     public float getyDirection() {
-        return this.yDirection;
+        return this.y;
     }
 
-    public void setyDirection(float yDirection) {
-        this.yDirection = yDirection;
+    public void setyDirection(float y) {
+        this.y = y;
     }
 }

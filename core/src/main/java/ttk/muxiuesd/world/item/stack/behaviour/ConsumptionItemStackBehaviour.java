@@ -1,14 +1,14 @@
 package ttk.muxiuesd.world.item.stack.behaviour;
 
-import ttk.muxiuesd.interfaces.IItemStackBehaviour;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 public class ConsumptionItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity user, ItemStack itemStack) {
-        boolean used = itemStack.getItem().use(world, user);
+        boolean used = itemStack.getItem().use(itemStack, world, user);
         if (!used) {
             return false;
         }

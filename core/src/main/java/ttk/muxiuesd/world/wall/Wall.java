@@ -9,16 +9,11 @@ import ttk.muxiuesd.world.block.abs.Block;
  * 墙体，即有碰撞箱的特殊方块
  * */
 public abstract class Wall extends Block implements ShapeRenderable {
+    public float x, y;
     private Rectangle hitbox;
 
     public Wall(Property property, String textureId, String texturePath) {
         super(property, textureId, texturePath);
-    }
-
-    @Override
-    public void setPosition(float x, float y) {
-        super.setPosition(x, y);
-        this.setHitbox();
     }
 
     @Override
@@ -46,5 +41,11 @@ public abstract class Wall extends Block implements ShapeRenderable {
     public Wall setHitbox(Rectangle hitbox) {
         this.hitbox = hitbox;
         return this;
+    }
+
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        this.setHitbox();
     }
 }

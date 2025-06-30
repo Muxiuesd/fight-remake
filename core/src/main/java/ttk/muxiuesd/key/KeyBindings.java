@@ -44,6 +44,22 @@ public class KeyBindings {
         Fight.getId("key_player_shield"), "key_player_shield",
         KeyBinding.Type.Mouse, Input.Buttons.RIGHT
     ));
+    public static KeyBinding PlayerInteract = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_interact"), "key_player_interact",
+        KeyBinding.Type.Mouse, Input.Buttons.RIGHT
+    ));
+    public static KeyBinding PlayerShift = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_shift"), "key_player_shift",
+        KeyBinding.Type.Keyboard, Input.Keys.SHIFT_LEFT
+    ));
+    public static KeyBinding PlayerCameraZoomIn = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_camera_zoom_in"), "key_player_camera_zoom_in",
+        KeyBinding.Type.Keyboard, Input.Keys.UP
+    ));
+    public static KeyBinding PlayerCameraZoomOut = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_camera_zoom_out"), "key_player_camera_zoom_out",
+        KeyBinding.Type.Keyboard, Input.Keys.DOWN
+    ));
 
     public static KeyBinding ExitGame = InputBinding.registerBinding(new KeyBinding(
         Fight.getId("key_exit_game"), "key_exit_game",

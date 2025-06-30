@@ -1,77 +1,44 @@
 package ttk.muxiuesd.world.entity.enemy;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.Group;
-import ttk.muxiuesd.world.entity.LivingEntity;
-import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
+import ttk.muxiuesd.world.entity.abs.Bullet;
+import ttk.muxiuesd.world.entity.abs.Enemy;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
-public class Slime extends LivingEntity {
-    //public TextureRegion body = new TextureRegion(new Texture("enemy/slime.png"));
+public class Slime extends Enemy {
     public int generation;  //史莱姆的代数，用于控制史莱姆的分裂次数，分裂次数越多，代数越高
-    public float T = 0.5f;
-    public float span = 0;
     public float factor = 0.7f;    //分裂时的缩放因子
-    public float attackRange = 10f;
-
 
     public Slime () {
         this(1);
     }
 
     public Slime(int generation) {
-        initialize(Group.enemy, 10, 10);
-
-        setSize(1, 1);
-        speed = 1f;
+        super(10f, 10f, 16f, 16f, 1f, 1.2f);
         this.generation = generation;
-
-        AssetsLoader.getInstance().loadAsync(Fight.getId("slime"),
-            Fight.getEntityTexture("enemy/slime.png"),
-            Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("slime"), Texture.class);
-            textureRegion = new TextureRegion(texture);
-        });
+        loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
 
         Log.print(this.getClass().getName(), "Slime 初始化完成");
     }
 
     @Override
-    public void update(float delta) {
-        //super.update(delta);
-        EntitySystem entitySystem = getEntitySystem();
-        Player player = entitySystem.getPlayer();
-
-        Direction direction = new Direction(player.x - x, player.y - y);
-        this.x = x + direction.getxDirection() * speed * delta;
-        this.y = y + direction.getyDirection() * speed * delta;
-
-        //与玩家接近一定的距离才会开始攻击
-        if (Util.getDistance(this, player) <= this.attackRange) {
-            if (span >= T) {
-                Bullet bullet = this.createBullet(new Direction(player.x - x, player.y - y));
-                getEntitySystem().add(bullet);
-                span = 0;
-            } else {
-                span += delta;
-            }
-        }
-        super.update(delta);
+    public void updateTarget (float delta, EntitySystem es) {
+        super.updateTarget(delta, es);
     }
 
     /**
      * @param direction 子弹的运动方向
      */
-    private Bullet createBullet (Direction direction) {
-        BulletFire bullet = new BulletFire(this);
+    @Override
+    public Bullet createBullet (Entity owner, Direction direction) {
+        //BulletFire bullet = new BulletFire(this);
+        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
+        bullet.setOwner(owner);
         bullet.setSize(
             (float) (bullet.width * Math.pow(this.factor, this.generation)),
             (float) (bullet.height * Math.pow(this.factor, this.generation)));

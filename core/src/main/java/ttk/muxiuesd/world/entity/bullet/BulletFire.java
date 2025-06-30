@@ -1,13 +1,14 @@
 package ttk.muxiuesd.world.entity.bullet;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Bullet;
+import ttk.muxiuesd.world.entity.abs.Entity;
 
 public class BulletFire extends Bullet {
-    //public static TextureRegion img = new TextureRegion(AssetsLoader.getInstance().get("bullet/flame.png", Texture.class));
+    public BulletFire () {
+        super(Fight.getId("bullet_fire"), "bullet/flame.png",
+            1f, 15f, 3f, 0f);
+    }
 
     public BulletFire(Entity owner) {
         super(owner);
@@ -17,22 +18,6 @@ public class BulletFire extends Bullet {
         setMaxLiveTime(3f);
         setLiveTime(0f);
         speed = 15f;
-
-        AssetsLoader.getInstance().loadAsync(Fight.getId("bullet_fire"),
-            Fight.getEntityTexture("bullet/flame.png"),
-            Texture.class, () -> {
-            Texture texture = AssetsLoader.getInstance().getById(Fight.getId("bullet_fire"), Texture.class);
-            textureRegion = new TextureRegion(texture);
-        });
+        bodyTexture = getTextureRegion(Fight.getId("bullet_fire"), "bullet/flame.png");
     }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-
-        setLiveTime(getLiveTime() + delta);
-        this.x = x + speed * delta * velX;
-        this.y = y + speed * delta * velY;
-    }
-
 }

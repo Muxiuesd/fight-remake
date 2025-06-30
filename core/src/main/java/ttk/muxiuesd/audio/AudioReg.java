@@ -16,13 +16,17 @@ public class AudioReg {
         registerSoundAsMusic("hurt_1",  "entity/damage/hit_1.ogg");
         registerSoundAsMusic("hurt_2",  "entity/damage/hit_2.ogg");
         registerSoundAsMusic("hurt_3",  "entity/damage/hit_3.ogg");
+        registerSoundAsMusic("eat_1",  "entity/eat/eat1.ogg");
+        registerSoundAsMusic("eat_2",  "entity/eat/eat2.ogg");
+        registerSoundAsMusic("eat_3",  "entity/eat/eat3.ogg");
+
+        registerSoundAsMusic("slime_small",  "entity/slime/small.ogg");
 
         //玩家
         registerSoundAsMusic("shoot", "player/shoot.wav");
         registerMusic("player_resurrection", "player_resurrection.mp3");
 
         //方块
-        //registerBlockSound("grass_walk", "walk/grass.ogg");
         registerBlockSound("stone_walk_2", "walk/stone.wav");
         registerBlockSound("stone_walk_1", "walk/stone_1.ogg");
 
@@ -32,6 +36,8 @@ public class AudioReg {
 
         //物品
         registerSoundAsMusic("click", "item/click.ogg");
+        registerSound("put", "item/put.ogg");
+        registerSound("pop", "item/pop.ogg");
 
         Log.print(AudioReg.class.getName(), "游戏音效注册完成");
     }

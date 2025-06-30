@@ -6,8 +6,6 @@ import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.*;
-import ttk.muxiuesd.world.item.ItemsReg;
-import ttk.muxiuesd.world.item.instence.BlockItem;
 
 import java.util.function.Supplier;
 
@@ -28,17 +26,18 @@ public class BlocksReg {
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
 
+    public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
+    public static final Block FURNACE = register("furnace", BlockFurnace::new);
+
     public static Block register (String name, final Supplier<Block> supplier) {
         Block block = registrant.register(name, supplier);
         String id = Fight.getId(name);
         //注册方块物品
-        ItemsReg.register(name, () -> new BlockItem(id, id));
+        //ItemsReg.register(name, () -> new BlockItem(id, id));
         return block;
     }
 
     public static Block newBlock (String name) {
         return registrant.get(name);
     }
-
-
 }

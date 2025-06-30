@@ -18,13 +18,20 @@ import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.Items;
+import ttk.muxiuesd.render.RenderProcessorManager;
+import ttk.muxiuesd.render.RenderProcessorsReg;
+import ttk.muxiuesd.render.instance.EntityRenderProcessor;
+import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
+import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.shader.ShaderScheduler;
+import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.BlocksReg;
-import ttk.muxiuesd.world.entity.EntitiesReg;
-import ttk.muxiuesd.world.item.ItemsReg;
+import ttk.muxiuesd.world.wall.WallsReg;
 
 /**
  * 主游戏屏幕
@@ -51,14 +58,26 @@ public class MainGameScreen implements Screen {
 
         //手动注册游戏内的元素
         AudioReg.registerAllAudios();
-        ItemsReg.registerAllItem();
-        BlocksReg.registerAllBlocks();
-        EntitiesReg.registerAllEntities();
+        //ItemsReg.registerAllItem();
+        Items.init();
+        Blocks.init();
+        //BlocksReg.registerAllBlocks();
+        WallsReg.initAllWalls();
+        //EntitiesReg.registerAllEntities();
+        Entities.init();
 
         //初始化着色器调度器
         ShaderScheduler.init();
 
         this.setWorld(new MainWorld(this));
+
+        RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
+            new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
+        RenderProcessorManager.register(RenderProcessorsReg.ENTITY,
+            new EntityRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+        RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
+            new ParticleRenderProcessor(this.cameraController.camera, ShadersReg.PARTICLE_SHADER, 300, this.world));
+
         this.world.getSystemManager().initAllSystems();
 
         //执行mod代码
@@ -84,16 +103,15 @@ public class MainGameScreen implements Screen {
         camera.update();
         Batch batch = this.batch;
         batch.setProjectionMatrix(camera.combined);
-
-        //batch.begin();
-        //绘制
-        this.world.draw(batch);
-        //batch.end();
+        batch.begin();
 
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin();
-        this.world.renderShape(shapeRenderer);
+
+        RenderProcessorManager.render(batch, shapeRenderer);
+
         shapeRenderer.end();
+        batch.end();
     }
 
     @Override
@@ -121,6 +139,7 @@ public class MainGameScreen implements Screen {
     public void dispose() {
         this.world.dispose();
     }
+
     /**
      * 设置当前世界
      * */

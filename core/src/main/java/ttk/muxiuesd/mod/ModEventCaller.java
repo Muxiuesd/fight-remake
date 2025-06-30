@@ -1,11 +1,12 @@
 package ttk.muxiuesd.mod;
 
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.abs.*;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Entity;
-import ttk.muxiuesd.world.entity.LivingEntity;
-import ttk.muxiuesd.world.entity.bullet.Bullet;
-import ttk.muxiuesd.world.event.EventBus;
-import ttk.muxiuesd.world.event.abs.*;
+import ttk.muxiuesd.world.entity.abs.Bullet;
+import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -21,7 +22,71 @@ public class ModEventCaller {
      * 向EventBus添加mod里的事件调用，使得mod里注册的事件能被正确调用
      * */
     protected static void registryAllEventCaller () {
-        EventBus eventBus = EventBus.getInstance();
+        ScriptEngine libEngine = ModLibManager.getInstance().getLibEngine();
+        Invocable invocable = (Invocable) libEngine;
+        EventBus.subscribe(EventTypes.BULLET_SHOOT, new BulletShootEvent() {
+            @Override
+            public void handle (World world, Entity shooter, Bullet bullet) {
+                try {
+                    invocable.invokeFunction("callBulletShootEvent", world, shooter, bullet);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        EventBus.subscribe(EventTypes.ENTITY_HURT, new EntityHurtEvent() {
+            @Override
+            public void handle (World world, Entity attackObject, Entity victim) {
+                try {
+                    invocable.invokeFunction("callEntityAttackedEvent", world, attackObject, victim);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        EventBus.subscribe(EventTypes.ENTITY_DEATH, new EntityDeathEvent() {
+            @Override
+            public void handle (World world, LivingEntity entity) {
+                try {
+                    invocable.invokeFunction("callEntityDeadEvent", world, entity);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        EventBus.subscribe(EventTypes.WORLD_TICK, new WorldTickEvent() {
+            @Override
+            public void tick (World world, float delta) {
+                try {
+                    invocable.invokeFunction("callWorldTickEvent", world, delta);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        EventBus.subscribe(EventTypes.WORLD_KEY_INPUT, new WorldKeyInputEvent() {
+            @Override
+            public void process (World world, int key) {
+                try {
+                    invocable.invokeFunction("callWorldKeyInputEvent", world, key);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        EventBus.subscribe(EventTypes.WORLD_BUTTON_INPUT, new WorldButtonInputEvent() {
+            @Override
+            public void process (World world, int screenX, int screenY, int pointer, int button) {
+                try {
+                    invocable.invokeFunction("callWorldButtonInputEvent", world, screenX, screenY, pointer, button);
+                } catch (ScriptException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        /*EventBus eventBus = EventBus.getInstance();
         ScriptEngine libEngine = ModLibManager.getInstance().getLibEngine();
         Invocable invocable = (Invocable) libEngine;
         eventBus.addEvent(EventBus.EventType.BulletShoot, new BulletShootEvent() {
@@ -83,6 +148,6 @@ public class ModEventCaller {
                     throw new RuntimeException(e);
                 }
             }
-        });
+        });*/
     }
 }

@@ -11,6 +11,10 @@ public class Log {
         Gdx.app.error(tag, message);
     }
 
+    public static void error(String tag, String message, Throwable error) {
+        Gdx.app.error(tag, message, error);
+    }
+
     public static void printPosition(Class clazz, float x, float y) {
         print(clazz.getName(), Util.position2Sting(x, y));
     }

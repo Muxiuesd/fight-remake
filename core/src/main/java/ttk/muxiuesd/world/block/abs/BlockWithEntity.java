@@ -1,0 +1,22 @@
+package ttk.muxiuesd.world.block.abs;
+
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockPos;
+
+/**
+ * 带有方块实体的方块
+ * */
+public abstract class BlockWithEntity<T extends BlockWithEntity<?>> extends Block {
+    public BlockWithEntity (Property property, String textureId) {
+        super(property, textureId);
+    }
+
+    public BlockWithEntity (Property property, String textureId, String texturePath) {
+        super(property, textureId, texturePath);
+    }
+    public abstract T createSelf();
+    /**
+     * 产生方块实体
+     * */
+    public abstract BlockEntity createBlockEntity(BlockPos blockPos, World world);
+}

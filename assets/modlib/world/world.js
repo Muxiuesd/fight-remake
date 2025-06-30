@@ -43,30 +43,30 @@ var World = {
     }
 }
 //以下的方法是游戏代码调用的
-var callBulletShootEvent = function (shooter, bullet) {
+var callBulletShootEvent = function (world, shooter, bullet) {
     for (var i = 0; i < World.eventGroups.bulletShoot.length; i++) {
-        World.eventGroups.bulletShoot[i](shooter, bullet);
+        World.eventGroups.bulletShoot[i](world, shooter, bullet);
     }
 }
-var callEntityAttackedEvent = function (attackObject, victim) {
+var callEntityAttackedEvent = function (world, attackObject, victim) {
     for (var i = 0; i < World.eventGroups.entityAttacked.length; i++) {
-        World.eventGroups.entityAttacked[i](attackObject, victim);
+        World.eventGroups.entityAttacked[i](world, attackObject, victim);
     }
 }
-var callEntityDeadEvent = function (deadEntity) {
+var callEntityDeadEvent = function (world, deadEntity) {
     for (var i = 0; i < World.eventGroups.entityDead.length; i++) {
-        World.eventGroups.entityDead[i](deadEntity);
+        World.eventGroups.entityDead[i](world, deadEntity);
     }
 }
-var callWorldKeyInputEvent = function (key) {
+var callWorldKeyInputEvent = function (world, key) {
     for (var i = 0; i < World.eventGroups.keyInput.length; i++) {
-        World.eventGroups.keyInput[i](key);
+        World.eventGroups.keyInput[i](world, key);
     }
 }
-var callWorldButtonInputEvent = function (screenX, screenY, pointer, button) {
+var callWorldButtonInputEvent = function (world, screenX, screenY, pointer, button) {
     //屏幕坐标系原点在游戏窗口左上角，y轴向下
     for (var i = 0; i < World.eventGroups.buttonInput.length; i++) {
-        World.eventGroups.buttonInput[i](screenX, screenY, pointer, button);
+        World.eventGroups.buttonInput[i](world, screenX, screenY, pointer, button);
     }
 }
 var callWorldTickEvent = function (world, delta) {

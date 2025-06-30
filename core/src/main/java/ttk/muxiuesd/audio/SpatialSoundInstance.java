@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.world.entity.Entity;
+import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 空间音效实例

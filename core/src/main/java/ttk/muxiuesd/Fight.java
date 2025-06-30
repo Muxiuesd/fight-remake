@@ -10,8 +10,21 @@ public class Fight {
     public static final float HEARING_RANGE = 16f;  //玩家的听觉范围，单位：世界中的1米
     public static final float MAX_ITEM_ENTITY_LIVING_TIME = 120f;   //物品实体最大存活时间，单位：秒
 
-    public static final float PICKUP_RANGE = 1.3f;  //玩家捡起掉落物的范围
+    public static final float PICKUP_RANGE = 1.5f;  //玩家捡起掉落物的范围
     public static final float ITEM_ENTITY_PICKUP_SPAN = 3f;     //掉落物可以被捡起来的cd
+
+    public static float PLAYER_VISUAL_RANGE = 64f;
+
+    /**
+     * 存档路径常量
+     */
+    public static final String PATH_SAVE = "save/";
+    public static final String PATH_SAVE_WORLD = "world/";
+    public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
+    public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
+
+
+
 
     public static String getId (String name) {
         return NAMESPACE + ":" + name;
@@ -20,15 +33,19 @@ public class Fight {
     /**
      * 从方块的材质根路径中获取方块的材质
      * */
-    public static String getBlockTexture (String path) {
+    public static String BlockTexturePath (String path) {
         return BLOCK_TEXTURE_ROOT + path;
     }
 
-    public static String getEntityTexture (String path) {
+    public static String EntityTexturePath (String path) {
         return ENTITY_TEXTURE_ROOT + path;
     }
 
-    public static String getItemTexture (String path) {
+    public static String ItemTexturePath (String path) {
         return ITEM_TEXTURE_ROOT + path;
+    }
+
+    public static String GameSavePath (String name) {
+        return PATH_SAVE + name;
     }
 }

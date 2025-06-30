@@ -1,8 +1,8 @@
 package ttk.muxiuesd.world.item.stack.behaviour;
 
-import ttk.muxiuesd.interfaces.IItemStackBehaviour;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -11,6 +11,6 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class CommonItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity user, ItemStack itemStack) {
-        return itemStack.getItem().use(world, user);
+        return itemStack.getItem().use(itemStack, world, user);
     }
 }

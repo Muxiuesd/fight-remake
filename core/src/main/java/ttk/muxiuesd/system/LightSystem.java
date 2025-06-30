@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import ttk.muxiuesd.interfaces.IWorldParticleRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.light.PointLight;
@@ -18,7 +20,7 @@ import java.nio.IntBuffer;
 /**
  * 光源系统
  * */
-public class LightSystem extends WorldSystem {
+public class LightSystem extends WorldSystem implements IWorldParticleRender {
     public static final int MAX_LIGHTS = 1688;
     // 假设每个光源位置是2个float,第3个是光的强度，一个light占4个，第四个没用，但是为了对齐内存，创建vec3也会要四个内存，glsl内部是vec4好计算
     private float[] lightPos = new float[MAX_LIGHTS * 4];
@@ -57,6 +59,7 @@ public class LightSystem extends WorldSystem {
 
     @Override
     public void draw(Batch batch) {
+        //this.initialize();
         //通过ubo的id绑定当前ubo为此ubo，该uboId已经创建ubo，所以不会再创建了
         Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, this.uboId);
         if(this.lightSize !=0)
@@ -91,10 +94,20 @@ public class LightSystem extends WorldSystem {
         this.lightSize = 0;//清除数组大小标记，以便下一帧重新收集
     }
 
+    @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.draw(batch);
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 200;
+    }
+
     /**
      * 收集所有的发光例子的数据
      * */
-    public void useLight(Array<? extends Particle> particleArray) {
+    public void useLight (Array<? extends Particle> particleArray) {
         for (Particle particle:particleArray) {
             if(particle instanceof ShinyParticle) {
                 ShinyParticle sp = (ShinyParticle) particle;
@@ -103,7 +116,10 @@ public class LightSystem extends WorldSystem {
         }
     }
 
-    private void useLight (PointLight light) {
+    /**
+     * 应用一个光源
+     * */
+    public void useLight (PointLight light) {
         //在这一帧里收集调用该方法的y所有光源数据
         if(this.lightSize < MAX_LIGHTS) {
             //往数组里传入light的数据

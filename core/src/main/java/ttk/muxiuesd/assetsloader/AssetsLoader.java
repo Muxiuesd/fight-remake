@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Util;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -45,15 +46,38 @@ public class AssetsLoader implements Disposable {
      */
     public <T> void loadAsync(String id, String filePath, Class<T> type, Runnable callback) {
         if (this.containsId(id)) {
-            //已存在则直接执行回调中的加载
-            Gdx.app.postRunnable(callback);
+            if (callback != null) {
+                //已存在则直接执行回调中的加载
+                Gdx.app.postRunnable(callback);
+            }
             return;
         }
-        this.loadAsync(filePath, type, callback);
+
+        AssetManager curManager = this.gameAssetManager;
+        String[] split = Util.splitID(id);
+        if (!Objects.equals(split[0], Fight.NAMESPACE)){
+            curManager = this.modAssetManagers.get(split[0]);
+        }
+
+        if (!curManager.isLoaded(filePath, type)) {
+            curManager.load(filePath, type);
+            curManager.finishLoading();
+
+            if (curManager.isLoaded(filePath, type)) {
+                this.idToPath.put(id, filePath);
+                if (callback != null) callback.run();
+                return;
+            } else {
+                throw new IllegalStateException("资源加载失败: " + filePath);
+            }
+        } else if (callback != null){
+            //如果已经加载，直接执行回调
+            callback.run();
+        }
         this.idToPath.put(id, filePath);
     }
 
-    public <T> void loadAsync(String filePath, Class<T> type, Runnable callback) {
+    private <T> void loadAsync(String filePath, Class<T> type, Runnable callback) {
         if (!this.gameAssetManager.isLoaded(filePath, type)) {
             this.gameAssetManager.load(filePath, type);
 
@@ -103,7 +127,6 @@ public class AssetsLoader implements Disposable {
             AssetManager modAssetManager = this.getModAssetManager(split[0]);
             return modAssetManager.get(this.idToPath.get(id), type);
         }
-        //throw new RuntimeException();
     }
 
     /**

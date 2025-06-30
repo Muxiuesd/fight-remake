@@ -5,20 +5,35 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.data.BlockJsonDataOutput;
+import ttk.muxiuesd.data.ItemJsonDataOutput;
+import ttk.muxiuesd.data.JsonDataReader;
+import ttk.muxiuesd.data.JsonDataWriter;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
+import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.BlockPosition;
-import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.event.EventBus;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 输入处理系统
@@ -44,6 +59,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
         Gdx.input.setInputProcessor(this);
     }
+
 
     @Override
     public void update(float delta) {
@@ -75,10 +91,69 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
+
+        Vector2 mouseWorldPosition = this.getMouseWorldPosition();
+        Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            Vector2 mouseWorldPosition = this.getMouseWorldPosition();
-            Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
-            Log.print(TAG, "鼠标选中的方块为：" + mouseBlock.getClass().getName());
+            Block mb = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+            Log.print(TAG, "鼠标选中的方块为：" + mb.getClass().getName());
+        }
+        if (KeyBindings.PlayerInteract.wasJustPressed()) {
+            ItemStack handItemStack = player.getHandItemStack();
+
+            if (handItemStack != null) {
+                //测试
+                Item item = handItemStack.getItem();
+                JsonDataWriter dataWriter = new JsonDataWriter();
+                dataWriter.objStart();
+                item.property.getPropertiesMap().write(dataWriter);
+                dataWriter.objEnd();
+
+                new ItemJsonDataOutput().output(dataWriter);
+            }
+            System.out.println("==============================================");
+            //写入测试
+            JsonDataWriter dataWriter = new JsonDataWriter();
+            dataWriter.objStart();
+            mouseBlock.writeCAT(mouseBlock.getProperty().getCAT());
+            mouseBlock.getProperty().getPropertiesMap().write(dataWriter);
+            dataWriter.objEnd();
+            new BlockJsonDataOutput().output(dataWriter);
+
+            //读取测试
+            String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "block.json");
+            System.out.println(s);
+            JsonDataReader dataReader = new JsonDataReader(s);
+            JsonValue obj = dataReader.readObj(PropertyTypes.BLOCK_SOUNDS_ID.getName());
+            System.out.println(obj.toJson(JsonWriter.OutputType.json));
+            JsonValue values = dataReader.readObj(PropertyTypes.CAT.getName());
+            mouseBlock.readCAT(values);
+
+            if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
+
+                BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
+                //计算交互区域网格坐标
+                BlockPos blockPos = blockEntity.getBlockPos();
+                GridPoint2 gridSize = blockEntity.getInteractGridSize();
+                int xn = (int) ((mouseWorldPosition.x - blockPos.x) * gridSize.x);
+                int yn = (int) ((mouseWorldPosition.y - blockPos.y) * gridSize.y);
+                GridPoint2 interactGrid = new GridPoint2(xn, yn);
+
+                System.out.println(interactGrid);
+
+                if (handItemStack == null) {
+                    InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);
+                    //TODO 空手交互事件
+                } else {
+                    InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid);
+                    if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
+                        //使用成功就检测手持物品是否用完，用完就清除
+                        player.backpack.clear(player.getHandIndex());
+                    }
+                    //TODO 手持物品交互事件
+                }
+            }
         }
     }
 
@@ -94,12 +169,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean keyUp (int keycode) {
-        /*EventGroup<KeyInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.KeyInput);
-        HashSet<KeyInputEvent> events = group.getEvents();
-        for (KeyInputEvent event : events) {
-            event.call(keycode);
-        }*/
-        EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
+        //EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
+        EventBus.post(EventTypes.WORLD_KEY_INPUT, new EventPosterWorldKeyInput(getWorld(), keycode));
         return false;
     }
 
@@ -115,12 +186,9 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-        /*EventGroup<ButtonInputEvent> group = EventBus.getInstance().getEventGroup(EventBus.EventType.ButtonInput);
-        HashSet<ButtonInputEvent> events = group.getEvents();
-        for (ButtonInputEvent event : events) {
-            event.call(screenX, screenY, pointer, button);
-        }*/
-        EventBus.getInstance().callEvent(EventBus.EventType.ButtonInput, screenX, screenY, pointer, button);
+        //EventBus.getInstance().callEvent(EventBus.EventType.ButtonInput, screenX, screenY, pointer, button);
+        EventBus.post(EventTypes.WORLD_BUTTON_INPUT,
+            new EventPosterWorldButtonInput(getWorld(), screenX, screenY, pointer, button));
         return false;
     }
 

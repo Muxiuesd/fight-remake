@@ -13,7 +13,7 @@ public class BlockWater extends Block {
     public BlockWater() {
         super(new Property().setFriction(0.2f).setSounds(BlockSoundsID.DEFAULT),
             Fight.getId("water"),
-            Fight.getBlockTexture("water_still.png"));
+            Fight.BlockTexturePath("water_still.png"));
     }
 
     @Override
