@@ -22,6 +22,7 @@ public final class Items {
     public static final Item BAIT = register("bait", ItemBait::new);
     public static final Item FISH = register("fish", ItemFish::new);
     public static final Item RUBBISH = register("rubbish", ItemRubbish::new);
+    public static final Item COAL = register("coal");
 
     //方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
@@ -36,9 +37,16 @@ public final class Items {
     public static final Item FURNACE = register(Blocks.FURNACE);
 
     /**
+     * 普通物品的注册
+     * */
+    public static Item register (String name) {
+        return register(name, () -> new CommonItem(name));
+    }
+
+    /**
      * 物品注册的基本方法
      * */
-    public static Item register(String name, Supplier<Item> factory) {
+    public static Item register (String name, Supplier<Item> factory) {
         String id = Fight.getId(name);
         Identifier identifier = new Identifier(id);
         return Registries.ITEM.register(identifier, factory.get()).setID(id);

@@ -167,7 +167,14 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     public static class Property {
         //属性映射
-        private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy();
+        private PropertiesDataMap<?> propertiesMap;
+
+        /**
+         * 实例化后默认属性
+         * */
+        public Property () {
+            this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
+        }
 
         public <T> T get (PropertyType<T> propertyType) {
             return getPropertiesMap().get(propertyType);
