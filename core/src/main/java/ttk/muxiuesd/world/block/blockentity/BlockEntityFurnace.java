@@ -118,8 +118,6 @@ public class BlockEntityFurnace extends BlockEntity {
 
     @Override
     public void tick (World world, float delta) {
-        //TODO 熔炉的熔炼配方
-
         this.workingParticle(world);
 
         Inventory inventory = getInventory();
@@ -165,35 +163,38 @@ public class BlockEntityFurnace extends BlockEntity {
                 this.curTick++;
                 this.curEnergy--;
                 this.setWorking(true);
-                return;
-            }
-            //到这里就是一次烧炼完成
-            //产出
-            this.curTick = 0;
-            inputStack.fastDecrease();
 
-            if (outputStack == null) {
-                //输出槽位位空时
-                inventory.setItemStack(this.getOutputSlotIndex(), resultStack.copy(1));
             }else {
-                //输出槽位不为空但物品相同
-                outputStack.setAmount(outputStack.getAmount() + 1);
-            }
-            //记得清理
-            inventory.clear();
-            return;
-        }
+                //到这里就是一次烧炼完成
+                //产出
+                this.curTick = 0;
+                inputStack.fastDecrease();
 
-        if (this.curEnergy > 0) {
-            this.setWorking(true);
-            this.curEnergy--;
+                if (outputStack == null) {
+                    //输出槽位位空时
+                    inventory.setItemStack(this.getOutputSlotIndex(), resultStack.copy(1));
+                } else {
+                    //输出槽位不为空但物品相同
+                    outputStack.setAmount(outputStack.getAmount() + 1);
+                }
+            }
+            inventory.clear();
         }else {
-            this.setWorking(false);
+            //输入槽位没物品时
+            if (this.curEnergy > 0) {
+                this.setWorking(true);
+                this.curEnergy--;
+            } else {
+                this.setWorking(false);
+            }
         }
     }
 
+    /**
+     * 工作时的粒子效果
+     * */
     public void workingParticle (World world) {
-        if (this.isWorking() && MathUtils.random() < 0.05f) {
+        if (this.isWorking() && MathUtils.random() < 0.07f) {
             ParticleSystem ps = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
             ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
                 new Vector2(getBlockPos()).add(0.45f, 0), new Vector2(0, 1.7f), new Vector2(),
