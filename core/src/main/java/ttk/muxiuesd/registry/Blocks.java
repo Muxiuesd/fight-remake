@@ -20,7 +20,7 @@ public final class Blocks {
     public static final Block STONE = register("stone", BlockStone::new);
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
-    public static final Block GLASS = register("glass", BlockGlass::new);
+    public static final Block GLASS = register("glass");
     public static final Block COAL_ORE = register("coal_ore");
 
     //带有方块实体的方块
@@ -31,7 +31,11 @@ public final class Blocks {
      * 注册一个非常普通的方块
      * */
     public static Block register (String name) {
-        return register(name, () -> new CommonBlock(name));
+        return register(name, new Block.Property());
+    }
+
+    public static Block register (String name, Block.Property property) {
+        return register(name, () -> new CommonBlock(name, property));
     }
 
     /**

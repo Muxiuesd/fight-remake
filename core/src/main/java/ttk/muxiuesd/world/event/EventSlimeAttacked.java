@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.event;
 
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.abs.EntityHurtEvent;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -29,7 +29,7 @@ public class EventSlimeAttacked extends EntityHurtEvent {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()
                 .getSystem("SoundEffectSystem");
-            ses.newSpatialSound(Fight.getId("hurt_3"), victim);
+            ses.newSpatialSound(Sounds.ENTITY_HURT_3, victim);
         }
     }
 }

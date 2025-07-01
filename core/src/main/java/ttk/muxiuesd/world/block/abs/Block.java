@@ -12,6 +12,7 @@ import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.cat.CAT;
 
@@ -22,8 +23,7 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
     private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.CAT, new CAT())
         .add(PropertyTypes.BLOCK_FRICTON, 1f)
-        .add(PropertyTypes.BLOCK_SOUNDS_ID, BlockSoundsID.DEFAULT);
-    //public static final Property DEFAULT_PROPERTY = new Property();
+        .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
 
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 

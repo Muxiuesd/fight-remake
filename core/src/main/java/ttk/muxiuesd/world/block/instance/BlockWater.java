@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.block.instance;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
 
 /**
@@ -11,7 +10,7 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockWater extends Block {
     public BlockWater() {
-        super(new Property().setFriction(0.2f).setSounds(BlockSoundsID.DEFAULT),
+        super(new Property().setFriction(0.2f),
             Fight.getId("water"),
             Fight.BlockTexturePath("water_still.png"));
     }

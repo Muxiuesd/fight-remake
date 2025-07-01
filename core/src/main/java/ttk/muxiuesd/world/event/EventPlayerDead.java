@@ -16,8 +16,4 @@ public class EventPlayerDead extends PlayerDeathEvent {
         Log.print(TAG, "位于世界："+ world +" 的玩家" + player + "死亡");
     }
 
-    /*@Override
-    public void callback (World world, Player player) {
-        Log.print(TAG, "位于世界："+ world +" 的玩家" + player + "死亡");
-    }*/
 }
