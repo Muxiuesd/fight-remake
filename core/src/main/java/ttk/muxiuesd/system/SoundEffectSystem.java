@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.audio.SoundInstance;
 import ttk.muxiuesd.audio.SpatialSoundInstance;
@@ -132,6 +133,9 @@ public class SoundEffectSystem extends WorldSystem {
         }
     }
 
+    public void newSpatialSound (Audio audio, Entity sounder) {
+        this.newSpatialSound(audio.getId(), sounder);
+    }
     /**
      * 新建一个空间音效
      * @param id 音效的Id，但必须是Music

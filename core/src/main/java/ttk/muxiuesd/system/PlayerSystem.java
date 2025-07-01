@@ -9,6 +9,7 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Timer;
@@ -97,7 +98,7 @@ public class PlayerSystem extends WorldSystem {
         CameraFollowSystem cfs = (CameraFollowSystem)getManager().getSystem("CameraFollowSystem");
         cfs.setFollower(this.player);
 
-        AudioPlayer.getInstance().playMusic(Fight.getId("player_resurrection"));
+        AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);
     }
 
 

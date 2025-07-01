@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
@@ -59,6 +60,7 @@ public class MainGameScreen implements Screen {
         //手动注册游戏内的元素
         //AudioReg.registerAllAudios();
         //ItemsReg.registerAllItem();
+        EventTypes.init();
         Sounds.init();
         Items.init();
         Blocks.init();

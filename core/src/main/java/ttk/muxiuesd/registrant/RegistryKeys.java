@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
@@ -22,6 +23,6 @@ public class RegistryKeys {
     public static final RegistryKey<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = new RegistryKey<>();
     public static final RegistryKey<CookingRecipe> COOKING_RECIPE = new RegistryKey<>();
 
-    public static final RegistryKey<String> AUDIOS = new RegistryKey<>();
+    public static final RegistryKey<Audio> AUDIOS = new RegistryKey<>();
     public static final RegistryKey<BlockSoundsID> BLOCK_SOUNDS = new RegistryKey<>();
 }

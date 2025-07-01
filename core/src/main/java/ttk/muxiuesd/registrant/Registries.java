@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
@@ -27,7 +28,7 @@ public class Registries {
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
     public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);
 
-    public static final Registry<String> AUDIOS = create(RegistryKeys.AUDIOS);
+    public static final Registry<Audio> AUDIOS = create(RegistryKeys.AUDIOS);
     public static final Registry<BlockSoundsID> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
 
     public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
