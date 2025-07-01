@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * */
 public class WeaponDiamondSword extends Weapon {
     public WeaponDiamondSword () {
-        super(Weapon.DEFAULT_PROPERTY,
+        super(Weapon.createDefaultProperty(),
             Fight.getId("test_weapon"),
             Fight.ItemTexturePath("diamond_sword.png"));
     }
