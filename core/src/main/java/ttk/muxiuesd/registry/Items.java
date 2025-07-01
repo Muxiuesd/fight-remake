@@ -21,7 +21,7 @@ public final class Items {
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new);
     public static final Item BAIT = register("bait", ItemBait::new);
     public static final Item FISH = register("fish", ItemFish::new);
-    public static final Item RUBBISH = register("rubbish", ItemRubbish::new);
+    public static final Item RUBBISH = register("rubbish");
     public static final Item COAL = register("coal");
 
     //方块物品

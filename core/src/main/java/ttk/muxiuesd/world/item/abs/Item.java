@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
@@ -15,6 +14,7 @@ import ttk.muxiuesd.interfaces.world.item.ItemShapeRenderable;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
@@ -31,7 +31,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 64)
         .add(PropertyTypes.ITEM_ON_USING, false)
-        .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
+        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getId());
 
     private String id;
     public Type type;
