@@ -8,7 +8,6 @@ import ttk.muxiuesd.world.entity.EntityFactory;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.RangedWeapon;
 import ttk.muxiuesd.world.item.abs.Weapon;
 
 /**

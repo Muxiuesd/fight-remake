@@ -15,7 +15,7 @@ public final class Items {
         Log.print(Items.class.getName(), "物品注册完成");
     }
     //常规物品
-    public static final Item TEST_ITEM = register("test_item", TestItem::new);
+    public static final Item TEST_ITEM = register("test_item", IronSword::new);
     public static final Item STICK = register("stick", ItemStick::new);
     public static final Item TEST_WEAPON = register("test_weapon", WeaponDiamondSword::new);
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new);

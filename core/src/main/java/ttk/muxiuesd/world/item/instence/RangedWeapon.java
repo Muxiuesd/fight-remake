@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.abs;
+package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
 import ttk.muxiuesd.system.EntitySystem;
@@ -6,11 +6,12 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Weapon;
 
 /**
  * 远程武器，可发射子弹
  * */
-public abstract class RangedWeapon extends Weapon {
+public class RangedWeapon extends Weapon {
     private BulletFactory<?> factory;   //子弹的工厂实现类
 
     public RangedWeapon (Property property, String textureId, String texturePath) {
