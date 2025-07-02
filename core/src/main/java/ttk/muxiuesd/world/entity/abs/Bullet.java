@@ -11,7 +11,6 @@ public abstract class Bullet extends Entity {
     public Entity owner;
 
     public float damage;
-    //public float speed;
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
 
