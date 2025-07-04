@@ -17,7 +17,9 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.entity.Group;
 
 /**
- * 基础实体
+ * 游戏的基础实体
+ * <p>
+ * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity implements ID<Entity>, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
@@ -44,6 +46,7 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         this.group = group;
     }
 
+    @Override
     public void draw(Batch batch) {
         //TODO 重写这部分
         if (this.attacked) {
@@ -61,26 +64,29 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         attacked = false;
     }
 
+    @Override
     public void update(float delta) {
-        this.setCullingArea(x, y, this.getWidth(), this.getHeight());
+        this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
     }
 
-    public void setCullingArea(float x, float y, float width, float height) {
-        this.hitbox.set(x, y, width, height);
-    }
-
+    @Override
     public void dispose() {
         if (this.bodyTexture != null) {
             this.bodyTexture = null;
         }
     }
 
+    public Entity setCullingArea(float x, float y, float width, float height) {
+        this.hitbox.set(x, y, width, height);
+        return this;
+    }
+
     public float getSpeed () {
-        return speed;
+        return this.speed;
     }
 
     public Entity setSpeed (float speed) {
@@ -99,54 +105,62 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this;
     }
 
-    public void setOrigin(float originX, float originY) {
+    public Entity setOrigin(float originX, float originY) {
         this.originX = originX;
         this.originY = originY;
+        return this;
     }
 
-    public void setPosition(float x, float y) {
-        if (this.x != x || this.y != y) {
-            this.x = x;
-            this.y = y;
-        }
+    public Vector2 getOrigin() {
+        return new Vector2(this.originX, this.originY);
     }
 
-    public void setSize(float width, float height) {
-        if (this.width != width || this.height != height) {
-            this.width = width;
-            this.height = height;
-        }
+    public Entity setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        return this;
     }
 
-    public void setSize (Vector2 size) {
+    public Entity setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
+        return this;
+    }
+
+    public Entity setSize (Vector2 size) {
         this.setSize(size.x, size.y);
+        return this;
     }
 
-    public void setBounds(float x, float y, float width, float height) {
-        setPosition(x, y);
-        setSize(width, height);
+    public Entity setBounds(float x, float y, float width, float height) {
+        this.setPosition(x, y);
+        this.setSize(width, height);
+        return this;
     }
 
     public Vector2 getPosition() {
         return new Vector2(this.x, this.y);
     }
 
-    public void setPosition(Vector2 vector2) {
+    public Entity setPosition(Vector2 vector2) {
         this.x = vector2.x;
         this.y = vector2.y;
+        return this;
     }
 
     public Vector2 getVelocity() {
         return new Vector2(this.velX, this.velY);
     }
 
-    public void setVelocity(Vector2 velocity) {
+    public Entity setVelocity(Vector2 velocity) {
         this.setVelocity(velocity.x, velocity.y);
+        return this;
     }
 
-    public void setVelocity(float x, float y) {
+    public Entity setVelocity(float x, float y) {
         this.velX = x;
         this.velY = y;
+        return this;
     }
 
     public Vector2 getSize () {
@@ -159,10 +173,6 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
 
     public float getHeight() {
         return this.height;
-    }
-
-    public Vector2 getOrigin() {
-        return new Vector2(this.originX, this.originY);
     }
 
     public Vector2 getCenter() {
@@ -191,16 +201,6 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this.es;
     }
 
-    @Override
-    public String getID () {
-        return this.id;
-    }
-    @Override
-    public Entity setID (String id) {
-        this.id = id;
-        return this;
-    }
-
     /**
      * 加载纹理区域
      * @param textureId 纹理材质id
@@ -222,5 +222,15 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
 
     public void setOnGround (boolean onGround) {
         this.onGround = onGround;
+    }
+
+    @Override
+    public String getID () {
+        return this.id;
+    }
+    @Override
+    public Entity setID (String id) {
+        this.id = id;
+        return this;
     }
 }
