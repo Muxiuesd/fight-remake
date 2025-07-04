@@ -26,6 +26,8 @@ public class WeaponItemStackBehaviour implements IItemStackBehaviour {
         }
         //用一次耐久减一
         property.setDuration(property.getDuration() - 1);
+        //武器使用挥手
+        user.swingHand(itemStack.useTimer.getMaxSpan());
         return true;
     }
 }

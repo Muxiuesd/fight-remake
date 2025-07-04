@@ -53,27 +53,20 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     @Override
     public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
-        /*if (this.texture != null) {
-            Direction direction = Util.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection()) - 45;
-            batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
-                0, 0,
-                holder.width, holder.height,
-                holder.scaleX, holder.scaleY, rotation);
-        }*/
 
         Direction direction = holder.getDirection();
         float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+        float rotationOffset = holder.getSwingHandDegreeOffset();
         if (rotation > 90f && rotation <= 270f) {
             batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
-                - holder.scaleX, holder.scaleY, rotation + 225f);
+                - holder.scaleX, holder.scaleY, rotation + 225f + rotationOffset);
         } else {
             batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
-                holder.scaleX, holder.scaleY, rotation - 45f);
+                holder.scaleX, holder.scaleY, rotation - 45f + rotationOffset);
         }
     }
 
