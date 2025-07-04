@@ -34,7 +34,7 @@ public class EventSystem extends WorldSystem {
         //bus.addEvent(EventBus.EventType.EntityAttacked, new EventPlayerAttacked());
         EventBus.subscribe(EventTypes.ENTITY_HURT, new EventPlayerAttacked());
         //bus.addEvent(EventBus.EventType.EntityAttacked, new EventSlimeAttacked(getWorld()));
-        EventBus.subscribe(EventTypes.ENTITY_HURT, new EventSlimeAttacked());
+        EventBus.subscribe(EventTypes.ENTITY_HURT, new EventEnemyAttacked());
 
         //bus.addEvent(EventBus.EventType.PlayerDeath, new EventPlayerDead());
         EventBus.subscribe(EventTypes.PLAYER_DEATH, new EventPlayerDead());

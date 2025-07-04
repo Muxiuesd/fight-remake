@@ -1,9 +1,11 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.interfaces.IWorldEntityRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.World;
@@ -16,7 +18,7 @@ import ttk.muxiuesd.world.wall.Wall;
  * <p>
  * 实体与实体之间的碰撞，实体与墙体的碰撞
  * */
-public class EntityCollisionSystem extends WorldSystem {
+public class EntityCollisionSystem extends WorldSystem implements IWorldEntityRender {
     public final String TAG = this.getClass().getName();
 
     private final EntitySystem es;
@@ -119,5 +121,18 @@ public class EntityCollisionSystem extends WorldSystem {
         Player player = this.es.getPlayer();
         Rectangle hurtbox = player.hitbox;
         batch.rect(hurtbox.x, hurtbox.y, hurtbox.getWidth(), hurtbox.getHeight());
+
+        Vector2 playerCenter = player.getCenter();
+        batch.line(playerCenter, new Vector2(playerCenter).add(player.getDirection().scl(2)));
+    }
+
+    @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.renderShape(shapeRenderer);
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 10000;
     }
 }

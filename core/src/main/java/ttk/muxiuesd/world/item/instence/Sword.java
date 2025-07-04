@@ -1,7 +1,15 @@
 package ttk.muxiuesd.world.item.instence;
 
+import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
+import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Weapon;
@@ -24,7 +32,15 @@ public class Sword extends Weapon {
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity user) {
-        //TODO 近战武器的攻击逻辑
+        Float range = itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE);
+        EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+        //检测剑的伤害区域内的敌人实体
+        Array<Enemy> entities = Util.sectorArea(es.enemyEntity, user.getCenter(), user.getDirection(), range, 60f);
+        for (Enemy enemy : entities) {
+            enemy.applyDamage(DamageTypes.SWORD, user);
+            //发送事件
+            EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, enemy));
+        }
 
         return super.use(itemStack, world, user);
     }

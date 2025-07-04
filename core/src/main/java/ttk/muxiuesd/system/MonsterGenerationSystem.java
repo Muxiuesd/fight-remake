@@ -2,13 +2,11 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.entity.abs.Enemy;
-import ttk.muxiuesd.world.entity.enemy.Slime;
+import ttk.muxiuesd.world.entity.creature.EntityTarget;
 
 /**
  * 怪物生成系统
@@ -36,13 +34,20 @@ public class MonsterGenerationSystem extends WorldSystem {
         this.es = (EntitySystem) getManager().getSystem("EntitySystem");
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
-        Slime slime = new Slime();
+        /*Slime slime = new Slime();
         slime.setEntitySystem(this.es);
         double radian = Util.randomRadian();
         slime.setBounds((float) (this.ps.getPlayer().x + 16 * Math.cos(radian)),
             (float) (this.ps.getPlayer().y + 16 * Math.sin(radian)),
             1, 1);
-        this.es.add(slime);
+        this.es.add(slime);*/
+
+        for (int i = 0; i < 5; i++) {
+            EntityTarget fish = new EntityTarget();
+            fish.setEntitySystem(this.es);
+            fish.setBounds(this.ps.getPlayer().x + 3, this.ps.getPlayer().y - 2 + i, 1, 1);
+            this.es.add(fish);
+        }
 
         /*Enemy modEnemy = (Enemy) Gets.get("testmod:zombie", Entity.class);
         modEnemy.setEntitySystem(this.es);
@@ -77,8 +82,8 @@ public class MonsterGenerationSystem extends WorldSystem {
             slime.setBounds(genX, genY, 1, 1);
             this.es.add(slime);*/
 
-            Enemy modEnemy = Gets.ENEMY("testmod:zombie", this.es);
-            modEnemy.setPosition(genX, genY);
+            /*Enemy modEnemy = Gets.ENEMY("testmod:zombie", this.es);
+            modEnemy.setPosition(genX, genY);*/
         }
         //System.out.println("生成怪物");
         //刷怪间隔归零

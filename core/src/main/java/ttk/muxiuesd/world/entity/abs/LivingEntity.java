@@ -128,9 +128,10 @@ public abstract class LivingEntity extends Entity {
     /**
      * 应用伤害
      * */
-    public <S extends Entity> void applyDamage (DamageType<S, LivingEntity> damageType, S source) {
+    public <S> void applyDamage (DamageType<S, LivingEntity> damageType, S source) {
         //TODO 各种判定
         damageType.apply(source, this);
+        this.setAttacked(true);
     }
 
     public boolean isDeath () {
