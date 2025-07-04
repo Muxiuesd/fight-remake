@@ -9,6 +9,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
+import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -122,6 +123,14 @@ public abstract class LivingEntity extends Entity {
             return ItemPickUpState.PARTIAL;
         }
         return ItemPickUpState.FAILURE;
+    }
+
+    /**
+     * 应用伤害
+     * */
+    public <S extends Entity> void applyDamage (DamageType<S, LivingEntity> damageType, S source) {
+        //TODO 各种判定
+        damageType.apply(source, this);
     }
 
     public boolean isDeath () {

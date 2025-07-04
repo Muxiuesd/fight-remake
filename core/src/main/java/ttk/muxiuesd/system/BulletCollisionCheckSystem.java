@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
+import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -62,8 +63,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             for (LivingEntity enemy : es.enemyEntity) {
                 if (playerBullet.hitbox.overlaps(enemy.hitbox)
                     || enemy.hitbox.overlaps(playerBullet.hitbox)) {
-                    //enemy.curHealth -= playerBullet.damage;
-                    enemy.decreaseHealth(playerBullet.getDamage());
+
+                    enemy.applyDamage(DamageTypes.BULLET, playerBullet);
+                    //enemy.decreaseHealth(playerBullet.getDamage());
                     enemy.setAttacked(true);
                     playerBullet.setLiveTime(playerBullet.getMaxLiveTime());
                     this.callEntityAttackedEvent(playerBullet, enemy);
@@ -90,10 +92,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
             if (enemyBullet.hitbox.contains(player.hitbox)
                 || player.hitbox.contains(enemyBullet.hitbox)) {
-                //player.curHealth -= enemyBullet.damage;
-                player.decreaseHealth(enemyBullet.getDamage());
+                player.applyDamage(DamageTypes.BULLET, enemyBullet);
+                //player.decreaseHealth(enemyBullet.getDamage());
                 enemyBullet.setLiveTime(enemyBullet.getMaxLiveTime());
-                //player.attacked = true;
                 player.setAttacked(true);
                 this.callEntityAttackedEvent(enemyBullet, player);
                 // Log.print(TAG, "玩家扣血：" + enemyBullet.damage + " 目前血量：" + player.curHealth);
