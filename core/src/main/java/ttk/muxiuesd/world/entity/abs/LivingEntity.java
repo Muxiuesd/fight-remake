@@ -20,8 +20,12 @@ import ttk.muxiuesd.world.item.ItemStack;
  * TODO 活物实体能有buff影响其行为状态
  * */
 public abstract class LivingEntity extends Entity {
-    public float maxHealth; // 生命值上限
-    public float curHealth; // 当前生命值
+    public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
+
+    private float maxHealth; // 生命值上限
+    private float curHealth; // 当前生命值
+    private boolean attacked;   //是否收到攻击的状态
+    private TaskTimer attackedTimer;    //被攻击状态持续的计时器
     public Backpack backpack;   //储存物品的背包
     private int handIndex;  //手部物品索引
 
@@ -32,6 +36,8 @@ public abstract class LivingEntity extends Entity {
         super.initialize(group);
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
+        this.attacked = false;
+        this.attackedTimer = new TaskTimer(ATTACK_SPAN, 0f, () -> this.attacked = false);
         this.backpack = new Backpack(backpackSize);
     }
 
@@ -39,15 +45,26 @@ public abstract class LivingEntity extends Entity {
     public void update (float delta) {
         super.update(delta);
         this.backpack.update(delta);
+        this.attackedTimer.update(delta);
+        this.attackedTimer.isReady();
     }
 
     @Override
     public void draw (Batch batch) {
-        super.draw(batch);
+        //身体渲染
+        if (!this.isAttacked()) {
+            super.draw(batch);
+        }else {
+            // 受到攻击变红
+            batch.setColor(255, 0, 0, 255);
+            super.draw(batch);
+            // 还原batch
+            batch.setColor(255, 255, 255, 255);
+        }
+
         //如果手上有物品，则绘制手上的物品
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
-            //itemStack.getItem().drawOnHand(batch, this);
             itemStack.drawItemOnHand(batch, this);
         }
     }
@@ -141,5 +158,60 @@ public abstract class LivingEntity extends Entity {
      * */
     public Direction getDirection () {
         return new Direction(velX, velY);
+    }
+
+    /**
+     * 减少一定的血量
+     * */
+    public LivingEntity decreaseHealth (float value) {
+        this.setCurHealth(Math.max(this.getCurHealth() - value, 0f));
+        return this;
+    }
+
+    /**
+     * 增加一定的血量
+     * */
+    public LivingEntity increaseHealth (float value) {
+        float after = this.getCurHealth() + value;
+        this.setCurHealth(Math.min(after, this.getMaxHealth()));
+        return this;
+    }
+
+    public float getMaxHealth () {
+        return this.maxHealth;
+    }
+
+    public LivingEntity setMaxHealth (float maxHealth) {
+        this.maxHealth = maxHealth;
+        return this;
+    }
+
+    public float getCurHealth () {
+        return this.curHealth;
+    }
+
+    public LivingEntity setCurHealth (float curHealth) {
+        this.curHealth = curHealth;
+        return this;
+    }
+
+    /**
+     * 查询是否在受攻击状态
+     * */
+    public boolean isAttacked () {
+        return this.attacked;
+    }
+
+    /**
+     * 设置是否在受攻击状态
+     * */
+    public LivingEntity setAttacked (boolean attacked) {
+        if (attacked) {
+            this.attackedTimer.setCurSpan(0f);
+        }else {
+            this.attackedTimer.setCurSpan(ATTACK_SPAN);
+        }
+        this.attacked = attacked;
+        return this;
     }
 }

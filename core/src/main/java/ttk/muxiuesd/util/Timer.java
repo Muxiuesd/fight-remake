@@ -32,6 +32,8 @@ public class Timer implements Updateable{
 
     @Override
     public void update (float delta) {
+        if (this.curSpan == this.maxSpan) return;
+
         this.curSpan += delta;
         if (this.curSpan > this.maxSpan) this.curSpan = this.maxSpan;
     }

@@ -62,8 +62,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             for (LivingEntity enemy : es.enemyEntity) {
                 if (playerBullet.hitbox.overlaps(enemy.hitbox)
                     || enemy.hitbox.overlaps(playerBullet.hitbox)) {
-                    enemy.curHealth -= playerBullet.damage;
-                    enemy.attacked = true;
+                    //enemy.curHealth -= playerBullet.damage;
+                    enemy.decreaseHealth(playerBullet.getDamage());
+                    enemy.setAttacked(true);
                     playerBullet.setLiveTime(playerBullet.getMaxLiveTime());
                     this.callEntityAttackedEvent(playerBullet, enemy);
                     // Log.print(TAG, "敌人扣血：" + playerBullet.damage + " 目前血量：" + enemy.curHealth);
@@ -89,9 +90,11 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
             if (enemyBullet.hitbox.contains(player.hitbox)
                 || player.hitbox.contains(enemyBullet.hitbox)) {
-                player.curHealth -= enemyBullet.damage;
+                //player.curHealth -= enemyBullet.damage;
+                player.decreaseHealth(enemyBullet.getDamage());
                 enemyBullet.setLiveTime(enemyBullet.getMaxLiveTime());
-                player.attacked = true;
+                //player.attacked = true;
+                player.setAttacked(true);
                 this.callEntityAttackedEvent(enemyBullet, player);
                 // Log.print(TAG, "玩家扣血：" + enemyBullet.damage + " 目前血量：" + player.curHealth);
             }

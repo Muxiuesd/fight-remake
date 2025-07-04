@@ -35,7 +35,6 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     public TextureRegion bodyTexture;
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
-    public boolean attacked = false;
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
     private EntitySystem es;    //此实体所属的实体系统
 
@@ -48,20 +47,13 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
 
     @Override
     public void draw(Batch batch) {
-        //TODO 重写这部分
-        if (this.attacked) {
-            // 受到攻击变红
-            batch.setColor(255, 0, 0, 255);
+        //最基础的绘制
+        if (this.bodyTexture != null) {
+            batch.draw(this.bodyTexture, this.x, this.y,
+                this.originX, this.originY,
+                this.width, this.height,
+                this.scaleX, this.scaleY, this.rotation);
         }
-        if (bodyTexture != null) {
-            batch.draw(bodyTexture, x, y,
-                originX, originY,
-                width, height,
-                scaleX, scaleY, rotation);
-        }
-        // 还原batch
-        batch.setColor(255, 255, 255, 255);
-        attacked = false;
     }
 
     @Override
