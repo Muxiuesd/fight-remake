@@ -4,7 +4,9 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.DamageTypes;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
@@ -49,5 +51,10 @@ public class Sword extends Weapon {
         SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
         ses.newSpatialSound(useSoundId, user);
         return true;
+    }
+
+    @Override
+    public IItemStackBehaviour getBehaviour () {
+        return ItemStackBehaviours.SWORD;
     }
 }

@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
@@ -248,4 +250,8 @@ public class ItemFishPole extends Item {
         else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);
     }
 
+    @Override
+    public IItemStackBehaviour getBehaviour () {
+        return ItemStackBehaviours.COMMON;
+    }
 }

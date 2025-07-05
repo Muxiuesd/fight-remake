@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
@@ -50,5 +52,10 @@ public class RangedWeapon extends Weapon {
     public RangedWeapon setFactory (BulletFactory<?> factory) {
         this.factory = factory;
         return this;
+    }
+
+    @Override
+    public IItemStackBehaviour getBehaviour () {
+        return ItemStackBehaviours.RANGED_WEAPON;
     }
 }

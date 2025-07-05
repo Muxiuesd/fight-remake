@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
@@ -9,5 +11,10 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class CommonItem extends Item {
     public CommonItem (String name) {
         super(Type.COMMON, new Property(), Fight.getId(name), Fight.ItemTexturePath(name + ".png"));
+    }
+
+    @Override
+    public IItemStackBehaviour getBehaviour () {
+        return ItemStackBehaviours.COMMON;
     }
 }

@@ -7,15 +7,13 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 物品：鱼
  * */
-public class ItemFish extends Item {
+public class ItemFish extends ConsumptionItem {
     public ItemFish () {
-        super(Type.CONSUMPTION,
-            new Property().setMaxCount(64).setUseSoundId(Fight.getId("eat_")),
+        super(new Property().setMaxCount(64).setUseSoundId(Fight.getId("eat_")),
             Fight.getId("fish"), Fight.ItemTexturePath("fish.png"));
     }
 

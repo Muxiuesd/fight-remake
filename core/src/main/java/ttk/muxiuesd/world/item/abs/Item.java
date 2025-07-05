@@ -9,6 +9,7 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.world.item.ItemRenderable;
 import ttk.muxiuesd.interfaces.world.item.ItemShapeRenderable;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
@@ -147,6 +148,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         this.property = property;
         return this;
     }
+
+    /**
+     * 获取这个物品的行为
+     * */
+    public abstract IItemStackBehaviour getBehaviour ();
 
     @Override
     public String getID () {
