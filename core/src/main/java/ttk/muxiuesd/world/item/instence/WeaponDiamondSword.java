@@ -8,14 +8,13 @@ import ttk.muxiuesd.world.entity.EntityFactory;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Weapon;
 
 /**
  * 测试武器
  * */
 public class WeaponDiamondSword extends RangedWeapon {
     public WeaponDiamondSword () {
-        super(Weapon.createDefaultProperty(),
+        super(RangedWeapon.createDefaultProperty(),
             Fight.getId("test_weapon"),
             Fight.ItemTexturePath("diamond_sword.png"),
             (world, owner, direction) -> {

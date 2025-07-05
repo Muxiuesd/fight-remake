@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -12,6 +13,14 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * 远程武器，可发射子弹
  * */
 public class RangedWeapon extends Weapon {
+    /**
+     * 新建一个默认的远程武器的属性
+     */
+    public static Property createDefaultProperty() {
+        return new Property().setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy())
+            .setUseSoundId(Sounds.ENTITY_SHOOT.getId());
+    }
+
     private BulletFactory<?> factory;   //子弹的工厂实现类
 
     public RangedWeapon (Property property, String textureId, String texturePath) {

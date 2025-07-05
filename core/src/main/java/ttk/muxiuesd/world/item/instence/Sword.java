@@ -6,7 +6,9 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
 import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -23,7 +25,8 @@ public class Sword extends Weapon {
      */
     public static Property createDefaultProperty() {
         return new Property().setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy())
-            .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2f);
+            .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2.5f)
+            .setUseSoundId(Sounds.ENTITY_SWEEP.getId());
     }
 
     public Sword (Property property, String textureId, String texturePath) {
@@ -42,6 +45,9 @@ public class Sword extends Weapon {
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, enemy));
         }
 
-        return super.use(itemStack, world, user);
+        String useSoundId = this.property.getUseSoundId();
+        SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
+        ses.newSpatialSound(useSoundId, user);
+        return true;
     }
 }
