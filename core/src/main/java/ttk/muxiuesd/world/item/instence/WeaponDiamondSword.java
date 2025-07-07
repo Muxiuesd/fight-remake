@@ -1,13 +1,7 @@
 package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.EntityFactory;
-import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
-import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 测试武器
@@ -24,13 +18,5 @@ public class WeaponDiamondSword extends RangedWeapon {
                 bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
                 return bullet;
             });
-    }
-
-    @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
-        EntitySystem entitySystem = user.getEntitySystem();
-        entitySystem.add(EntityFactory.createFireBullet(user, Util.getDirection()));
-
-        return super.use(itemStack, world, user);
     }
 }

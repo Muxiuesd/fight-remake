@@ -28,7 +28,6 @@ public class RangedWeapon extends Weapon {
     public RangedWeapon (Property property, String textureId, String texturePath) {
         super(property, textureId, texturePath);
     }
-
     public RangedWeapon (Property property, String textureId, String texturePath, BulletFactory<?> factory) {
         super(property, textureId, texturePath);
         this.factory = factory;
@@ -38,17 +37,25 @@ public class RangedWeapon extends Weapon {
     public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         if (this.getFactory() != null) {
             //生成子弹
-            Bullet bullet = factory.create(world, user, user.getDirection());
+            Bullet bullet = this.factory.create(world, user, user.getDirection());
             EntitySystem entitySystem = user.getEntitySystem();
             entitySystem.add(bullet);
+
+            return super.use(itemStack, world, user);
         }
-        return super.use(itemStack, world, user);
+        return false;
     }
 
+    /**
+     * 获取子弹实体工厂
+     * */
     public BulletFactory<?> getFactory () {
         return this.factory;
     }
 
+    /**
+     * 设置子弹实体工厂
+     * */
     public RangedWeapon setFactory (BulletFactory<?> factory) {
         this.factory = factory;
         return this;
