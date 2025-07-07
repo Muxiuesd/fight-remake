@@ -60,12 +60,17 @@ public class EntitySystem extends WorldSystem implements IWorldEntityRender {
         Log.print(TAG, "EntitySystem初始化完成！");
     }
 
+    /**
+     * 添加实体
+     * */
+    public void add (Entity entity) {
+        //防止重复添加
+        if (this._delayAdd.contains(entity, true) || this.entities.contains(entity, true)) return;
 
-    public void add(Entity entity) {
         this._delayAdd.add(entity);
     }
 
-    public void remove(Entity entity) {
+    public void remove (Entity entity) {
         this._delayRemove.add(entity);
     }
 

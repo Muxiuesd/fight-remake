@@ -17,6 +17,9 @@ public class TaskTimer extends Timer {
         this.task = task;
     }
 
+    /**
+     * 检查是否到时间，如果到时间时返回true并且自动归零，同时给定的执行任务
+     * */
     @Override
     public boolean isReady () {
         boolean ready = super.isReady();
