@@ -2,9 +2,7 @@ package ttk.muxiuesd.world.item.instence;
 
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.world.World;
@@ -12,12 +10,11 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 方块物品
  * */
-public class BlockItem extends Item {
+public class BlockItem extends ConsumptionItem {
     final Block block;
 
     public BlockItem(Block block, String textureId) {
@@ -25,7 +22,7 @@ public class BlockItem extends Item {
     }
 
     public BlockItem(Block block, Property property, String textureId) {
-        super(Type.CONSUMPTION, property, textureId);
+        super(property, textureId);
         this.block = block;
     }
 
@@ -47,10 +44,5 @@ public class BlockItem extends Item {
         itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
 
         return true;
-    }
-
-    @Override
-    public IItemStackBehaviour getBehaviour () {
-        return ItemStackBehaviours.CONSUMPTION;
     }
 }

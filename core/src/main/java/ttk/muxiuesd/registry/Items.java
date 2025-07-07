@@ -10,6 +10,9 @@ import ttk.muxiuesd.world.item.instence.*;
 
 import java.util.function.Supplier;
 
+/**
+ * 所有的物品
+ * */
 public final class Items {
     public static void init () {
         Log.print(Items.class.getName(), "物品注册完成");
