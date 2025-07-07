@@ -16,11 +16,11 @@ public class MainWorld extends World {
         addSystem("EventSystem", new EventSystem(this));
         addSystem("PlayerSystem", new PlayerSystem(this));
         addSystem("ChunkSystem", new ChunkSystem(this));
-        addSystem("EntitySystem", new EntitySystem(this));
+        addSystem("EntitySystem", new GroundEntitySystem(this));
         addSystem("DaynightSystem", new DaynightSystem(this));
         addSystem("ParticleSystem", new ParticleSystem(this));
         addSystem("CameraFollowSystem", new CameraFollowSystem(this));
-        addSystem("EntityCollisionSystem", new EntityCollisionSystem(this));
+        addSystem("EntityCollisionSystem", new GroundEntityCollisionSystem(this));
         addSystem("BulletCollisionCheckSystem", new BulletCollisionCheckSystem(this));
         addSystem("HandleInputSystem", new HandleInputSystem(this));
         addSystem("SoundEffectSystem", new SoundEffectSystem(this));

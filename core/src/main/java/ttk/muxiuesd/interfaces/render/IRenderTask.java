@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package ttk.muxiuesd.interfaces.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;

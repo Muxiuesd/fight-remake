@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package ttk.muxiuesd.interfaces.render;
 
 /**
  * 渲染接口识别器

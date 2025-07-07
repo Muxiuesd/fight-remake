@@ -10,7 +10,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
-import ttk.muxiuesd.interfaces.IWorldEntityRender;
+import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -30,8 +30,8 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 实体系统
  * */
-public class EntitySystem extends WorldSystem implements IWorldEntityRender {
-    public final String TAG = EntitySystem.class.getName();
+public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntityRender {
+    public final String TAG = GroundEntitySystem.class.getName();
 
     private final Array<Entity> _delayAdd = new Array<>();
     private final Array<Entity> _delayRemove = new Array<>();
@@ -46,7 +46,7 @@ public class EntitySystem extends WorldSystem implements IWorldEntityRender {
     private final Array<Entity> updatableEntity = new Array<>();
     private final Array<Entity> drawableEntity = new Array<>();
 
-    public EntitySystem(World world) {
+    public GroundEntitySystem (World world) {
         super(world);
     }
 

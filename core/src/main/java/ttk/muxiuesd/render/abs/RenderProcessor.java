@@ -3,8 +3,8 @@ package ttk.muxiuesd.render.abs;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import ttk.muxiuesd.interfaces.IRenderTask;
-import ttk.muxiuesd.interfaces.IRenderTaskRecognizer;
+import ttk.muxiuesd.interfaces.render.IRenderTask;
+import ttk.muxiuesd.interfaces.render.IRenderTaskRecognizer;
 import ttk.muxiuesd.shader.ShaderScheduler;
 
 import java.util.ArrayList;

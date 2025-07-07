@@ -39,7 +39,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void update(float delta) {
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        GroundEntitySystem es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         ChunkSystem  cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
@@ -108,7 +108,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
      * 子弹与墙体碰撞
      * TODO 修复子弹与未加载的区块检测碰撞的bug
      * */
-    private void bulletAndWallCollision(Bullet bullet, EntitySystem es, PlayerSystem ps, ChunkSystem cs) {
+    private void bulletAndWallCollision(Bullet bullet, GroundEntitySystem es, PlayerSystem ps, ChunkSystem cs) {
         //墙体与子弹
         Vector2 bulletPosition = bullet.getPosition();
         ChunkPosition chunkPosition = cs.getChunkPosition(bulletPosition.x, bulletPosition.y);
@@ -324,7 +324,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        GroundEntitySystem es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
         Array<Bullet> playerBulletEntity = es.playerBulletEntity;
         Array<Bullet> enemyBulletEntity = es.enemyBulletEntity;
         for (Bullet bullet : playerBulletEntity) {

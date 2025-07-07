@@ -9,7 +9,7 @@ import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.GroundEntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -38,7 +38,7 @@ public class Sword extends Weapon {
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         Float range = itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE);
-        EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+        GroundEntitySystem es = (GroundEntitySystem) world.getSystemManager().getSystem("EntitySystem");
         //检测剑的伤害区域内的敌人实体
         Array<Enemy> entities = Util.sectorArea(es.enemyEntity, user.getCenter(), user.getDirection(), range, 60f);
         for (Enemy enemy : entities) {

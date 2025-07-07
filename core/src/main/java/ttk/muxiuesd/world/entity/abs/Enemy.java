@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.entity.abs;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.GroundEntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
@@ -67,7 +67,7 @@ public abstract class Enemy extends LivingEntity {
     /**
      * 自定义敌人的目标更新逻辑
      * */
-    public void updateTarget (float delta, EntitySystem es) {
+    public void updateTarget (float delta, GroundEntitySystem es) {
         //默认以玩家为攻击目标
         Player player = es.getPlayer();
         //需要在视野范围才跟踪玩家
@@ -81,7 +81,7 @@ public abstract class Enemy extends LivingEntity {
     /**
      * 攻击行为
      * */
-    public void attack (float delta, EntitySystem es) {
+    public void attack (float delta, GroundEntitySystem es) {
         this.attackTimer.update(delta);
 
         Entity target = this.getCurTarget();

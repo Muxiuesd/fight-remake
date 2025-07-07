@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.entity.enemy;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.GroundEntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -27,7 +27,7 @@ public class Slime extends Enemy {
     }
 
     @Override
-    public void updateTarget (float delta, EntitySystem es) {
+    public void updateTarget (float delta, GroundEntitySystem es) {
         super.updateTarget(delta, es);
     }
 

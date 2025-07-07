@@ -2,7 +2,7 @@ package ttk.muxiuesd.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import ttk.muxiuesd.interfaces.IRenderTask;
+import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.render.abs.RenderProcessor;
 import ttk.muxiuesd.util.Log;
 

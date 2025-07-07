@@ -9,7 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
-import ttk.muxiuesd.interfaces.IWorldChunkRender;
+import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;

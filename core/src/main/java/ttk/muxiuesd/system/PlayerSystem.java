@@ -85,7 +85,7 @@ public class PlayerSystem extends WorldSystem {
      * */
     private void remakePlayer () {
         //移除旧的玩家实体
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        GroundEntitySystem es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
         es.remove(this.player);
 
         //生成新的玩家实体

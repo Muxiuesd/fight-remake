@@ -3,8 +3,8 @@ package ttk.muxiuesd.render.instance;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import ttk.muxiuesd.interfaces.IRenderTask;
-import ttk.muxiuesd.interfaces.IWorldParticleRender;
+import ttk.muxiuesd.interfaces.render.IRenderTask;
+import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
 import ttk.muxiuesd.render.abs.WorldRenderProcessor;
 import ttk.muxiuesd.world.World;
 

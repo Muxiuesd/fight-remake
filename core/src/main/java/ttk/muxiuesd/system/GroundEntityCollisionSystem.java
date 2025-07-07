@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.interfaces.IWorldEntityRender;
+import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.World;
@@ -18,16 +18,16 @@ import ttk.muxiuesd.world.wall.Wall;
  * <p>
  * 实体与实体之间的碰撞，实体与墙体的碰撞
  * */
-public class EntityCollisionSystem extends WorldSystem implements IWorldEntityRender {
+public class GroundEntityCollisionSystem extends WorldSystem implements IWorldGroundEntityRender {
     public final String TAG = this.getClass().getName();
 
-    private final EntitySystem es;
+    private final GroundEntitySystem es;
     private final PlayerSystem ps;
     private final ChunkSystem cs;
 
-    public EntityCollisionSystem (World world) {
+    public GroundEntityCollisionSystem (World world) {
         super(world);
-        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
+        this.es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
         this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
     }

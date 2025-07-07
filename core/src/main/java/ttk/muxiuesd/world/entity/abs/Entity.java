@@ -13,7 +13,7 @@ import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.GroundEntitySystem;
 import ttk.muxiuesd.world.entity.Group;
 
 /**
@@ -36,7 +36,7 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
-    private EntitySystem es;    //此实体所属的实体系统
+    private GroundEntitySystem es;    //此实体所属的实体系统
 
     /**
      * 延迟初始化
@@ -184,12 +184,12 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this;
     }
 
-    public Entity setEntitySystem(EntitySystem es) {
+    public Entity setEntitySystem(GroundEntitySystem es) {
         this.es = es;
         return this;
     }
 
-    public EntitySystem getEntitySystem() {
+    public GroundEntitySystem getEntitySystem() {
         return this.es;
     }
 

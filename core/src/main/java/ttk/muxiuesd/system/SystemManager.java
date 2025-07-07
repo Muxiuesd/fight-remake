@@ -1,8 +1,8 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.IRenderTask;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;

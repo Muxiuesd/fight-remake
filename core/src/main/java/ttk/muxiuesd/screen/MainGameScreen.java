@@ -17,14 +17,13 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
-import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
-import ttk.muxiuesd.render.instance.EntityRenderProcessor;
+import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
 import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
 import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.shader.ShaderScheduler;
@@ -74,12 +73,14 @@ public class MainGameScreen implements Screen {
 
         this.setWorld(new MainWorld(this));
 
+        RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
+            new EntityGroundRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
-            new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
-        RenderProcessorManager.register(RenderProcessorsReg.ENTITY,
-            new EntityRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+            new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+        RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
+            new EntityGroundRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 300, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
-            new ParticleRenderProcessor(this.cameraController.camera, ShadersReg.PARTICLE_SHADER, 300, this.world));
+            new ParticleRenderProcessor(this.cameraController.camera, ShadersReg.PARTICLE_SHADER, 400, this.world));
 
         this.world.getSystemManager().initAllSystems();
 
@@ -89,9 +90,9 @@ public class MainGameScreen implements Screen {
         ModLoader.getInstance().loadAllMods();
         ModLoader.getInstance().runAllMods();
 
-        RegistrantGroup.printAllBlocks();
+        /*RegistrantGroup.printAllBlocks();
         RegistrantGroup.printAllEntities();
-        RegistrantGroup.printAllItems();
+        RegistrantGroup.printAllItems();*/
 
         Log.print(TAG, "------游戏正式开始运行------");
     }

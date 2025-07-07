@@ -25,7 +25,7 @@ public class MonsterGenerationSystem extends WorldSystem implements Runnable {
 
     private TimeSystem ts;
     private PlayerSystem ps;
-    private EntitySystem es;
+    private GroundEntitySystem es;
     private ChunkSystem cs;
 
     private float maxGenSpan = 8f;      //生成怪物时间间隔，现实秒
@@ -46,7 +46,7 @@ public class MonsterGenerationSystem extends WorldSystem implements Runnable {
     public void initialize () {
         this.ts = (TimeSystem) getManager().getSystem("TimeSystem");
         this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
+        this.es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
         for (int i = 0; i < 5; i++) {

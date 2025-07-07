@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package ttk.muxiuesd.interfaces.render;
 
 /**
  * 世界区块渲染任务

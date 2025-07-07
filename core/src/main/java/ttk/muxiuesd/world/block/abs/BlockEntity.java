@@ -10,7 +10,7 @@ import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
 import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.GroundEntitySystem;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -75,7 +75,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
      * 方块实体被破坏
      * */
     public void beDestroyed (World world, Player destroyer) {
-        EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+        GroundEntitySystem es = (GroundEntitySystem) world.getSystemManager().getSystem("EntitySystem");
         //掉落物品
         for (int i = 0; i < this.getInventory().getSize(); i++) {
             ItemStack itemStack = this.getInventory().getItemStack(i);

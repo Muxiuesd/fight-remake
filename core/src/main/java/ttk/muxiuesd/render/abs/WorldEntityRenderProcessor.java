@@ -1,16 +1,16 @@
-package ttk.muxiuesd.render.instance;
+package ttk.muxiuesd.render.abs;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import ttk.muxiuesd.interfaces.IRenderTask;
-import ttk.muxiuesd.interfaces.IWorldEntityRender;
-import ttk.muxiuesd.render.abs.WorldRenderProcessor;
 import ttk.muxiuesd.system.DaynightSystem;
 import ttk.muxiuesd.world.World;
 
-public class EntityRenderProcessor extends WorldRenderProcessor {
-    public EntityRenderProcessor (Camera camera, String shaderId, int renderOrder, World world) {
+/**
+ * 世界实体渲染抽象类
+ * */
+public abstract class WorldEntityRenderProcessor extends WorldRenderProcessor {
+    public WorldEntityRenderProcessor (Camera camera, String shaderId, int renderOrder, World world) {
         super(camera, shaderId, renderOrder, world);
     }
 
@@ -38,12 +38,4 @@ public class EntityRenderProcessor extends WorldRenderProcessor {
         daynightSystem.end();
     }
 
-    @Override
-    public boolean recognize (IRenderTask task) {
-        if (task instanceof IWorldEntityRender) {
-            addRenderTask(task);
-            return true;
-        }
-        return false;
-    }
 }
