@@ -24,6 +24,7 @@ import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
 import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
+import ttk.muxiuesd.render.instance.EntityUndergroundRenderProcessor;
 import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
 import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.shader.ShaderScheduler;
@@ -74,7 +75,7 @@ public class MainGameScreen implements Screen {
         this.setWorld(new MainWorld(this));
 
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
-            new EntityGroundRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
+            new EntityUndergroundRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
             new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
