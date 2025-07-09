@@ -11,7 +11,7 @@ import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
-import ttk.muxiuesd.system.GroundEntitySystem;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.CurveDrawer;
@@ -56,7 +56,7 @@ public class ItemFishPole extends Item {
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
 
         if (!itemStack.onUsing()) {//抛出鱼钩
-            GroundEntitySystem es = user.getEntitySystem();
+            EntitySystem es = user.getEntitySystem();
             //获取鱼钩
             EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
             fishingHook.setPosition(user.getPosition());

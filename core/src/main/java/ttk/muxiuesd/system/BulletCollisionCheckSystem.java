@@ -39,7 +39,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void update(float delta) {
-        GroundEntitySystem es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
+        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         ChunkSystem  cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
 
@@ -54,13 +54,13 @@ public class BulletCollisionCheckSystem extends WorldSystem {
         }
 
         //玩家的子弹碰撞检测
-        for (Bullet playerBullet : es.playerBulletEntity) {
+        for (Bullet playerBullet : es.getPlayerBulletEntity()) {
             if (playerBullet.getLiveTime() > playerBullet.getMaxLiveTime()) {
                 es.remove(playerBullet);
                 continue;
             }
             //敌人与玩家子弹
-            for (LivingEntity enemy : es.enemyEntity) {
+            for (LivingEntity enemy : es.getEnemyEntity()) {
                 if (playerBullet.hitbox.overlaps(enemy.hitbox)
                     || enemy.hitbox.overlaps(playerBullet.hitbox)) {
 
@@ -76,7 +76,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             this.bulletAndWallCollision(playerBullet, es, ps, cs);
         }
         // 玩家与子弹碰撞检测
-        for (Bullet enemyBullet : es.enemyBulletEntity) {
+        for (Bullet enemyBullet : es.getEnemyBulletEntity()) {
             if (enemyBullet.getLiveTime() > enemyBullet.getMaxLiveTime()) {
                 es.remove(enemyBullet);
                 continue;
@@ -108,7 +108,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
      * 子弹与墙体碰撞
      * TODO 修复子弹与未加载的区块检测碰撞的bug
      * */
-    private void bulletAndWallCollision(Bullet bullet, GroundEntitySystem es, PlayerSystem ps, ChunkSystem cs) {
+    private void bulletAndWallCollision(Bullet bullet, EntitySystem es, PlayerSystem ps, ChunkSystem cs) {
         //墙体与子弹
         Vector2 bulletPosition = bullet.getPosition();
         ChunkPosition chunkPosition = cs.getChunkPosition(bulletPosition.x, bulletPosition.y);
@@ -324,9 +324,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        GroundEntitySystem es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
-        Array<Bullet> playerBulletEntity = es.playerBulletEntity;
-        Array<Bullet> enemyBulletEntity = es.enemyBulletEntity;
+        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        Array<Bullet> playerBulletEntity = es.getPlayerBulletEntity();
+        Array<Bullet> enemyBulletEntity = es.getEnemyBulletEntity();
         for (Bullet bullet : playerBulletEntity) {
             Rectangle hurtbox = bullet.hitbox;
             batch.rect(hurtbox.getX(), hurtbox.getY(), hurtbox.getWidth(), hurtbox.getHeight());

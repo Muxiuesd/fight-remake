@@ -86,13 +86,8 @@ public class MainGameScreen implements Screen {
 
         //执行mod代码
         ModLibManager.getInstance().loadCoreLib();
-
         ModLoader.getInstance().loadAllMods();
         ModLoader.getInstance().runAllMods();
-
-        /*RegistrantGroup.printAllBlocks();
-        RegistrantGroup.printAllEntities();
-        RegistrantGroup.printAllItems();*/
 
         Log.print(TAG, "------游戏正式开始运行------");
     }

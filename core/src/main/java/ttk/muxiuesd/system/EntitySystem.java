@@ -1,7 +1,5 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
@@ -10,7 +8,8 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
-import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
+import ttk.muxiuesd.registry.RenderLayers;
+import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -27,26 +26,30 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * 实体系统
+ * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
-public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntityRender {
-    public final String TAG = GroundEntitySystem.class.getName();
+public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRender */{
+    public final String TAG = EntitySystem.class.getName();
 
     private final Array<Entity> _delayAdd = new Array<>();
     private final Array<Entity> _delayRemove = new Array<>();
 
-    private final Array<Entity> entities = new Array<>();
+    private final Array<Entity> entities = new Array<>();   //所有实体
 
-    public Array<Enemy> enemyEntity = new Array<>();
-    public Array<Bullet> playerBulletEntity = new Array<>();
-    public Array<Bullet> enemyBulletEntity = new Array<>();
-    public Array<ItemEntity> itemEntity = new Array<>();
+    private Array<Enemy> enemyEntity = new Array<>();
+    private Array<Bullet> playerBulletEntity = new Array<>();
+    private Array<Bullet> enemyBulletEntity = new Array<>();
+    private Array<ItemEntity> itemEntity = new Array<>();
 
     private final Array<Entity> updatableEntity = new Array<>();
-    private final Array<Entity> drawableEntity = new Array<>();
+    //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
+    private final ConcurrentHashMap<RenderLayer, Array<Entity>> renderableEntities = new ConcurrentHashMap<>();
 
-    public GroundEntitySystem (World world) {
+
+    public EntitySystem (World world) {
         super(world);
     }
 
@@ -56,6 +59,9 @@ public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntit
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
         this.add(player);
+
+        this.renderableEntities.put(RenderLayers.ENTITY_UNDERGROUND, new Array<>());
+        this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
 
         Log.print(TAG, "EntitySystem初始化完成！");
     }
@@ -104,9 +110,11 @@ public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntit
             throw new IllegalArgumentException("无法识别的实体类型或者实体组：" + entity.getClass().getName());
         }
 
-        this.updatableEntity.add(entity);
-        this.drawableEntity.add(entity);
         this.entities.add(entity);
+        this.updatableEntity.add(entity);
+        //把实体添加进相应的渲染层级
+        if (this.renderableEntities.containsKey(entity.getRenderLayer()))
+            this.renderableEntities.get(entity.getRenderLayer()).add(entity);
     }
 
     /**
@@ -137,9 +145,10 @@ public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntit
             this.itemEntity.removeValue(itemEntity, true);
         }
 
-        this.updatableEntity.removeValue(entity, true);
-        this.drawableEntity.removeValue(entity, true);
         this.entities.removeValue(entity, true);
+        this.updatableEntity.removeValue(entity, true);
+        //把实体移除出渲染层级
+        this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
     }
 
     @Override
@@ -271,8 +280,7 @@ public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntit
         entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
-
-    @Override
+    /*@Override
     public void draw(Batch batch) {
         for (Entity entity : this.drawableEntity) {
             entity.draw(batch);
@@ -295,7 +303,7 @@ public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntit
     @Override
     public int getRenderPriority () {
         return 100;
-    }
+    }*/
 
     @Override
     public void dispose() {
@@ -326,4 +334,43 @@ public class GroundEntitySystem extends WorldSystem implements IWorldGroundEntit
         return this.entities;
     }
 
+    public Array<Enemy> getEnemyEntity () {
+        return enemyEntity;
+    }
+
+    public EntitySystem setEnemyEntity (Array<Enemy> enemyEntity) {
+        this.enemyEntity = enemyEntity;
+        return this;
+    }
+
+    public Array<Bullet> getPlayerBulletEntity () {
+        return playerBulletEntity;
+    }
+
+    public EntitySystem setPlayerBulletEntity (Array<Bullet> playerBulletEntity) {
+        this.playerBulletEntity = playerBulletEntity;
+        return this;
+    }
+
+    public Array<Bullet> getEnemyBulletEntity () {
+        return enemyBulletEntity;
+    }
+
+    public EntitySystem setEnemyBulletEntity (Array<Bullet> enemyBulletEntity) {
+        this.enemyBulletEntity = enemyBulletEntity;
+        return this;
+    }
+
+    public Array<ItemEntity> getItemEntity () {
+        return itemEntity;
+    }
+
+    public EntitySystem setItemEntity (Array<ItemEntity> itemEntity) {
+        this.itemEntity = itemEntity;
+        return this;
+    }
+
+    public ConcurrentHashMap<RenderLayer, Array<Entity>> getRenderableEntities () {
+        return this.renderableEntities;
+    }
 }

@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.event;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.event.abs.EntityDeathEvent;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.GroundEntitySystem;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -20,7 +20,7 @@ public class EventSlimeDead extends EntityDeathEvent {
     public void handle (World world, LivingEntity entity) {
         //史莱姆死亡分裂
         if (entity instanceof Slime mom) {
-            GroundEntitySystem es = (GroundEntitySystem) world.getSystemManager().getSystem("EntitySystem");
+            EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
             int generation = mom.generation;
             if (generation == maxGeneration) {
                 return;

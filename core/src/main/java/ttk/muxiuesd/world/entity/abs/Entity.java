@@ -13,7 +13,9 @@ import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.system.GroundEntitySystem;
+import ttk.muxiuesd.registry.RenderLayers;
+import ttk.muxiuesd.render.RenderLayer;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.entity.Group;
 
 /**
@@ -36,7 +38,7 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
-    private GroundEntitySystem es;    //此实体所属的实体系统
+    private EntitySystem es;    //此实体所属的实体系统
 
     /**
      * 延迟初始化
@@ -184,12 +186,12 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this;
     }
 
-    public Entity setEntitySystem(GroundEntitySystem es) {
+    public Entity setEntitySystem(EntitySystem es) {
         this.es = es;
         return this;
     }
 
-    public GroundEntitySystem getEntitySystem() {
+    public EntitySystem getEntitySystem() {
         return this.es;
     }
 
@@ -208,12 +210,22 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return new TextureRegion(texture);
     }
 
+    /**
+     * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦
+     * */
     public boolean isOnGround () {
         return onGround;
     }
 
     public void setOnGround (boolean onGround) {
         this.onGround = onGround;
+    }
+
+    /**
+     * 获取这个实体的渲染层级，默认为地面实体
+     * */
+    public RenderLayer getRenderLayer () {
+        return RenderLayers.ENTITY_GROUND;
     }
 
     @Override

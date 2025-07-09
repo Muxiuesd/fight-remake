@@ -4,7 +4,7 @@ import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.GroundEntitySystem;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -38,7 +38,7 @@ public class RangedWeapon extends Weapon {
         if (this.getFactory() != null) {
             //生成子弹
             Bullet bullet = this.factory.create(world, user, user.getDirection());
-            GroundEntitySystem entitySystem = user.getEntitySystem();
+            EntitySystem entitySystem = user.getEntitySystem();
             entitySystem.add(bullet);
 
             return super.use(itemStack, world, user);

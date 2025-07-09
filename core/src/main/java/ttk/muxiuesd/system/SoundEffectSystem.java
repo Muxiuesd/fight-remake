@@ -27,7 +27,7 @@ public class SoundEffectSystem extends WorldSystem {
 
     private ChunkSystem cs;
     private PlayerSystem ps;
-    private GroundEntitySystem es;
+    private EntitySystem es;
 
     private LinkedHashMap<String, SoundInstance> activeSounds;  //正在播放的音效
     private Array<SpatialSoundInstance> activeSpatialSounds;    //正在播放的空间音效
@@ -46,7 +46,7 @@ public class SoundEffectSystem extends WorldSystem {
 
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
+        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
 
 
         String[] devices = Gdx.audio.getAvailableOutputDevices();

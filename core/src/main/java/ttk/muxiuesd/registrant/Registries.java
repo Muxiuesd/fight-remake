@@ -6,6 +6,7 @@ import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
+import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -32,6 +33,8 @@ public class Registries {
 
     public static final Registry<Audio> AUDIOS = create(RegistryKeys.AUDIOS);
     public static final Registry<BlockSoundsID> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
+    public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
+
 
     public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
         return new DefaultRegistry<>();

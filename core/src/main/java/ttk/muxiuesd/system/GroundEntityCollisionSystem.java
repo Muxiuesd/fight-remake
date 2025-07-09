@@ -21,13 +21,13 @@ import ttk.muxiuesd.world.wall.Wall;
 public class GroundEntityCollisionSystem extends WorldSystem implements IWorldGroundEntityRender {
     public final String TAG = this.getClass().getName();
 
-    private final GroundEntitySystem es;
+    private final EntitySystem es;
     private final PlayerSystem ps;
     private final ChunkSystem cs;
 
     public GroundEntityCollisionSystem (World world) {
         super(world);
-        this.es = (GroundEntitySystem) getManager().getSystem("EntitySystem");
+        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
         this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
     }

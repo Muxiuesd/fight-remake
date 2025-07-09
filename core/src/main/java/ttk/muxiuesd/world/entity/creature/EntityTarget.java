@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.entity.creature;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.system.GroundEntitySystem;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 
 /**
@@ -14,7 +14,7 @@ public class EntityTarget extends Enemy {
     }
 
     @Override
-    public void attack (float delta, GroundEntitySystem es) {
+    public void attack (float delta, EntitySystem es) {
         //super.attack(delta, es);
     }
 }
