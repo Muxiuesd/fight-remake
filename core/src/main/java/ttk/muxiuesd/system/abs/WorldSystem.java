@@ -45,4 +45,8 @@ public abstract class WorldSystem extends GameSystem {
     public void update (float delta) {
 
     }
+
+    public String tag () {
+        return this.getClass().getName();
+    }
 }

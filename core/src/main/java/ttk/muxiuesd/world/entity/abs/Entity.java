@@ -196,6 +196,13 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     }
 
     /**
+     * 加载身体材质
+     * */
+    public void loadBodyTextureRegion (String textureId, String texturePath) {
+        bodyTexture = this.getTextureRegion(textureId, texturePath);
+    }
+
+    /**
      * 加载纹理区域
      * @param textureId 纹理材质id
      * @param texturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过

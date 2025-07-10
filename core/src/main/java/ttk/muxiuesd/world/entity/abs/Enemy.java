@@ -112,13 +112,6 @@ public abstract class Enemy extends LivingEntity {
         return bullet;
     }
 
-    /**
-     * 加载身体材质
-     * */
-    public void loadBodyTextureRegion (String textureId, String texturePath) {
-        bodyTexture = this.getTextureRegion(textureId, texturePath);
-    }
-
     public Entity getCurTarget () {
         return curTarget;
     }

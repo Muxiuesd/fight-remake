@@ -26,6 +26,7 @@ public class MainWorld extends World {
         addSystem("HandleInputSystem", new HandleInputSystem(this));
         addSystem("SoundEffectSystem", new SoundEffectSystem(this));
         addSystem("MonsterGenerationSystem", new MonsterGenerationSystem(this));
+        addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
 
         //addSystem()

@@ -12,7 +12,7 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
-import ttk.muxiuesd.world.entity.creature.EntityTarget;
+import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.genfactory.SlimeGenFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,22 +66,6 @@ public class MonsterGenerationSystem extends WorldSystem implements Runnable {
             return;
         }
 
-        /*Player player = this.ps.getPlayer();
-        Vector2 playerCenter = player.getCenter();
-
-        //对每一个生成工厂执行一次生成，具体生成取决于工厂接口的实现
-        for (EnemyGenFactory<?> factory : this.genFactories.values()) {
-            float randomRange = MathUtils.random(this.minGenRange, this.maxGenRange);
-            float randomAngle = Util.randomAngle();
-            float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
-            float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
-            Enemy[] enemies = factory.create(getWorld(), genX, genY);
-            //防止没添加进实体系统，统一执行一遍
-            for (Enemy e : enemies) {
-                e.setEntitySystem(this.es);
-                this.es.add(e);
-            }
-        }*/
         //更新计时器
         if (this.genTimer != null) {
             this.genTimer.update(delta);
@@ -104,8 +88,11 @@ public class MonsterGenerationSystem extends WorldSystem implements Runnable {
             float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
             float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
             Enemy[] enemies = factory.create(getWorld(), genX, genY);
+            //啥也没有生成就直接跳过
+            if (enemies == null) continue;
             //防止没添加进实体系统，统一执行一遍
             for (Enemy e : enemies) {
+                if (e == null) continue;
                 e.setEntitySystem(this.es);
                 this.es.add(e);
             }

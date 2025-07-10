@@ -4,7 +4,6 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -23,7 +22,7 @@ public class Slime extends Enemy {
         this.generation = generation;
         loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
 
-        Log.print(this.getClass().getName(), "Slime 初始化完成");
+        //Log.print(this.getClass().getName(), "Slime 初始化完成");
     }
 
     @Override

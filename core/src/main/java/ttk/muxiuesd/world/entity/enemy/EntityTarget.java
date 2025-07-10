@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.entity.creature;
+package ttk.muxiuesd.world.entity.enemy;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.EntitySystem;

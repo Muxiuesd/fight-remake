@@ -7,7 +7,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
-import ttk.muxiuesd.world.entity.creature.EntityTarget;
+import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
 import java.util.function.Supplier;

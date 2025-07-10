@@ -106,9 +106,9 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
             }
         } else if (entity instanceof ItemEntity itemEntity) {
             this.itemEntity.add(itemEntity);
-        } else {
+        }/* else {
             throw new IllegalArgumentException("无法识别的实体类型或者实体组：" + entity.getClass().getName());
-        }
+        }*/
 
         this.entities.add(entity);
         this.updatableEntity.add(entity);
