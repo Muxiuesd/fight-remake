@@ -16,11 +16,11 @@ import ttk.muxiuesd.world.entity.genfactory.PufferFishGenFactory;
  * 地下生物生成
  * */
 public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFactory<?>> implements Runnable {
+    private int maxGenCount = 20;  //玩家周围最大的生物生成数量
     private float minGenRange = 5f;
     private float maxGenRange = 20f;
     private float maxGenSpan = 1f;      //生成时间间隔，现实秒
     private TaskTimer genTimer; //生成计时器，到时间自动执行
-
 
 
     public UndergroundCreatureGenSystem (World world) {
@@ -39,6 +39,13 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
     public void update (float delta) {
         //非白天不刷生物
         if (!getTimeSystem().isDay()) return;
+
+        //附近的实体超过最大数量不刷生物
+        int entityCount = Util.entityCount(
+            getEntitySystem().getEntities(),
+            getPlayerSystem().getPlayer().getCenter(),
+            this.maxGenRange);
+        if (entityCount >= maxGenCount) return;
 
         if (this.genTimer != null) {
             this.genTimer.update(delta);
