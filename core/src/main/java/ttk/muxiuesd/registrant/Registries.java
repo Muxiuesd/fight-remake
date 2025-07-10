@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
@@ -11,6 +12,7 @@ import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -23,8 +25,11 @@ import java.util.function.Supplier;
  * 游戏内的所有注册表
  * */
 public class Registries {
+    public static final Array<Registry<?>> ALL_REGISTRY = new Array<>();
+
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
+    public static final Registry<EntityType<?>> ENTITY_TYPE = create(RegistryKeys.ENTITY_TYPE);
     public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
@@ -38,9 +43,13 @@ public class Registries {
 
     public static final Registry<FightPool<?>> POOL = create(RegistryKeys.POOL);
 
-
+    /**
+     * 创建一个注册表
+     * */
     public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
-        return new DefaultRegistry<>();
+        DefaultRegistry<T> registry = new DefaultRegistry<>();
+        ALL_REGISTRY.add(registry);
+        return registry;
     }
 
     /**

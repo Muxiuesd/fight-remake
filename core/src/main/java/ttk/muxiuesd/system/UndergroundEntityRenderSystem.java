@@ -12,10 +12,10 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 /**
  * 地下实体渲染系统
  * */
-public class UnderGroundEntityRenderSystem extends EntityRenderSystem implements IWorldUndergroundEntityRender {
+public class UndergroundEntityRenderSystem extends EntityRenderSystem implements IWorldUndergroundEntityRender {
     public static final int RENDER_PRIORITY = 100;
 
-    public UnderGroundEntityRenderSystem (World world) {
+    public UndergroundEntityRenderSystem (World world) {
         super(world);
     }
 

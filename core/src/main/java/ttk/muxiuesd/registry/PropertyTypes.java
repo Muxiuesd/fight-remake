@@ -14,6 +14,8 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * 属性的使用方法：定义属性、注册属性、添加属性进物品或方块或实体
  * */
 public final class PropertyTypes {
+    public static void init () {
+    }
 
     public static final PropertyType<CAT> CAT = register("cat", new PropertyCAT());
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());

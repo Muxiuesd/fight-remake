@@ -5,16 +5,15 @@ import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 
 /**
  * 音效的注册
  * */
 public final class Sounds {
-    public static void init (){
-        Log.print(Sounds.class.getName(), "游戏音效注册完成");
+    public static void init () {
     }
+
     public static final AudioLoader LOADER = AudioLoader.getInstance();
 
     //实体

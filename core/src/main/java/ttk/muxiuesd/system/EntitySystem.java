@@ -8,6 +8,8 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
+import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -16,6 +18,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
@@ -38,16 +41,13 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
     private final Array<Entity> _delayRemove = new Array<>();
 
     private final Array<Entity> entities = new Array<>();   //所有实体
-
-    private Array<Enemy> enemyEntity = new Array<>();
-    private Array<Bullet> playerBulletEntity = new Array<>();
-    private Array<Bullet> enemyBulletEntity = new Array<>();
-    private Array<ItemEntity> itemEntity = new Array<>();
-
     private final Array<Entity> updatableEntity = new Array<>();
+
+    //实体管理组map，每一种注册过的实体类型都有一个管理组，key为实体类型，value为该实体类型的持有数组
+    private final ConcurrentHashMap<EntityType<?>, Array<?>> entityTypes = new ConcurrentHashMap<>();
+
     //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
     private final ConcurrentHashMap<RenderLayer, Array<Entity>> renderableEntities = new ConcurrentHashMap<>();
-
 
     public EntitySystem (World world) {
         super(world);
@@ -55,10 +55,15 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
 
     @Override
     public void initialize () {
+        //将注册的实体类型的管理组加进来
+        for (EntityType<?> entityType : Registries.ENTITY_TYPE.getMap().values()) {
+            this.entityTypes.put(entityType, entityType.createEntityArray());
+        }
+
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
-        this.add(player);
+        this.add(EntityTypes.PLAYER, player);
 
         this.renderableEntities.put(RenderLayers.ENTITY_UNDERGROUND, new Array<>());
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
@@ -67,7 +72,22 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
     }
 
     /**
-     * 添加实体
+     * 将实体加进对应的管理组，因为一种实体可以隶属于不同的管理组进而有不同的行为
+     * */
+    public <T extends Entity> void add (EntityType<T> type, T entity) {
+        this.add(entity);
+        //避免重复添加
+        if (!this.getEntityArray(type).contains(entity, true)) this.getEntityArray(type).add(entity);
+    }
+
+    public <T extends Entity> void remove (EntityType<T> type, T entity) {
+        this.remove(entity);
+        //避免重复移除
+        if (this.getEntityArray(type).contains(entity, true)) this.getEntityArray(type).removeValue(entity, true);
+    }
+
+    /**
+     * 简单的添加实体
      * */
     public void add (Entity entity) {
         //防止重复添加
@@ -76,6 +96,9 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
         this._delayAdd.add(entity);
     }
 
+    /**
+     * 简单的移除实体
+     * */
     public void remove (Entity entity) {
         this._delayRemove.add(entity);
     }
@@ -85,13 +108,14 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
      *
      * @param entity 实体
      */
-    private void _add(Entity entity) {
+    private void _add (Entity entity) {
         //优先进行实体组类型判断
         if (entity.group == Group.player) {
             //玩家组
-            //Bullet bullet = (Bullet) entity;
             if (entity instanceof Bullet bullet) {
-                this.playerBulletEntity.add(bullet);
+                //玩家的子弹
+                //this.playerBulletEntity.add(bullet);
+                this.addEntity(EntityTypes.PLAYER_BULLET, bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             } else if (entity instanceof Player player) {
                 //TODO
@@ -99,16 +123,17 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
         } else if (entity.group == Group.enemy) {
             //敌人组
             if (entity instanceof Enemy enemy) {
-                this.enemyEntity.add(enemy);
+                //this.enemyEntity.add(enemy);
+                this.addEntity(EntityTypes.ENEMY, enemy);
             } else if (entity instanceof Bullet bullet) {
-                this.enemyBulletEntity.add(bullet);
+                //this.enemyBulletEntity.add(bullet);
+                this.addEntity(EntityTypes.ENEMY_BULLET, bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             }
         } else if (entity instanceof ItemEntity itemEntity) {
-            this.itemEntity.add(itemEntity);
-        }/* else {
-            throw new IllegalArgumentException("无法识别的实体类型或者实体组：" + entity.getClass().getName());
-        }*/
+            this.addEntity(EntityTypes.ITEM_ENTITY, itemEntity);
+            //this.itemEntity.add(itemEntity);
+        }
 
         this.entities.add(entity);
         this.updatableEntity.add(entity);
@@ -122,27 +147,31 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
      *
      * @param entity 实体
      */
-    private void _remove(Entity entity) {
+    private void _remove (Entity entity) {
         //优先进行实体组类型判断
         if (entity.group == Group.enemy) {
             //绝大部分移除调用都是敌人相关的子弹实体
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
-                this.enemyBulletEntity.removeValue(bullet, true);
+                this.removeEntity(EntityTypes.ENEMY_BULLET, bullet);
+                //this.enemyBulletEntity.removeValue(bullet, true);
             }else if (entity instanceof Enemy enemy) {
-                this.enemyEntity.removeValue(enemy, true);
+                this.removeEntity(EntityTypes.ENEMY, enemy);
+                //this.enemyEntity.removeValue(enemy, true);
             }
         } else if (entity.group == Group.player) {
             //其次是玩家相关的实体
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
-                this.playerBulletEntity.removeValue(bullet, true);
+                this.removeEntity(EntityTypes.PLAYER_BULLET, bullet);
+                //this.playerBulletEntity.removeValue(bullet, true);
             }else {
                 //TODO 暂时不能移除玩家
             }
         } else if (entity instanceof ItemEntity itemEntity) {
             //剩下就是物品实体
-            this.itemEntity.removeValue(itemEntity, true);
+            this.removeEntity(EntityTypes.ITEM_ENTITY, itemEntity);
+            //this.itemEntity.removeValue(itemEntity, true);
         }
 
         this.entities.removeValue(entity, true);
@@ -334,40 +363,37 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
         return this.entities;
     }
 
-    public Array<Enemy> getEnemyEntity () {
-        return enemyEntity;
+    /**
+     * 把实体加进对应的实体类型管理组里面
+     * */
+    private <T extends Entity> void addEntity (EntityType<T> type, T entity) {
+        this.getEntityArray(type).add(entity);
     }
 
-    public EntitySystem setEnemyEntity (Array<Enemy> enemyEntity) {
-        this.enemyEntity = enemyEntity;
-        return this;
+    /**
+     * 把实体从对应的实体类型管理组里面移除
+     * */
+    private <T extends Entity> void removeEntity (EntityType<T> type, T entity) {
+        this.getEntityArray(type).removeValue(entity, true);
+    }
+
+    /**
+     * 获取实体类型相应的管理组
+     * */
+    public <T extends Entity> Array<T> getEntityArray (EntityType<T> type) {
+        return (Array<T>) this.entityTypes.get(type);
+    }
+
+    public Array<Enemy> getEnemyEntity () {
+        return this.getEntityArray(EntityTypes.ENEMY);
     }
 
     public Array<Bullet> getPlayerBulletEntity () {
-        return playerBulletEntity;
-    }
-
-    public EntitySystem setPlayerBulletEntity (Array<Bullet> playerBulletEntity) {
-        this.playerBulletEntity = playerBulletEntity;
-        return this;
+        return this.getEntityArray(EntityTypes.PLAYER_BULLET);
     }
 
     public Array<Bullet> getEnemyBulletEntity () {
-        return enemyBulletEntity;
-    }
-
-    public EntitySystem setEnemyBulletEntity (Array<Bullet> enemyBulletEntity) {
-        this.enemyBulletEntity = enemyBulletEntity;
-        return this;
-    }
-
-    public Array<ItemEntity> getItemEntity () {
-        return itemEntity;
-    }
-
-    public EntitySystem setItemEntity (Array<ItemEntity> itemEntity) {
-        this.itemEntity = itemEntity;
-        return this;
+        return this.getEntityArray(EntityTypes.ENEMY_BULLET);
     }
 
     public ConcurrentHashMap<RenderLayer, Array<Entity>> getRenderableEntities () {

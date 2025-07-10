@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.CreatureGenFactory;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
@@ -40,9 +41,9 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
         //非白天不刷生物
         if (!getTimeSystem().isDay()) return;
 
-        //附近的实体超过最大数量不刷生物
+        //附近的生物数量超过最大值不刷生物
         int entityCount = Util.entityCount(
-            getEntitySystem().getEntities(),
+            getEntitySystem().getEntityArray(EntityTypes.CREATURE),
             getPlayerSystem().getPlayer().getCenter(),
             this.maxGenRange);
         if (entityCount >= maxGenCount) return;
@@ -70,7 +71,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
             for (LivingEntity e : entities) {
                 if (e == null) continue;
                 e.setEntitySystem(getEntitySystem());
-                getEntitySystem().add(e);
+                getEntitySystem().add(EntityTypes.CREATURE, e);
             }
         }
     }

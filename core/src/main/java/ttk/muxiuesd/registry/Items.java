@@ -3,7 +3,6 @@ package ttk.muxiuesd.registry;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.instence.*;
@@ -15,8 +14,8 @@ import java.util.function.Supplier;
  * */
 public final class Items {
     public static void init () {
-        Log.print(Items.class.getName(), "物品注册完成");
     }
+
     //常规物品
     public static final Item TEST_ITEM = register("test_item", IronSword::new);
     public static final Item STICK = register("stick", ItemStick::new);

@@ -3,7 +3,6 @@ package ttk.muxiuesd.registry;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -17,7 +16,6 @@ import java.util.function.Supplier;
 
 public final class Entities {
     public static void init () {
-        Log.print(Entities.class.getName(), "实体注册完成");
     }
 
     public static final Entity ITEM_ENTITY = register("item_entity", ItemEntity::new);

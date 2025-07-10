@@ -3,7 +3,6 @@ package ttk.muxiuesd.registry;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.*;
 
@@ -11,9 +10,7 @@ import java.util.function.Supplier;
 
 public final class Blocks {
     public static void init () {
-        Log.print(Blocks.class.getName(), "游戏方块注册完毕");
     }
-
     //普通方块
     public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
     public static final Block GRASS = register("grass", BlockGrass::new);

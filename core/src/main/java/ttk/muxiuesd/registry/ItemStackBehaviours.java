@@ -11,6 +11,9 @@ import ttk.muxiuesd.world.item.stack.behaviour.*;
  * 物品使用行为逻辑(为了代码整洁才抽象出来的)
  * */
 public final class ItemStackBehaviours {
+    public static void init () {
+    }
+
     public static final IItemStackBehaviour COMMON = register("common", new CommonItemStackBehaviour());
     public static final IItemStackBehaviour CONSUMPTION = register("consumption", new ConsumptionItemStackBehaviour());
     public static final IItemStackBehaviour SWORD = register("sword", new SwordItemStackBehaviour());

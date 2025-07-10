@@ -15,6 +15,9 @@ import java.util.function.Function;
  * 所有伤害类型
  * */
 public final class DamageTypes {
+    public static void init () {
+    }
+
     public static final DamageType<Bullet, LivingEntity> BULLET = register("bullet_damage", DamageTypeBullet::new);
     public static final DamageType<LivingEntity, LivingEntity> SWORD = register("sword_damage", DamageTypeSword::new);
 

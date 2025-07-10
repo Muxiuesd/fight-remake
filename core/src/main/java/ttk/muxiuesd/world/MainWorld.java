@@ -16,7 +16,7 @@ public class MainWorld extends World {
         addSystem("PlayerSystem", new PlayerSystem(this));
         addSystem("ChunkSystem", new ChunkSystem(this));
         addSystem("EntitySystem", new EntitySystem(this));
-        addSystem("UndergroundEntityRenderSystem", new UnderGroundEntityRenderSystem(this));
+        addSystem("UndergroundEntityRenderSystem", new UndergroundEntityRenderSystem(this));
         addSystem("GroundEntityRenderSystem", new GroundEntityRenderSystem(this));
         addSystem("DaynightSystem", new DaynightSystem(this));
         addSystem("ParticleSystem", new ParticleSystem(this));

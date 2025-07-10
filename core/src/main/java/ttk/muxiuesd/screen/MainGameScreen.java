@@ -60,9 +60,8 @@ public class MainGameScreen implements Screen {
         Sounds.init();
         Items.init();
         Blocks.init();
-        //BlocksReg.registerAllBlocks();
         WallsReg.initAllWalls();
-        //EntitiesReg.registerAllEntities();
+        EntityTypes.init();
         Entities.init();
 
         //初始化着色器调度器
