@@ -21,41 +21,56 @@ public class PufferFish extends LivingEntity {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(0.7f, 0.7f);
     public static final int MAX_RANDOM_COUNT = 5;
 
-    private TaskTimer timer;
-    private Vector2 targetDistance;
+    private TaskTimer randomWalkTimer;  //随机游走计时器
+    private Vector2 walkDistance;
+    private Runnable walkTimerEndTask;  //游走结束任务
+    private TaskTimer restTimer;    //休息计时器
+    private Runnable restTimerEndTask;
 
     public PufferFish() {
         initialize(Group.creature, 5, 5, 1);
         loadBodyTextureRegion(Fight.getId("puffer_fish"), "fish/puffer_fish.png");
         setSize(DEFAULT_SIZE);
         setSpeed(1f);
+
+        this.restTimerEndTask = () -> this.restTimer = null;
+        this.walkTimerEndTask =  () -> {
+            this.randomWalkTimer = null;
+            this.walkDistance = null;
+            //每一次游走结束后生成休息计时器
+            this.restTimer = new TaskTimer(MathUtils.random(1f, 3f), this.restTimerEndTask);
+        };
+        //实体刚生成不会马上游走
+        this.restTimer = new TaskTimer(MathUtils.random(1f, 3f), this.restTimerEndTask);
     }
 
     @Override
     public void update (float delta) {
-        super.update(delta);
-        if (this.timer == null) {
-            //没有timer就说明没有随机游走，就生成一个
-            this.timer = new TaskTimer(2f, () -> {
-                this.timer = null;
-                this.targetDistance = null;
-            });
-            this.randomWalkPath(getEntitySystem().getWorld());
+        if (this.randomWalkTimer == null) {
+            //没有游走计时器并且休息计时器准备好了就说明到了需要随机游走得时候
+            if (this.restTimer != null && this.restTimer.isReady()) {
+                this.randomWalkTimer = new TaskTimer(2f, this.walkTimerEndTask);
+                this.randomWalkPath(getEntitySystem().getWorld());
+            }
         }else {
             //有timer就是在进行随机游走
-            this.timer.update(delta);
-            if (!this.timer.isReady()) {
+            this.randomWalkTimer.update(delta);
+            if (!this.randomWalkTimer.isReady()) {
                 setPosition(getPosition().add(
-                    this.targetDistance.x * delta * speed,
-                    this.targetDistance.y * delta * speed)
+                    this.walkDistance.x * delta * speed,
+                    this.walkDistance.y * delta * speed)
                 );
             }
         }
+        if (this.restTimer != null) {
+            this.restTimer.update(delta);
+        }
 
+        super.update(delta);
     }
 
     /**
-     * 简单的随机游走路线
+     * 生成简单的随机游走路线
      * */
     public void randomWalkPath (World world) {
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
@@ -72,7 +87,7 @@ public class PufferFish extends LivingEntity {
             count++;
             //目的地的坐标的方块得是水方块
         }while (cs.getBlock(position.x + dx, position.y + dy) != Blocks.WATER || count == MAX_RANDOM_COUNT);
-        this.targetDistance = new Vector2().set(dx, dy);
+        this.walkDistance = new Vector2().set(dx, dy);
     }
 
 
