@@ -17,10 +17,7 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
-import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.Entities;
-import ttk.muxiuesd.registry.Items;
-import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
 import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
@@ -58,8 +55,7 @@ public class MainGameScreen implements Screen {
         this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
         //手动注册游戏内的元素
-        //AudioReg.registerAllAudios();
-        //ItemsReg.registerAllItem();
+        Pools.init();
         EventTypes.init();
         Sounds.init();
         Items.init();

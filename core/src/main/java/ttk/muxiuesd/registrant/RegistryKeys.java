@@ -2,6 +2,7 @@ package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
 import ttk.muxiuesd.render.RenderLayer;
@@ -29,4 +30,6 @@ public class RegistryKeys {
     public static final RegistryKey<Audio> AUDIOS = new RegistryKey<>();
     public static final RegistryKey<BlockSoundsID> BLOCK_SOUNDS = new RegistryKey<>();
     public static final RegistryKey<RenderLayer> RENDER_LAYER = new RegistryKey<>();
+
+    public static final RegistryKey<FightPool<?>> POOL = new RegistryKey<>();
 }
