@@ -90,9 +90,9 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public boolean dropItem (int index, int amount) {
+    public ItemEntity dropItem (int index, int amount) {
         ItemStack itemStack = this.backpack.dropItem(index, amount);
-        if (itemStack == null) return false;
+        if (itemStack == null) return null;
 
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), getEntitySystem());
         itemEntity.setPosition(getPosition());
@@ -111,7 +111,7 @@ public class Player extends LivingEntity {
 
         AudioPlayer.getInstance().playSound(Fight.getId("pop"));
 
-        return true;
+        return itemEntity;
     }
 
     @Override

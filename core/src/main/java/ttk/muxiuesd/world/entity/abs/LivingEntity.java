@@ -105,12 +105,12 @@ public abstract class LivingEntity extends Entity {
 
     /**
      * 丢弃物品
-     * @return 丢弃成功返回true，丢弃失败返回false
+     * @return 丢弃成功返回丢出来的物品实体，丢弃失败返回null
      * */
-    public boolean dropItem (int index, int amount) {
+    public ItemEntity dropItem (int index, int amount) {
         ItemStack itemStack = this.backpack.dropItem(index, amount);
-        if (itemStack == null) return false;
-
+        if (itemStack == null) return null;
+        //简单的生成一个物品实体而已
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY("item_entity", getEntitySystem());
         itemEntity.setPosition(getPosition());
         itemEntity.setOnGround(false);
@@ -118,7 +118,7 @@ public abstract class LivingEntity extends Entity {
         itemEntity.setItemStack(itemStack);
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
-        return true;
+        return itemEntity;
     }
 
     /**
@@ -149,6 +149,13 @@ public abstract class LivingEntity extends Entity {
 
     public boolean isDeath () {
         return this.curHealth <= 0;
+    }
+
+    /**
+     * 活物实体死亡执行
+     * */
+    public void onDeath (World world, Entity killer) {
+
     }
 
     public ItemStack getHandItemStack () {
