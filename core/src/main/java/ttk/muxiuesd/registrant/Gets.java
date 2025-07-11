@@ -24,9 +24,6 @@ public class Gets {
      * 已知实体系统获取新实体，自动设置所属的实体系统，自动添加进去
      * */
     public static Entity ENTITY (String id, EntitySystem entitySystem) {
-        /*Entity entity = get(id, Entity.class);
-        entity.setEntitySystem(entitySystem);
-        entitySystem.add(entity);*/
         Entity entity = Registries.ENTITY.get(id).get().setID(id).setEntitySystem(entitySystem);
         entitySystem.add(entity);
         return entity;

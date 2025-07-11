@@ -44,7 +44,7 @@ public class ModEventCaller {
                 }
             }
         });
-        EventBus.subscribe(EventTypes.ENTITY_DEATH, new EntityDeathEvent() {
+        EventBus.subscribe(EventTypes.ENTITY_DEATH, new LivingEntityDeathEvent() {
             @Override
             public void handle (World world, LivingEntity entity) {
                 try {

@@ -26,26 +26,15 @@ public class EventSystem extends WorldSystem {
      * 如：世界事件
      * */
     private void initAllEvents () {
-        //EventBus bus = EventBus.getInstance();
         //添加游戏内事件
-        //bus.addEvent(EventBus.EventType.TickUpdate, new EventWorldWorldTick());
         EventBus.subscribe(EventTypes.WORLD_TICK, new EventWorldWorldTick());
-
-        //bus.addEvent(EventBus.EventType.EntityAttacked, new EventPlayerAttacked());
         EventBus.subscribe(EventTypes.ENTITY_HURT, new EventPlayerAttacked());
-        //bus.addEvent(EventBus.EventType.EntityAttacked, new EventSlimeAttacked(getWorld()));
         EventBus.subscribe(EventTypes.ENTITY_HURT, new EventEnemyAttacked());
-
-        //bus.addEvent(EventBus.EventType.PlayerDeath, new EventPlayerDead());
         EventBus.subscribe(EventTypes.PLAYER_DEATH, new EventPlayerDead());
-        //bus.addEvent(EventBus.EventType.EntityDeath, new EventSlimeDead(getWorld()));
         EventBus.subscribe(EventTypes.ENTITY_DEATH, new EventSlimeDead());
-        //bus.addEvent(EventBus.EventType.BulletShoot, new EventPlayerShootBullet(getWorld()));
+        EventBus.subscribe(EventTypes.ENTITY_DEATH, new EventLivingEntityDeath());
         EventBus.subscribe(EventTypes.BULLET_SHOOT, new EventPlayerShootBullet());
-        //bus.addEvent(EventBus.EventType.BulletShoot, new EventEnemyShootBullet(getWorld()));
         EventBus.subscribe(EventTypes.BULLET_SHOOT, new EventEnemyShootBullet());
-
-        //bus.addEvent(EventBus.EventType.BlockReplaceEvent, new EventBlockReplace());
         EventBus.subscribe(EventTypes.BLOCK_REPLACE, new EventBlockReplace());
     }
 }

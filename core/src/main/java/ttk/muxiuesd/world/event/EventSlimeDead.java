@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.event;
 
 import com.badlogic.gdx.math.MathUtils;
-import ttk.muxiuesd.event.abs.EntityDeathEvent;
+import ttk.muxiuesd.event.abs.LivingEntityDeathEvent;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.entity.enemy.Slime;
 /**
  * 事件: 史莱姆死亡
  * */
-public class EventSlimeDead extends EntityDeathEvent {
+public class EventSlimeDead extends LivingEntityDeathEvent {
     public int maxGeneration = 3;
 
     @Override

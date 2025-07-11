@@ -10,7 +10,7 @@ import ttk.muxiuesd.util.Log;
 public class EventTypes {
     public static void init (){
         Log.print(EventTypes.class.getName(), "所有游戏事件注册完毕");
-    };
+    }
 
     public static final String BULLET_SHOOT = EventBus.register("BulletShoot",
         new EventHandler<BulletShootEvent, EventPosterBulletShoot>() {
@@ -29,7 +29,7 @@ public class EventTypes {
     });
 
     public static final String ENTITY_DEATH = EventBus.register("EntityDeath",
-        new EventHandler<EntityDeathEvent, EventPosterEntityDeath>() {
+        new EventHandler<LivingEntityDeathEvent, EventPosterEntityDeath>() {
         @Override
         public void callEvents (EventPosterEntityDeath poster) {
             getEvents().forEach(event -> event.handle(poster.world, poster.entity));

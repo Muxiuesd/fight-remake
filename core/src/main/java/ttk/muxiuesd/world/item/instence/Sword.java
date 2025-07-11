@@ -5,10 +5,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
-import ttk.muxiuesd.registry.DamageTypes;
-import ttk.muxiuesd.registry.ItemStackBehaviours;
-import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Util;
@@ -45,6 +42,13 @@ public class Sword extends Weapon {
             enemy.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, enemy));
+        }
+        //检测剑的伤害区域内的生物实体
+        Array<LivingEntity> livingEntities = Util.sectorArea(es.getEntityArray(EntityTypes.CREATURE), user.getCenter(), user.getDirection(), range, 60f);
+        for (LivingEntity le : livingEntities) {
+            le.applyDamage(DamageTypes.SWORD, user);
+            //发送事件
+            EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, le));
         }
 
         String useSoundId = this.property.getUseSoundId();

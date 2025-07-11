@@ -114,7 +114,6 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
             //玩家组
             if (entity instanceof Bullet bullet) {
                 //玩家的子弹
-                //this.playerBulletEntity.add(bullet);
                 this.addEntity(EntityTypes.PLAYER_BULLET, bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             } else if (entity instanceof Player player) {
@@ -123,16 +122,13 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
         } else if (entity.group == Group.enemy) {
             //敌人组
             if (entity instanceof Enemy enemy) {
-                //this.enemyEntity.add(enemy);
                 this.addEntity(EntityTypes.ENEMY, enemy);
             } else if (entity instanceof Bullet bullet) {
-                //this.enemyBulletEntity.add(bullet);
                 this.addEntity(EntityTypes.ENEMY_BULLET, bullet);
                 this.callBulletShootEvent(bullet.owner, bullet);
             }
         } else if (entity instanceof ItemEntity itemEntity) {
             this.addEntity(EntityTypes.ITEM_ENTITY, itemEntity);
-            //this.itemEntity.add(itemEntity);
         }
 
         this.entities.add(entity);
@@ -154,24 +150,20 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
                 this.removeEntity(EntityTypes.ENEMY_BULLET, bullet);
-                //this.enemyBulletEntity.removeValue(bullet, true);
             }else if (entity instanceof Enemy enemy) {
                 this.removeEntity(EntityTypes.ENEMY, enemy);
-                //this.enemyEntity.removeValue(enemy, true);
             }
         } else if (entity.group == Group.player) {
             //其次是玩家相关的实体
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
                 this.removeEntity(EntityTypes.PLAYER_BULLET, bullet);
-                //this.playerBulletEntity.removeValue(bullet, true);
-            }else {
-                //TODO 暂时不能移除玩家
+            }else if (entity instanceof Player player) {
+                //TODO
             }
         } else if (entity instanceof ItemEntity itemEntity) {
             //剩下就是物品实体
             this.removeEntity(EntityTypes.ITEM_ENTITY, itemEntity);
-            //this.itemEntity.removeValue(itemEntity, true);
         }
 
         this.entities.removeValue(entity, true);
@@ -345,12 +337,10 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
      * 调用事件
      * */
     public void callBulletShootEvent (Entity shooter, Bullet bullet) {
-        //EventBus.getInstance().callEvent(EventBus.EventType.BulletShoot, shooter, bullet);
-        ttk.muxiuesd.event.EventBus.post("BulletShoot", new EventPosterBulletShoot(getWorld(), shooter, bullet));
+        EventBus.post("BulletShoot", new EventPosterBulletShoot(getWorld(), shooter, bullet));
     }
 
     public void callEntityDeadEvent (LivingEntity deadEntity) {
-        //EventBus.getInstance().callEvent(EventBus.EventType.EntityDeath, deadEntity);
         EventBus.post(EventTypes.ENTITY_DEATH, new EventPosterEntityDeath(getWorld(), deadEntity));
     }
 
@@ -359,6 +349,9 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
         return ps.getPlayer();
     }
 
+    /**
+     * 获取所有的实体
+     * */
     public Array<Entity> getEntities () {
         return this.entities;
     }

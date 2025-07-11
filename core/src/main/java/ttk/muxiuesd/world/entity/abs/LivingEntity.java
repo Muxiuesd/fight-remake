@@ -3,7 +3,9 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
@@ -111,7 +113,7 @@ public abstract class LivingEntity extends Entity {
         ItemStack itemStack = this.backpack.dropItem(index, amount);
         if (itemStack == null) return null;
         //简单的生成一个物品实体而已
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY("item_entity", getEntitySystem());
+        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY.getID(), getEntitySystem());
         itemEntity.setPosition(getPosition());
         itemEntity.setOnGround(false);
         itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
@@ -154,8 +156,15 @@ public abstract class LivingEntity extends Entity {
     /**
      * 活物实体死亡执行
      * */
-    public void onDeath (World world, Entity killer) {
+    public void onDeath (World world) {
+        Backpack bp = this.getBackpack();
+        for (int i = 0; i < bp.getSize(); i++) {
+            ItemStack itemStack = bp.getItemStack(i);
+            if (itemStack == null) continue;
 
+            this.dropItem(i, itemStack.getAmount())
+                .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+        }
     }
 
     public ItemStack getHandItemStack () {
@@ -271,5 +280,14 @@ public abstract class LivingEntity extends Entity {
 
     public float getMaxSwingHandDegree () {
         return this.maxSwingHandDegree;
+    }
+
+    public Backpack getBackpack () {
+        return this.backpack;
+    }
+
+    public LivingEntity setBackpack (Backpack backpack) {
+        this.backpack = backpack;
+        return this;
     }
 }
