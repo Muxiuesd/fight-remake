@@ -1,13 +1,16 @@
 package ttk.muxiuesd.world.entity.enemy;
 
+import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
+import ttk.muxiuesd.world.item.ItemStack;
 
 public class Slime extends Enemy {
     public int generation;  //史莱姆的代数，用于控制史莱姆的分裂次数，分裂次数越多，代数越高
@@ -21,8 +24,7 @@ public class Slime extends Enemy {
         super(10f, 10f, 16f, 16f, 1f, 1.2f);
         this.generation = generation;
         loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
-
-        //Log.print(this.getClass().getName(), "Slime 初始化完成");
+        getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
     }
 
     @Override

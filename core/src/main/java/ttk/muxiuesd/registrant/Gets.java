@@ -20,6 +20,9 @@ public class Gets {
         return Registries.BLOCK.get(id);
     }
 
+    public static Entity ENTITY (Entity entity, EntitySystem entitySystem) {
+        return ENTITY(entity.getID(), entitySystem);
+    }
     /**
      * 已知实体系统获取新实体，自动设置所属的实体系统，自动添加进去
      * */

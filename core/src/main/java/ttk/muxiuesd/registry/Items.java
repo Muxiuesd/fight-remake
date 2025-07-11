@@ -26,6 +26,7 @@ public final class Items {
     public static final Item PUFFER_FISH = register("puffer_fish", ItemPufferFish::new);
     public static final Item RUBBISH = register("rubbish");
     public static final Item COAL = register("coal");
+    public static final Item SLIME_BALL = register("slime_ball");
 
     //方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
