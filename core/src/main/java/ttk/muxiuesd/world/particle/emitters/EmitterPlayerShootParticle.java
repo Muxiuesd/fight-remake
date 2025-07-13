@@ -26,8 +26,6 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
                 return particleSpell;
             }
         });
-        //这里设置默认的贴图会出错
-        //this.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("spell"), Texture.class));
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
     }
