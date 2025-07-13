@@ -27,7 +27,7 @@ public class PufferFish extends LivingEntity {
     private Vector2 walkDistance;
     private Runnable walkTimerEndTask;  //游走结束任务
     private TaskTimer restTimer;    //休息计时器
-    private Runnable restTimerEndTask;
+    private Runnable restTimerEndTask;  //休息状态结束后任务
 
     public PufferFish() {
         initialize(Group.creature, 5, 5, 1);
@@ -37,15 +37,19 @@ public class PufferFish extends LivingEntity {
         getBackpack().addItem(new ItemStack(Items.PUFFER_FISH, 1));
 
 
-        this.restTimerEndTask = () -> this.restTimer = null;
+        this.restTimerEndTask = () -> {
+            Pools.TASK_TIMER.free(this.restTimer);
+            this.restTimer = null;
+        };
         this.walkTimerEndTask =  () -> {
+            Pools.TASK_TIMER.free(this.randomWalkTimer);
             this.randomWalkTimer = null;
             this.walkDistance = null;
             //每一次游走结束后生成休息计时器
-            this.restTimer = new TaskTimer(MathUtils.random(1f, 3f), this.restTimerEndTask);
+            this.restTimer = Pools.TASK_TIMER.obtain().setMaxSpan(MathUtils.random(1f, 3f)).setTask(this.restTimerEndTask);
         };
         //实体刚生成不会马上游走
-        this.restTimer = new TaskTimer(MathUtils.random(1f, 3f), this.restTimerEndTask);
+        this.restTimer = Pools.TASK_TIMER.obtain().setMaxSpan(MathUtils.random(1f, 3f)).setTask(this.restTimerEndTask);
     }
 
     @Override
@@ -53,7 +57,7 @@ public class PufferFish extends LivingEntity {
         if (this.randomWalkTimer == null) {
             //没有游走计时器并且休息计时器准备好了就说明到了需要随机游走得时候
             if (this.restTimer != null && this.restTimer.isReady()) {
-                this.randomWalkTimer = new TaskTimer(2f, this.walkTimerEndTask);
+                this.randomWalkTimer = Pools.TASK_TIMER.obtain().setMaxSpan(2f).setTask(this.walkTimerEndTask);
                 this.randomWalkPath(getEntitySystem().getWorld());
             }
         }else {

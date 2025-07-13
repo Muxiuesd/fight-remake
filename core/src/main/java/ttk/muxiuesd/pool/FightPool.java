@@ -1,5 +1,6 @@
 package ttk.muxiuesd.pool;
 
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 
 /**
@@ -7,6 +8,11 @@ import com.badlogic.gdx.utils.Pools;
  */
 public class FightPool<T> {
     private final Class<T> clazz;
+
+    public FightPool (Class<T> clazz, Pool<T> pool) {
+        this.clazz = clazz;
+        Pools.set(clazz, pool);
+    }
 
     public FightPool (Class<T> clazz) {
         this.clazz = clazz;
@@ -19,5 +25,9 @@ public class FightPool<T> {
 
     public void free (T object) {
         Pools.free(object);
+    }
+
+    public int size () {
+        return Pools.get(this.clazz).getFree();
     }
 }

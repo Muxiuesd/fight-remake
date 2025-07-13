@@ -2,9 +2,10 @@ package ttk.muxiuesd.world.entity.abs;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Timer;
+import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.Player;
@@ -15,7 +16,7 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
  * */
 public abstract class Enemy extends LivingEntity {
     private Entity curTarget;   //敌人当前需要攻击的目标
-    private Timer attackTimer;
+    private TaskTimer attackTimer;  //攻击计时器
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
 
@@ -32,7 +33,7 @@ public abstract class Enemy extends LivingEntity {
         this.visionRange = visionRange;
         this.attackRange = attackRange;
         this.speed = speed;
-        this.attackTimer = new Timer(attackSpan);
+        this.attackTimer = Pools.TASK_TIMER.obtain().setMaxSpan(attackSpan);
 
         setSize(1f, 1f);
     }
@@ -137,5 +138,14 @@ public abstract class Enemy extends LivingEntity {
     public Enemy setAttackRange (float attackRange) {
         this.attackRange = attackRange;
         return this;
+    }
+
+    @Override
+    public void dispose () {
+        super.dispose();
+        if (this.attackTimer != null) {
+            Pools.TASK_TIMER.free(this.attackTimer);
+            this.attackTimer = null;
+        }
     }
 }

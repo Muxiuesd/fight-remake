@@ -3,12 +3,13 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
-import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Group;
@@ -25,6 +26,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * TODO 活物实体能有buff影响其行为状态
  * */
 public abstract class LivingEntity extends Entity {
+    public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
@@ -34,7 +36,7 @@ public abstract class LivingEntity extends Entity {
     private TaskTimer attackedTimer;    //被攻击状态持续的计时器
     public Backpack backpack;   //储存物品的背包
     private int handIndex;  //手部物品索引
-    private Timer swingHandTimer;
+    private TaskTimer swingHandTimer;
     private float maxSwingHandDegree;
 
 
@@ -43,12 +45,16 @@ public abstract class LivingEntity extends Entity {
     }
     public void initialize (Group group, float maxHealth, float curHealth, int backpackSize) {
         super.initialize(group);
+        setSize(DEFAULT_SIZE);
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
         this.attacked = false;
-        this.attackedTimer = new TaskTimer(ATTACK_SPAN, 0f, () -> this.attacked = false);
+        //this.attackedTimer = new TaskTimer(ATTACK_SPAN, 0f, () -> this.attacked = false);
+        this.attackedTimer = Pools.TASK_TIMER.obtain()
+            .setMaxSpan(ATTACK_SPAN)
+            .setCurSpan(0)
+            .setTask(() -> this.attacked = false);
         this.backpack = new Backpack(backpackSize);
-        //this.swingHandTimer = new Timer(SWING_HAND_TIME, 0);
         this.maxSwingHandDegree = 60f;
     }
 
@@ -201,7 +207,14 @@ public abstract class LivingEntity extends Entity {
      **/
     public void swingHand (float swingTime) {
         if (this.swingHandTimer == null) {
-            this.swingHandTimer = new TaskTimer(swingTime, 0, () -> this.swingHandTimer = null);
+            //this.swingHandTimer = new TaskTimer(swingTime, 0, () -> this.swingHandTimer = null);
+            this.swingHandTimer = Pools.TASK_TIMER.obtain()
+                .setMaxSpan(swingTime)
+                .setCurSpan(0)
+                .setTask(() -> {
+                    Pools.TASK_TIMER.free(this.swingHandTimer);
+                    this.swingHandTimer = null;
+                });
         }
     }
 

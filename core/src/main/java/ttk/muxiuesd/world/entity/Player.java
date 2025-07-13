@@ -8,8 +8,12 @@ import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Items;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.HandleInputSystem;
-import ttk.muxiuesd.util.*;
+import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.TaskTimer;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -18,10 +22,9 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 玩家
  */
 public class Player extends LivingEntity {
-    public TextureRegion body;
     public TextureRegion shield;
-    public Timer defendCDTimer; //防御状态冷却计时器
-    public Timer defendDurationTimer; //防御状态持续计时器
+    public TaskTimer defendCDTimer; //防御状态冷却计时器
+    public TaskTimer defendDurationTimer; //防御状态持续计时器
     public boolean isDefend = false;
     public float defenseRadius = 1.23f; //防御半径
 
@@ -34,12 +37,16 @@ public class Player extends LivingEntity {
 
         speed = 8;
         curSpeed = speed;
-        setSize(1, 1);
         bodyTexture = getTextureRegion(Fight.getId("player"), "player/player.png");
-
         this.shield = getTextureRegion(Fight.getId("player_shield"), "player/shield.png");
-        this.defendCDTimer = new Timer(2f, 0);
-        this.defendDurationTimer = new Timer(0.3f, 0);
+
+        this.defendCDTimer = Pools.TASK_TIMER.obtain().setMaxSpan(2f).setCurSpan(0f)
+            .setTask(() -> this.isDefend = true);
+        this.defendDurationTimer = Pools.TASK_TIMER.obtain().setMaxSpan(0.3f).setCurSpan(0f)
+            .setTask(() ->  {
+                //到时间了就取消防御状态
+                this.isDefend = false;
+            });
 
 
         backpack.setItemStack(0, new ItemStack(Items.TEST_ITEM));
@@ -67,8 +74,6 @@ public class Player extends LivingEntity {
         } else {
             //防御状态下
             if (this.defendDurationTimer.isReady()) {
-                //到时间了就取消防御状态
-                this.isDefend = false;
             }else {
                 //没到时间就继续计时
                 this.defendDurationTimer.update(delta);
@@ -91,16 +96,19 @@ public class Player extends LivingEntity {
 
     @Override
     public ItemEntity dropItem (int index, int amount) {
-        ItemStack itemStack = this.backpack.dropItem(index, amount);
+        ItemStack itemStack = getBackpack().dropItem(index, amount);
         if (itemStack == null) return null;
 
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), getEntitySystem());
-        itemEntity.setPosition(getPosition());
         itemEntity.setItemStack(itemStack);
-        itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
+        itemEntity.setPosition(getPosition());
         itemEntity.setVelocity(Util.getDirection());
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
+        itemEntity.setOnGround(false);
+        itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.3f).setTask(() -> {
+            Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
+            itemEntity.setOnAirTimer(null);
+        }));
 
         HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
         Vector2 mwp = his.getMouseWorldPosition();
@@ -140,10 +148,11 @@ public class Player extends LivingEntity {
         // 左键发射攻击性子弹
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
             Bullet bullet = EntityFactory.createFireBullet(this, Util.getDirection());
-            //getEntitySystem().add(bullet);
         }
-        if (KeyBindings.PlayerShield.wasJustPressed() && this.defendCDTimer.isReady()) {
-            this.isDefend = true;
+        //玩家右键防御
+        if (KeyBindings.PlayerShield.wasJustPressed()) {
+            this.defendCDTimer.isReady();
+            //TODO 护盾使用成功的相关操作
         }
         if (KeyBindings.PlayerUseItem.wasJustPressed()) {
             useItem(getEntitySystem().getWorld());

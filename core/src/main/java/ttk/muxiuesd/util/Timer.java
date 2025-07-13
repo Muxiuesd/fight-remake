@@ -1,13 +1,17 @@
 package ttk.muxiuesd.util;
 
+import com.badlogic.gdx.utils.Pool;
 import ttk.muxiuesd.interfaces.Updateable;
 
 /**
  * 计时器,用于各种需要检查时间间隔的地方
  * */
-public class Timer implements Updateable{
+public class Timer<T extends Timer<?>> implements Updateable, Pool.Poolable {
     private float maxSpan;
     private float curSpan;
+
+    public Timer () {
+    }
 
     public Timer (float maxSpan) {
         this(maxSpan, 0);
@@ -42,15 +46,23 @@ public class Timer implements Updateable{
         return maxSpan;
     }
 
-    public void setMaxSpan (float maxSpan) {
+    public T setMaxSpan (float maxSpan) {
         this.maxSpan = maxSpan;
+        return (T) this;
     }
 
     public float getCurSpan () {
         return curSpan;
     }
 
-    public void setCurSpan (float curSpan) {
+    public T setCurSpan (float curSpan) {
         this.curSpan = curSpan;
+        return (T) this;
+    }
+
+    @Override
+    public void reset () {
+        this.curSpan = 0;
+        this.maxSpan = 0;
     }
 }

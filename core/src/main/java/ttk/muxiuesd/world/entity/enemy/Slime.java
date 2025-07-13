@@ -37,7 +37,6 @@ public class Slime extends Enemy {
      */
     @Override
     public Bullet createBullet (Entity owner, Direction direction) {
-        //BulletFire bullet = new BulletFire(this);
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
         bullet.setOwner(owner);
         bullet.setSize(
