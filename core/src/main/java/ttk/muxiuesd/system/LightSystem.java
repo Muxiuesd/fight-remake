@@ -37,7 +37,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
 
     @Override
     public void initialize () {
-        int programID = getWorld().getScreen().batch.getShader().getHandle();//获取着色器句柄，以供获取Uniform Block 的索引
+        int programID = getWorld().getScreen().getBatch().getShader().getHandle();//获取着色器句柄，以供获取Uniform Block 的索引
         int blockIndex = Gdx.gl30.glGetUniformBlockIndex(programID, "LightBlock"); // 获取 Uniform Block 的索引
         Gdx.gl30.glUniformBlockBinding(programID, blockIndex, 0); // 绑定到绑定点 GPU会来0这个位置找数据
 
