@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.system.ChunkSystem;
-import ttk.muxiuesd.system.HandleInputSystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -28,8 +28,7 @@ public class BlockItem extends ConsumptionItem {
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity user) {
-        HandleInputSystem his = (HandleInputSystem) world.getSystemManager().getSystem("HandleInputSystem");
-        Vector2 worldPosition = his.getMouseWorldPosition();
+        Vector2 worldPosition = Util.getMouseWorldPosition();
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
         //替换鼠标点到的方块
         Block replacedBlock = cs.replaceBlock(block, worldPosition.x, worldPosition.y);

@@ -1,9 +1,12 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -11,6 +14,16 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  */
 public class Util {
     public static final double PI2 = Math.PI * 2;
+
+    /**
+     * 获取鼠标指向的游戏世界坐标
+     * */
+    public static Vector2 getMouseWorldPosition() {
+        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
+        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
+        Vector3 up = camera.unproject(mp);
+        return new Vector2(up.x, up.y);
+    }
 
     /**
      * 获取鼠标的位置,相对于游戏窗口的中心

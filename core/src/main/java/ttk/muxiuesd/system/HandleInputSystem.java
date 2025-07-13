@@ -3,15 +3,13 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.data.BlockJsonDataOutput;
 import ttk.muxiuesd.data.ItemJsonDataOutput;
 import ttk.muxiuesd.data.JsonDataReader;
@@ -20,9 +18,9 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
 import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
+import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
@@ -39,11 +37,10 @@ import ttk.muxiuesd.world.item.abs.Item;
  * 输入处理系统
  * 按键状态的更新都在这里面
  * */
-public class HandleInputSystem extends WorldSystem implements InputProcessor {
+public class HandleInputSystem extends WorldSystem implements InputProcessor, IWorldChunkRender {
     public final String TAG = this.getClass().getName();
 
     private PlayerSystem playerSystem;
-    private CameraController cameraController;
     private BlockPosition mouseBlockPosition;   //鼠标指向的方块的坐标
 
     public HandleInputSystem(World world) {
@@ -52,10 +49,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void initialize () {
-        MainGameScreen screen = getWorld().getScreen();
-        this.cameraController = screen.cameraController;
-        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
-        playerSystem = ps;
+        this.playerSystem = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
 
         Gdx.input.setInputProcessor(this);
     }
@@ -92,7 +86,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
 
-        Vector2 mouseWorldPosition = this.getMouseWorldPosition();
+        Vector2 mouseWorldPosition = Util.getMouseWorldPosition();
         Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
 
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
@@ -160,6 +154,11 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     @Override
     public void renderShape(ShapeRenderer batch) {
         this.renderBlockCheckBox(batch);
+    }
+
+    @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.renderShape(shapeRenderer);
     }
 
     @Override
@@ -237,19 +236,19 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
      * 获取鼠标指向的方块坐标
      * */
     public BlockPosition getMouseBlockPosition() {
-        Vector2 wp = this.getMouseWorldPosition();
+        Vector2 wp = Util.getMouseWorldPosition();
         return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
     }
 
     /**
      * 获取鼠标指向的世界坐标
      * */
-    public Vector2 getMouseWorldPosition() {
-        OrthographicCamera camera = cameraController.camera;
+    /*public Vector2 getMouseWorldPosition() {
+        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
         Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
         Vector3 up = camera.unproject(mp);
         return new Vector2(up.x, up.y);
-    }
+    }*/
 
     /**
      * 绘制方块选中框
@@ -265,5 +264,12 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                 0.8f);
             batch.setColor(Color.WHITE);
         }
+    }
+
+
+
+    @Override
+    public int getRenderPriority () {
+        return 5000;
     }
 }

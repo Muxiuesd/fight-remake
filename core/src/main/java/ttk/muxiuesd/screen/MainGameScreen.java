@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,7 +11,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
@@ -39,7 +38,6 @@ public class MainGameScreen implements Screen {
 
     public Batch batch = new SpriteBatch();
     public Viewport viewport;
-    public CameraController cameraController;
     public ShapeRenderer shapeRenderer = new ShapeRenderer() {{
         setAutoShapeType(true);
     }};
@@ -51,8 +49,8 @@ public class MainGameScreen implements Screen {
     public void show() {
         int w = Gdx.graphics.getWidth();
         int h = Gdx.graphics.getHeight();
-        this.cameraController = new CameraController(new OrthographicCamera());
-        this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
+        this.viewport = new ScalingViewport(Scaling.fit, w, h, PlayerCamera.INSTANCE.getCamera());
+        //this.viewport = new ScalingViewport(Scaling.fit, w, h, cameraController.camera);
 
         //手动注册游戏内的元素
         Pools.init();
@@ -70,13 +68,13 @@ public class MainGameScreen implements Screen {
         this.setWorld(new MainWorld(this));
 
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
-            new EntityUndergroundRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 100, this.world));
+            new EntityUndergroundRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.DAYNIGHT_SHADER, 100, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
-            new WorldChunkRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+            new WorldChunkRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.DAYNIGHT_SHADER, 200, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
-            new EntityGroundRenderProcessor(this.cameraController.camera, ShadersReg.DAYNIGHT_SHADER, 300, this.world));
+            new EntityGroundRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.DAYNIGHT_SHADER, 300, this.world));
         RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
-            new ParticleRenderProcessor(this.cameraController.camera, ShadersReg.PARTICLE_SHADER, 400, this.world));
+            new ParticleRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.PARTICLE_SHADER, 400, this.world));
 
         this.world.getSystemManager().initAllSystems();
 
@@ -112,7 +110,8 @@ public class MainGameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         this.viewport.setWorldSize(width, height);
-        this.cameraController.resize(width, height);
+        //this.cameraController.resize(width, height);
+        PlayerCamera.INSTANCE.resize(width, height);
     }
 
     @Override

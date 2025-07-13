@@ -3,6 +3,7 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -23,7 +24,7 @@ public class DaynightSystem extends WorldSystem {
     @Override
     public void initialize () {
         //this.daynightShader = new DaynightShader(this);
-        this.camera = getWorld().getScreen().cameraController.camera;
+        this.camera = PlayerCamera.INSTANCE.getCamera();
         this.timeSystem = (TimeSystem) getManager().getSystem("TimeSystem");
     }
 

@@ -12,7 +12,6 @@ import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
@@ -146,8 +145,7 @@ public class ItemFishPole extends Item {
         if (owner instanceof Player player) {
             //玩家抛竿
             Vector2 ownerPos = player.getCenter();
-            HandleInputSystem his = (HandleInputSystem) world.getSystemManager().getSystem("HandleInputSystem");
-            Vector2 mwp = his.getMouseWorldPosition();
+            Vector2 mwp = Util.getMouseWorldPosition();
             float distance = Util.getDistance(ownerPos.x, owner.y, mwp.x, mwp.y);
             fishingHook.setSpeed(Math.min(distance, this.castSpeed));
         }else {

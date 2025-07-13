@@ -9,7 +9,6 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.system.HandleInputSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
@@ -110,8 +109,8 @@ public class Player extends LivingEntity {
             itemEntity.setOnAirTimer(null);
         }));
 
-        HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
-        Vector2 mwp = his.getMouseWorldPosition();
+        //HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
+        Vector2 mwp = Util.getMouseWorldPosition();
         float distance = Util.getDistance(x, y, mwp.x, mwp.y);
         float v = Math.min(distance, 4f);
         itemEntity.setSpeed(v);
