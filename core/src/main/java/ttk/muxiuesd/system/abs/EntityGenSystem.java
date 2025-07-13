@@ -19,12 +19,18 @@ public class EntityGenSystem<T extends EntityGenFactory<?>> extends WorldSystem 
     private PlayerSystem playerSystem;
     private EntitySystem entitySystem;
     private ChunkSystem chunkSystem;
-    //所有的生成工厂
-    private final ConcurrentHashMap<String, T> genFactories;
 
-    public EntityGenSystem (World world) {
+    private final ConcurrentHashMap<String, T> genFactories;    //所有的生成工厂
+
+    private float minGenRange;    //小于这个范围不生怪
+    private float maxGenRange;    //大于这个范围不生怪
+
+    public EntityGenSystem (World world, ConcurrentHashMap<String, T> genFactories,
+                            float minGenRange, float maxGenRange) {
         super(world);
-        this.genFactories = new ConcurrentHashMap<>();
+        this.genFactories = genFactories;
+        this.minGenRange = minGenRange;
+        this.maxGenRange = maxGenRange;
     }
 
     @Override
@@ -94,5 +100,21 @@ public class EntityGenSystem<T extends EntityGenFactory<?>> extends WorldSystem 
     public EntityGenSystem<T> setPlayerSystem (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
         return this;
+    }
+
+    public float getMinGenRange () {
+        return this.minGenRange;
+    }
+
+    public void setMinGenRange (float minGenRange) {
+        this.minGenRange = minGenRange;
+    }
+
+    public float getMaxGenRange () {
+        return this.maxGenRange;
+    }
+
+    public void setMaxGenRange (float maxGenRange) {
+        this.maxGenRange = maxGenRange;
     }
 }

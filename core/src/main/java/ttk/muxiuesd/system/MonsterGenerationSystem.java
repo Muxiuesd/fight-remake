@@ -16,6 +16,8 @@ import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 import ttk.muxiuesd.world.entity.genfactory.SlimeGenFactory;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * 怪物生成系统
  * */
@@ -25,11 +27,9 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     private float maxGenSpan = 8f;      //生成怪物时间间隔，现实秒
     private TaskTimer genTimer; //生成怪物计时器，到时间自动执行
 
-    private float minGenRange = 12f;    //小于这个范围不生怪
-    private float maxGenRange = 26f;    //大于这个范围不生怪
 
     public MonsterGenerationSystem (World world) {
-        super(world);
+        super(world, new ConcurrentHashMap<>(), 12, 18);
         this.genTimer = new TaskTimer(this.maxGenSpan, this);
     }
 
@@ -77,7 +77,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
 
         //对每一个生成工厂执行一次生成，具体生成取决于工厂接口的实现
         for (EnemyGenFactory<?> factory : getGenFactories().values()) {
-            float randomRange = MathUtils.random(this.minGenRange, this.maxGenRange);
+            float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());
             float randomAngle = Util.randomAngle();
             float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
             float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
@@ -101,21 +101,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
         this.maxGenSpan = maxGenSpan;
     }
 
-    public float getMinGenRange () {
-        return this.minGenRange;
-    }
 
-    public void setMinGenRange (float minGenRange) {
-        this.minGenRange = minGenRange;
-    }
-
-    public float getMaxGenRange () {
-        return this.maxGenRange;
-    }
-
-    public void setMaxGenRange (float maxGenRange) {
-        this.maxGenRange = maxGenRange;
-    }
 }
 
 

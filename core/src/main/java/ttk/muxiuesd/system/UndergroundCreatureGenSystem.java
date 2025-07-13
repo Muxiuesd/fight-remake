@@ -13,19 +13,18 @@ import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.genfactory.PufferFishGenFactory;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * 地下生物生成
  * */
 public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFactory<?>> implements Runnable {
-    private int maxGenCount = 20;  //玩家周围最大的生物生成数量
-    private float minGenRange = 5f;
-    private float maxGenRange = 20f;
-    private float maxGenSpan = 1f;      //生成时间间隔，现实秒
+    private int maxCount = 20;  //玩家周围最大的生物数量
+    private float maxGenSpan = 5f;      //生成时间间隔，现实秒
     private TaskTimer genTimer; //生成计时器，到时间自动执行
 
-
     public UndergroundCreatureGenSystem (World world) {
-        super(world);
+        super(world, new ConcurrentHashMap<>(), 8, 20);
         this.genTimer = new TaskTimer(this.maxGenSpan, this);
     }
 
@@ -42,11 +41,11 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
         if (!getTimeSystem().isDay()) return;
 
         //附近的生物数量超过最大值不刷生物
-        int entityCount = Util.entityCount(
-            getEntitySystem().getEntityArray(EntityTypes.CREATURE),
+        int entityCount = Util.entityCount(getEntitySystem().getEntityArray(EntityTypes.CREATURE),
             getPlayerSystem().getPlayer().getCenter(),
-            this.maxGenRange);
-        if (entityCount >= maxGenCount) return;
+            getMaxGenRange()
+        );
+        if (entityCount >= maxCount) return;
 
         if (this.genTimer != null) {
             this.genTimer.update(delta);
@@ -60,7 +59,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
         Vector2 playerCenter = player.getCenter();
 
         for (CreatureGenFactory<?> factory: getGenFactories().values()) {
-            float randomRange = MathUtils.random(this.minGenRange, this.maxGenRange);
+            float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());
             float randomAngle = Util.randomAngle();
             float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
             float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
