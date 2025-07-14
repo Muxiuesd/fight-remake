@@ -70,8 +70,8 @@ public class KeyBindings {
         Fight.getId("key_chunk_boundary_display"), "key_chunk_boundary_display",
         KeyBinding.Type.Keyboard, Input.Keys.C
     ));
-    public static KeyBinding WallHitboxDisplay = InputBinding.registerBinding(new KeyBinding(
-        Fight.getId("key_wall_hitbox_display"), "key_wall_hitbox_display",
+    public static KeyBinding HitboxDisplay = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_hitbox_display"), "key_hitbox_display",
         KeyBinding.Type.Keyboard, Input.Keys.H
     ));
     public static KeyBinding PlayerPositionPrint = InputBinding.registerBinding(new KeyBinding(

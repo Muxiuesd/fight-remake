@@ -1,5 +1,8 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
@@ -8,6 +11,8 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
+import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.RenderLayers;
@@ -34,8 +39,10 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
-public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRender */{
+public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender {
     public final String TAG = EntitySystem.class.getName();
+
+    private boolean renderHitbox = false;
 
     private final Array<Entity> _delayAdd = new Array<>();
     private final Array<Entity> _delayRemove = new Array<>();
@@ -44,7 +51,7 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
     private final Array<Entity> updatableEntity = new Array<>();
 
     //实体管理组map，每一种注册过的实体类型都有一个管理组，key为实体类型，value为该实体类型的持有数组
-    private final ConcurrentHashMap<EntityType<?>, Array<?>> entityTypes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<EntityType<? extends Entity>, Array<? extends Entity>> entityTypes = new ConcurrentHashMap<>();
 
     //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
     private final ConcurrentHashMap<RenderLayer, Array<Entity>> renderableEntities = new ConcurrentHashMap<>();
@@ -174,6 +181,8 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
 
     @Override
     public void update(float delta) {
+        if (KeyBindings.HitboxDisplay.wasJustPressed()) this.renderHitbox = !this.renderHitbox;
+
         if (!_delayRemove.isEmpty()) {
             for (Entity entity : this._delayRemove) {
                 _remove(entity);
@@ -301,30 +310,20 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
         entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
-    /*@Override
-    public void draw(Batch batch) {
-        for (Entity entity : this.drawableEntity) {
-            entity.draw(batch);
-        }
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        for (Entity entity : this.getEntities()) {
-            entity.renderShape(batch);
-        }
-    }
-
     @Override
     public void render (Batch batch, ShapeRenderer shapeRenderer) {
-        this.draw(batch);
         this.renderShape(shapeRenderer);
     }
 
     @Override
-    public int getRenderPriority () {
-        return 100;
-    }*/
+    public void renderShape (ShapeRenderer batch) {
+        if (this.renderHitbox) {
+            for (Entity entity : this.entities) {
+                Rectangle hitbox = entity.getHitbox();
+                batch.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+            }
+        }
+    }
 
     @Override
     public void dispose() {
@@ -391,5 +390,10 @@ public class EntitySystem extends WorldSystem/* implements IWorldGroundEntityRen
 
     public ConcurrentHashMap<RenderLayer, Array<Entity>> getRenderableEntities () {
         return this.renderableEntities;
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 10000;
     }
 }

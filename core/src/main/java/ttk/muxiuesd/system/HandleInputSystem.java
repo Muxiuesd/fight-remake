@@ -73,7 +73,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
         if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
             cs.chunkEdgeRender = !cs.chunkEdgeRender;
         }
-        if (KeyBindings.WallHitboxDisplay.wasJustPressed()) {
+        if (KeyBindings.HitboxDisplay.wasJustPressed()) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
 

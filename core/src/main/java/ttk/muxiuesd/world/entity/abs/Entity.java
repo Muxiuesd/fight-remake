@@ -186,6 +186,15 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this;
     }
 
+    public Rectangle getHitbox() {
+        return this.hitbox;
+    }
+
+    public Entity setHitbox (Rectangle hitbox) {
+        this.hitbox = hitbox;
+        return this;
+    }
+
     public Entity setEntitySystem(EntitySystem es) {
         this.es = es;
         return this;
