@@ -17,9 +17,7 @@ public final class Items {
     }
 
     //常规物品
-    public static final Item TEST_ITEM = register("test_item", IronSword::new);
     public static final Item STICK = register("stick", ItemStick::new);
-    public static final Item TEST_WEAPON = register("test_weapon", WeaponDiamondSword::new);
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new);
     public static final Item BAIT = register("bait", ItemBait::new);
     public static final Item FISH = register("fish", ItemFish::new);
@@ -27,6 +25,11 @@ public final class Items {
     public static final Item RUBBISH = register("rubbish");
     public static final Item COAL = register("coal");
     public static final Item SLIME_BALL = register("slime_ball");
+
+    //武器类的物品
+    public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
+    public static final Item TEST_WEAPON = register("test_weapon", WeaponDiamondSword::new);
+    public static final Item TORCH = register("torch", ItemTorch::new);
 
     //方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);

@@ -168,11 +168,6 @@ public class ItemFishPole extends Item {
         hook.isReturning = true;
         hook.setOnGround(false);
         hook.setSpeed(this.pullSpeed);
-        /*this.hook.isReturning = true;
-        this.hook.setOnGround(false);
-        this.hook.setSpeed(this.pullSpeed);*/
-        //抛竿标记变为false在鱼钩逻辑里
-        //this.isCasting = false;
     }
 
     @Override
@@ -214,10 +209,6 @@ public class ItemFishPole extends Item {
 
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
-        /*TextureRegion renderTexture = this.texture;
-        if (this.isCasting) {
-            renderTexture = this.castTexture;
-        }*/
         if (this.texture != null) {
             batch.draw(this.texture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
                 itemEntity.originX, itemEntity.originY,
