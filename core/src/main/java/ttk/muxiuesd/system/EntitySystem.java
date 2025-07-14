@@ -247,14 +247,15 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     itemEntity.setLivingTime(0);
                 }
                 //捡起失败则什么也没发生
+                itemEntity.setVelocity(0, 0);
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PICKUP_RANGE) {
-                //在捡起范围内，让物品实体朝向玩家运动
+            if (distance <= Fight.PICKUP_RANGE && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+                //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
                 itemEntity.setVelocity(direction);
-                itemEntity.setSpeed(16f);
+                itemEntity.setSpeed(7.7f);
             }
         }
 

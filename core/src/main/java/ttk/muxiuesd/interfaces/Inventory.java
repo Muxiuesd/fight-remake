@@ -2,8 +2,6 @@ package ttk.muxiuesd.interfaces;
 
 import ttk.muxiuesd.world.item.ItemStack;
 
-import java.util.Objects;
-
 /**
  * 容器接口
  * */
@@ -70,7 +68,7 @@ public interface Inventory {
             ItemStack stack = this.getItemStack(index);
             //还有空位说明没装满
             if (stack == null) return false;
-            if (Objects.equals(itemStack.getItem().getID(), stack.getItem().getID())
+            if (stack.getItem() == itemStack.getItem()
                 && stack.getAmount() < stack.getProperty().getMaxCount()) {
                 //如果有相同的物品堆叠并且容器里的物品堆叠数量并没有达到最大值，也不算满
                 return false;
