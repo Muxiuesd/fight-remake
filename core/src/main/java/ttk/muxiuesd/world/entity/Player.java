@@ -4,9 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
@@ -95,28 +93,15 @@ public class Player extends LivingEntity {
 
     @Override
     public ItemEntity dropItem (int index, int amount) {
-        ItemStack itemStack = getBackpack().dropItem(index, amount);
-        if (itemStack == null) return null;
-
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), getEntitySystem());
-        itemEntity.setItemStack(itemStack);
-        itemEntity.setPosition(getPosition());
-        itemEntity.setVelocity(Util.getDirection());
-        itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
-        itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.3f).setTask(() -> {
-            Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
-            itemEntity.setOnAirTimer(null);
-        }));
-
-        //HandleInputSystem his = (HandleInputSystem) getEntitySystem().getWorld().getSystemManager().getSystem("HandleInputSystem");
-        Vector2 mwp = Util.getMouseWorldPosition();
-        float distance = Util.getDistance(x, y, mwp.x, mwp.y);
-        float v = Math.min(distance, 4f);
-        itemEntity.setSpeed(v);
-        itemEntity.setCurSpeed(v);
-
-        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+        ItemEntity itemEntity = super.dropItem(index, amount);
+        if (itemEntity != null) {
+            Vector2 mwp = Util.getMouseWorldPosition();
+            float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+            float v = Math.min(distance, 4f);
+            itemEntity.setSpeed(v);
+            itemEntity.setCurSpeed(v);
+            itemEntity.setVelocity(getDirection());
+        }
 
         return itemEntity;
     }

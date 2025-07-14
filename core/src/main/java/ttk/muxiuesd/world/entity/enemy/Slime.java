@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.entity.enemy;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
@@ -19,7 +20,6 @@ public class Slime extends Enemy {
     public Slime () {
         this(1);
     }
-
     public Slime(int generation) {
         super(10f, 10f, 16f, 16f, 1f, 1.2f);
         this.generation = generation;
@@ -46,5 +46,10 @@ public class Slime extends Enemy {
         bullet.setDirection(direction.getxDirection(), direction.getyDirection());
         bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
         return bullet;
+    }
+
+    @Override
+    public void drawHandItem (Batch batch) {
+        //不绘制手持的物品
     }
 }

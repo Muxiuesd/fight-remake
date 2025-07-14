@@ -64,10 +64,9 @@ public class PufferFish extends LivingEntity {
             //有timer就是在进行随机游走
             this.randomWalkTimer.update(delta);
             if (!this.randomWalkTimer.isReady()) {
-                setPosition(getPosition().add(
-                    this.walkDistance.x * delta * speed,
-                    this.walkDistance.y * delta * speed)
-                );
+                //设置速度
+                setVelocity(this.walkDistance.x * delta * speed, walkDistance.y * delta * speed);
+                setPosition(getPosition().add(velX, velY));
             }
         }
         if (this.restTimer != null) {

@@ -40,7 +40,6 @@ public abstract class Enemy extends LivingEntity {
 
     @Override
     public void update (float delta) {
-        //this.attackTimer.update(delta);
         //先更新目标
         this.updateTarget(delta, getEntitySystem());
         //更新位置
@@ -59,8 +58,9 @@ public abstract class Enemy extends LivingEntity {
         Entity target = getCurTarget();
         if (target != null) {
             Direction direction = new Direction(target.x - x, target.y - y);
-            this.x += direction.getxDirection() * curSpeed * delta;
-            this.y += direction.getyDirection() * curSpeed * delta;
+            setVelocity(direction.getxDirection() * curSpeed * delta, direction.getyDirection() * curSpeed * delta);
+            this.x += velX;
+            this.y += velY;
         }
         //TODO 敌人没有目标时随意游走
     }

@@ -13,6 +13,7 @@ public class EventPlayerDead extends PlayerDeathEvent {
 
     @Override
     public void handle (World world, Player player) {
+        player.onDeath(world);
         Log.print(TAG, "位于世界："+ world +" 的玩家" + player + "死亡");
     }
 

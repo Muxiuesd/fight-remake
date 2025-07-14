@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Pools;
@@ -83,7 +84,13 @@ public abstract class LivingEntity extends Entity {
             // 还原batch
             batch.setColor(255, 255, 255, 255);
         }
+        this.drawHandItem(batch);
+    }
 
+    /**
+     * 手上持有的物品绘制
+     * */
+    public void drawHandItem (Batch batch) {
         //如果手上有物品，则绘制手上的物品
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
@@ -118,13 +125,20 @@ public abstract class LivingEntity extends Entity {
     public ItemEntity dropItem (int index, int amount) {
         ItemStack itemStack = this.backpack.dropItem(index, amount);
         if (itemStack == null) return null;
+
         //简单的生成一个物品实体而已
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY.getID(), getEntitySystem());
-        itemEntity.setPosition(getPosition());
+        itemEntity.setPosition(getCenter());
         itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
+        itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
+            .setTask(() -> {
+                Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
+                itemEntity.setOnAirTimer(null);
+        }));
         itemEntity.setItemStack(itemStack);
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
+
+        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
 
         return itemEntity;
     }
@@ -163,13 +177,23 @@ public abstract class LivingEntity extends Entity {
      * 活物实体死亡执行
      * */
     public void onDeath (World world) {
+        //死亡默认掉落所有物品
         Backpack bp = this.getBackpack();
         for (int i = 0; i < bp.getSize(); i++) {
             ItemStack itemStack = bp.getItemStack(i);
             if (itemStack == null) continue;
 
-            this.dropItem(i, itemStack.getAmount())
-                .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+            //赋予随机方向的速度
+            float radian = MathUtils.random() * MathUtils.PI2;
+            float speed = MathUtils.random(1.3f, 2f);
+            float velX = MathUtils.cos(radian);
+            float velY = MathUtils.sin(radian);
+
+            ItemEntity itemEntity = this.dropItem(i, itemStack.getAmount());
+            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+            itemEntity.setSpeed(speed);
+            itemEntity.setCurSpeed(speed);
+            itemEntity.setVelocity(velX, velY);
         }
     }
 
