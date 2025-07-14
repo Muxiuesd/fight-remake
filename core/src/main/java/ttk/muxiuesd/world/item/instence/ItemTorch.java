@@ -17,6 +17,8 @@ import ttk.muxiuesd.world.light.PointLight;
  * 火把物品
  * */
 public class ItemTorch extends Sword {
+    private final Color color = new Color(0.88f, 0.7f, 0.0f, 0.3f);
+
     public ItemTorch () {
         super(createDefaultProperty()
                 .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2f)
@@ -28,20 +30,19 @@ public class ItemTorch extends Sword {
     @Override
     public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
         super.drawOnHand(batch, holder, itemStack);
-
+        //计算光源的正确位置
         Vector2 holderCenter = holder.getCenter();
         Direction direction = holder.getDirection();
-        float deg = direction.angleDeg();
-        float xOffset = holder.getWidth() * 1.114f * MathUtils.cosDeg(deg);
-        float yOffset = holder.getHeight()* 1.114f * MathUtils.sinDeg(deg);
-
+        float deg = direction.angleDeg() + holder.getSwingHandDegreeOffset();
+        float xOffset = holder.getWidth() * 1.014f * MathUtils.cosDeg(deg);
+        float yOffset = holder.getHeight()* 1.014f * MathUtils.sinDeg(deg);
 
         World world = holder.getEntitySystem().getWorld();
         LightSystem lightSystem = (LightSystem) world.getSystemManager().getSystem("LightSystem");
         PointLight light = new PointLight(
             new Vector2(holderCenter).add(xOffset, yOffset),
-            new Color(0.88f, 0.7f, 0.0f, 0.5f),
-            1f
+            this.color,
+            3f
         );
         lightSystem.useLight(light);
     }
