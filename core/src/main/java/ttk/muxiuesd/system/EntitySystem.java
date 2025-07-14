@@ -321,6 +321,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             for (Entity entity : this.entities) {
                 Rectangle hitbox = entity.getHitbox();
                 batch.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+                Vector2 entityCenter = entity.getCenter();
+                if (entity instanceof LivingEntity livingEntity) {
+                    batch.line(entityCenter, new Vector2(entityCenter).add(livingEntity.getDirection().scl(1)));
+                }else {
+                    batch.line(entityCenter, new Vector2(entityCenter).add(entity.getVelocity().scl(1)));
+                }
             }
         }
     }
