@@ -31,7 +31,7 @@ public class Player extends LivingEntity {
 
     public Player(float maxHealth, float curHealth) {
         initialize(Group.player, maxHealth, curHealth, 16);
-
+        renderHandItem = true;
         speed = 8;
         curSpeed = speed;
         bodyTexture = getTextureRegion(Fight.getId("player"), "player/player.png");

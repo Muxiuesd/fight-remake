@@ -36,6 +36,7 @@ public abstract class LivingEntity extends Entity {
     private boolean attacked;   //是否收到攻击的状态
     private TaskTimer attackedTimer;    //被攻击状态持续的计时器
     public Backpack backpack;   //储存物品的背包
+    public boolean renderHandItem = false;  //是否渲染手部持有的物品（有的实体没有手，持有物品不用渲染出来）
     private int handIndex;  //手部物品索引
     private TaskTimer swingHandTimer;
     private float maxSwingHandDegree;
@@ -84,7 +85,7 @@ public abstract class LivingEntity extends Entity {
             // 还原batch
             batch.setColor(255, 255, 255, 255);
         }
-        this.drawHandItem(batch);
+        if (this.renderHandItem) this.drawHandItem(batch);
     }
 
     /**
@@ -100,6 +101,13 @@ public abstract class LivingEntity extends Entity {
 
     @Override
     public void renderShape (ShapeRenderer batch) {
+        if (this.renderHandItem) this.renderShapeHandItem(batch);
+    }
+
+    /**
+     * 持有物品的形状渲染
+     * */
+    public void renderShapeHandItem (ShapeRenderer batch) {
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
             itemStack.renderShape(batch);
