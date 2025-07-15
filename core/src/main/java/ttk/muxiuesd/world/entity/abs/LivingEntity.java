@@ -136,7 +136,8 @@ public abstract class LivingEntity extends Entity {
 
         //简单的生成一个物品实体而已
         ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY.getID(), getEntitySystem());
-        itemEntity.setPosition(getCenter());
+        //使得物品中心与实体中心对齐
+        itemEntity.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)));
         itemEntity.setOnGround(false);
         itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
             .setTask(() -> {
