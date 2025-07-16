@@ -46,17 +46,20 @@ void main() {
     for (int i = 0; i < u_lighsize; i++) {
         vec2 lightPos = u_light[i].xy;
         float lightIntensity = u_light[i].z;  // 光源强度
-
         //计算片段到光源的距离
         float distance = distance(v_position2d, lightPos);
-        float attenuation = 1.0 / (1.0 + 10.0* distance*distance);  // 衰减因子
+        float attenuation = 1.0 / (1.0 +5*pow(distance,3/2));  // 衰减因子
         //计算光照贡献
-        vec3 lightColor2 = u_lightColor[i].rgb * lightIntensity * attenuation;
+        vec3 lightColor2 = u_lightColor[i].rgb *initialTexColor.rgb* lightIntensity * attenuation;
         sumLightColor += lightColor2;
     }
 
     // 最终颜色混合
-    vec3 finalColor=clamp(texColor.rgb * lightColor * brightness+sumLightColor,vec3(0.0),initialTexColor.rgb+0.1*(sumLightColor));
+    //vec3 finalColor=clamp(texColor.rgb * lightColor * brightness+sumLightColor,vec3(0.0),initialTexColor.rgb/*+0.1*(sumLightColor)*/);
+    vec3 upper = initialTexColor.rgb;           // 天花板
+    vec3 lower = upper * 0.3;             // 开始减速点
+    vec3 ratio = smoothstep(lower, upper, texColor.rgb * lightColor * brightness+sumLightColor);   //平滑 0~1
+    vec3 finalColor  = mix(texColor.rgb * lightColor * brightness+sumLightColor, upper, ratio);          // 软上限
     finalColor=clamp(finalColor,0.0,1.0);//限制颜色在0~1之间，避免可能产生未定义行为
     fragColor = vec4(finalColor, texColor.a);
 }
