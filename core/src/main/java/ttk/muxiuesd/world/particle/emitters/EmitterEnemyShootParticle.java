@@ -24,7 +24,7 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
             protected ParticleSpell newObject () {
                 ParticleSpell spell = new ParticleSpell();
                 spell.init();
-                spell.getLight().setColor(new Color(0.9f, 0.1f, 0.3f, 1f));
+                spell.getLight().setColor(new Color(0.9f, 0.1f, 0.3f, 0.6f));
                 return spell;
             }
         });

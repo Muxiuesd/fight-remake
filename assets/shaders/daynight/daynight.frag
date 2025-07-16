@@ -48,7 +48,10 @@ void main() {
         float lightIntensity = u_light[i].z;  // 光源强度
         //计算片段到光源的距离
         float distance = distance(v_position2d, lightPos);
-        float attenuation = 1.0 / (1.0 +5*pow(distance,3/2));  // 衰减因子
+        float attenuation = 1.0 / (1.0 + 5 * pow(distance, 3/2));  // 衰减因子
+        if (attenuation < 0.001) {
+            attenuation = 0;
+        }
         //计算光照贡献
         vec3 lightColor2 = u_lightColor[i].rgb *initialTexColor.rgb* lightIntensity * attenuation;
         sumLightColor += lightColor2;

@@ -42,7 +42,7 @@ public class ItemTorch extends Sword {
         PointLight light = new PointLight(
             new Vector2(holderCenter).add(xOffset, yOffset),
             Color.WHITE,
-            5f
+            1f
         );
         lightSystem.useLight(light);
     }

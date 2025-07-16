@@ -21,8 +21,8 @@ public class EmitterFurnaceFire extends ParticleEmitter<ParticleFire> {
     private Color color;
 
     public EmitterFurnaceFire () {
-        this.color = new Color(0.8f, 0.2f, 0.2f, 0.3f);
-        setParticlePool(new ParticlePool<ParticleFire>(50) {
+        this.color = new Color(0.88f, 0.1f, 0.1f, 0.2f);
+        setParticlePool(new ParticlePool<>(50) {
             @Override
             protected ParticleFire newObject () {
                 ParticleFire particle = new ParticleFire(color, 0.2f);
