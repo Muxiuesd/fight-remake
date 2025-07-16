@@ -51,7 +51,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
             null/*null表示不立即上传数据,因为主要在draw()通过glBufferSubData更新数据*/,
             GL20.GL_DYNAMIC_DRAW/*表示数据需要频繁更新*/);
 
-        // 将创建UBO 绑定到绑定点 0,和前面"LightBlock"的相同，GPU早到的就是这个已经创建好了的ubo
+        // 将创建UBO 绑定到绑定点 0,和前面"LightBlock"的相同，GPU找到的就是这个已经创建好了的ubo
         Gdx.gl30.glBindBufferBase(GL30.GL_UNIFORM_BUFFER, 0, uboId);
 
         Gdx.gl30.glBindBuffer(GL30.GL_UNIFORM_BUFFER, 0);//解除绑定当前ubo，以免其它东西受影响
@@ -105,7 +105,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
     }
 
     /**
-     * 收集所有的发光例子的数据
+     * 收集所有的发光粒子的数据
      * */
     public void useLight (Array<? extends Particle> particleArray) {
         for (Particle particle:particleArray) {

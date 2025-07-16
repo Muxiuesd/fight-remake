@@ -41,8 +41,8 @@ public class ItemTorch extends Sword {
         LightSystem lightSystem = (LightSystem) world.getSystemManager().getSystem("LightSystem");
         PointLight light = new PointLight(
             new Vector2(holderCenter).add(xOffset, yOffset),
-            this.color,
-            3f
+            Color.WHITE,
+            5f
         );
         lightSystem.useLight(light);
     }
