@@ -3,11 +3,11 @@ package ttk.muxiuesd.world.event;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.abs.BulletShootEvent;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -17,7 +17,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 public class EventPlayerShootBullet extends BulletShootEvent {
     @Override
     public void handle (World world, Entity shooter, Bullet bullet) {
-        if (shooter.group == Group.player) {
+        if (shooter.getType() == EntityTypes.PLAYER) {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()
                 .getSystem("SoundEffectSystem");

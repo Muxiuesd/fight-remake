@@ -9,7 +9,6 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
-import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
 import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
 import ttk.muxiuesd.key.KeyBindings;
@@ -212,7 +211,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     private void updateLivingEntity(LivingEntity livingEntity, float delta) {
         //移除死亡的实体,玩家死亡移除不在这个逻辑里
         if (livingEntity.isDeath()) {
-            this.callEntityDeadEvent(livingEntity);
+            EventBus.post(EventTypes.ENTITY_DEATH, new EventPosterEntityDeath(getWorld(), livingEntity));
             this.remove(livingEntity);
         }
     }
@@ -331,17 +330,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         for (Entity entity : this.getEntities()) {
             entity.dispose();
         }
-    }
-
-    /**
-     * 调用事件
-     * */
-    public void callBulletShootEvent (Entity shooter, Bullet bullet) {
-        EventBus.post("BulletShoot", new EventPosterBulletShoot(getWorld(), shooter, bullet));
-    }
-
-    public void callEntityDeadEvent (LivingEntity deadEntity) {
-        EventBus.post(EventTypes.ENTITY_DEATH, new EventPosterEntityDeath(getWorld(), deadEntity));
     }
 
     public Player getPlayer() {

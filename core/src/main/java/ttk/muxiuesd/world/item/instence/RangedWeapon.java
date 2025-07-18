@@ -1,5 +1,8 @@
 package ttk.muxiuesd.world.item.instence;
 
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.EntityTypes;
@@ -46,6 +49,7 @@ public class RangedWeapon extends Weapon {
             EntitySystem entitySystem = user.getEntitySystem();
             entitySystem.add(bullet);
 
+            EventBus.post(EventTypes.BULLET_SHOOT, new EventPosterBulletShoot(world, user, bullet));
             return super.use(itemStack, world, user);
         }
         return false;

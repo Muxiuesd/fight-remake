@@ -1,6 +1,9 @@
 package ttk.muxiuesd.world.entity.abs;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.event.EventBus;
+import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
@@ -98,6 +101,7 @@ public abstract class Enemy extends LivingEntity {
         //在攻击范围之内且攻击间隔到了就要攻击
         Bullet bullet = this.createBullet(this, new Direction(target.x - x, target.y - y));
         getEntitySystem().add(bullet);
+        EventBus.post(EventTypes.BULLET_SHOOT, new EventPosterBulletShoot(es.getWorld(), this, bullet));
     }
 
     /**

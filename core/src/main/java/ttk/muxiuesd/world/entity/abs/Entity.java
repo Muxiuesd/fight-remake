@@ -17,7 +17,6 @@ import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.entity.EntityType;
-import ttk.muxiuesd.world.entity.Group;
 
 /**
  * 游戏的基础实体
@@ -27,7 +26,6 @@ import ttk.muxiuesd.world.entity.Group;
 public abstract class Entity implements ID<Entity>, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
 
-    public Group group;
     public float speed, curSpeed;
     public float x, y;
     public float velX, velY;
@@ -41,13 +39,6 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
     private EntitySystem es;    //此实体所属的实体系统
     private EntityType<?> type;
-
-    /**
-     * 延迟初始化
-     * */
-    public void initialize(Group group) {
-        this.group = group;
-    }
 
     /**
      * 延迟初始化
