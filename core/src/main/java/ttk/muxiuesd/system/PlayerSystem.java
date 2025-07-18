@@ -7,6 +7,7 @@ import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
+import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registry.Sounds;
@@ -16,7 +17,6 @@ import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.entity.EntitiesReg;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -38,7 +38,7 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        this.player = (Player) EntitiesReg.get("player");
+        this.player = (Player) Gets.ENTITY(Fight.getId("player"));
         this.playerLastPosition = this.player.getPosition();
         this.bubbleEmitTimer = new Timer(0.5f);
         Log.print(TAG, "PlayerSystem初始化完成！");
@@ -49,7 +49,6 @@ public class PlayerSystem extends WorldSystem {
         this.bubbleEmitTimer.update(delta);
 
         if (this.player.isDeath()) {
-            //EventBus.getInstance().callEvent(EventBus.EventType.PlayerDeath, getWorld(), player);
             EventBus.post(EventTypes.PLAYER_DEATH, new EventPosterPlayerDeath(getWorld(), this.player));
             this.remakePlayer();
             return;
@@ -89,13 +88,13 @@ public class PlayerSystem extends WorldSystem {
         es.remove(this.player);
 
         //生成新的玩家实体
-        this.player = (Player) EntitiesReg.get("player");
+        this.player = (Player) Gets.ENTITY(Fight.getId("player"));
         this.player.setEntitySystem(es);
         this.playerLastPosition = this.player.getPosition();
         es.add(player);
 
         //更新其他与玩家有关的配置
-        CameraFollowSystem cfs = (CameraFollowSystem)getManager().getSystem("CameraFollowSystem");
+        CameraFollowSystem cfs = (CameraFollowSystem) getManager().getSystem("CameraFollowSystem");
         cfs.setFollower(this.player);
 
         AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);

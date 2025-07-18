@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.enemy;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 
@@ -9,7 +10,7 @@ import ttk.muxiuesd.world.entity.abs.Enemy;
  * */
 public class EntityTarget extends Enemy {
     public EntityTarget () {
-        super(1000, 1000, 1, 1, 1, 0);
+        super(EntityTypes.ENEMY,1000, 1000, 1, 1, 1, 0);
         bodyTexture = getTextureRegion(Fight.getId("fish"), "fish/fish.png");
     }
 

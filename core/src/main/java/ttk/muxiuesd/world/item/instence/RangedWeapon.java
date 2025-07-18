@@ -2,10 +2,12 @@ package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -36,8 +38,11 @@ public class RangedWeapon extends Weapon {
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity user) {
         if (this.getFactory() != null) {
-            //生成子弹
-            Bullet bullet = this.factory.create(world, user, user.getDirection());
+            //生成子弹，子弹所属的实体类型为对应的实体附属的子弹类型
+            EntityType<?> entityType = user.getType().getChildType("bullet");
+            //防止null
+            if (entityType == null) entityType = EntityTypes.PLAYER;
+            Bullet bullet = this.factory.create(world, user, entityType, user.getDirection());
             EntitySystem entitySystem = user.getEntitySystem();
             entitySystem.add(bullet);
 

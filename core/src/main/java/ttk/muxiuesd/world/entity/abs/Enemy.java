@@ -7,7 +7,7 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
@@ -20,15 +20,15 @@ public abstract class Enemy extends LivingEntity {
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
 
-    public Enemy (String textureId, float maxHealth, float curHealth,
+    public Enemy (EntityType<? extends Enemy> entityType, String textureId, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
-        this(maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
+        this(entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
         this.loadBodyTextureRegion(textureId, null);
     }
 
-    public Enemy (float maxHealth, float curHealth,
+    public Enemy (EntityType<? extends Enemy> entityType, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
-        initialize(Group.enemy, maxHealth, curHealth);
+        initialize(entityType, maxHealth, curHealth);
 
         this.visionRange = visionRange;
         this.attackRange = attackRange;

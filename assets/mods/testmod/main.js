@@ -3,7 +3,7 @@ var namespace = "testmod";
 
 var fileLoader = File.getFileLoader(namespace);
 
-fileLoader.load(
+/*fileLoader.load(
     "testmod:grass",
     "assets/grass.png",
     Texture.class,
@@ -55,7 +55,7 @@ entityRegister.register("zombie", Entity.newSupplier(function () {
 
 entityRegister.register("bullet_sword", Entity.newSupplier(function () {
     return Entity.newBullet("testmod:sword",5.0, 10.5, 10.0, 0.0);
-}));
+}));*/
 
 /*World.event.add("entityAttacked", function (world, attackObject, victim) {
     Log.print(TAG, "攻击物：" + attackObject + "，受攻击者：" + victim);

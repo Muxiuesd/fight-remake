@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.bullet;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -10,8 +11,8 @@ public class BulletFire extends Bullet {
             1f, 15f, 3f, 0f);
     }
 
-    public BulletFire(Entity owner) {
-        super(owner);
+    public BulletFire(Entity owner, EntityType<?> type) {
+        super(owner, type);
 
         setSize(0.5f, 0.5f);
         damage = 1f;

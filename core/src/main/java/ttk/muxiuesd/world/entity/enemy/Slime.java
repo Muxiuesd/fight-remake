@@ -1,9 +1,9 @@
 package ttk.muxiuesd.world.entity.enemy;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
@@ -21,10 +21,11 @@ public class Slime extends Enemy {
         this(1);
     }
     public Slime(int generation) {
-        super(10f, 10f, 16f, 16f, 1f, 1.2f);
+        super(EntityTypes.ENEMY,10f, 10f, 16f, 16f, 1f, 1.2f);
         this.generation = generation;
         loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
         getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
+        renderHandItem = false;
     }
 
     @Override
@@ -38,6 +39,7 @@ public class Slime extends Enemy {
     @Override
     public Bullet createBullet (Entity owner, Direction direction) {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
+        bullet.setType(EntityTypes.ENEMY_BULLET);
         bullet.setOwner(owner);
         bullet.setSize(
             (float) (bullet.width * Math.pow(this.factor, this.generation)),
@@ -46,10 +48,5 @@ public class Slime extends Enemy {
         bullet.setDirection(direction.getxDirection(), direction.getyDirection());
         bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
         return bullet;
-    }
-
-    @Override
-    public void drawHandItem (Batch batch) {
-        //不绘制手持的物品
     }
 }

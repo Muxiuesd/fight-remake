@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -30,7 +30,7 @@ public class Player extends LivingEntity {
     }
 
     public Player(float maxHealth, float curHealth) {
-        initialize(Group.player, maxHealth, curHealth, 16);
+        initialize(EntityTypes.PLAYER, maxHealth, curHealth, 16);
         renderHandItem = true;
         speed = 8;
         curSpeed = speed;
@@ -131,7 +131,7 @@ public class Player extends LivingEntity {
 
         // 左键发射攻击性子弹
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            Bullet bullet = EntityFactory.createFireBullet(this, Util.getDirection());
+            //Bullet bullet = EntityFactory.createFireBullet(this, Util.getDirection());
         }
         //玩家右键防御
         if (KeyBindings.PlayerShield.wasJustPressed()) {

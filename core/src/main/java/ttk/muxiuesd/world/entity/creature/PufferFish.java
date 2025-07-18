@@ -3,16 +3,12 @@ package ttk.muxiuesd.world.entity.creature;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.Items;
-import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.registry.RenderLayers;
+import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -30,7 +26,7 @@ public class PufferFish extends LivingEntity {
     private Runnable restTimerEndTask;  //休息状态结束后任务
 
     public PufferFish() {
-        initialize(Group.creature, 5, 5, 1);
+        initialize(EntityTypes.CREATURE, 5, 5, 1);
         loadBodyTextureRegion(Fight.getId("puffer_fish"), "fish/puffer_fish.png");
         setSize(DEFAULT_SIZE);
         setSpeed(1f);

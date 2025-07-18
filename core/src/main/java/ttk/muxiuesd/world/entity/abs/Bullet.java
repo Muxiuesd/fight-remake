@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.world.entity.EntityType;
 
 /**
  * 子弹
@@ -14,12 +15,10 @@ public abstract class Bullet extends Entity {
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
 
-    public Bullet () {
-    }
-
-    public Bullet(Entity owner) {
+    public Bullet () {}
+    public Bullet (Entity owner, EntityType<?> entityType) {
+        initialize(entityType);
         this.owner = owner;
-        initialize(owner.group);
     }
 
     public Bullet (String textureId, float damage, float speed, float maxLiveTime, float initLiveTime) {
@@ -55,7 +54,7 @@ public abstract class Bullet extends Entity {
     }
 
     public Entity getOwner () {
-        return owner;
+        return this.owner;
     }
 
     /**
@@ -63,7 +62,6 @@ public abstract class Bullet extends Entity {
      * */
     public Bullet setOwner (Entity owner) {
         this.owner = owner;
-        group = owner.group;
         return this;
     }
 

@@ -24,7 +24,6 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.EntityType;
-import ttk.muxiuesd.world.entity.Group;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -50,8 +49,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     private final Array<Entity> entities = new Array<>();   //所有实体
     private final Array<Entity> updatableEntity = new Array<>();
 
-    //实体管理组map，每一种注册过的实体类型都有一个管理组，key为实体类型，value为该实体类型的持有数组
-    private final ConcurrentHashMap<EntityType<? extends Entity>, Array<? extends Entity>> entityTypes = new ConcurrentHashMap<>();
+    //实体管理组map，每一种注册过的实体类型都有一个管理组，key为实体类型，value为该实体类型的持有实体管理数组
+    private final ConcurrentHashMap<EntityType<?>, Array<? extends Entity>> entityTypes = new ConcurrentHashMap<>();
 
     //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
     private final ConcurrentHashMap<RenderLayer, Array<Entity>> renderableEntities = new ConcurrentHashMap<>();
@@ -70,7 +69,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
-        this.add(EntityTypes.PLAYER, player);
+        this.add(player);
 
         this.renderableEntities.put(RenderLayers.ENTITY_UNDERGROUND, new Array<>());
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
@@ -79,24 +78,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     }
 
     /**
-     * 将实体加进对应的管理组，因为一种实体可以隶属于不同的管理组进而有不同的行为
+     * 添加实体
      * */
-    public <T extends Entity> void add (EntityType<T> type, T entity) {
-        this.add(entity);
-        //避免重复添加
-        if (!this.getEntityArray(type).contains(entity, true)) this.getEntityArray(type).add(entity);
-    }
-
-    public <T extends Entity> void remove (EntityType<T> type, T entity) {
-        this.remove(entity);
-        //避免重复移除
-        if (this.getEntityArray(type).contains(entity, true)) this.getEntityArray(type).removeValue(entity, true);
-    }
-
-    /**
-     * 简单的添加实体
-     * */
-    public void add (Entity entity) {
+    public <T extends Entity> void add (T entity) {
         //防止重复添加
         if (this._delayAdd.contains(entity, true) || this.entities.contains(entity, true)) return;
 
@@ -104,20 +88,21 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     }
 
     /**
-     * 简单的移除实体
+     * 移除实体
      * */
-    public void remove (Entity entity) {
-        this._delayRemove.add(entity);
+    public <T extends Entity> void remove (T entity) {
+        if (this.entities.contains(entity, true)) {
+            this._delayRemove.add(entity);
+        }
     }
 
     /**
      * 延迟添加实体防止并发修改异常
-     *
      * @param entity 实体
      */
-    private void _add (Entity entity) {
+    private <T extends Entity> void _add (T entity) {
         //优先进行实体组类型判断
-        if (entity.group == Group.player) {
+        /*if (entity.group == Group.player) {
             //玩家组
             if (entity instanceof Bullet bullet) {
                 //玩家的子弹
@@ -136,8 +121,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
         } else if (entity instanceof ItemEntity itemEntity) {
             this.addEntity(EntityTypes.ITEM_ENTITY, itemEntity);
-        }
+        }*/
 
+        Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
+        if (! entityArray.contains(entity, true)) {
+            //避免重复添加
+            entityArray.add(entity);
+        }
         this.entities.add(entity);
         this.updatableEntity.add(entity);
         //把实体添加进相应的渲染层级
@@ -147,12 +137,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     /**
      * 延迟移除实体防止并发修改异常
-     *
      * @param entity 实体
      */
-    private void _remove (Entity entity) {
+    private <T extends Entity> void _remove (T entity) {
         //优先进行实体组类型判断
-        if (entity.group == Group.enemy) {
+        /*if (entity.group == Group.enemy) {
             //绝大部分移除调用都是敌人相关的子弹实体
             if (entity instanceof Bullet bullet) {
                 //大部分是子弹
@@ -171,8 +160,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         } else if (entity instanceof ItemEntity itemEntity) {
             //剩下就是物品实体
             this.removeEntity(EntityTypes.ITEM_ENTITY, itemEntity);
-        }
+        }*/
 
+        Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
+        if (entityArray.contains(entity, true)) {
+            //避免重复移除
+            entityArray.removeValue(entity, true);
+        }
         this.entities.removeValue(entity, true);
         this.updatableEntity.removeValue(entity, true);
         //把实体移除出渲染层级
@@ -360,20 +354,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     public Array<Entity> getEntities () {
         return this.entities;
-    }
-
-    /**
-     * 把实体加进对应的实体类型管理组里面
-     * */
-    private <T extends Entity> void addEntity (EntityType<T> type, T entity) {
-        this.getEntityArray(type).add(entity);
-    }
-
-    /**
-     * 把实体从对应的实体类型管理组里面移除
-     * */
-    private <T extends Entity> void removeEntity (EntityType<T> type, T entity) {
-        this.getEntityArray(type).removeValue(entity, true);
     }
 
     /**

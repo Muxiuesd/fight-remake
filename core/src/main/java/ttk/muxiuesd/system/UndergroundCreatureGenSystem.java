@@ -70,7 +70,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
             for (LivingEntity e : entities) {
                 if (e == null) continue;
                 e.setEntitySystem(getEntitySystem());
-                getEntitySystem().add(EntityTypes.CREATURE, e);
+                getEntitySystem().add(e);
             }
         }
     }

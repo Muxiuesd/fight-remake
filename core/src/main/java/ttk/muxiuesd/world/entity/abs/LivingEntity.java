@@ -13,7 +13,7 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.ItemPickUpState;
@@ -42,16 +42,15 @@ public abstract class LivingEntity extends Entity {
     private float maxSwingHandDegree;
 
 
-    public void initialize (Group group, float maxHealth, float curHealth) {
-        initialize(group, maxHealth, curHealth, 16);
+    public void initialize (EntityType<? extends LivingEntity> entityType, float maxHealth, float curHealth) {
+        initialize(entityType, maxHealth, curHealth, 16);
     }
-    public void initialize (Group group, float maxHealth, float curHealth, int backpackSize) {
-        super.initialize(group);
+    public void initialize (EntityType<? extends LivingEntity> entityType, float maxHealth, float curHealth, int backpackSize) {
+        super.initialize(entityType);
         setSize(DEFAULT_SIZE);
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
         this.attacked = false;
-        //this.attackedTimer = new TaskTimer(ATTACK_SPAN, 0f, () -> this.attacked = false);
         this.attackedTimer = Pools.TASK_TIMER.obtain()
             .setMaxSpan(ATTACK_SPAN)
             .setCurSpan(0)

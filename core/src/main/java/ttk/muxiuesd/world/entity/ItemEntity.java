@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -22,7 +23,7 @@ public class ItemEntity extends Entity {
 
 
     public ItemEntity () {
-        initialize(Group.item);
+        initialize(EntityTypes.ITEM_ENTITY);
         this.positionOffset = new Vector2();
         setSize(DEFAULT_SIZE);
     }
