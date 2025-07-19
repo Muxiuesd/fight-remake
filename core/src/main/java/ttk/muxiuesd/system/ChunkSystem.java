@@ -550,6 +550,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.getChunkGenerator().generate(new ChunkPosition(chunkX, chunkY));
     }
 
+    public Block getBlock (Vector2 position) {
+        return this.getBlock(position.x, position.y);
+    }
     /**
      * 获取世界坐标上对应的方块
      *
