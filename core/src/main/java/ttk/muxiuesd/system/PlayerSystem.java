@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.EventBus;
@@ -10,13 +11,18 @@ import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
+import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -70,6 +76,8 @@ public class PlayerSystem extends WorldSystem {
                 this.player.getSize().scl(0.2f), this.player.getSize().scl(0.05f),
                 this.player.getScale(), MathUtils.random(0, 360), 2f);
         }
+
+        //this.test();
     }
 
     public void setItemStack (int index, String itemId) {
@@ -117,5 +125,20 @@ public class PlayerSystem extends WorldSystem {
         boolean result = !lp.equals(np);
         if (result) this.playerLastPosition = np;
         return result;
+    }
+
+    private void test () {
+        Registries.ITEM.getMap().values().forEach(item -> {
+            ItemStack itemStack = new ItemStack(item);
+            ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, this.getPlayer().getEntitySystem());
+            itemEntity.setItemStack(itemStack);
+            Direction direction = this.player.getDirection();
+            itemEntity.setVelocity(direction.scl(MathUtils.random(0.7f, 1.2f)));
+            itemEntity.setSpeed(3f);
+            itemEntity.setPosition(this.player.getCenter());
+        });
+
+        Array<ItemEntity> entityArray = this.getPlayer().getEntitySystem().getEntityArray(EntityTypes.ITEM_ENTITY);
+        System.out.println(entityArray.size);
     }
 }
