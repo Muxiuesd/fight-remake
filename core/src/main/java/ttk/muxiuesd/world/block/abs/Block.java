@@ -27,6 +27,14 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
 
     public static final float BlockWidth = 1f, BlockHeight = 1f;
 
+    /**
+     * 生成默认的属性
+     * */
+    public static Property createProperty() {
+        return new Property();
+    }
+
+
     private String id;
     public TextureRegion textureRegion;
 
@@ -37,11 +45,13 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
 
     private Property property;
 
+    public Block(Property property) {
+        this.setProperty(property);
+    }
     public Block (Property property, String textureId) {
         this.setProperty(property);
         this.textureRegion = this.loadTextureRegion(textureId);
     }
-
     public Block(Property property, String textureId, String texturePath) {
         this.setProperty(property);
         this.textureRegion = this.loadTextureRegion(textureId, texturePath);
@@ -135,10 +145,7 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
      * 使用构建者模式
      * */
     public static class Property {
-
-
         private PropertiesDataMap<?> propertiesDataMap;
-
 
         public Property() {
             this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();

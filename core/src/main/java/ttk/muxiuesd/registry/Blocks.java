@@ -12,6 +12,7 @@ public final class Blocks {
     public static void init () {
     }
     //普通方块
+    public static final Block ARI = register("air", BlockAir::new);
     public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
     public static final Block GRASS = register("grass", BlockGrass::new);
     public static final Block STONE = register("stone", BlockStone::new);

@@ -20,6 +20,8 @@ import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
 import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
@@ -29,7 +31,9 @@ import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -64,7 +68,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
-        //Log.print(TAG, "鼠标指向世界的方块坐标: (" + this.mouseBlockPosition.getX() + ", " + this.mouseBlockPosition.getY() + ")");
         if (KeyBindings.ExitGame.wasPressed()) {
             Log.print(TAG, "游戏退出！");
             Gdx.app.exit();
@@ -124,7 +127,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
             JsonValue values = dataReader.readObj(PropertyTypes.CAT.getName());
             mouseBlock.readCAT(values);
 
-            if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
+            if (mouseBlock instanceof BlockWithEntity<?, ?> blockWithEntity) {
 
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
                 //计算交互区域网格坐标
@@ -147,6 +150,17 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
                     }
                     //TODO 手持物品交互事件
                 }
+            }else {
+                //空手右键破坏方块
+                if (handItemStack == null && mouseBlock != Blocks.ARI) {
+                    Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
+                    ItemEntity itemEntity = ItemEntityGenFactory.create(
+                        player.getEntitySystem(),
+                        mouseWorldPosition,
+                        new ItemStack(Gets.ITEM(replacedBlock.getID()), 1)
+                    );
+                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+                }
             }
         }
     }
@@ -168,7 +182,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
 
     @Override
     public boolean keyUp (int keycode) {
-        //EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
         EventBus.post(EventTypes.WORLD_KEY_INPUT, new EventPosterWorldKeyInput(getWorld(), keycode));
         return false;
     }
@@ -241,16 +254,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
     }
 
     /**
-     * 获取鼠标指向的世界坐标
-     * */
-    /*public Vector2 getMouseWorldPosition() {
-        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
-    }*/
-
-    /**
      * 绘制方块选中框
      */
     private void renderBlockCheckBox (ShapeRenderer batch) {
@@ -265,8 +268,6 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
             batch.setColor(Color.WHITE);
         }
     }
-
-
 
     @Override
     public int getRenderPriority () {

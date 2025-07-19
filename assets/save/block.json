@@ -1,6 +1,6 @@
 {
 "cat": {
-	"id": "fight:furnace",
+	"id": "fight:coal_ore",
 	"width": 1,
 	"height": 1,
 	"originX": 0,
@@ -9,7 +9,7 @@
 	"scaleY": 1,
 	"rotation": 0
 },
-"block_friction": 0.5,
+"block_friction": 1,
 "block_sounds": {
 	"WALK": "fight:stone_walk",
 	"PUT": "fight:stone_put",
