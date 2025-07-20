@@ -63,11 +63,11 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
             float randomAngle = Util.randomAngle();
             float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
             float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
-            LivingEntity[] entities = factory.create(getWorld(), genX, genY);
+            LivingEntity<?>[] entities = factory.create(getWorld(), genX, genY);
             //啥也没有生成就直接跳过
             if (entities == null) continue;
             //防止没添加进实体系统，统一执行一遍。一般来说工厂里只管生成，不管添加最好
-            for (LivingEntity e : entities) {
+            for (LivingEntity<?> e : entities) {
                 if (e == null) continue;
                 e.setEntitySystem(getEntitySystem());
                 getEntitySystem().add(e);

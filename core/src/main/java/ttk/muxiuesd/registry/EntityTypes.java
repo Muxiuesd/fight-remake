@@ -23,11 +23,11 @@ public final class EntityTypes {
     public static final EntityType<Bullet> PLAYER_BULLET = register("player_bullet",
         PLAYER.addChildType("bullet", new EntityType<Bullet>()));
 
-    public static final EntityType<Enemy> ENEMY = register("enemy", new EntityType<Enemy>());
+    public static final EntityType<Enemy<?>> ENEMY = register("enemy", new EntityType<Enemy<?>>());
     public static final EntityType<Bullet> ENEMY_BULLET = register("enemy_bullet",
         ENEMY.addChildType("bullet", new EntityType<Bullet>()));
 
-    public static final EntityType<LivingEntity> CREATURE = register("creature", new EntityType<LivingEntity>());
+    public static final EntityType<LivingEntity<?>> CREATURE = register("creature", new EntityType<LivingEntity<?>>());
     public static final EntityType<ItemEntity> ITEM_ENTITY = register("item_entity", new EntityType<ItemEntity>());
 
     public static <T extends Entity> EntityType<T> register (String name, EntityType<T> entityType) {

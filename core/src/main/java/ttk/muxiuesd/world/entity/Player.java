@@ -18,7 +18,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 玩家
  */
-public class Player extends LivingEntity {
+public class Player extends LivingEntity<Player> {
     public TextureRegion shield;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器

@@ -1,6 +1,6 @@
 {
 "cat": {
-	"id": "fight:air",
+	"id": "fight:grass",
 	"width": 1,
 	"height": 1,
 	"originX": 0,
@@ -11,8 +11,8 @@
 },
 "block_friction": 1,
 "block_sounds": {
-	"WALK": "fight:stone_walk",
-	"PUT": "fight:stone_put",
-	"DESTROY": "fight:stone_destroy"
+	"WALK": "fight:grass_walk",
+	"PUT": "fight:grass_put",
+	"DESTROY": "fight:grass_destroy"
 }
 }

@@ -53,7 +53,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * TODO 不同类型的物品不同的绘制方式
      * */
     @Override
-    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
+    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
 
         Direction direction = holder.getDirection();
         float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
@@ -97,7 +97,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * 使用此物品
      * @return 是否使用成功
      * */
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放物品使用音效
         String useSoundId = this.property.getUseSoundId();
         SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
@@ -109,13 +109,13 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     /**
      * 物品被放下来（从手持变成非手持）
      * */
-    public void putDown (ItemStack itemStack, World world, LivingEntity holder) {
+    public void putDown (ItemStack itemStack, World world, LivingEntity<?> holder) {
     }
 
     /**
      * 当物品被丢弃的时候的行为
      * */
-    public void beDropped (ItemStack itemStack, World world, LivingEntity dropper) {
+    public void beDropped (ItemStack itemStack, World world, LivingEntity<?> dropper) {
     }
 
     /**

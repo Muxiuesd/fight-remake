@@ -351,7 +351,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return (Array<T>) this.entityTypes.get(type);
     }
 
-    public Array<Enemy> getEnemyEntity () {
+    public Array<Enemy<?>> getEnemyEntity () {
         return this.getEntityArray(EntityTypes.ENEMY);
     }
 

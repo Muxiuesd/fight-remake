@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.item.ItemStack;
 
-public class Slime extends Enemy {
+public class Slime extends Enemy<Slime> {
     public int generation;  //史莱姆的代数，用于控制史莱姆的分裂次数，分裂次数越多，代数越高
     public float factor = 0.7f;    //分裂时的缩放因子
 

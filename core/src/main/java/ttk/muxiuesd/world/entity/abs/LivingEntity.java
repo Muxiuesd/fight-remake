@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Pools;
@@ -19,18 +20,22 @@ import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
+import java.util.LinkedHashMap;
+
 /**
  * 活物实体
  * <p>
- * 有生命值、能持有、使用物品
+ * 有生命值、能持有、使用物品，有各种行为
  * <p>
  * TODO 活物实体能有buff影响其行为状态
  * */
-public abstract class LivingEntity extends Entity {
+public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
+    private LinkedHashMap<String, LivingEntityState<T>> states;
+    private LivingEntityState<T> curState;
     private float maxHealth; // 生命值上限
     private float curHealth; // 当前生命值
     private boolean attacked;   //是否收到攻击的状态
@@ -42,12 +47,13 @@ public abstract class LivingEntity extends Entity {
     private float maxSwingHandDegree;
 
 
-    public void initialize (EntityType<? extends LivingEntity> entityType, float maxHealth, float curHealth) {
+    public void initialize (EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth) {
         initialize(entityType, maxHealth, curHealth, 16);
     }
-    public void initialize (EntityType<? extends LivingEntity> entityType, float maxHealth, float curHealth, int backpackSize) {
+    public void initialize (EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth, int backpackSize) {
         super.initialize(entityType);
         setSize(DEFAULT_SIZE);
+        this.states = new LinkedHashMap<>();
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
         this.attacked = false;
@@ -65,6 +71,8 @@ public abstract class LivingEntity extends Entity {
         this.backpack.update(delta);
         this.attackedTimer.update(delta);
         this.attackedTimer.isReady();
+        //处理当前状态
+        if (this.getCurState() != null) getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
 
         if (this.swingHandTimer != null) {
             this.swingHandTimer.update(delta);
@@ -171,7 +179,7 @@ public abstract class LivingEntity extends Entity {
     /**
      * 应用伤害
      * */
-    public <S> void applyDamage (DamageType<S, LivingEntity> damageType, S source) {
+    public <S> void applyDamage (DamageType<S, LivingEntity<?>> damageType, S source) {
         //TODO 各种判定
         damageType.apply(source, this);
         this.setAttacked(true);
@@ -270,36 +278,36 @@ public abstract class LivingEntity extends Entity {
     /**
      * 减少一定的血量
      * */
-    public LivingEntity decreaseHealth (float value) {
+    public T decreaseHealth (float value) {
         this.setCurHealth(Math.max(this.getCurHealth() - value, 0f));
-        return this;
+        return (T) this;
     }
 
     /**
      * 增加一定的血量
      * */
-    public LivingEntity increaseHealth (float value) {
+    public T increaseHealth (float value) {
         float after = this.getCurHealth() + value;
         this.setCurHealth(Math.min(after, this.getMaxHealth()));
-        return this;
+        return (T) this;
     }
 
     public float getMaxHealth () {
         return this.maxHealth;
     }
 
-    public LivingEntity setMaxHealth (float maxHealth) {
+    public T setMaxHealth (float maxHealth) {
         this.maxHealth = maxHealth;
-        return this;
+        return (T) this;
     }
 
     public float getCurHealth () {
         return this.curHealth;
     }
 
-    public LivingEntity setCurHealth (float curHealth) {
+    public T setCurHealth (float curHealth) {
         this.curHealth = curHealth;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -312,14 +320,14 @@ public abstract class LivingEntity extends Entity {
     /**
      * 设置是否在受攻击状态
      * */
-    public LivingEntity setAttacked (boolean attacked) {
+    public T setAttacked (boolean attacked) {
         if (attacked) {
             this.attackedTimer.setCurSpan(0f);
         }else {
             this.attackedTimer.setCurSpan(ATTACK_SPAN);
         }
         this.attacked = attacked;
-        return this;
+        return (T) this;
     }
 
 
@@ -331,8 +339,32 @@ public abstract class LivingEntity extends Entity {
         return this.backpack;
     }
 
-    public LivingEntity setBackpack (Backpack backpack) {
+    public T setBackpack (Backpack backpack) {
         this.backpack = backpack;
+        return (T) this;
+    }
+
+    public void setState (String id) {
+        LinkedHashMap<String, LivingEntityState<T>> states = this.getStates();
+        LivingEntityState<T> state = states.get(id);
+        this.setCurState(state);
+    }
+
+    public T addState (String id, LivingEntityState<T> state) {
+        getStates().put(id, state);
+        return (T) this;
+    }
+
+    public LinkedHashMap<String, LivingEntityState<T>> getStates () {
+        return this.states;
+    }
+
+    public LivingEntityState<T> getCurState () {
+        return this.curState;
+    }
+
+    public LivingEntity<T> setCurState (LivingEntityState<T> curState) {
+        this.curState = curState;
         return this;
     }
 }

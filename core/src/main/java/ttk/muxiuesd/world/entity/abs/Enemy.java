@@ -17,19 +17,19 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
 /**
  * 敌人实体抽象类
  * */
-public abstract class Enemy extends LivingEntity {
+public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     private Entity curTarget;   //敌人当前需要攻击的目标
     private TaskTimer attackTimer;  //攻击计时器
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
 
-    public Enemy (EntityType<? extends Enemy> entityType, String textureId, float maxHealth, float curHealth,
+    public Enemy (EntityType<? extends Enemy<?>> entityType, String textureId, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
         this(entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
         this.loadBodyTextureRegion(textureId, null);
     }
 
-    public Enemy (EntityType<? extends Enemy> entityType, float maxHealth, float curHealth,
+    public Enemy (EntityType<? extends Enemy<?>> entityType, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
         initialize(entityType, maxHealth, curHealth);
 
@@ -121,7 +121,7 @@ public abstract class Enemy extends LivingEntity {
         return curTarget;
     }
 
-    public Enemy setCurTarget (Entity curTarget) {
+    public Enemy<?> setCurTarget (Entity curTarget) {
         this.curTarget = curTarget;
         return this;
     }
@@ -130,7 +130,7 @@ public abstract class Enemy extends LivingEntity {
         return visionRange;
     }
 
-    public Enemy setVisionRange (float visionRange) {
+    public Enemy<?> setVisionRange (float visionRange) {
         this.visionRange = visionRange;
         return this;
     }
@@ -139,7 +139,7 @@ public abstract class Enemy extends LivingEntity {
         return attackRange;
     }
 
-    public Enemy setAttackRange (float attackRange) {
+    public Enemy<?> setAttackRange (float attackRange) {
         this.attackRange = attackRange;
         return this;
     }

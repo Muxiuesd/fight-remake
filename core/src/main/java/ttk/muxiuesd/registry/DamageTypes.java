@@ -18,8 +18,8 @@ public final class DamageTypes {
     public static void init () {
     }
 
-    public static final DamageType<Bullet, LivingEntity> BULLET = register("bullet_damage", DamageTypeBullet::new);
-    public static final DamageType<LivingEntity, LivingEntity> SWORD = register("sword_damage", DamageTypeSword::new);
+    public static final DamageType<Bullet, LivingEntity<?>> BULLET = register("bullet_damage", DamageTypeBullet::new);
+    public static final DamageType<LivingEntity<?>, LivingEntity<?>> SWORD = register("sword_damage", DamageTypeSword::new);
 
 
     public static <S, T> DamageType<S, T> register (String name, Function<Identifier, DamageType<S, T>> function) {

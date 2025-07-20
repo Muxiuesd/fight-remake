@@ -33,19 +33,19 @@ public class Sword extends Weapon {
     }
 
     @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         Float range = itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE);
         EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
         //检测剑的伤害区域内的敌人实体
-        Array<Enemy> entities = Util.sectorArea(es.getEnemyEntity(), user.getCenter(), user.getDirection(), range, 60f);
-        for (Enemy enemy : entities) {
+        Array<Enemy<?>> entities = Util.sectorArea(es.getEnemyEntity(), user.getCenter(), user.getDirection(), range, 60f);
+        for (Enemy<?> enemy : entities) {
             enemy.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, enemy));
         }
         //检测剑的伤害区域内的生物实体
-        Array<LivingEntity> livingEntities = Util.sectorArea(es.getEntityArray(EntityTypes.CREATURE), user.getCenter(), user.getDirection(), range, 60f);
-        for (LivingEntity le : livingEntities) {
+        Array<LivingEntity<?>> livingEntities = Util.sectorArea(es.getEntityArray(EntityTypes.CREATURE), user.getCenter(), user.getDirection(), range, 60f);
+        for (LivingEntity<?> le : livingEntities) {
             le.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, le));

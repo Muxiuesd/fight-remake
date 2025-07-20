@@ -1,6 +1,5 @@
 package ttk.muxiuesd.screen;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -43,10 +42,6 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void show() {
-        int w = Gdx.graphics.getWidth();
-        int h = Gdx.graphics.getHeight();
-        //this.viewport = new ScalingViewport(Scaling.fit, w, h, PlayerCamera.INSTANCE.getCamera());
-
         //手动注册游戏内的元素
         Pools.init();
         EventTypes.init();
