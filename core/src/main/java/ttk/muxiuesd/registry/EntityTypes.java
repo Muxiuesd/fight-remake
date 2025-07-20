@@ -30,7 +30,7 @@ public final class EntityTypes {
     public static final EntityType<LivingEntity<?>> CREATURE = register("creature", new EntityType<LivingEntity<?>>());
     public static final EntityType<ItemEntity> ITEM_ENTITY = register("item_entity", new EntityType<ItemEntity>());
 
-    public static <T extends Entity> EntityType<T> register (String name, EntityType<T> entityType) {
+    public static <T extends Entity<?>> EntityType<T> register (String name, EntityType<T> entityType) {
         return (EntityType<T>) Registries.ENTITY_TYPE.register(new Identifier(Fight.getId(name)), entityType);
     }
 }

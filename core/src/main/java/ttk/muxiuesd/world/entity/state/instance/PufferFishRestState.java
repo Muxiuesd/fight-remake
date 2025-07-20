@@ -11,11 +11,14 @@ import ttk.muxiuesd.world.entity.state.abs.StatePufferFish;
 /**
  * 河豚休息状态
  * */
-public class PufferFishRestState extends StatePufferFish implements Runnable {
+public class PufferFishRestState extends StatePufferFish{
 
     public PufferFishRestState () {
+    }
+
+    @Override
+    public void start (World world, PufferFish entity) {
         setTimer(Pools.TASK_TIMER.obtain().setMaxSpan(MathUtils.random(1f, 3f)));
-        setTask(this);
     }
 
     @Override
@@ -25,13 +28,13 @@ public class PufferFishRestState extends StatePufferFish implements Runnable {
             timer.update(delta);
             if (timer.isReady()) {
                 entity.randomWalkPath(world);
-                entity.setState(Fight.getId("randomWalk"));
+                entity.setState(Fight.getId("random_walk"));
             }
         }
     }
 
     @Override
-    public void run () {
+    public void end (World world, PufferFish entity) {
         Pools.TASK_TIMER.free(getTimer());
         setTimer(null);
     }

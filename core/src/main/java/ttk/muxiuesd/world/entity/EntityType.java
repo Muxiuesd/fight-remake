@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * 用于注册的实体类型
  * */
-public class EntityType<T extends Entity> {
+public class EntityType<T extends Entity<?>> {
     //改实体类型的附属类型，比如玩家类型实体附属玩家子弹类型实体
     private final HashMap<String, EntityType<?>> childTypes = new HashMap<>();
 
@@ -23,7 +23,7 @@ public class EntityType<T extends Entity> {
     /**
      * 添加附属类型
      * */
-    public <E extends Entity> EntityType<E> addChildType(String name, EntityType<E> childType) {
+    public <E extends Entity<?>> EntityType<E> addChildType(String name, EntityType<E> childType) {
         this.childTypes.put(name, childType);
         return childType;
     }

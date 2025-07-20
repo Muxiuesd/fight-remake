@@ -17,7 +17,7 @@ import ttk.muxiuesd.world.particle.ParticleDefaultConfig;
  * */
 public class EventEnemyShootBullet extends BulletShootEvent {
     @Override
-    public void handle (World world, Entity shooter, Bullet bullet) {
+    public void handle (World world, Entity<?> shooter, Bullet bullet) {
         if (shooter.getType() == EntityTypes.ENEMY) {
             SoundEffectSystem ses = (SoundEffectSystem) world
                 .getSystemManager()

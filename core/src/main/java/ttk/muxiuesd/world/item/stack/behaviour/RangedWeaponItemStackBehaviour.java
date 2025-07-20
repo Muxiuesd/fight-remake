@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.item.instence.RangedWeapon;
  * */
 public class RangedWeaponItemStackBehaviour implements IItemStackBehaviour {
     @Override
-    public boolean use (World world, LivingEntity user, ItemStack itemStack) {
+    public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
         RangedWeapon weapon = (RangedWeapon) itemStack.getItem();
         Item.Property property = weapon.getProperty();
         if (!itemStack.isReady()) {

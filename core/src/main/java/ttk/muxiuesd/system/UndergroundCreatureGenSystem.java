@@ -69,7 +69,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
             //防止没添加进实体系统，统一执行一遍。一般来说工厂里只管生成，不管添加最好
             for (LivingEntity<?> e : entities) {
                 if (e == null) continue;
-                e.setEntitySystem(getEntitySystem());
+                //e.setEntitySystem(getEntitySystem());
                 getEntitySystem().add(e);
             }
         }

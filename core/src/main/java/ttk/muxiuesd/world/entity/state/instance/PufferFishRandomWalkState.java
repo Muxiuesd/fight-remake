@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.entity.state.instance;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Pools;
@@ -14,7 +15,11 @@ import ttk.muxiuesd.world.entity.state.abs.StatePufferFish;
 public class PufferFishRandomWalkState extends StatePufferFish {
 
     public PufferFishRandomWalkState () {
-        super(Pools.TASK_TIMER.obtain().setMaxSpan(2f), () -> {});
+    }
+
+    @Override
+    public void start (World world, PufferFish entity) {
+        setTimer(Pools.TASK_TIMER.obtain().setMaxSpan(MathUtils.random(1.2f, 2.7f)));
     }
 
     @Override
@@ -32,5 +37,11 @@ public class PufferFishRandomWalkState extends StatePufferFish {
                 entity.setPosition(entity.getPosition().add(entity.getVelocity()));
             }
         }
+    }
+
+    @Override
+    public void end (World world, PufferFish entity) {
+        Pools.TASK_TIMER.free(getTimer());
+        setTimer(null);
     }
 }

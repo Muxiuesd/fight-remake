@@ -20,8 +20,8 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 鱼钩实体
  * */
-public class EntityFishingHook extends Entity {
-    private LivingEntity owner;
+public class EntityFishingHook extends Entity<EntityFishingHook> {
+    private LivingEntity<?> owner;
     private ItemStack poleStack;
     private Direction throwDirection;
     private ChunkSystem cs;
@@ -36,7 +36,7 @@ public class EntityFishingHook extends Entity {
         this(EntityTypes.PLAYER);
     }
     public EntityFishingHook(EntityType<?> entityType) {
-        initialize(entityType);
+        super(entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
         bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");
@@ -120,11 +120,11 @@ public class EntityFishingHook extends Entity {
         y += velY;
     }
 
-    public LivingEntity getOwner () {
+    public LivingEntity<?> getOwner () {
         return owner;
     }
 
-    public EntityFishingHook setOwner (LivingEntity owner) {
+    public EntityFishingHook setOwner (LivingEntity<?> owner) {
         this.owner = owner;
         return this;
     }

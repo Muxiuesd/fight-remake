@@ -27,14 +27,14 @@ public class UndergroundEntityRenderSystem extends EntityRenderSystem implements
 
     @Override
     public void draw(Batch batch) {
-        for (Entity entity : this.getUndergroundEntities()) {
+        for (Entity<?> entity : this.getUndergroundEntities()) {
             entity.draw(batch);
         }
     }
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        for (Entity entity : this.getUndergroundEntities()) {
+        for (Entity<?> entity : this.getUndergroundEntities()) {
             entity.renderShape(batch);
         }
     }
@@ -44,7 +44,7 @@ public class UndergroundEntityRenderSystem extends EntityRenderSystem implements
         return RENDER_PRIORITY;
     }
 
-    public Array<Entity> getUndergroundEntities () {
+    public Array<Entity<?>> getUndergroundEntities () {
         return this.getCurEntitySystem().getRenderableEntities().get(RenderLayers.ENTITY_UNDERGROUND);
     }
 }

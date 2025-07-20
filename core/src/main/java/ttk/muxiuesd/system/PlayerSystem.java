@@ -36,7 +36,7 @@ public class PlayerSystem extends WorldSystem {
     private Player player;
     private Vector2 playerLastPosition;
 
-    private Timer bubbleEmitTimer;  //气泡粒子发射计时器
+    private Timer<?> bubbleEmitTimer;  //气泡粒子发射计时器
 
     public PlayerSystem(World world) {
         super(world);
@@ -46,7 +46,7 @@ public class PlayerSystem extends WorldSystem {
     public void initialize () {
         this.player = (Player) Gets.ENTITY(Fight.getId("player"));
         this.playerLastPosition = this.player.getPosition();
-        this.bubbleEmitTimer = new Timer(0.5f);
+        this.bubbleEmitTimer = new Timer<>(0.5f);
         Log.print(TAG, "PlayerSystem初始化完成！");
     }
 

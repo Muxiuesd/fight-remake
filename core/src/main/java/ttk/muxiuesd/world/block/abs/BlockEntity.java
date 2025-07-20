@@ -53,14 +53,14 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     /**
      * 空手与方块互动
      * */
-    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
+    public InteractResult interact (World world, LivingEntity<?> user, GridPoint2 interactGridPos) {
         return InteractResult.FAILURE;
     }
 
     /**
      * 手持物品与方块互动
      * */
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
+    public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         return InteractResult.FAILURE;
     }
 

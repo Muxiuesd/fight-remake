@@ -28,7 +28,7 @@ public class ItemTorch extends Sword {
     }
 
     @Override
-    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
+    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
         super.drawOnHand(batch, holder, itemStack);
         //计算光源的正确位置
         Vector2 holderCenter = holder.getCenter();

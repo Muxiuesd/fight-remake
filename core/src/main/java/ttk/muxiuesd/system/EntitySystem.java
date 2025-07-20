@@ -42,17 +42,17 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     private boolean renderHitbox = false;
 
-    private final Array<Entity> _delayAdd = new Array<>();
-    private final Array<Entity> _delayRemove = new Array<>();
+    private final Array<Entity<?>> _delayAdd = new Array<>();
+    private final Array<Entity<?>> _delayRemove = new Array<>();
 
-    private final Array<Entity> entities = new Array<>();   //所有实体
-    private final Array<Entity> updatableEntity = new Array<>();
+    private final Array<Entity<?>> entities = new Array<>();   //所有实体
+    private final Array<Entity<?>> updatableEntity = new Array<>();
 
     //实体管理组map，每一种注册过的实体类型都有一个管理组，key为实体类型，value为该实体类型的持有实体管理数组
-    private final ConcurrentHashMap<EntityType<?>, Array<? extends Entity>> entityTypes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<EntityType<?>, Array<? extends Entity<?>>> entityTypes = new ConcurrentHashMap<>();
 
     //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
-    private final ConcurrentHashMap<RenderLayer, Array<Entity>> renderableEntities = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<RenderLayer, Array<Entity<?>>> renderableEntities = new ConcurrentHashMap<>();
 
     public EntitySystem (World world) {
         super(world);
@@ -100,28 +100,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * @param entity 实体
      */
     private <T extends Entity> void _add (T entity) {
-        //优先进行实体组类型判断
-        /*if (entity.group == Group.player) {
-            //玩家组
-            if (entity instanceof Bullet bullet) {
-                //玩家的子弹
-                this.addEntity(EntityTypes.PLAYER_BULLET, bullet);
-                this.callBulletShootEvent(bullet.owner, bullet);
-            } else if (entity instanceof Player player) {
-                //TODO
-            }
-        } else if (entity.group == Group.enemy) {
-            //敌人组
-            if (entity instanceof Enemy enemy) {
-                this.addEntity(EntityTypes.ENEMY, enemy);
-            } else if (entity instanceof Bullet bullet) {
-                this.addEntity(EntityTypes.ENEMY_BULLET, bullet);
-                this.callBulletShootEvent(bullet.owner, bullet);
-            }
-        } else if (entity instanceof ItemEntity itemEntity) {
-            this.addEntity(EntityTypes.ITEM_ENTITY, itemEntity);
-        }*/
-
         Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
         if (! entityArray.contains(entity, true)) {
             //避免重复添加
@@ -132,6 +110,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //把实体添加进相应的渲染层级
         if (this.renderableEntities.containsKey(entity.getRenderLayer()))
             this.renderableEntities.get(entity.getRenderLayer()).add(entity);
+        //防止没有指定实体系统
+        entity.setEntitySystem(this);
+        entity.initialize();
     }
 
     /**
@@ -139,28 +120,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * @param entity 实体
      */
     private <T extends Entity> void _remove (T entity) {
-        //优先进行实体组类型判断
-        /*if (entity.group == Group.enemy) {
-            //绝大部分移除调用都是敌人相关的子弹实体
-            if (entity instanceof Bullet bullet) {
-                //大部分是子弹
-                this.removeEntity(EntityTypes.ENEMY_BULLET, bullet);
-            }else if (entity instanceof Enemy enemy) {
-                this.removeEntity(EntityTypes.ENEMY, enemy);
-            }
-        } else if (entity.group == Group.player) {
-            //其次是玩家相关的实体
-            if (entity instanceof Bullet bullet) {
-                //大部分是子弹
-                this.removeEntity(EntityTypes.PLAYER_BULLET, bullet);
-            }else if (entity instanceof Player player) {
-                //TODO
-            }
-        } else if (entity instanceof ItemEntity itemEntity) {
-            //剩下就是物品实体
-            this.removeEntity(EntityTypes.ITEM_ENTITY, itemEntity);
-        }*/
-
         Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
         if (entityArray.contains(entity, true)) {
             //避免重复移除
@@ -327,7 +286,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     @Override
     public void dispose() {
-        for (Entity entity : this.getEntities()) {
+        for (Entity<?> entity : this.getEntities()) {
             entity.dispose();
         }
     }
@@ -340,14 +299,14 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 获取所有的实体
      * */
-    public Array<Entity> getEntities () {
+    public Array<Entity<?>> getEntities () {
         return this.entities;
     }
 
     /**
      * 获取实体类型相应的管理组
      * */
-    public <T extends Entity> Array<T> getEntityArray (EntityType<T> type) {
+    public <T extends Entity<?>> Array<T> getEntityArray (EntityType<T> type) {
         return (Array<T>) this.entityTypes.get(type);
     }
 
@@ -363,7 +322,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return this.getEntityArray(EntityTypes.ENEMY_BULLET);
     }
 
-    public ConcurrentHashMap<RenderLayer, Array<Entity>> getRenderableEntities () {
+    public ConcurrentHashMap<RenderLayer, Array<Entity<?>>> getRenderableEntities () {
         return this.renderableEntities;
     }
 

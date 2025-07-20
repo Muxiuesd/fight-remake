@@ -133,7 +133,7 @@ public class SoundEffectSystem extends WorldSystem {
         }
     }
 
-    public void newSpatialSound (Audio audio, Entity sounder) {
+    public void newSpatialSound (Audio audio, Entity<?> sounder) {
         this.newSpatialSound(audio.getId(), sounder);
     }
     /**
@@ -141,7 +141,7 @@ public class SoundEffectSystem extends WorldSystem {
      * @param id 音效的Id，但必须是Music
      * @param sounder 发出声音的实体
      * */
-    public void newSpatialSound (String id, Entity sounder) {
+    public void newSpatialSound (String id, Entity<?> sounder) {
         Music music = AudioLoader.getInstance().newMusic(id);
         SpatialSoundInstance instance = new SpatialSoundInstance(music, sounder, this.ps.getPlayer());
         //播放结束回调

@@ -18,7 +18,7 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
  * 敌人实体抽象类
  * */
 public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
-    private Entity curTarget;   //敌人当前需要攻击的目标
+    private Entity<?> curTarget;   //敌人当前需要攻击的目标
     private TaskTimer attackTimer;  //攻击计时器
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
@@ -31,7 +31,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
 
     public Enemy (EntityType<? extends Enemy<?>> entityType, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
-        initialize(entityType, maxHealth, curHealth);
+        super(entityType, maxHealth, curHealth);
 
         this.visionRange = visionRange;
         this.attackRange = attackRange;
@@ -58,7 +58,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
      * 更新位置，一般朝向目标方向移动
      * */
     public void updatePosition (float delta) {
-        Entity target = getCurTarget();
+        Entity<?> target = getCurTarget();
         if (target != null) {
             Direction direction = new Direction(target.x - x, target.y - y);
             setVelocity(direction.getxDirection() * curSpeed * delta, direction.getyDirection() * curSpeed * delta);
@@ -88,7 +88,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     public void attack (float delta, EntitySystem es) {
         this.attackTimer.update(delta);
 
-        Entity target = this.getCurTarget();
+        Entity<?> target = this.getCurTarget();
         float distance = Util.getDistance(this, target);
         //在攻击范围之外不攻击
         if (distance > getAttackRange()) {
@@ -108,7 +108,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
      * 自定义发射的子弹
      * @param direction 子弹的运动方向
      * */
-    public Bullet createBullet (Entity owner, Direction direction) {
+    public Bullet createBullet (Entity<?> owner, Direction direction) {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
@@ -117,11 +117,11 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
         return bullet;
     }
 
-    public Entity getCurTarget () {
+    public Entity<?> getCurTarget () {
         return curTarget;
     }
 
-    public Enemy<?> setCurTarget (Entity curTarget) {
+    public Enemy<?> setCurTarget (Entity<?> curTarget) {
         this.curTarget = curTarget;
         return this;
     }

@@ -8,5 +8,5 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 物品堆栈行为逻辑
  * */
 public interface IItemStackBehaviour {
-    boolean use (World world, LivingEntity user, ItemStack itemStack);
+    boolean use (World world, LivingEntity<?> user, ItemStack itemStack);
 }

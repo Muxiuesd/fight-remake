@@ -30,7 +30,7 @@ public class Registries {
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<EntityType<?>> ENTITY_TYPE = create(RegistryKeys.ENTITY_TYPE);
-    public static final Registry<Supplier<Entity>> ENTITY = create(RegistryKeys.ENTITY);
+    public static final Registry<Supplier<? extends Entity<?>>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
 

@@ -56,18 +56,6 @@ public class FishingLootTable extends LootTable {
     /**
      * 生成战利品
      * */
-    /*public static ItemStack generate (String id) {
-        if (!lootTable.containsKey(id)) {
-            Log.print(TAG, "Id为：" + id + " 的钓鱼战利品表不存在！");
-            throw new IllegalStateException(id + " 不存在！");
-        }
-        Supplier<? extends ItemStack> supplier = lootTable.get(id);
-        return supplier.get();
-    }*/
-
-    /**
-     * 生成战利品
-     * */
     @Override
     public List<ItemStack> generate (int luck) {
         return LootGenerator.generate(this, luck);

@@ -47,7 +47,7 @@ public class BlockEntityFurnace extends BlockEntity {
     }
 
     @Override
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
+    public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //TODO 根据物品类型或者配方来判断是否可以把东西放进来当原料或者燃料
 
         Slot interactSlot = getSlot(interactGridPos);
@@ -97,7 +97,7 @@ public class BlockEntityFurnace extends BlockEntity {
     }
 
     @Override
-    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
+    public InteractResult interact (World world, LivingEntity<?> user, GridPoint2 interactGridPos) {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
         //获取交互槽位

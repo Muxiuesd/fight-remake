@@ -23,7 +23,7 @@ import ttk.muxiuesd.world.entity.EntityType;
  * <p>
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
-public abstract class Entity implements ID<Entity>, Disposable, Drawable, Updateable, ShapeRenderable {
+public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
 
     public float speed, curSpeed;
@@ -40,11 +40,15 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     private EntitySystem es;    //此实体所属的实体系统
     private EntityType<?> type;
 
+    public Entity() {}
+    public Entity (EntityType<?> type) {
+        setType(type);
+    }
+
     /**
-     * 延迟初始化
+     * 延迟初始化，在实体添加到实体系统后才会执行
      * */
-    public void initialize(EntityType<?> type) {
-        this.type = type;
+    public void initialize() {
     }
 
     @Override
@@ -74,87 +78,87 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         }
     }
 
-    public Entity setCullingArea(float x, float y, float width, float height) {
+    public T setCullingArea(float x, float y, float width, float height) {
         this.hitbox.set(x, y, width, height);
-        return this;
+        return (T) this;
     }
 
     public float getSpeed () {
         return this.speed;
     }
 
-    public Entity setSpeed (float speed) {
+    public T setSpeed (float speed) {
         if (this.speed >= 0) {
             this.speed = speed;
         }
-        return this;
+        return (T) this;
     }
 
     public float getCurSpeed () {
         return curSpeed;
     }
 
-    public Entity setCurSpeed (float curSpeed) {
+    public T setCurSpeed (float curSpeed) {
         this.curSpeed = curSpeed;
-        return this;
+        return (T) this;
     }
 
-    public Entity setOrigin(float originX, float originY) {
+    public T setOrigin(float originX, float originY) {
         this.originX = originX;
         this.originY = originY;
-        return this;
+        return (T) this;
     }
 
     public Vector2 getOrigin() {
         return new Vector2(this.originX, this.originY);
     }
 
-    public Entity setPosition(float x, float y) {
+    public T setPosition(float x, float y) {
         this.x = x;
         this.y = y;
-        return this;
+        return (T) this;
     }
 
-    public Entity setSize(float width, float height) {
+    public T setSize(float width, float height) {
         this.width = width;
         this.height = height;
-        return this;
+        return (T) this;
     }
 
-    public Entity setSize (Vector2 size) {
+    public T setSize (Vector2 size) {
         this.setSize(size.x, size.y);
-        return this;
+        return (T) this;
     }
 
-    public Entity setBounds(float x, float y, float width, float height) {
+    public T setBounds(float x, float y, float width, float height) {
         this.setPosition(x, y);
         this.setSize(width, height);
-        return this;
+        return (T) this;
     }
 
     public Vector2 getPosition() {
         return new Vector2(this.x, this.y);
     }
 
-    public Entity setPosition(Vector2 vector2) {
+    public T setPosition(Vector2 vector2) {
         this.x = vector2.x;
         this.y = vector2.y;
-        return this;
+        return (T) this;
     }
 
     public Vector2 getVelocity() {
         return new Vector2(this.velX, this.velY);
     }
 
-    public Entity setVelocity(Vector2 velocity) {
+    public T setVelocity(Vector2 velocity) {
         this.setVelocity(velocity.x, velocity.y);
-        return this;
+        return (T) this;
     }
 
-    public Entity setVelocity(float x, float y) {
+    public T setVelocity(float x, float y) {
         this.velX = x;
         this.velY = y;
-        return this;
+        return (T) this;
     }
 
     public Vector2 getSize () {
@@ -181,23 +185,23 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return rotation;
     }
 
-    public Entity setRotation (float rotation) {
+    public T setRotation (float rotation) {
         this.rotation = rotation;
-        return this;
+        return (T) this;
     }
 
     public Rectangle getHitbox() {
         return this.hitbox;
     }
 
-    public Entity setHitbox (Rectangle hitbox) {
+    public T setHitbox (Rectangle hitbox) {
         this.hitbox = hitbox;
-        return this;
+        return (T) this;
     }
 
-    public Entity setEntitySystem(EntitySystem es) {
+    public T setEntitySystem(EntitySystem es) {
         this.es = es;
-        return this;
+        return (T) this;
     }
 
     public EntitySystem getEntitySystem() {
@@ -208,9 +212,9 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this.type;
     }
 
-    public Entity setType (EntityType<?> type) {
+    public T setType (EntityType<?> type) {
         this.type = type;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -258,8 +262,8 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this.id;
     }
     @Override
-    public Entity setID (String id) {
+    public T setID (String id) {
         this.id = id;
-        return this;
+        return (T) this;
     }
 }

@@ -28,7 +28,7 @@ public class BlockItem extends ConsumptionItem {
     }
 
     @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         Vector2 worldPosition = Util.getMouseWorldPosition();
         ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
 

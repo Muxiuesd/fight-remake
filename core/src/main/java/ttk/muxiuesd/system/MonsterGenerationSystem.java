@@ -87,7 +87,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
             //防止没添加进实体系统，统一执行一遍
             for (Enemy<?> e : enemies) {
                 if (e == null) continue;
-                e.setEntitySystem(es);
+                //e.setEntitySystem(es);
                 es.add(e);
             }
         }
@@ -100,8 +100,6 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void setMaxGenSpan (float maxGenSpan) {
         this.maxGenSpan = maxGenSpan;
     }
-
-
 }
 
 

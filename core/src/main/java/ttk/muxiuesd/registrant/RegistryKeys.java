@@ -22,7 +22,7 @@ public class RegistryKeys {
     public static final RegistryKey<Item> ITEM = new RegistryKey<>();
     public static final RegistryKey<Block> BLOCK = new RegistryKey<>();
     public static final RegistryKey<EntityType<?>> ENTITY_TYPE = new RegistryKey<>();
-    public static final RegistryKey<Supplier<Entity>> ENTITY = new RegistryKey<>();
+    public static final RegistryKey<Supplier<? extends Entity<?>>> ENTITY = new RegistryKey<>();
     public static final RegistryKey<DamageType<?, ?>> DAMAGE_TYPE = new RegistryKey<>();
     public static final RegistryKey<PropertyType<?>> PROPERTY_TYPE = new RegistryKey<>();
 

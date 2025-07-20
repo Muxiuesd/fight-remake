@@ -30,7 +30,7 @@ public class Player extends LivingEntity<Player> {
     }
 
     public Player(float maxHealth, float curHealth) {
-        initialize(EntityTypes.PLAYER, maxHealth, curHealth, 16);
+        super(EntityTypes.PLAYER, maxHealth, curHealth, 16);
         renderHandItem = true;
         speed = 8;
         curSpeed = speed;

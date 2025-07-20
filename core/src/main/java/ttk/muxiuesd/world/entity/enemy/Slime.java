@@ -37,7 +37,7 @@ public class Slime extends Enemy<Slime> {
      * @param direction 子弹的运动方向
      */
     @Override
-    public Bullet createBullet (Entity owner, Direction direction) {
+    public Bullet createBullet (Entity<?> owner, Direction direction) {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
         bullet.setType(EntityTypes.ENEMY_BULLET);
         bullet.setOwner(owner);

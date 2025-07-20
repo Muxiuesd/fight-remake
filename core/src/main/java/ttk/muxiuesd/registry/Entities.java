@@ -18,26 +18,27 @@ public final class Entities {
     public static void init () {
     }
 
-    public static final Entity ITEM_ENTITY = register("item_entity", ItemEntity::new);
+    public static final ItemEntity ITEM_ENTITY = register("item_entity", ItemEntity::new);
     //活物实体
-    public static final Entity PLAYER = register("player", Player::new);
+    public static final Player PLAYER = register("player", Player::new);
 
     //敌人
-    public static final Entity SLIME = register("slime", Slime::new);
-    public static final Entity TARGET = register("target", EntityTarget::new);
+    public static final Slime SLIME = register("slime", Slime::new);
+    public static final EntityTarget TARGET = register("target", EntityTarget::new);
 
     //生物
-    public static final Entity PUFFER_FISH = register("puffer_fish", PufferFish::new);
+    public static final PufferFish PUFFER_FISH = register("puffer_fish", PufferFish::new);
 
     //子弹实体
-    public static final Entity BULLET_FIRE = register("bullet_fire", BulletFire::new);
+    public static final BulletFire BULLET_FIRE = register("bullet_fire", BulletFire::new);
 
     //最普通的实体
-    public static final Entity FISHING_HOOK = register("fishing_hook", EntityFishingHook::new);
+    public static final EntityFishingHook FISHING_HOOK = register("fishing_hook", EntityFishingHook::new);
 
 
-    public static Entity register (String name, Supplier<Entity> supplier) {
+    public static <T extends Entity<?>> T register (String name, Supplier<T> supplier) {
         Identifier identifier = new Identifier(Fight.NAMESPACE, name);
-        return Registries.ENTITY.register(identifier, supplier).get().setID(identifier.getId());
+        Registries.ENTITY.register(identifier, supplier);
+        return (T) supplier.get().setID(identifier.getId());
     }
 }

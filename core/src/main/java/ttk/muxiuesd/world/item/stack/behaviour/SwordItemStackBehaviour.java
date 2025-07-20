@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * */
 public class SwordItemStackBehaviour implements IItemStackBehaviour {
     @Override
-    public boolean use (World world, LivingEntity user, ItemStack itemStack) {
+    public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
         Weapon weapon = (Weapon) itemStack.getItem();
         Item.Property property = weapon.getProperty();
         if (!itemStack.isReady()) {

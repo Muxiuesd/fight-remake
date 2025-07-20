@@ -29,7 +29,7 @@ public class FoodItem extends ConsumptionItem {
     }
 
     @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         Log.print(this.toString(), user.getID() + " 在吃鱼");
         //随机吃鱼音效
         String useSoundId = this.property.getUseSoundId() + MathUtils.random(1, 3);

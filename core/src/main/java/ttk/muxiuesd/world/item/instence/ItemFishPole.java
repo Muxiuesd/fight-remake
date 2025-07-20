@@ -51,7 +51,7 @@ public class ItemFishPole extends Item {
     }
 
     @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
 
         if (!itemStack.onUsing()) {//抛出鱼钩
@@ -99,7 +99,7 @@ public class ItemFishPole extends Item {
     }
 
     @Override
-    public void putDown (ItemStack itemStack, World world, LivingEntity holder) {
+    public void putDown (ItemStack itemStack, World world, LivingEntity<?> holder) {
         //放下钓鱼竿也马上让鱼钩消失
         if (itemStack.onUsing()) {
             EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
@@ -110,7 +110,7 @@ public class ItemFishPole extends Item {
     }
 
     @Override
-    public void beDropped (ItemStack itemStack, World world, LivingEntity dropper) {
+    public void beDropped (ItemStack itemStack, World world, LivingEntity<?> dropper) {
         //钓鱼的时候被丢出来，则直接让鱼钩消失
         if (itemStack.onUsing()) {
             //this.hook.removeSelf();
@@ -141,7 +141,7 @@ public class ItemFishPole extends Item {
     public void throwHook (ItemStack itemStack, World world, EntityFishingHook fishingHook) {
         //Boolean onUsing = itemStack.getProperty().get(PropertyTypes.ITEM_ON_USING);
 
-        LivingEntity owner = fishingHook.getOwner();
+        LivingEntity<?> owner = fishingHook.getOwner();
         if (owner instanceof Player player) {
             //玩家抛竿
             Vector2 ownerPos = player.getCenter();
@@ -171,7 +171,7 @@ public class ItemFishPole extends Item {
     }
 
     @Override
-    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
+    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
         if (!itemStack.onUsing()) {
             if (this.texture == null) return;
             //没抛竿渲染
@@ -225,7 +225,7 @@ public class ItemFishPole extends Item {
         Direction direction = Util.getDirection();
         float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
         //绘制鱼线
-        LivingEntity hookOwner = hook.getOwner();
+        LivingEntity<?> hookOwner = hook.getOwner();
         Vector2 ownerPos = hookOwner.getCenter();
         float xOffset = hookOwner.getWidth() * 1.314f * MathUtils.cosDeg(rotation);
         float yOffset = hookOwner.getHeight()* 1.314f * MathUtils.sinDeg(rotation);

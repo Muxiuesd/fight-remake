@@ -17,7 +17,7 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
     public int maxGeneration = 3;
 
     @Override
-    public void handle (World world, LivingEntity entity) {
+    public void handle (World world, LivingEntity<?> entity) {
         //史莱姆死亡分裂
         if (entity instanceof Slime mom) {
             EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");

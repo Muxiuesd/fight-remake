@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
  * <p>
  * TODO 活物实体能有buff影响其行为状态
  * */
-public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
+public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
@@ -46,12 +46,11 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
     private TaskTimer swingHandTimer;
     private float maxSwingHandDegree;
 
-
-    public void initialize (EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth) {
-        initialize(entityType, maxHealth, curHealth, 16);
+    public LivingEntity(EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth) {
+        this(entityType, maxHealth, curHealth, 16);
     }
-    public void initialize (EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth, int backpackSize) {
-        super.initialize(entityType);
+    public LivingEntity(EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth, int backpackSize) {
+        super(entityType);
         setSize(DEFAULT_SIZE);
         this.states = new LinkedHashMap<>();
         this.maxHealth = maxHealth;
@@ -65,6 +64,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
         this.maxSwingHandDegree = 60f;
     }
 
+
     @Override
     public void update (float delta) {
         super.update(delta);
@@ -72,7 +72,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
         this.attackedTimer.update(delta);
         this.attackedTimer.isReady();
         //处理当前状态
-        if (this.getCurState() != null) getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
+        if (this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
 
         if (this.swingHandTimer != null) {
             this.swingHandTimer.update(delta);
@@ -217,8 +217,9 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
         return this.backpack.getItemStack(this.handIndex);
     }
 
-    public void setHandItemStack (ItemStack itemStack) {
+    public T setHandItemStack (ItemStack itemStack) {
         this.backpack.setItemStack(this.getHandIndex(), itemStack);
+        return (T) this;
     }
 
     public int getHandIndex () {
@@ -238,14 +239,14 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
         }
     }
 
-    public void swingHand () {
-        this.swingHand(SWING_HAND_TIME);
+    public T swingHand () {
+        return this.swingHand(SWING_HAND_TIME);
     }
 
     /**
      * 挥手
      **/
-    public void swingHand (float swingTime) {
+    public T swingHand (float swingTime) {
         if (this.swingHandTimer == null) {
             //this.swingHandTimer = new TaskTimer(swingTime, 0, () -> this.swingHandTimer = null);
             this.swingHandTimer = Pools.TASK_TIMER.obtain()
@@ -256,6 +257,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
                     this.swingHandTimer = null;
                 });
         }
+        return (T) this;
     }
 
     /**
@@ -344,6 +346,9 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
         return (T) this;
     }
 
+    /**
+     * 根据id来切换状态
+     * */
     public void setState (String id) {
         LinkedHashMap<String, LivingEntityState<T>> states = this.getStates();
         LivingEntityState<T> state = states.get(id);
@@ -355,16 +360,28 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity {
         return (T) this;
     }
 
+    /**
+     * 获取所有状态
+     * */
     public LinkedHashMap<String, LivingEntityState<T>> getStates () {
         return this.states;
     }
 
+    /**
+     * 获取当前的状态
+     * */
     public LivingEntityState<T> getCurState () {
         return this.curState;
     }
 
     public LivingEntity<T> setCurState (LivingEntityState<T> curState) {
-        this.curState = curState;
+        //确保不会空
+        if (getEntitySystem() != null) {
+            World world = getEntitySystem().getWorld();
+            if (this.getCurState() != null) this.curState.end(world, (T) this);
+            this.curState = curState;
+            this.curState.start(world, (T) this);
+        }
         return this;
     }
 }

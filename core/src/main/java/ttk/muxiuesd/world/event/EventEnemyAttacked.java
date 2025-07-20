@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 public class EventEnemyAttacked extends EntityHurtEvent {
 
     @Override
-    public void handle (World world, Entity attackObject, Entity victim) {
+    public void handle (World world, Entity<?> attackObject, Entity<?> victim) {
         //播放收到攻击的音效
         SoundEffectSystem ses = (SoundEffectSystem) world
             .getSystemManager()

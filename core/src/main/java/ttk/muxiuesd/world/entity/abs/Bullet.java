@@ -8,16 +8,16 @@ import ttk.muxiuesd.world.entity.EntityType;
 /**
  * 子弹
  */
-public abstract class Bullet extends Entity {
-    public Entity owner;
+public abstract class Bullet extends Entity<Bullet> {
+    public Entity<?> owner;
 
     public float damage;
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
 
     public Bullet () {}
-    public Bullet (Entity owner, EntityType<?> entityType) {
-        initialize(entityType);
+    public Bullet (Entity<?> owner, EntityType<?> entityType) {
+        super(entityType);
         this.owner = owner;
     }
 
@@ -32,7 +32,7 @@ public abstract class Bullet extends Entity {
         this(null, textureId, texturePath, damage, speed, maxLiveTime, initLiveTime);
     }
 
-    public Bullet (Entity owner, String textureId, String texturePath,
+    public Bullet (Entity<?> owner, String textureId, String texturePath,
                    float damage, float speed, float maxLiveTime, float initLiveTime) {
         //全部指定
         this.owner = owner;
@@ -53,14 +53,14 @@ public abstract class Bullet extends Entity {
         super.update(delta);
     }
 
-    public Entity getOwner () {
+    public Entity<?> getOwner () {
         return this.owner;
     }
 
     /**
      * 设置子弹的主人，同时设置子弹所属的实体组别（与主人同组）
      * */
-    public Bullet setOwner (Entity owner) {
+    public Bullet setOwner (Entity<?> owner) {
         this.owner = owner;
         return this;
     }

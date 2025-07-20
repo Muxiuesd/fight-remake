@@ -28,14 +28,14 @@ public class GroundEntityRenderSystem extends EntityRenderSystem implements IWor
 
     @Override
     public void draw(Batch batch) {
-        for (Entity entity : this.getGroundEntities()) {
+        for (Entity<?> entity : this.getGroundEntities()) {
             entity.draw(batch);
         }
     }
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        for (Entity entity : this.getGroundEntities()) {
+        for (Entity<?> entity : this.getGroundEntities()) {
             entity.renderShape(batch);
         }
     }
@@ -45,7 +45,7 @@ public class GroundEntityRenderSystem extends EntityRenderSystem implements IWor
         return RENDER_PRIORITY;
     }
 
-    public Array<Entity> getGroundEntities() {
+    public Array<Entity<?>> getGroundEntities() {
         return this.getCurEntitySystem().getRenderableEntities().get(RenderLayers.ENTITY_GROUND);
     }
 }
