@@ -12,6 +12,7 @@ import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.function.Supplier;
 
@@ -21,6 +22,7 @@ import java.util.function.Supplier;
 public class RegistryKeys {
     public static final RegistryKey<Item> ITEM = new RegistryKey<>();
     public static final RegistryKey<Block> BLOCK = new RegistryKey<>();
+    public static final RegistryKey<Wall<?>> WALL = new RegistryKey<>();
     public static final RegistryKey<EntityType<?>> ENTITY_TYPE = new RegistryKey<>();
     public static final RegistryKey<Supplier<? extends Entity<?>>> ENTITY = new RegistryKey<>();
     public static final RegistryKey<DamageType<?, ?>> DAMAGE_TYPE = new RegistryKey<>();

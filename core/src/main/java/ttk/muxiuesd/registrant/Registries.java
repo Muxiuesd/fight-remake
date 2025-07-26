@@ -16,6 +16,7 @@ import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,6 +30,7 @@ public class Registries {
 
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
+    public static final Registry<Wall<?>> WALL = create(RegistryKeys.WALL);
     public static final Registry<EntityType<?>> ENTITY_TYPE = create(RegistryKeys.ENTITY_TYPE);
     public static final Registry<Supplier<? extends Entity<?>>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
