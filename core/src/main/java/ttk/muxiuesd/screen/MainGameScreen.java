@@ -24,7 +24,6 @@ import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.wall.WallsReg;
 
 /**
  * 主游戏屏幕
@@ -48,7 +47,7 @@ public class MainGameScreen implements Screen {
         Sounds.init();
         Items.init();
         Blocks.init();
-        WallsReg.initAllWalls();
+        Walls.init();
         EntityTypes.init();
         Entities.init();
 

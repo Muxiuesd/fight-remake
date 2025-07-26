@@ -1,8 +1,8 @@
 {
-"item_max_count": 1,
-"weapon_damage": 3,
-"weapon_duration": 100,
-"weapon_use_span": 0.2,
-"weapon_attack_range": 2.5,
-"item_use_sound_id": "fight:sweep"
+"fight:item_max_count": 1,
+"fight:weapon_damage": 3,
+"fight:weapon_duration": 100,
+"fight:weapon_use_span": 0.2,
+"fight:weapon_attack_range": 2.5,
+"fight:item_use_sound_id": "fight:sweep"
 }

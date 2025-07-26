@@ -1,6 +1,7 @@
 package ttk.muxiuesd.interfaces.serialization;
 
 import ttk.muxiuesd.interfaces.data.DataReader;
+import ttk.muxiuesd.interfaces.data.DataWriter;
 
 import java.util.Optional;
 
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @param <W> 数据写入类
  * @param <R> 数据读取类
  * */
-public interface Codec<T, W, R> {
+public interface Codec<T, W extends DataWriter<?>, R extends DataReader<?>> {
     /**
      * 编码成指定格式
      * */
@@ -20,5 +21,5 @@ public interface Codec<T, W, R> {
     /**
      * 解码成类
      * */
-    Optional<T> decode (DataReader<R> dataReader);
+    Optional<T> decode (R dataReader);
 }

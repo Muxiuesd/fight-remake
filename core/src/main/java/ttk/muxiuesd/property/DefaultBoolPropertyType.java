@@ -1,5 +1,6 @@
 package ttk.muxiuesd.property;
 
+import ttk.muxiuesd.interfaces.data.DataReader;
 import ttk.muxiuesd.interfaces.data.DataWriter;
 
 /**
@@ -8,6 +9,11 @@ import ttk.muxiuesd.interfaces.data.DataWriter;
 public class DefaultBoolPropertyType extends PropertyType<Boolean>{
     @Override
     public void write (DataWriter writer, Boolean data) {
-        writer.writeBoolean(getName(), data);
+        writer.writeBoolean(getId(), data);
+    }
+
+    @Override
+    public Boolean read (DataReader<?> reader, String dataKey) {
+        return reader.readBoolean(dataKey);
     }
 }

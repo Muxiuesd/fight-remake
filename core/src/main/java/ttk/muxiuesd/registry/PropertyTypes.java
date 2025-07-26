@@ -21,7 +21,7 @@ public final class PropertyTypes {
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
     public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
-    public static final PropertyType<Entity> ITEM_WITH_ENTITY = register("item_with_entity", new PropertyItemWithEntity());
+    public static final PropertyType<Entity<?>> ITEM_WITH_ENTITY = register("item_with_entity", new PropertyItemWithEntity());
 
     public static final PropertyType<Float> WEAPON_USE_SAPN = register("weapon_use_span", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_DAMAGE = register("weapon_damage", new DefaultFloatPropertyType());
@@ -33,7 +33,8 @@ public final class PropertyTypes {
 
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {
-        Identifier identifier = new Identifier(Fight.getId(name));
-        return (PropertyType<T>) Registries.PROPERTY_TYPE.register(identifier, type).setName(name);
+        String id = Fight.getId(name);
+        Identifier identifier = new Identifier(id);
+        return (PropertyType<T>) Registries.PROPERTY_TYPE.register(identifier, type).setId(id);
     }
 }

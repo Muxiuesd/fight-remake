@@ -125,7 +125,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
             chunkDataWriter.objStart();
             Codecs.CHUNK.encode(cs.getChunk(playerCenter.x, playerCenter.y), chunkDataWriter);
             chunkDataWriter.objEnd();
-            new ChunkJsonDataOutput().output(chunkDataWriter);
+            new ChunkJsonDataOutput("testChunk.json").output(chunkDataWriter);
 
             //读取测试
             /*String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "block.json");

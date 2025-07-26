@@ -44,11 +44,15 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     //储存一个区块里的方块
     private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
-    private final Wall[][]  walls;
+    private final Wall<?>[][]  walls;
     private final int[][] heights;
 
+
     public Chunk(ChunkSystem chunkSystem) {
+        this();
         this.chunkSystem = chunkSystem;
+    }
+    public Chunk () {
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
@@ -64,7 +68,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             }
         });
         this.traversal((x, y) -> {
-            Wall wall = walls[y][x];
+            Wall<?> wall = walls[y][x];
             if (wall != null) {
                 wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
@@ -84,7 +88,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
                 blocks[y][x] = null;
             }
 
-            Wall wall = walls[y][x];
+            Wall<?> wall = walls[y][x];
             if (wall != null) {
                 walls[y][x] = null;
             }
@@ -108,11 +112,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         return this.blocks[cy][cx];
     }
 
-    public Wall getWall(int cx, int cy) {
+    public Wall<?> getWall(int cx, int cy) {
         return this.walls[cy][cx];
     }
 
-    public void setWall(Wall wall, int cx, int cy) {
+    public void setWall(Wall<?> wall, int cx, int cy) {
         this.walls[cy][cx] = wall;
     }
 

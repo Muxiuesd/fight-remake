@@ -25,8 +25,11 @@ public class CAT {
         this.getMap().forEach((key, value) -> writer.getWriter().writeValue(key, value));
     }
 
+    /**
+     * 从json文件中读取值
+     * */
     public void read (JsonValue values) {
-
+        //TODO
     }
 
     public HashMap<String, Object> getMap () {

@@ -11,6 +11,7 @@ import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
+import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.block.BlockSoundsID;
@@ -122,9 +123,11 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
      * */
     @Override
     public void writeCAT (CAT cat) {
-        cat.set("aaaaaa", 123456);
     }
 
+    /**
+     * 从json中获取值
+     * */
     @Override
     public void readCAT (JsonValue values) {
     }
@@ -145,30 +148,43 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         }
 
         public Property setCAT (CAT cat) {
-            this.propertiesDataMap.add(PropertyTypes.CAT, cat);
-            return this;
+            return this.set(PropertyTypes.CAT, cat);
         }
 
         public float getFriction() {
-            return this.propertiesDataMap.get(PropertyTypes.BLOCK_FRICTON);
+            return this.get(PropertyTypes.BLOCK_FRICTON);
         }
 
         public Property setFriction(float friction) {
-            if (friction >= 0f) this.propertiesDataMap.add(PropertyTypes.BLOCK_FRICTON, friction);
+            if (friction >= 0f) return this.set(PropertyTypes.BLOCK_FRICTON, friction);
             return this;
         }
 
         public BlockSoundsID getSounds() {
-            return this.propertiesDataMap.get(PropertyTypes.BLOCK_SOUNDS_ID);
+            return this.get(PropertyTypes.BLOCK_SOUNDS_ID);
         }
 
         public Property setSounds(BlockSoundsID sounds) {
-            this.propertiesDataMap.add(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
+            return this.set(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
+        }
+
+        /**
+         * 设置属性
+         * */
+        public <T> Property set (PropertyType<T> property, T value) {
+            this.getPropertiesMap().add(property, value);
             return this;
         }
 
+        /**
+         * 获取属性
+         * */
+        public <T> T get (PropertyType<T> property) {
+            return this.getPropertiesMap().get(property);
+        }
+
         public PropertiesDataMap<?> getPropertiesMap () {
-            return propertiesDataMap;
+            return this.propertiesDataMap;
         }
 
         public Property setPropertiesMap (PropertiesDataMap<?> propertiesDataMap) {

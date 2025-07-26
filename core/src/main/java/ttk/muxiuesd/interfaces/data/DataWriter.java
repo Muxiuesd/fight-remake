@@ -2,6 +2,7 @@ package ttk.muxiuesd.interfaces.data;
 
 /**
  * 数据写入接口
+ * @param <T> writer的类型
  * */
 public interface DataWriter<T> {
      DataWriter<T> writeInt(String key, int value);

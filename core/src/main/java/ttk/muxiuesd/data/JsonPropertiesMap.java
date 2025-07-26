@@ -74,6 +74,8 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap> {
 
     @Override
     public void write (DataWriter<?> writer) {
-        this.propertiesMap.forEach((propertyType, value) -> propertyType.write(writer, value));
+        this.propertiesMap.forEach((propertyType, value) -> {
+            propertyType.write(writer, value);
+        });
     }
 }

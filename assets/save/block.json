@@ -1,21 +1,12 @@
 {
-"id": "fight:stone",
-"width": 1,
-"height": 1,
-"originX": 0,
-"originY": 0,
-"scaleX": 1,
-"scaleY": 1,
-"rotation": 0,
+"id": "fight:sand",
 "property": {
-	"block_friction": 1,
-	"block_sounds": {
-		"WALK": "fight:stone_walk",
-		"PUT": "fight:stone_put",
-		"DESTROY": "fight:stone_destroy"
+	"fight:block_friction": 0.9,
+	"fight:block_sounds": {
+		"WALK": "fight:sand_walk",
+		"PUT": "fight:sand_put",
+		"DESTROY": "fight:sand_destroy"
 	},
-	"cat": {
-		"aaaaaa": 123456
-	}
+	"fight:cat": {}
 }
 }

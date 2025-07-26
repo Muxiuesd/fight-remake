@@ -1,10 +1,14 @@
 package ttk.muxiuesd.serialization;
 
+import com.badlogic.gdx.utils.JsonValue;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.interfaces.data.DataReader;
+import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 
 import java.util.Optional;
 
@@ -16,14 +20,16 @@ public class BlockCodec extends JsonCodec<Block> {
     public void encode (Block block, JsonDataWriter dataWriter) {
         //基础属性
         dataWriter
-            .writeString("id", block.getID())
-            .writeFloat("width", block.width)
+            .writeString("id", block.getID());
+        if (block instanceof BlockWithEntity) {
+            dataWriter.writeFloat("width", block.width)
             .writeFloat("height", block.height)
             .writeFloat("originX", block.originX)
             .writeFloat("originY", block.originY)
             .writeFloat("scaleX", block.scaleX)
             .writeFloat("scaleY", block.scaleY)
             .writeFloat("rotation", block.rotation);
+        }
         //自定义属性
         dataWriter.objStart("property");
         //记得调用一次cat写入
@@ -33,7 +39,36 @@ public class BlockCodec extends JsonCodec<Block> {
     }
 
     @Override
-    protected Optional<Block> parse (DataReader<JsonDataReader> dataReader) {
-        return Optional.empty();
+    protected Optional<Block> parse (JsonDataReader dataReader) {
+        String id = dataReader.readString("id");
+        Block block = Registries.BLOCK.get(id);
+
+        ////对于有方块实体的方块
+        if (block instanceof BlockWithEntity<?,?> blockWithEntity) {
+            BlockWithEntity<?, ?> self = blockWithEntity.createSelf();
+            //读取基础属性
+            self.width = dataReader.readFloat("width");
+            self.height = dataReader.readFloat("height");
+            self.originX = dataReader.readFloat("originX");
+            self.originY = dataReader.readFloat("originY");
+            self.scaleX = dataReader.readFloat("scaleX");
+            self.scaleY = dataReader.readFloat("scaleY");
+            self.rotation = dataReader.readFloat("rotation");
+
+            //属性解码
+            JsonValue property = dataReader.readObj("property");
+            for (JsonValue prop : property) {
+                //读取每一个属性id，获取对应的属性，通过属性自己的读取来获取值
+                String typeID = prop.name();
+                PropertyType propertyType = Registries.PROPERTY_TYPE.get(typeID);
+                self.getProperty().set(propertyType, propertyType.read(dataReader, typeID));
+            }
+            //读取cat
+            self.readCAT(property.get(Fight.getId("cat")));
+
+            return Optional.of(self);
+        }
+        //普通方块
+        return Optional.of(block);
     }
 }

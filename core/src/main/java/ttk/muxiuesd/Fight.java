@@ -19,7 +19,7 @@ public class Fight {
      * 存档路径常量
      */
     public static final String PATH_SAVE = "save/";
-    public static final String PATH_SAVE_WORLD = "world/";
+    public static final String PATH_SAVE_WORLD = PATH_SAVE + "world/";
     public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
     public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
 
