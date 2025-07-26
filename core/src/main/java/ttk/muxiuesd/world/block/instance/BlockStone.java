@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockStone extends Block {
     public BlockStone() {
-        super(new Property(),
+        super(createProperty(),
             Fight.getId("stone"),
             Fight.BlockTexturePath("stone.png"));
     }

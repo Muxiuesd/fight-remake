@@ -21,7 +21,6 @@ import ttk.muxiuesd.world.cat.CAT;
  * */
 public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICAT {
     private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-        .add(PropertyTypes.CAT, new CAT())
         .add(PropertyTypes.BLOCK_FRICTON, 1f)
         .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
 
@@ -29,9 +28,10 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
 
     /**
      * 生成默认的属性
+     * 有些需要实例化的东西就放里面防止浅拷贝
      * */
     public static Property createProperty() {
-        return new Property();
+        return new Property().setCAT(new CAT());
     }
 
 
@@ -117,28 +117,16 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         return this;
     }
 
+    /**
+     * 在方块属性写入前一刻调用
+     * */
     @Override
     public void writeCAT (CAT cat) {
-        cat.set("id", this.getID());
-        cat.set("width", this.width);
-        cat.set("height", this.height);
-        cat.set("originX", this.originX);
-        cat.set("originY", this.originY);
-        cat.set("scaleX", this.scaleX);
-        cat.set("scaleY", this.scaleY);
-        cat.set("rotation", this.rotation);
+        cat.set("aaaaaa", 123456);
     }
 
     @Override
     public void readCAT (JsonValue values) {
-        this.setID(values.getString("id"));
-        this.width = values.getFloat("width");
-        this.height = values.getFloat("height");
-        this.originX = values.getFloat("originX");
-        this.originY = values.getFloat("originY");
-        this.scaleX = values.getFloat("scaleX");
-        this.scaleY = values.getFloat("scaleY");
-        this.rotation = values.getFloat("rotation");
     }
 
     /**方块属性
@@ -147,7 +135,8 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
     public static class Property {
         private PropertiesDataMap<?> propertiesDataMap;
 
-        public Property() {
+        private Property() {
+            ////这里有可能浅拷贝
             this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
         }
 
@@ -155,8 +144,9 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
             return this.propertiesDataMap.get(PropertyTypes.CAT);
         }
 
-        public void setCAT (CAT cat) {
+        public Property setCAT (CAT cat) {
             this.propertiesDataMap.add(PropertyTypes.CAT, cat);
+            return this;
         }
 
         public float getFriction() {

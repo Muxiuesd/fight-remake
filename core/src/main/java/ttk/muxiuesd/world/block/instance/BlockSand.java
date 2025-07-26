@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockSand extends Block {
     public BlockSand() {
-        super(new Block.Property()
+        super(createProperty()
                 .setFriction(0.9f)
                 .setSounds(Sounds.SAND),
             Fight.getId("sand"),

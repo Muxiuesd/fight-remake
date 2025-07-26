@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
  * 自定义属性标签：custom attribute tag （CAT）
  * */
 public class CAT {
-    private HashMap<String, Object> entries = new LinkedHashMap<>();
+    private final HashMap<String, Object> entries = new LinkedHashMap<>();
 
     public CAT set (String key, Object value) {
         this.getMap().put(key, value);

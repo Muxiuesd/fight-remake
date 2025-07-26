@@ -6,13 +6,13 @@ import ttk.muxiuesd.data.abs.JsonDataOutput;
 import ttk.muxiuesd.util.FileUtil;
 
 /**
- * 方块的json输出类
+ * 区块的json数据输出
  * */
-public class BlockJsonDataOutput extends JsonDataOutput {
+public class ChunkJsonDataOutput extends JsonDataOutput {
     @Override
     public void output (JsonDataWriter writer) {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
-        FileUtil.createFile(Fight.PATH_SAVE, "block.json").writeString(json.prettyPrint(string), false);
+        FileUtil.createFile(Fight.PATH_SAVE, "chunk.json").writeString(json.prettyPrint(string), false);
     }
 }

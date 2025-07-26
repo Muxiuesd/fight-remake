@@ -11,7 +11,7 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityCraftingTable;
  * */
 public class BlockCraftingTable extends BlockWithEntity<BlockCraftingTable, BlockEntityCraftingTable> {
     public BlockCraftingTable () {
-        super(new Property().setFriction(0.7f),
+        super(createProperty().setFriction(0.7f),
             Fight.getId("crafting_table"),
             Fight.BlockTexturePath("crafting_table.png"));
     }

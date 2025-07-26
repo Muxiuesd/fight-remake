@@ -1,18 +1,21 @@
 {
-"cat": {
-	"id": "fight:grass",
-	"width": 1,
-	"height": 1,
-	"originX": 0,
-	"originY": 0,
-	"scaleX": 1,
-	"scaleY": 1,
-	"rotation": 0
-},
-"block_friction": 1,
-"block_sounds": {
-	"WALK": "fight:grass_walk",
-	"PUT": "fight:grass_put",
-	"DESTROY": "fight:grass_destroy"
+"id": "fight:stone",
+"width": 1,
+"height": 1,
+"originX": 0,
+"originY": 0,
+"scaleX": 1,
+"scaleY": 1,
+"rotation": 0,
+"property": {
+	"block_friction": 1,
+	"block_sounds": {
+		"WALK": "fight:stone_walk",
+		"PUT": "fight:stone_put",
+		"DESTROY": "fight:stone_destroy"
+	},
+	"cat": {
+		"aaaaaa": 123456
+	}
 }
 }

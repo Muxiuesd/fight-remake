@@ -29,7 +29,7 @@ public final class Blocks {
      * 注册一个非常普通的方块
      * */
     public static Block register (String name) {
-        return register(name, new Block.Property());
+        return register(name, Block.createProperty());
     }
 
     public static Block register (String name, Block.Property property) {

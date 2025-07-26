@@ -577,6 +577,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return block;
     }
 
+    public Chunk getChunk (float wx, float wy) {
+        return this.getChunk(this.getChunkPosition(wx, wy));
+    }
+
     /**
      * 获取区块
      */

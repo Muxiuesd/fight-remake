@@ -10,7 +10,7 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockWater extends Block {
     public BlockWater() {
-        super(new Property().setFriction(0.2f),
+        super(createProperty().setFriction(0.2f),
             Fight.getId("water"),
             Fight.BlockTexturePath("water_still.png"));
     }

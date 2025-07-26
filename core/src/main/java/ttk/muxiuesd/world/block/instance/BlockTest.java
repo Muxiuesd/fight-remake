@@ -5,7 +5,7 @@ import ttk.muxiuesd.world.block.abs.Block;
 
 public class BlockTest extends Block {
     public BlockTest() {
-        super(new Property(),
+        super(createProperty(),
             Fight.getId("block_test"),
             Fight.BlockTexturePath("block_test.png"));
     }
