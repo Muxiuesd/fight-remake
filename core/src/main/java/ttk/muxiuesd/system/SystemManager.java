@@ -50,18 +50,6 @@ public class SystemManager implements Updateable, Disposable {
         Log.print(TAG, "所有系统初始化完毕");
     }
 
-
-
-    /*@Override
-    public void draw(Batch batch) {
-        this.systems.values().forEach(system -> system.draw(batch));
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        this.systems.values().forEach(system -> system.renderShape(batch));
-    }*/
-
     @Override
     public void update(float delta) {
         this.systems.values().forEach(system -> system.update(delta));

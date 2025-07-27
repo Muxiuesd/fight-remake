@@ -41,7 +41,7 @@ public class BlockCodec extends JsonCodec<Block> {
     }
 
     @Override
-    protected Optional<Block> parse (JsonDataReader dataReader) {
+    public Optional<Block> parse (JsonDataReader dataReader) {
         String id = dataReader.readString("id");
         Block block = Registries.BLOCK.get(id);
 

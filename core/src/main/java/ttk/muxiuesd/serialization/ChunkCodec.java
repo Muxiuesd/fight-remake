@@ -47,7 +47,7 @@ public class ChunkCodec extends JsonCodec<Chunk> {
     }
 
     @Override
-    protected Optional<Chunk> parse (JsonDataReader dataReader) {
+    public Optional<Chunk> parse (JsonDataReader dataReader) {
         Chunk resultChunk = new Chunk();
         //解析方块
         this.decodeTraversal("blocks", dataReader, resultChunk,

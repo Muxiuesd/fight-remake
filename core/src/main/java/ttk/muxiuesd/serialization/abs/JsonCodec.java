@@ -18,5 +18,5 @@ public abstract class JsonCodec<T> implements Codec<T, JsonDataWriter, JsonDataR
     /**
      * 解析出结果
      * */
-    protected abstract Optional<T> parse (JsonDataReader dataReader);
+    public abstract Optional<T> parse (JsonDataReader dataReader);
 }

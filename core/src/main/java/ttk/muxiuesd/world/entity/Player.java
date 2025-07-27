@@ -56,7 +56,6 @@ public class Player extends LivingEntity<Player> {
         //backpack.setItemStack(6, new ItemStack(Items.FISH, 2));
         backpack.setItemStack(7, new ItemStack(Items.TORCH));
 
-        //backpack.setItemStack(6, new ItemStack(Gets.ITEM(Fight.getId("bait"))));
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }

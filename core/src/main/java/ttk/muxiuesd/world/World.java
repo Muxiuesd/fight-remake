@@ -1,18 +1,13 @@
 package ttk.muxiuesd.world;
 
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.WorldSystemsManager;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Log;
-
-import java.util.Optional;
 
 /**世界的基类
  * */
@@ -24,21 +19,6 @@ public abstract class World implements Updateable, Disposable {
 
     public World(MainGameScreen screen) {
         this.screen = screen;
-
-        //检查世界信息文件是否存在
-        if(FileUtil.fileExists(Fight.PATH_SAVE, "worldInfo.json")) {
-            //存在就读取
-            String file = FileUtil.readFileAsString(Fight.PATH_SAVE, "worldInfo.json");
-            Optional<WorldInfo> optional = WorldInfo.CODEC.parse(new JsonDataReader(file));
-            if (optional.isPresent()) {
-                //让这个实例存在
-                WorldInfo.INSTANCE = optional.get();
-            }
-        }else {
-            //新建一个
-            WorldInfo.INSTANCE = new WorldInfo();
-        }
-
     }
 
     /**

@@ -32,7 +32,7 @@ public class WallCodec extends JsonCodec<Wall<?>> {
     }
 
     @Override
-    protected Optional<Wall<?>> parse (JsonDataReader dataReader) {
+    public Optional<Wall<?>> parse (JsonDataReader dataReader) {
         String id = dataReader.readString("id");
         Wall<?> wall = Registries.WALL.get(id);
         Wall<?> self = wall.createSelf(new Vector2(dataReader.readFloat("x"), dataReader.readFloat("y")));
