@@ -24,7 +24,13 @@ public class JsonDataReader implements DataReader<JsonReader> {
 
     @Override
     public int readInt (String key) {
-        return this.getParse().getInt(key);
+        int value = 0;
+        try {
+            value = this.getParse().getInt(key);
+        }catch (Exception e) {
+            value = (int) this.getParse().getLong(key);
+        }
+        return value;
     }
 
     @Override

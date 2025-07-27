@@ -9,6 +9,7 @@ import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
 import ttk.muxiuesd.render.RenderLayer;
+import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -44,6 +45,7 @@ public class Registries {
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
     public static final Registry<FightPool<?>> POOL = create(RegistryKeys.POOL);
+    public static final Registry<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = create(RegistryKeys.WORLD_INFO_HASH_MAP);
 
     /**
      * 创建一个注册表

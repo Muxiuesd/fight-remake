@@ -39,15 +39,15 @@ public class WallCodec extends JsonCodec<Wall<?>> {
         self.setID(id);
 
         //属性解码
-        JsonValue property = dataReader.readObj("property");
-        for (JsonValue prop : property) {
+        JsonValue propertyValue = dataReader.readObj("property");
+        for (JsonValue prop : propertyValue) {
             //读取每一个属性id，获取对应的属性，通过属性自己的读取来获取值
             String typeID = prop.name();
             PropertyType propertyType = Registries.PROPERTY_TYPE.get(typeID);
-            self.getProperty().set(propertyType, propertyType.read(dataReader, typeID));
+            self.getProperty().set(propertyType, propertyType.read(new JsonDataReader(propertyValue), typeID));
         }
         //读取cat
-        self.readCAT(property.get(Fight.getId("cat")));
+        self.readCAT(propertyValue.get(Fight.getId("cat")));
 
         return Optional.of(self);
     }

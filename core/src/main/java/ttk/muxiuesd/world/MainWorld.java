@@ -29,6 +29,5 @@ public class MainWorld extends World {
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
 
-        //addSystem()
     }
 }
