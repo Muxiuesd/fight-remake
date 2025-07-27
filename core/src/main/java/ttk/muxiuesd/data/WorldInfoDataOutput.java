@@ -12,6 +12,6 @@ public class WorldInfoDataOutput extends JsonDataOutput {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
         FileUtil.deleteFile(Fight.PATH_SAVE, WorldInfo.FILE_NAME);
-        FileUtil.createFile(Fight.PATH_SAVE, WorldInfo.FILE_NAME).writeString(json.prettyPrint(string), false);
+        FileUtil.createFile(Fight.PATH_SAVE_WORLD, WorldInfo.FILE_NAME).writeString(json.prettyPrint(string), false);
     }
 }
