@@ -1,12 +1,3 @@
 {
-"id": "fight:sand",
-"property": {
-	"fight:block_friction": 0.9,
-	"fight:block_sounds": {
-		"WALK": "fight:sand_walk",
-		"PUT": "fight:sand_put",
-		"DESTROY": "fight:sand_destroy"
-	},
-	"fight:cat": {}
-}
+"id": "fight:sand"
 }
