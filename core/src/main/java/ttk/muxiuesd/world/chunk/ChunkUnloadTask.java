@@ -25,7 +25,6 @@ public class ChunkUnloadTask extends ChunkTask {
         chunkDataWriter.objEnd();
         new ChunkJsonDataOutput(chunk.getChunkPosition().toString()).output(chunkDataWriter);
 
-        //this.chunk.dispose();
         return this.chunk;
     }
 }

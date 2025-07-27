@@ -199,10 +199,20 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void dispose() {
-        for (Chunk activeChunk : this.activeChunks) {
-            activeChunk.dispose();
-        }
+        this.saveAllChunks();
         this.shutdownChunkLoadPool();
+    }
+
+    /**
+     * 卸载保存现有的所有区块
+     * */
+    private void saveAllChunks() {
+        Log.print(TAG, "保存游戏所有的区块信息。。。");
+        for (Chunk chunk : this.activeChunks) {
+            ChunkUnloadTask chunkUnloadTask = new ChunkUnloadTask(this, chunk);
+            chunkUnloadTask.call();
+        }
+        Log.print(TAG, "游戏所有的区块信息完成保存！");
     }
 
     /**
@@ -510,10 +520,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * （主线程）初始化区块
+     * （主线程）加载区块
      */
     public Chunk initChunk(int chunkX, int chunkY) {
-        return this.getChunkGenerator().generate(new ChunkPosition(chunkX, chunkY));
+        ChunkLoadTask chunkLoadTask = new ChunkLoadTask(this, new ChunkPosition(chunkX, chunkY));
+        return chunkLoadTask.call();
     }
 
     public Block getBlock (Vector2 position) {

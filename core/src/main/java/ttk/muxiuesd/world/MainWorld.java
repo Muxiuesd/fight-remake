@@ -30,8 +30,8 @@ public class MainWorld extends World {
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
 
-        WorldInformation.INT.put("seed", 114514);
-        WorldInformation.LONG.put("seed", 114514L);
+        WorldInformation.INT.putIfAbsent("seed", 114514);
+        WorldInformation.LONG.putIfAbsent("seed", 114514L);
     }
 
 
