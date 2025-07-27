@@ -99,8 +99,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * 在对应坐标上设置方块
      * */
     public void setBlock (Block block, int cx, int cy) {
-        //TODO 判断方块是否存在
         this.blocks[cy][cx] = block;
+        //确保区块系统里存在这个方块
+        if (this.chunkSystem != null) {
+            this.chunkSystem.addBlock(block, this.getWorldX(cx), this.getWorldY(cy));
+        }
     }
     /**
      * 获取区块中的方块
@@ -318,5 +321,14 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             cp.y = (int) (wy % ChunkHeight);
         }
         return cp;
+    }
+
+    public ChunkSystem getChunkSystem () {
+        return this.chunkSystem;
+    }
+
+    public Chunk setChunkSystem (ChunkSystem chunkSystem) {
+        this.chunkSystem = chunkSystem;
+        return this;
     }
 }

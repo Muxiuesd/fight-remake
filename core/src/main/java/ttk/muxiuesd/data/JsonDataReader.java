@@ -13,6 +13,10 @@ public class JsonDataReader implements DataReader<JsonReader> {
     private JsonReader reader;
     private JsonValue parse;
 
+    public JsonDataReader(JsonValue parse) {
+        this.reader = new JsonReader();
+        this.parse = parse;
+    }
     public JsonDataReader (String jsonString) {
         this.reader = new JsonReader();
         this.parse  = this.reader.parse(jsonString);
@@ -60,7 +64,7 @@ public class JsonDataReader implements DataReader<JsonReader> {
 
     @Override
     public String readString (String key) {
-        if (this.getParse().has(key)) return this.getParse().get(key).toString();
+        //if (this.getParse().has(key)) return this.getParse().get(key).toString();
         return this.getParse().getString(key);
     }
 

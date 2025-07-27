@@ -1,9 +1,15 @@
 package ttk.muxiuesd.world.chunk;
 
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.data.JsonDataReader;
+import ttk.muxiuesd.serialization.Codecs;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkTask;
+
+import java.util.Optional;
 
 /**
  * 异步加载Chunk的任务
@@ -14,8 +20,28 @@ public class ChunkLoadTask extends ChunkTask {
     }
 
     @Override
-    public Chunk call() throws Exception {
+    public Chunk call() {
         //TODO 加载保存过的区块
+        String name = getChunkPosition().toString() + ".json";
+        if (!FileUtil.fileExists(Fight.PATH_SAVE_CHUNKS, name)) {
+            //文件不存在，新生成
+            Chunk chunk = this.genNewChunk();
+            chunk.setChunkPosition(getChunkPosition());
+            chunk.setChunkSystem(getChunkSystem());
+            return chunk;
+        }
+        //文件存在，就从文件加载区块
+        Optional<Chunk> optional = Codecs.CHUNK.decode(
+            new JsonDataReader(FileUtil.readFileAsString(Fight.PATH_SAVE_CHUNKS, name))
+        );
+
+        Chunk chunk = optional.orElse(this.genNewChunk());
+        chunk.setChunkPosition(getChunkPosition());
+        chunk.setChunkSystem(getChunkSystem());
+        return chunk;
+    }
+
+    private Chunk genNewChunk() {
         ChunkGenerator generator = getChunkSystem().getChunkGenerator();
         return generator.generate(getChunkPosition());
     }

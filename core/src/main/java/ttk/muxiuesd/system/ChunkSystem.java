@@ -46,7 +46,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     //方块实例，不带有方块实体的同一种方块在world里只有一个实例，带有方块实体的方块都是单独一个实例
     private final ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
     //方块实体，每一个方块实体都是一个单独的实例
-    private final ConcurrentHashMap<BlockWithEntity, BlockEntity> blockEntities = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BlockWithEntity<?, ?>, BlockEntity> blockEntities = new ConcurrentHashMap<>();
 
     // 当前活跃的线程
     private ArrayList<Chunk> activeChunks = new ArrayList<>();
@@ -95,7 +95,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         // 检查线程池里的区块是否加载完成
         if (!this.chunkLoadingTasks.isEmpty()) {
-            //System.out.println(this.chunkLoadingTasks.size());
             for (ChunkPosition position : this.chunkLoadingTasks.keySet()) {
                 if (this.isChunkLoaded(position)) {
                     // 如果加载完成，则将区块加入活跃队列
@@ -115,7 +114,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                     this.chunkLoadingTasks.remove(position);
                 }
             }
-            //System.out.println(this._loadChunks.size());
         }
         if (!this.chunkUnloadingTasks.isEmpty()) {
             for (ChunkPosition position : this.chunkUnloadingTasks.keySet()) {
@@ -206,12 +204,12 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 添加方块
+     * 添加方块，确切地说，是把这个方块的实例放进区块系统里确保可以被查询到
      * */
     public void addBlock (Block block, float wx, float wy) {
         Vector2 floor = Util.fastFloor(wx, wy);
         //如果新的方块是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        if (block instanceof BlockWithEntity<?, ?> blockWithEntity) {
             //添加方块实体
             BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
             this.addBlockEntity(blockWithEntity, blockEntity);
@@ -242,7 +240,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     private void addBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        if (block instanceof BlockWithEntity<? ,?> blockWithEntity) {
             this.blockInstances.put(this.getBlockKey(blockWithEntity), blockWithEntity);
             return;
         }
@@ -258,7 +256,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     private Block removeBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        if (block instanceof BlockWithEntity<? ,?> blockWithEntity) {
             return this.blockInstances.remove(this.getBlockKey(blockWithEntity));
         }
 
@@ -273,7 +271,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 添加方块实体
      * */
-    private void addBlockEntity(BlockWithEntity block, BlockEntity blockEntity) {
+    private void addBlockEntity(BlockWithEntity<? ,?> block, BlockEntity blockEntity) {
         if (block == null || blockEntity == null) return;
 
         TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
@@ -286,7 +284,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 移除方块实体
      * */
-    private BlockEntity removeBlockEntity(BlockWithEntity block) {
+    private BlockEntity removeBlockEntity (BlockWithEntity<?, ?> block) {
         BlockEntity removed = this.getBlockEntities().remove(block);
         if (removed == null) return null;
 
@@ -312,23 +310,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         Chunk chunk = this.getChunk(chunkPosition);
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
 
-        /*ConcurrentHashMap<String, Block> instancesMap = this.getBlockInstancesMap();
-        if (! instancesMap.containsKey(newBlock.getID())) {
-            //如果方块实例不存在，就加进去
-            instancesMap.put(newBlock.getID(), newBlock);
-        }*/
-
-        /*//如果新的方块是带有方块实体的方块
-        if (newBlock instanceof BlockWithEntity blockWithEntity) {
-            //添加方块实体
-            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
-            this.addBlockEntity(blockWithEntity, blockEntity);
-            //TODO 事件：添加方块实体
-        }
-        this.addBlockInstance(newBlock);*/
-
         //如果旧的方块是带有方块实体的方块
-        if (oldBlock instanceof BlockWithEntity blockWithEntity) {
+        if (oldBlock instanceof BlockWithEntity<? ,?> blockWithEntity) {
             this.removeBlockEntity(blockWithEntity);
             //TODO 事件：移除方块实体
             //移除对应的方块实例
@@ -336,9 +319,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         //如果新方块是带有方块实体的方块
-        if (newBlock instanceof BlockWithEntity blockWithEntity) {
+        if (newBlock instanceof BlockWithEntity<? ,?> blockWithEntity) {
             //需要新建一个实例再添加
-            BlockWithEntity self = blockWithEntity.createSelf();
+            BlockWithEntity<? ,?> self = blockWithEntity.createSelf();
             this.addBlock(self, wx, wy);
             chunk.setBlock(self, chunkBlockPos.x, chunkBlockPos.y);
         }else {
@@ -403,29 +386,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //检查是否加载过或者正在加载这个区块
         boolean chunkExist = this.chunkExist(loadChunkPosition);
 
-        // 检查是否已经在加载队列里
-        /*for (Chunk chunk : this._loadChunks) {
-            ChunkPosition chunkPosition = chunk.getChunkPosition();
-            if (chunkPosition.equals(loadChunkPosition)) {
-                // Log.error(TAG, "编号为：(" + chunkX +","+ chunkY +")的区块已加载！！！");
-                chunkExist = true;
-                break;
-            }
-        }
-        // 检查是否已经在活跃队列里
-        for (Chunk chunk : this.activeChunks) {
-            ChunkPosition chunkPosition = chunk.getChunkPosition();
-            if (chunkPosition.equals(loadChunkPosition)) {
-                // Log.error(TAG, "编号为：(" + chunkX +","+ chunkY +")的区块已活跃！！！");
-                chunkExist = true;
-                break;
-            }
-        }*/
         if (chunkExist) {
             // TODO 实现如果区块已存在的更多操作，比如加载保存的此区块的数据
             return;
         }
-
 
         // 生成任务并提交到线程池里加载区块
         ChunkLoadTask task = new ChunkLoadTask(this, loadChunkPosition);
@@ -692,7 +656,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.blockInstances;
     }
 
-    public ConcurrentHashMap<BlockWithEntity, BlockEntity> getBlockEntities () {
+    public ConcurrentHashMap<BlockWithEntity<?, ?>, BlockEntity> getBlockEntities () {
         return this.blockEntities;
     }
 

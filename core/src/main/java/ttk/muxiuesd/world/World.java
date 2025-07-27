@@ -27,20 +27,6 @@ public abstract class World implements Updateable, Disposable {
         return this;
     }
 
-    /*@Override
-    public void draw(Batch batch) {
-        if (this.worldSystemsManager != null) {
-            this.getSystemManager().draw(batch);
-        }
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        if (this.worldSystemsManager != null) {
-            this.getSystemManager().renderShape(batch);
-        }
-    }*/
-
     @Override
     public void update(float delta) {
         if (this.worldSystemsManager != null) {

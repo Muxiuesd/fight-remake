@@ -18,9 +18,10 @@ import java.util.Optional;
 public class BlockCodec extends JsonCodec<Block> {
     @Override
     public void encode (Block block, JsonDataWriter dataWriter) {
-        //基础属性
-        dataWriter
-            .writeString("id", block.getID());
+        //基础属性（所有类型的方块必须写入）
+        dataWriter.writeString("id", block.getID());
+
+        //带有方块实体的方块是一个方块一个实例，所以需要写入自定义的各种属性
         if (block instanceof BlockWithEntity) {
             dataWriter.writeFloat("width", block.width)
             .writeFloat("height", block.height)
@@ -29,13 +30,14 @@ public class BlockCodec extends JsonCodec<Block> {
             .writeFloat("scaleX", block.scaleX)
             .writeFloat("scaleY", block.scaleY)
             .writeFloat("rotation", block.rotation);
+
+            //自定义属性
+            dataWriter.objStart("property");
+            //记得调用一次cat写入
+            block.writeCAT(block.getProperty().getCAT());
+            block.getProperty().getPropertiesMap().write(dataWriter);
+            dataWriter.objEnd();
         }
-        //自定义属性
-        dataWriter.objStart("property");
-        //记得调用一次cat写入
-        block.writeCAT(block.getProperty().getCAT());
-        block.getProperty().getPropertiesMap().write(dataWriter);
-        dataWriter.objEnd();
     }
 
     @Override
@@ -43,7 +45,7 @@ public class BlockCodec extends JsonCodec<Block> {
         String id = dataReader.readString("id");
         Block block = Registries.BLOCK.get(id);
 
-        ////对于有方块实体的方块
+        //对于有方块实体的方块
         if (block instanceof BlockWithEntity<?,?> blockWithEntity) {
             BlockWithEntity<?, ?> self = blockWithEntity.createSelf();
             //读取基础属性
@@ -68,6 +70,7 @@ public class BlockCodec extends JsonCodec<Block> {
 
             return Optional.of(self);
         }
+
         //普通方块
         return Optional.of(block);
     }

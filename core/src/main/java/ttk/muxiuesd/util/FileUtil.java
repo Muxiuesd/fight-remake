@@ -20,11 +20,6 @@ public class FileUtil {
         try {
             FileHandle file = getFileHandle(path, fileName);
             if (!file.exists()) {
-                /*// 确保父目录存在
-                FileHandle parent = file.parent();
-                if (parent != null && !parent.exists()) {
-                    parent.mkdirs();
-                }*/
                 // 创建空文件
                 file.write(false);
             }
