@@ -38,10 +38,10 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public ItemStack (Item item, int amount) {
         this(item, amount, item.getBehaviour(), item.property.getPropertiesMap().copy());
     }
-    public ItemStack (Item item, int amount, PropertiesDataMap<?> propertiesMap) {
+    public ItemStack (Item item, int amount, PropertiesDataMap<?, ?, ?> propertiesMap) {
         this(item, amount, item.getBehaviour(), propertiesMap);
     }
-    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?> propertiesMap) {
+    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?, ?, ?> propertiesMap) {
         this.item = item;
         this.amount = amount;
 
@@ -59,14 +59,14 @@ public class ItemStack implements Updateable, ShapeRenderable {
     /**
      * 使用
      * */
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (World world, LivingEntity<?> user) {
         return this.behaviour.use(world, user, this);
     }
 
     /**
      * 这个物品堆叠从手上换下来
      * */
-    public void putDown (World world, LivingEntity holder) {
+    public void putDown (World world, LivingEntity<?> holder) {
         this.getItem().putDown(this, world, holder);
     }
 
@@ -80,7 +80,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
     /**
      * 物品在手上的绘制
      * */
-    public void drawItemOnHand (Batch batch, LivingEntity holder) {
+    public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
         this.getItem().drawOnHand(batch, holder, this);
     }
 

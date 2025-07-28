@@ -5,6 +5,7 @@ import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
 import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;

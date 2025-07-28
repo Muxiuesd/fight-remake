@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
@@ -31,11 +31,11 @@ public class BlockCodec extends JsonCodec<Block> {
             .writeFloat("scaleY", block.scaleY)
             .writeFloat("rotation", block.rotation);
 
-            //自定义属性
-            dataWriter.objStart("property");
             //记得调用一次cat写入
             block.writeCAT(block.getProperty().getCAT());
-            block.getProperty().getPropertiesMap().write(dataWriter);
+            //编码自定义属性
+            dataWriter.objStart("property");
+            Codecs.BLOCK_PROPERTY.encode(block.getProperty(), dataWriter);
             dataWriter.objEnd();
         }
     }
@@ -57,16 +57,21 @@ public class BlockCodec extends JsonCodec<Block> {
             self.scaleY = dataReader.readFloat("scaleY");
             self.rotation = dataReader.readFloat("rotation");
 
-            //属性解码
-            JsonValue property = dataReader.readObj("property");
-            for (JsonValue prop : property) {
+            /*for (JsonValue prop : propertyValue) {
                 //读取每一个属性id，获取对应的属性，通过属性自己的读取来获取值
                 String typeID = prop.name();
                 PropertyType propertyType = Registries.PROPERTY_TYPE.get(typeID);
                 self.getProperty().set(propertyType, propertyType.read(dataReader, typeID));
+            }*/
+            //属性解码
+            JsonValue propertyValue = dataReader.readObj("property");
+            Optional<Block.Property> propertyOptional = Codecs.BLOCK_PROPERTY.decode(new JsonDataReader(propertyValue));
+            if (propertyOptional.isPresent()) {
+                self.setProperty(propertyOptional.get());
             }
+
             //读取cat
-            self.readCAT(property.get(Fight.getId("cat")));
+            self.readCAT(propertyValue.get(Fight.getId("cat")));
 
             return Optional.of(self);
         }

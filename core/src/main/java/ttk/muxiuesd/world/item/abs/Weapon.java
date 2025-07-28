@@ -8,7 +8,7 @@ import ttk.muxiuesd.registry.PropertyTypes;
  * 武器类
  * */
 public abstract class Weapon extends Item {
-    public static final PropertiesDataMap<?> DEFAULT_WEAPON_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+    public static final PropertiesDataMap<?, ?, ?> DEFAULT_WEAPON_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 1)
         .add(PropertyTypes.WEAPON_DAMAGE, 1f)
         .add(PropertyTypes.WEAPON_DURATION, 100)

@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.chunk;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.serialization.Codecs;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.FileUtil;

@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.BlockJsonDataOutput;
 import ttk.muxiuesd.data.ChunkJsonDataOutput;
-import ttk.muxiuesd.data.ItemJsonDataOutput;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -20,7 +19,7 @@ import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.serialization.Codecs;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.BlockPosition;
 import ttk.muxiuesd.util.ChunkPosition;
@@ -36,7 +35,6 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 输入处理系统
@@ -102,13 +100,13 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
 
             if (handItemStack != null) {
                 //测试
-                Item item = handItemStack.getItem();
+                /*Item item = handItemStack.getItem();
                 JsonDataWriter dataWriter = new JsonDataWriter();
                 dataWriter.objStart();
                 item.property.getPropertiesMap().write(dataWriter);
                 dataWriter.objEnd();
 
-                new ItemJsonDataOutput().output(dataWriter);
+                new ItemJsonDataOutput().output(dataWriter);*/
             }
             System.out.println("==============================================");
             //方块写入测试

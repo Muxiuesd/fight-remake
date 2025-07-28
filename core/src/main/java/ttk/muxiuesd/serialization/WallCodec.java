@@ -5,9 +5,10 @@ import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class WallCodec extends JsonCodec<Wall<?>> {
         wall.writeCAT(wall.getProperty().getCAT());
         //自定义属性
         dataWriter.objStart("property");
-        wall.getProperty().getPropertiesMap().write(dataWriter);
+        Codecs.BLOCK_PROPERTY.encode (wall.getProperty(), dataWriter);
         dataWriter.objEnd();
     }
 
@@ -40,11 +41,9 @@ public class WallCodec extends JsonCodec<Wall<?>> {
 
         //属性解码
         JsonValue propertyValue = dataReader.readObj("property");
-        for (JsonValue prop : propertyValue) {
-            //读取每一个属性id，获取对应的属性，通过属性自己的读取来获取值
-            String typeID = prop.name();
-            PropertyType propertyType = Registries.PROPERTY_TYPE.get(typeID);
-            self.getProperty().set(propertyType, propertyType.read(new JsonDataReader(propertyValue), typeID));
+        Optional<Block.Property> propertyOptional = Codecs.BLOCK_PROPERTY.decode(new JsonDataReader(propertyValue));
+        if (propertyOptional.isPresent()) {
+            self.setProperty(propertyOptional.get());
         }
         //读取cat
         self.readCAT(propertyValue.get(Fight.getId("cat")));

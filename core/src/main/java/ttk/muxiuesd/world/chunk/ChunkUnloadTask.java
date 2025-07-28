@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.chunk;
 
 import ttk.muxiuesd.data.ChunkJsonDataOutput;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.serialization.Codecs;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 

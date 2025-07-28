@@ -11,6 +11,6 @@ public class DefaultFloatPropertyType extends PropertyType<Float> {
 
     @Override
     public Float read (DataReader<?> reader, String dataKey) {
-        return reader.readFloat(dataKey);
+        return reader.readFloat(getId());
     }
 }

@@ -24,53 +24,55 @@ public class JsonDataReader implements DataReader<JsonReader> {
 
     @Override
     public int readInt (String key) {
-        int value = 0;
-        try {
-            value = this.getParse().getInt(key);
-        }catch (Exception e) {
-            value = (int) this.getParse().getLong(key);
-        }
-        return value;
+        this.check(key);
+        return this.getParse().getInt(key);
     }
 
     @Override
     public long readLong (String key) {
+        this.check(key);
         return this.getParse().getLong(key);
     }
 
     @Override
     public float readFloat (String key) {
+        this.check(key);
         return this.getParse().getFloat(key);
     }
 
     @Override
     public double readDouble (String key) {
+        this.check(key);
         return this.getParse().getDouble(key);
     }
 
     @Override
     public boolean readBoolean (String key) {
+        this.check(key);
         return this.getParse().getBoolean(key);
     }
 
     @Override
     public char readChar (String key) {
+        this.check(key);
         return this.getParse().getChar(key);
     }
 
     @Override
     public byte readByte (String key) {
+        this.check(key);
         return this.getParse().getByte(key);
     }
 
     @Override
     public short readShort (String key) {
+        this.check(key);
         return this.getParse().getShort(key);
     }
 
     @Override
     public String readString (String key) {
-        //if (this.getParse().has(key)) return this.getParse().get(key).toString();
+        this.check(key);
         return this.getParse().getString(key);
     }
 
@@ -79,7 +81,8 @@ public class JsonDataReader implements DataReader<JsonReader> {
      * */
     public JsonValue readObj (String key) {
         if (!this.getParse().has(key)) {
-            Log.error(TAG, "json中不存在名为：" + key + " 的obj！！！");
+            Log.error(TAG, "json中不存在名为：" + key + " 的obj！！！" +
+                "原文：\n" + this.getParse().toString());
             throw new IllegalArgumentException(key);
         }
         return this.getParse().get(key);
@@ -100,5 +103,13 @@ public class JsonDataReader implements DataReader<JsonReader> {
             this.reader = reader;
         }
         return this;
+    }
+
+    private void check (String key) {
+        if (!this.getParse().has(key)) {
+            Log.error(TAG, "json中不存在名为：" + key + " 的值！！！" +
+                "原文：\n" + this.getParse().toString());
+            throw new IllegalArgumentException(key);
+        }
     }
 }

@@ -29,7 +29,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
 public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, ItemShapeRenderable {
-    public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+    public static final JsonPropertiesMap ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 64)
         .add(PropertyTypes.ITEM_ON_USING, false)
         .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getId());
@@ -179,7 +179,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     public static class Property {
         //属性映射
-        private PropertiesDataMap<?> propertiesMap;
+        private PropertiesDataMap<?, ?, ?> propertiesMap;
 
         /**
          * 实例化后默认属性
@@ -245,11 +245,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             return this;
         }
 
-        public PropertiesDataMap<?> getPropertiesMap () {
+        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
             return this.propertiesMap;
         }
 
-        public Property setPropertiesMap (PropertiesDataMap<?> propertiesMap) {
+        public Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
             this.propertiesMap = propertiesMap;
             return this;
         }

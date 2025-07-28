@@ -15,6 +15,7 @@ public abstract class JsonCodec<T> implements Codec<T, JsonDataWriter, JsonDataR
     public Optional<T> decode (JsonDataReader dataReader) {
         return this.parse(dataReader);
     }
+
     /**
      * 解析出结果
      * */
