@@ -65,6 +65,8 @@ public final class Items {
      * */
     public static Item register (Block block) {
         String id = block.getID();
-        return Registries.ITEM.register(new Identifier(id), new BlockItem(block, id));
+        BlockItem blockItem = new BlockItem(block, id);
+        blockItem.setID(id);
+        return Registries.ITEM.register(new Identifier(id), blockItem);
     }
 }
