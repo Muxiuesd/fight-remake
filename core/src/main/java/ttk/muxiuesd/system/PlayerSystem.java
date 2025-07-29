@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.data.BackpackDataOutput;
+import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
@@ -12,6 +14,7 @@ import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Sounds;
@@ -108,6 +111,15 @@ public class PlayerSystem extends WorldSystem {
         AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);
     }
 
+    @Override
+    public void dispose () {
+        JsonDataWriter dataWriter = new JsonDataWriter();
+        dataWriter.objStart();
+        Codecs.BACKPACK.encode(this.getPlayer().getBackpack(), dataWriter);
+        dataWriter.objEnd();
+
+        new BackpackDataOutput("player_backpack").output(dataWriter);
+    }
 
     /**
      * 获取玩家的唯一方式，其他地方获取玩家也是通过这个方法

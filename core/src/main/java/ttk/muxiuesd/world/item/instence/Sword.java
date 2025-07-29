@@ -23,7 +23,7 @@ public class Sword extends Weapon {
      * 新建一个默认的近战武器的属性
      */
     public static Property createDefaultProperty() {
-        return new Property().setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy())
+        return Weapon.createDefaultProperty()
             .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2.5f)
             .setUseSoundId(Sounds.ENTITY_SWEEP.getId());
     }
