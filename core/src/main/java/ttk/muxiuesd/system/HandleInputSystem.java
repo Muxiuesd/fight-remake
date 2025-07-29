@@ -108,7 +108,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
 
                 new ItemJsonDataOutput().output(dataWriter);*/
             }
-            System.out.println("==============================================");
+            //System.out.println("==============================================");
             //方块写入测试
             JsonDataWriter dataWriter = new JsonDataWriter();
             dataWriter.objStart();

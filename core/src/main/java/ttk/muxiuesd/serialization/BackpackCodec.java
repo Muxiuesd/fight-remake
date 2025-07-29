@@ -37,6 +37,18 @@ public class BackpackCodec extends InventoryCodec<Backpack> {
 
     @Override
     public Optional<Backpack> parse (JsonDataReader dataReader) {
-        return Optional.empty();
+        Backpack backpack = new Backpack(dataReader.readInt("size"));
+        JsonDataReader itemStacksData = new JsonDataReader(dataReader.readObj("itemStacks"));
+        for (int i = 0; i < backpack.getSize(); i++) {
+            String index = String.valueOf(i);
+            //该索引没有物品数据就跳过
+            if (! itemStacksData.getParse().has(index)) continue;
+
+            Optional<ItemStack> optional = Codecs.ITEM_STACK.decode(new JsonDataReader(itemStacksData.readObj(index)));
+            if (optional.isPresent()) {
+                backpack.setItemStack(i, optional.get());
+            }
+        }
+        return Optional.of(backpack);
     }
 }

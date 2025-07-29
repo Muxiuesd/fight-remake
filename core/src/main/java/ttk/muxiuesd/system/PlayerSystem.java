@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.data.BackpackDataOutput;
+import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -20,15 +21,19 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
+
+import java.util.Optional;
 
 /**
  * 玩家系统
@@ -50,6 +55,15 @@ public class PlayerSystem extends WorldSystem {
         this.player = (Player) Gets.ENTITY(Fight.getId("player"));
         this.playerLastPosition = this.player.getPosition();
         this.bubbleEmitTimer = new Timer<>(0.5f);
+
+        String file = FileUtil.readFileAsString(Fight.PATH_SAVE_ENTITIES, "player_backpack.json");
+        JsonDataReader dataReader = new JsonDataReader(file);
+        Optional<Backpack> optional = Codecs.BACKPACK.decode(dataReader);
+        if (optional.isPresent()) {
+            this.player.setBackpack(optional.get());
+        }
+
+
         Log.print(TAG, "PlayerSystem初始化完成！");
     }
 
