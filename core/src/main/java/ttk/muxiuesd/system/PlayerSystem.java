@@ -52,15 +52,18 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        this.player = (Player) Gets.ENTITY(Fight.getId("player"));
+        this.player = Entities.PLAYER.create(getWorld());
         this.playerLastPosition = this.player.getPosition();
         this.bubbleEmitTimer = new Timer<>(0.5f);
-        //测试用玩家背包解码
-        String file = FileUtil.readFileAsString(Fight.PATH_SAVE_ENTITIES, "player_backpack.json");
-        JsonDataReader dataReader = new JsonDataReader(file);
-        Optional<Backpack> optional = Codecs.BACKPACK.decode(dataReader);
-        if (optional.isPresent()) {
-            this.player.setBackpack(optional.get());
+
+        if (FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, "player_backpack.json")) {
+            //测试用玩家背包解码
+            String file = FileUtil.readFileAsString(Fight.PATH_SAVE_ENTITIES, "player_backpack.json");
+            JsonDataReader dataReader = new JsonDataReader(file);
+            Optional<Backpack> optional = Codecs.BACKPACK.decode(dataReader);
+            if (optional.isPresent()) {
+                this.player.setBackpack(optional.get());
+            }
         }
 
 
@@ -112,7 +115,7 @@ public class PlayerSystem extends WorldSystem {
         es.remove(this.player);
 
         //生成新的玩家实体
-        this.player = (Player) Gets.ENTITY(Fight.getId("player"));
+        this.player = Entities.PLAYER.create(getWorld());
         this.player.setEntitySystem(es);
         this.playerLastPosition = this.player.getPosition();
         es.add(player);

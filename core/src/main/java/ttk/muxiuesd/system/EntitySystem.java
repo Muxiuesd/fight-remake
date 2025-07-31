@@ -151,7 +151,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         for (Entity entity : this.updatableEntity) {
             //先把所有实体更新一次
             if (!(entity instanceof ItemEntity)) {
-                //对于物品实体进行当前速度更新
+                //对于非物品实体进行当前速度更新
                 this.calculateEntityCurSpeed(entity, (ChunkSystem) getManager().getSystem("ChunkSystem"), delta);
             }
             entity.update(delta);

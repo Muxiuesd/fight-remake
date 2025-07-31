@@ -2,6 +2,7 @@ package ttk.muxiuesd.registry;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
@@ -12,33 +13,66 @@ import ttk.muxiuesd.world.entity.creature.PufferFish;
 import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
-import java.util.function.Supplier;
-
 public final class Entities {
     public static void init () {
     }
 
-    public static final ItemEntity ITEM_ENTITY = register("item_entity", ItemEntity::new);
+    public static final EntityProvider<ItemEntity> ITEM_ENTITY = register(
+        "item_entity",
+        EntityProvider.Builder.<ItemEntity>create(ItemEntity::new)
+            .setDefaultType(EntityTypes.ITEM_ENTITY)
+            .build()
+    );
     //活物实体
-    public static final Player PLAYER = register("player", Player::new);
+    public static final EntityProvider<Player> PLAYER = register(
+        "player",
+        EntityProvider.Builder.<Player>create(Player::new)
+            .setDefaultType(EntityTypes.PLAYER)
+            .build()
+    );
 
     //敌人
-    public static final Slime SLIME = register("slime", Slime::new);
-    public static final EntityTarget TARGET = register("target", EntityTarget::new);
+    public static final EntityProvider<Slime> SLIME = register(
+        "slime",
+        EntityProvider.Builder.<Slime>create(Slime::new)
+            .setDefaultType(EntityTypes.ENEMY)
+            .build()
+    );
+
+    public static final EntityProvider<EntityTarget> TARGET = register(
+        "target",
+        EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
+            .setDefaultType(EntityTypes.ENEMY)
+            .build()
+    );
 
     //生物
-    public static final PufferFish PUFFER_FISH = register("puffer_fish", PufferFish::new);
+    public static final EntityProvider<PufferFish> PUFFER_FISH = register(
+        "puffer_fish",
+        EntityProvider.Builder.<PufferFish>create(PufferFish::new)
+            .setDefaultType(EntityTypes.CREATURE)
+            .build()
+    );
 
     //子弹实体
-    public static final BulletFire BULLET_FIRE = register("bullet_fire", BulletFire::new);
+    public static final EntityProvider<BulletFire> BULLET_FIRE = register(
+        "bullet_fire",
+        EntityProvider.Builder.<BulletFire>create(BulletFire::new)
+            .setDefaultType(EntityTypes.ENEMY_BULLET)
+            .build()
+    );
 
     //最普通的实体
-    public static final EntityFishingHook FISHING_HOOK = register("fishing_hook", EntityFishingHook::new);
+    public static final EntityProvider<EntityFishingHook> FISHING_HOOK = register(
+        "fishing_hook",
+        EntityProvider.Builder.<EntityFishingHook>create(EntityFishingHook::new)
+            .setDefaultType(EntityTypes.PLAYER_FIASHING_HOOK)
+            .build()
+    );
 
 
-    public static <T extends Entity<?>> T register (String name, Supplier<T> supplier) {
+    public static <T extends Entity<?>> EntityProvider<T> register (String name, EntityProvider<T> provider) {
         Identifier identifier = new Identifier(Fight.NAMESPACE, name);
-        Registries.ENTITY.register(identifier, supplier);
-        return (T) supplier.get().setID(identifier.getId());
+        return (EntityProvider<T>) Registries.ENTITY.register(identifier, provider);
     }
 }

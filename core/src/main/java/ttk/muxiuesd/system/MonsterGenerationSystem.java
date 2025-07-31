@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.EnemyGenFactory;
-import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
 import ttk.muxiuesd.util.TaskTimer;
@@ -39,15 +38,16 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
         PlayerSystem ps = getPlayerSystem();
         EntitySystem es = getEntitySystem();
         for (int i = 0; i < 5; i++) {
-            EntityTarget fish = new EntityTarget();
+            EntityTarget fish = Entities.TARGET.create(getWorld());
             fish.setBounds(ps.getPlayer().x + 5, ps.getPlayer().y - 2 + i, 1, 1);
             fish.setEntitySystem(es);
             es.add(fish);
         }
 
 
-        Slime slime = (Slime) Gets.ENTITY(Entities.SLIME, es);
+        Slime slime = Entities.SLIME.create(getWorld());
         slime.setBounds(ps.getPlayer().x + 10, ps.getPlayer().y + 10, 1, 1);
+        es.add(slime);
 
         this.addGenFactory(Fight.getId("slime"), new SlimeGenFactory());
     }

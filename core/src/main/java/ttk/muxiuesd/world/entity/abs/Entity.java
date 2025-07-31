@@ -16,6 +16,7 @@ import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 
 /**
@@ -42,6 +43,9 @@ public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, 
 
     public Entity() {}
     public Entity (EntityType<?> type) {
+        setType(type);
+    }
+    public Entity (World world, EntityType<?> type) {
         setType(type);
     }
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
@@ -14,14 +15,12 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.EntityType;
-import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.function.Supplier;
 
 /**
  * 游戏内的所有注册表
@@ -33,7 +32,7 @@ public class Registries {
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<Wall<?>> WALL = create(RegistryKeys.WALL);
     public static final Registry<EntityType<?>> ENTITY_TYPE = create(RegistryKeys.ENTITY_TYPE);
-    public static final Registry<Supplier<? extends Entity<?>>> ENTITY = create(RegistryKeys.ENTITY);
+    public static final Registry<EntityProvider<?>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
 

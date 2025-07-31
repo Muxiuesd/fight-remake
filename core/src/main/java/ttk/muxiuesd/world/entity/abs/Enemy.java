@@ -10,6 +10,7 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
@@ -23,15 +24,21 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
 
-    public Enemy (EntityType<? extends Enemy<?>> entityType, String textureId, float maxHealth, float curHealth,
+
+    public Enemy (World world, EntityType<?> entityType,
+                  String textureId, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
-        this(entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
+        this(world, entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
         this.loadBodyTextureRegion(textureId, null);
     }
 
-    public Enemy (EntityType<? extends Enemy<?>> entityType, float maxHealth, float curHealth,
+    public Enemy (World world, EntityType<?> entityType) {
+        this(world, entityType, 10, 10, 10, 5, 2, 3);
+    }
+    public Enemy (World world, EntityType<?> entityType,
+                  float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
-        super(entityType, maxHealth, curHealth);
+        super(world, entityType, maxHealth, curHealth);
 
         this.visionRange = visionRange;
         this.attackRange = attackRange;
@@ -109,7 +116,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
      * @param direction 子弹的运动方向
      * */
     public Bullet createBullet (Entity<?> owner, Direction direction) {
-        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
+        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
         bullet.setPosition(x + (getWidth() - bullet.getWidth())/2, y + (getHeight() - bullet.getHeight())/2);

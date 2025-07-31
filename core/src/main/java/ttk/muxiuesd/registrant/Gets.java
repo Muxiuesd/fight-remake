@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -20,32 +21,29 @@ public class Gets {
         return Registries.BLOCK.get(id);
     }
 
-    public static Entity<?> ENTITY (Entity<?> entity, EntitySystem entitySystem) {
-        return ENTITY(entity.getID(), entitySystem);
-    }
-    /**
-     * 已知实体系统获取新实体，自动设置所属的实体系统，自动添加进去
-     * */
-    public static Entity<?> ENTITY (String id, EntitySystem entitySystem) {
-        Entity<?> entity = Registries.ENTITY.get(id).get().setID(id).setEntitySystem(entitySystem);
+    public static Entity<?> ENTITY (EntityProvider<?> provider, EntitySystem entitySystem) {
+        Entity<?> entity = provider.create(entitySystem.getWorld());
+        entity.setEntitySystem(entitySystem);
         entitySystem.add(entity);
         return entity;
     }
 
-    public static Entity<?> ENTITY (String id) {
-        return Registries.ENTITY.get(id).get().setID(id);
-    }
-
-    public static Enemy<?> ENEMY (String id) {
-        return (Enemy<?>) ENTITY(id);
+    /**
+     * 已知实体系统获取新实体，自动设置所属的实体系统，自动添加进去
+     * */
+    public static Entity<?> ENTITY (String id, EntitySystem entitySystem) {
+        EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
+        Entity<?> entity = entityProvider.create(entitySystem.getWorld());
+        entitySystem.add(entity);
+        return entity;
     }
 
     public static Enemy<?> ENEMY (String id, EntitySystem entitySystem) {
         return (Enemy<?>) ENTITY(id, entitySystem);
     }
 
-    public static Bullet BULLET (String id) {
-        return (Bullet) ENTITY(id);
+    public static Bullet BULLET (String id, EntitySystem entitySystem) {
+        return (Bullet) ENTITY(id, entitySystem);
     }
 }
 

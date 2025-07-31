@@ -7,6 +7,8 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -17,16 +19,18 @@ public class Slime extends Enemy<Slime> {
     public int generation;  //史莱姆的代数，用于控制史莱姆的分裂次数，分裂次数越多，代数越高
     public float factor = 0.7f;    //分裂时的缩放因子
 
-    public Slime () {
-        this(1);
+    public Slime (World world, EntityType<? super Slime> entityType) {
+        this(world, entityType, 1);
     }
-    public Slime(int generation) {
-        super(EntityTypes.ENEMY,10f, 10f, 16f, 16f, 1f, 1.2f);
+    public Slime(World world, EntityType<? super Slime> entityType, int generation) {
+        super(world, entityType, 10, 10, 16 ,10 , 1, 3);
+
         this.generation = generation;
         loadBodyTextureRegion(Fight.getId("slime"), "enemy/slime.png");
         getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
         renderHandItem = false;
     }
+
 
     @Override
     public void updateTarget (float delta, EntitySystem es) {
@@ -38,7 +42,7 @@ public class Slime extends Enemy<Slime> {
      */
     @Override
     public Bullet createBullet (Entity<?> owner, Direction direction) {
-        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"));
+        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"), owner.getEntitySystem());
         bullet.setType(EntityTypes.ENEMY_BULLET);
         bullet.setOwner(owner);
         bullet.setSize(

@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -25,12 +25,11 @@ public class Player extends LivingEntity<Player> {
     public boolean isDefend = false;
     public float defenseRadius = 1.23f; //防御半径
 
-    public Player () {
-        this(10, 10);
+    public Player (World world, EntityType<? super Player> entityType) {
+        this(world, entityType, 20, 20);
     }
-
-    public Player(float maxHealth, float curHealth) {
-        super(EntityTypes.PLAYER, maxHealth, curHealth, 16);
+    public Player(World world, EntityType<? super Player> entityType, float maxHealth, float curHealth) {
+        super(world, entityType, maxHealth, curHealth, 16);
         renderHandItem = true;
         speed = 8;
         curSpeed = speed;

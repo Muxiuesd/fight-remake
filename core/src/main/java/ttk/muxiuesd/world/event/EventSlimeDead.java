@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.event;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.event.abs.LivingEntityDeathEvent;
+import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
@@ -26,7 +27,7 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
                 return;
             }
             for (int i = 0; i < MathUtils.random(generation, generation + 3); i++) {
-                Slime child = new Slime();
+                Slime child = Entities.SLIME.create(world);
                 child.generation = generation + 1;
                 child.setEntitySystem(es);
                 float x = (float) (mom.x + MathUtils.random(mom.getWidth(), 2f) * Util.randomCos());

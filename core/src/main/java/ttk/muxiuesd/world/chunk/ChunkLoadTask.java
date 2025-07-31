@@ -23,7 +23,7 @@ public class ChunkLoadTask extends ChunkTask {
     public Chunk call() {
         //TODO 加载保存过的区块
         String name = getChunkPosition().toString() + ".json";
-        if (!FileUtil.fileExists(Fight.PATH_SAVE_CHUNKS, name)) {
+        if (! FileUtil.fileExists(Fight.PATH_SAVE_CHUNKS, name)) {
             //文件不存在，新生成
             Chunk chunk = this.genNewChunk();
             chunk.setChunkPosition(getChunkPosition());
@@ -31,14 +31,21 @@ public class ChunkLoadTask extends ChunkTask {
             return chunk;
         }
         //文件存在，就从文件加载区块
-        Optional<Chunk> optional = Codecs.CHUNK.decode(
-            new JsonDataReader(FileUtil.readFileAsString(Fight.PATH_SAVE_CHUNKS, name))
-        );
-
+        Optional<Chunk> optional = Optional.empty();
+        String file = FileUtil.readFileAsString(Fight.PATH_SAVE_CHUNKS, name);
+        JsonDataReader dataReader = new JsonDataReader(file);
+        try {
+            optional = Codecs.CHUNK.decode(
+                dataReader
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Chunk chunk = optional.orElse(this.genNewChunk());
         chunk.setChunkPosition(getChunkPosition());
         chunk.setChunkSystem(getChunkSystem());
         return chunk;
+
     }
 
     private Chunk genNewChunk() {

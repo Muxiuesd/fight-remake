@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.util.TaskTimer;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -21,9 +22,11 @@ public class ItemEntity extends Entity<ItemEntity> {
     private float cycle;
     private float livingTime;   //存在时间
 
-
-    public ItemEntity () {
-        super(EntityTypes.ITEM_ENTITY);
+    public ItemEntity (World world, EntityType<? super ItemEntity> entityType) {
+        this(world);
+    }
+    public ItemEntity (World world) {
+        super(world, EntityTypes.ITEM_ENTITY);
         this.positionOffset = new Vector2();
         setSize(DEFAULT_SIZE);
     }

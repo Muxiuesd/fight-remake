@@ -46,11 +46,14 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     private TaskTimer swingHandTimer;
     private float maxSwingHandDegree;
 
-    public LivingEntity(EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth) {
-        this(entityType, maxHealth, curHealth, 16);
+    public LivingEntity (World world, EntityType<?> entityType) {
+        this(world, entityType, 10, 10);
     }
-    public LivingEntity(EntityType<? extends LivingEntity<?>> entityType, float maxHealth, float curHealth, int backpackSize) {
-        super(entityType);
+    public LivingEntity(World world, EntityType<?> entityType, float maxHealth, float curHealth) {
+        this(world, entityType, maxHealth, curHealth, 16);
+    }
+    public LivingEntity(World world, EntityType<?> entityType, float maxHealth, float curHealth, int backpackSize) {
+        super(world, entityType);
         setSize(DEFAULT_SIZE);
         this.states = new LinkedHashMap<>();
         this.maxHealth = maxHealth;
@@ -142,7 +145,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         if (itemStack == null) return null;
 
         //简单的生成一个物品实体而已
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY.getID(), getEntitySystem());
+        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
         //使得物品中心与实体中心对齐
         itemEntity.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)));
         itemEntity.setOnGround(false);

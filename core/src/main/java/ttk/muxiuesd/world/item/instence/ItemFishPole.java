@@ -28,15 +28,12 @@ import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.loottable.FishingLootTable;
 
-import java.util.function.Supplier;
-
 /**
  * 钓鱼竿
  * <p>
  * 能抛出的钓鱼钩
  * */
 public class ItemFishPole extends Item {
-    public static final Supplier<EntityFishingHook> DEFAULT_HOOK = EntityFishingHook::new;
     public TextureRegion castTexture;
     //public EntityFishingHook hook;
     //public boolean isCasting = false; //是否抛竿

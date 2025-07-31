@@ -3,11 +3,15 @@ package ttk.muxiuesd.world.entity.creature;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registry.*;
+import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Items;
+import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.state.instance.PufferFishRandomWalkState;
 import ttk.muxiuesd.world.entity.state.instance.PufferFishRestState;
@@ -22,8 +26,8 @@ public class PufferFish extends LivingEntity<PufferFish> {
 
     private Vector2 walkDistance;
 
-    public PufferFish() {
-        super(EntityTypes.CREATURE, 5, 5, 1);
+    public PufferFish (World world, EntityType<? super PufferFish> entityType) {
+        super(world, entityType, 5, 5, 1);
         loadBodyTextureRegion(Fight.getId("puffer_fish"), "fish/puffer_fish.png");
         setSize(DEFAULT_SIZE);
         setSpeed(1f);

@@ -4,13 +4,13 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -32,11 +32,9 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     private float cycle;
     public boolean isReturning;
 
-    public EntityFishingHook () {
-        this(EntityTypes.PLAYER);
-    }
-    public EntityFishingHook(EntityType<?> entityType) {
-        super(entityType);
+
+    public EntityFishingHook(World world, EntityType<?> entityType) {
+        super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
         bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");

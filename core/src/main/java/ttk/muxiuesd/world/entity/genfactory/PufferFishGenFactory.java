@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.genfactory;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.interfaces.world.entity.CreatureGenFactory;
 import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -22,7 +23,7 @@ public class PufferFishGenFactory implements CreatureGenFactory<PufferFish> {
 
         PufferFish[] fish = new PufferFish[MathUtils.random(1, ONCE_MAX_GAN)];
         for (int i = 0; i < fish.length; i++) {
-            PufferFish pufferFish = new PufferFish();
+            PufferFish pufferFish = Entities.PUFFER_FISH.create(world);
             pufferFish.setPosition(genX, genY);
             fish[i] = pufferFish;
         }

@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 
 /**
@@ -15,25 +16,33 @@ public abstract class Bullet extends Entity<Bullet> {
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
 
-    public Bullet () {}
-    public Bullet (Entity<?> owner, EntityType<?> entityType) {
-        super(entityType);
+    public Bullet (World world, EntityType<?> entityType) {
+        super(world, entityType);
+    }
+    public Bullet (World world, EntityType<?> entityType, Entity<?> owner) {
+        super(world, entityType);
         this.owner = owner;
     }
 
-    public Bullet (String textureId, float damage, float speed, float maxLiveTime, float initLiveTime) {
-        //先不指定所有者，等真的使用的时候再指定
-        this(null, textureId, null, damage, speed, maxLiveTime, initLiveTime);
-    }
-
-    public Bullet (String textureId, String texturePath,
+    public Bullet (World world, EntityType<?> entityType,
+                   String textureId,
                    float damage, float speed, float maxLiveTime, float initLiveTime) {
         //先不指定所有者，等真的使用的时候再指定
-        this(null, textureId, texturePath, damage, speed, maxLiveTime, initLiveTime);
+        this(world, entityType, null, textureId, null, damage, speed, maxLiveTime, initLiveTime);
     }
 
-    public Bullet (Entity<?> owner, String textureId, String texturePath,
+    public Bullet (World world, EntityType<?> entityType,
+                   String textureId, String texturePath,
                    float damage, float speed, float maxLiveTime, float initLiveTime) {
+        //先不指定所有者，等真的使用的时候再指定
+        this(world, entityType, null, textureId, texturePath, damage, speed, maxLiveTime, initLiveTime);
+    }
+
+    public Bullet (World world, EntityType<?> entityType,
+                   Entity<?> owner,
+                   String textureId, String texturePath,
+                   float damage, float speed, float maxLiveTime, float initLiveTime) {
+        super(world, entityType);
         //全部指定
         this.owner = owner;
         this.damage = damage;
