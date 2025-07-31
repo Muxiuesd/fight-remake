@@ -55,7 +55,7 @@ public class PlayerSystem extends WorldSystem {
         this.player = (Player) Gets.ENTITY(Fight.getId("player"));
         this.playerLastPosition = this.player.getPosition();
         this.bubbleEmitTimer = new Timer<>(0.5f);
-
+        //测试用玩家背包解码
         String file = FileUtil.readFileAsString(Fight.PATH_SAVE_ENTITIES, "player_backpack.json");
         JsonDataReader dataReader = new JsonDataReader(file);
         Optional<Backpack> optional = Codecs.BACKPACK.decode(dataReader);
@@ -80,7 +80,6 @@ public class PlayerSystem extends WorldSystem {
         ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
         Vector2 playerCenter = this.player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
-        //player.curSpeed = player.speed * block.getProperty().getFriction();
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
