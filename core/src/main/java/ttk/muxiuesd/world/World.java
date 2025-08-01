@@ -39,16 +39,19 @@ public abstract class World implements Updateable, Disposable {
     @Override
     public void dispose() {
         //编写信息文件
+        this.writeWorldInfo();
+
+        if (this.worldSystemsManager != null) {
+            this.getSystemManager().dispose();
+        }
+    }
+
+    private void writeWorldInfo () {
         JsonDataWriter dataWriter = new JsonDataWriter();
         dataWriter.objStart();
         WorldInfo.CODEC.encode(WorldInfo.INSTANCE, dataWriter);
         dataWriter.objEnd();
         new WorldInfoDataOutput().output(dataWriter);
-
-
-        if (this.worldSystemsManager != null) {
-            this.getSystemManager().dispose();
-        }
     }
 
     public WorldSystemsManager getSystemManager() {

@@ -209,7 +209,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             float velY = MathUtils.sin(radian);
 
             ItemEntity itemEntity = this.dropItem(i, itemStack.getAmount());
-            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
             itemEntity.setSpeed(speed);
             itemEntity.setCurSpeed(speed);
             itemEntity.setVelocity(velX, velY);

@@ -63,6 +63,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public ChunkSystem(World world) {
         super(world);
+        WorldInformation.INT.putIfAbsent("seed", 114514);
     }
 
     @Override
@@ -361,16 +362,18 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         // System.out.println("("+ player.x+ "," + player.y +")" + "("+ playerChunkX + "," + playerChunkY +")");
         // TODO 实现更好的循环
-        for (int y = -2; y < 3; y++) {
-            for (int x = -2; x < 3; x++) {
+        Integer value = Fight.PLAYER_VISUAL_RANGE.getValue();
+        for (int y = -value; y < value + 1; y++) {
+            for (int x = -value; x < value + 1; x++) {
                 int newChunkX = playerChunkX + x;
                 int newChunkY = playerChunkY + y;
                 float distance = Util.getDistance(
                     playerCenter.x, playerCenter.y,
                     newChunkX * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
-                    newChunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f);
+                    newChunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f
+                );
 
-                if (distance <= Fight.PLAYER_VISUAL_RANGE) {
+                if (distance <= value * (Chunk.ChunkWidth + Chunk.ChunkHeight) / 2f) {
                     this.loadChunk(newChunkX, newChunkY);
                 }
             }
@@ -381,11 +384,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 计算需要被卸载的区块
      */
     private void calculateNeedUnloadedChunk() {
+        Integer value = Fight.PLAYER_VISUAL_RANGE.getValue();
         for (Chunk chunk : this.activeChunks) {
             float distance = Util.getDistance(this.player.x, this.player.y,
                 chunk.getChunkPosition().getX() * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
-                chunk.getChunkPosition().getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f);
-            if (distance > Fight.PLAYER_VISUAL_RANGE) {
+                chunk.getChunkPosition().getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f
+            );
+
+            if (distance > value * (Chunk.ChunkWidth + Chunk.ChunkHeight) / 2f) {
                 this.unloadChunk(chunk);
             }
         }

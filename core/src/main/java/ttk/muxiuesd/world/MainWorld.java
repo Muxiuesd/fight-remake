@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world;
 
-import ttk.muxiuesd.registry.WorldInformation;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.*;
 
@@ -30,8 +29,6 @@ public class MainWorld extends World {
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
 
-        WorldInformation.INT.putIfAbsent("seed", 114514);
-        WorldInformation.LONG.putIfAbsent("seed", 114514L);
     }
 
 

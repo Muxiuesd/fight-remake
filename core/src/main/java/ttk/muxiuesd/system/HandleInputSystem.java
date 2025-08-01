@@ -166,7 +166,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
                         mouseWorldPosition,
                         new ItemStack(Gets.ITEM(replacedBlock.getID()), 1)
                     );
-                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
                 }
             }
         }

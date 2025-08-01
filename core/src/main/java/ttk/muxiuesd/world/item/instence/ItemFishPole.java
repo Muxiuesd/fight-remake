@@ -75,7 +75,7 @@ public class ItemFishPole extends Item {
                 FishingLootTable.fastGenerate(100, genItemStack -> {
                     ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
                     itemEntity.setPosition(hookPos);
-                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
                     itemEntity.setItemStack(genItemStack);
                     itemEntity.setSpeed(this.pullSpeed);
                     itemEntity.setCurSpeed(this.pullSpeed);

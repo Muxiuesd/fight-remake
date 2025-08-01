@@ -177,14 +177,14 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     private void updateItemEntity (ItemEntity itemEntity, float delta) {
         //移除超过存活时间的物品实体
-        if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME) {
+        if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME.getValue()) {
             this.remove(itemEntity);
             //跳过这个物品实体的 其他操作
             return;
         }
         Player player = this.getPlayer();
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
-        if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN) {
+        if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN.getValue()) {
             //当物品实体与玩家的碰撞箱相碰就是捡起
             if (itemEntity.hitbox.overlaps(player.hitbox)) {
                 ItemStack itemStack = itemEntity.getItemStack();
@@ -203,7 +203,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PICKUP_RANGE && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+            if (distance <= Fight.PICKUP_RANGE.getValue() && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
                 itemEntity.setVelocity(direction);

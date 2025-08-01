@@ -15,10 +15,7 @@ import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.registry.Codecs;
-import ttk.muxiuesd.registry.Entities;
-import ttk.muxiuesd.registry.EntityTypes;
-import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.FileUtil;
@@ -48,6 +45,7 @@ public class PlayerSystem extends WorldSystem {
 
     public PlayerSystem(World world) {
         super(world);
+        WorldInformation.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package ttk.muxiuesd;
 
+import ttk.muxiuesd.util.Info;
+
 public class Fight {
     public static final String NAMESPACE = "fight";
     public static final String AUDIO_ROOT = "audio/";
@@ -7,13 +9,21 @@ public class Fight {
     public static final String ENTITY_TEXTURE_ROOT = "texture/entity/";
     public static final String ITEM_TEXTURE_ROOT = "texture/item/";
 
-    public static final float HEARING_RANGE = 16f;  //玩家的听觉范围，单位：世界中的1米
-    public static final float MAX_ITEM_ENTITY_LIVING_TIME = 120f;   //物品实体最大存活时间，单位：秒
+    //玩家的听觉范围，单位：世界中的1米
+    public static final Info<Float> HEARING_RANGE = Info.create("player_hearing_range", 16f);
+    //物品实体最大存活时间，单位：秒
+    public static final Info<Float> MAX_ITEM_ENTITY_LIVING_TIME = Info.create("max_item_entity_living_time", 300f);
+    //玩家捡起掉落物的范围，单位：世界的一米
+    public static final Info<Float> PICKUP_RANGE = Info.create("player_pickup_item_range", 1.5f);
+    //掉落物可以被捡起来的cd
+    public static final Info<Float> ITEM_ENTITY_PICKUP_SPAN = Info.create("item_entity_pickup_span", 2f);
+    //玩家视野，单位：区块
+    public static final Info<Integer> PLAYER_VISUAL_RANGE = Info.create("player_vision", 4);
 
-    public static final float PICKUP_RANGE = 1.5f;  //玩家捡起掉落物的范围
-    public static final float ITEM_ENTITY_PICKUP_SPAN = 3f;     //掉落物可以被捡起来的cd
-
-    public static float PLAYER_VISUAL_RANGE = 64f;
+    //实体渲染距离，与玩家距离超过这个值的实体不渲染
+    public static final Info<Float> ENTITY_RENDER_RANGE = Info.create("entity_render_range", 20f);
+    //实体更新距离，与玩家距离超过这个值的实体不更新
+    public static final Info<Float> ENTITY_UPDATE_RANGE = Info.create("entity_update_range", 32f);
 
     /**
      * 存档路径常量

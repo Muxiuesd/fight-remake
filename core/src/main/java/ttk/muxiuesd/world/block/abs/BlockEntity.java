@@ -92,7 +92,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
             double radian = Util.randomRadian();
             itemEntity.setSpeed(speed);
             itemEntity.setVelocity(new Vector2((float) Math.cos(radian), (float) Math.sin(radian)));
-            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN);
+            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
 
             this.getInventory().clear(i);
         }

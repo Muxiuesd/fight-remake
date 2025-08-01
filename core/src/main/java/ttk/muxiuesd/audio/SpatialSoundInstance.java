@@ -45,10 +45,11 @@ public class SpatialSoundInstance extends MusicInstance implements Updateable {
      * */
     public float calculateVolume() {
         float distance = receiver.getPosition().dst(sounder.getPosition());
-        if (distance > Fight.HEARING_RANGE) {
+        Float hearingRange = Fight.HEARING_RANGE.getValue();
+        if (distance > hearingRange) {
             return 0f;
         }
-        return 1f - distance / Fight.HEARING_RANGE;
+        return 1f - distance / hearingRange;
     }
 
     /**
