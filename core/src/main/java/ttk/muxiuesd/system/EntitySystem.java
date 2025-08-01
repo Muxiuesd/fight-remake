@@ -376,6 +376,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return this.getEntityArray(EntityTypes.ENEMY_BULLET);
     }
 
+    /**
+     * 获取所有可渲染实体
+     * */
     public ConcurrentHashMap<RenderLayer, Array<Entity<?>>> getRenderableEntities () {
         return this.renderableEntities;
     }
