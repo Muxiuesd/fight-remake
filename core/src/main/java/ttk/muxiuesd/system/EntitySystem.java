@@ -46,7 +46,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     private final Array<Entity<?>> _delayRemove = new Array<>();
 
     private final Array<Entity<?>> entities = new Array<>();   //所有实体
-    private final Array<Entity<?>> updatableEntity = new Array<>();
+    private final Array<Entity<?>> updatableEntity = new Array<>(); //可以更新的实体
+    private final Array<Entity<?>> incationEntity = new Array<>(); //不更新的实体
 
     //实体管理组map，每一种注册过的实体类型都有一个管理组，key为实体类型，value为该实体类型的持有实体管理数组
     private final ConcurrentHashMap<EntityType<?>, Array<? extends Entity<?>>> entityTypes = new ConcurrentHashMap<>();
@@ -106,7 +107,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             entityArray.add(entity);
         }
         this.entities.add(entity);
-        this.updatableEntity.add(entity);
+        //this.updatableEntity.add(entity);
         //把实体添加进相应的渲染层级
         if (this.renderableEntities.containsKey(entity.getRenderLayer()))
             this.renderableEntities.get(entity.getRenderLayer()).add(entity);
@@ -126,7 +127,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             entityArray.removeValue(entity, true);
         }
         this.entities.removeValue(entity, true);
-        this.updatableEntity.removeValue(entity, true);
+        //this.updatableEntity.removeValue(entity, true);
         //把实体移除出渲染层级
         this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
     }
@@ -148,6 +149,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             _delayAdd.clear();
         }
 
+        this.calculateNeedActiveEntity();
+        this.calculateInactionEntity();
+
         for (Entity entity : this.updatableEntity) {
             //先把所有实体更新一次
             if (!(entity instanceof ItemEntity)) {
@@ -165,6 +169,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 this.updateItemEntity(itemEntity, delta);
             }
         }
+        this.updatableEntity.clear();
+        this.incationEntity.clear();
     }
 
     private void updateLivingEntity(LivingEntity livingEntity, float delta) {
@@ -261,6 +267,54 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         entity.setCurSpeed(curSpeed);
         //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
         entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
+    }
+
+    /**
+     * 计算需要更新的实体（活跃实体）
+     * */
+    private void calculateNeedActiveEntity() {
+        Player player = this.getPlayer();
+        if (player == null) return;
+        for (Entity<?> entity: this.getEntities()) {
+            float distance = Util.getDistance(entity, player);
+            if (distance <= Fight.ENTITY_UPDATE_RANGE.getValue()) {
+                this.activateEntity(entity);
+            }
+        }
+    }
+
+    /**
+     * 计算不需要更新的实体（不活跃实体）
+     * */
+    private void calculateInactionEntity() {
+        Player player = this.getPlayer();
+        if (player == null) return;
+        for (Entity<?> entity: this.getEntities()) {
+            float distance = Util.getDistance(entity, player);
+            if (distance > Fight.ENTITY_UPDATE_RANGE.getValue()) {
+                this.deactivateEntity(entity);
+            }
+        }
+    }
+
+    /**
+     * 激活实体
+     * */
+    private void activateEntity (Entity<?> entity) {
+        this.updatableEntity.add(entity);
+        if (this.incationEntity.contains(entity, true)) {
+            this.incationEntity.removeValue(entity, true);
+        }
+    }
+
+    /**
+     * 静默实体
+     * */
+    private void deactivateEntity (Entity<?> entity) {
+        this.incationEntity.add(entity);
+        if (this.updatableEntity.contains(entity, true)) {
+            this.updatableEntity.removeValue(entity, true);
+        }
     }
 
     @Override
