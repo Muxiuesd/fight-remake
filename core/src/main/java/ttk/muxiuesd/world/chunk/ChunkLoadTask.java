@@ -32,6 +32,7 @@ public class ChunkLoadTask extends ChunkTask {
         }
         //文件存在，就从文件加载区块
         Optional<Chunk> optional = Optional.empty();
+        //TODO 修复读取内容为空
         String file = FileUtil.readFileAsString(Fight.PATH_SAVE_CHUNKS, name);
         JsonDataReader dataReader = new JsonDataReader(file);
         try {
@@ -39,7 +40,13 @@ public class ChunkLoadTask extends ChunkTask {
                 dataReader
             );
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            //尝试从正在卸载的区块里获取
+            Chunk unloadedChunk = getChunkSystem().getUnloadedChunk(getChunkPosition());
+            if (unloadedChunk != null) {
+                return unloadedChunk;
+            }
+            //到这里就是获取不了
+            return null;
         }
         Chunk chunk = optional.orElse(this.genNewChunk());
         chunk.setChunkPosition(getChunkPosition());
@@ -48,6 +55,9 @@ public class ChunkLoadTask extends ChunkTask {
 
     }
 
+    /**
+     * 新生成一个区块
+     * */
     private Chunk genNewChunk() {
         ChunkGenerator generator = getChunkSystem().getChunkGenerator();
         return generator.generate(getChunkPosition());

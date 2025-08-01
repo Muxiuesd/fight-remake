@@ -82,7 +82,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void dispose() {
-        this.traversal((x, y) -> {
+        /*this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (block != null) {
                 blocks[y][x] = null;
@@ -92,7 +92,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             if (wall != null) {
                 walls[y][x] = null;
             }
-        });
+        });*/
     }
 
     /**

@@ -10,6 +10,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
+import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.WorldInformation;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
@@ -527,12 +528,17 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return chunkLoadTask.call();
     }
 
+    /**
+     * 获取方块
+     * @param position 世界坐标
+     */
     public Block getBlock (Vector2 position) {
         return this.getBlock(position.x, position.y);
     }
     /**
      * 获取世界坐标上对应的方块
-     *
+     * @param wx 世界x坐标
+     * @param wy 世界y坐标
      * @return
      */
     public Block getBlock(float wx, float wy) {
@@ -541,8 +547,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
-            Log.error(TAG, "获取的区块为null！！！");
-            throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
+            /*Log.error(TAG, "获取的区块为null！！！");
+            throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");*/
+            return Blocks.ARI;
         }
 
         Block block = chunk.seekBlock(floor.x, floor.y);
@@ -556,6 +563,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     /**
      * 获取区块
+     * @param position 世界坐标
      */
     public Chunk getChunk (Vector2 position) {
         return this.getChunk(position.x, position.y);
@@ -575,7 +583,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
         // 如果没有这个区块,暂时就这么处理
         Chunk chunk = this.initChunk(chunkPosition.getX(), chunkPosition.getY());
-        if (!this.chunkExist(chunkPosition)) this._loadChunks.add(chunk);
+        if (chunk != null && !this.chunkExist(chunkPosition)) this._loadChunks.add(chunk);
         return chunk;
     }
 
