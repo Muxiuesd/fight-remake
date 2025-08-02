@@ -27,14 +27,14 @@ public abstract class WorldEntityRenderProcessor extends WorldRenderProcessor {
     @Override
     protected void beginShader (Batch batch) {
         //这里开始日夜着色
-        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        DaynightSystem daynightSystem = getWorld().getSystem(DaynightSystem.class);
         daynightSystem.begin(batch);
     }
 
     @Override
     protected void endShader () {
         //这里结束日夜着色
-        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        DaynightSystem daynightSystem = getWorld().getSystem(DaynightSystem.class);
         daynightSystem.end();
     }
 

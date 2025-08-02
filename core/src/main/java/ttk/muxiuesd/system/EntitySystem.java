@@ -39,8 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
 public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender {
-    public final String TAG = EntitySystem.class.getName();
-
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -71,7 +69,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             this.entityTypes.put(entityType, entityType.createEntityArray());
         }
 
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getManager().getSystem(PlayerSystem.class);
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
         this.add(player);
@@ -79,7 +77,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.renderableEntities.put(RenderLayers.ENTITY_UNDERGROUND, new Array<>());
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
 
-        Log.print(TAG, "EntitySystem初始化完成！");
+        Log.print(TAG(), "EntitySystem初始化完成！");
     }
 
     /**
@@ -161,7 +159,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             //先把所有实体更新一次
             if (!(entity instanceof ItemEntity)) {
                 //对于非物品实体进行当前速度更新
-                this.calculateEntityCurSpeed(entity, (ChunkSystem) getManager().getSystem("ChunkSystem"), delta);
+                this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
             }
             entity.update(delta);
             //细化实体更新
@@ -222,7 +220,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
         }
 
-        this.calculateItemEntityCurSpeed(itemEntity, (ChunkSystem) getManager().getSystem("ChunkSystem"), delta);
+        this.calculateItemEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
     }
 
     /**
@@ -351,7 +349,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     }
 
     public Player getPlayer() {
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getManager().getSystem(PlayerSystem.class);
         return ps.getPlayer();
     }
 

@@ -71,7 +71,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //this.noise = new WorldMapNoise((int) (Math.random() * 10000));
         this.noise = new WorldMapNoise(WorldInformationType.INT.get("seed"));
 
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
         this.playerLastPosition = new Vector2(this.player.x + 10000, this.player.y + 10000);
 
@@ -93,7 +93,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             return;
         }
 
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
         this.chunkLoadTimer.update(delta);
 
@@ -288,7 +288,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     private void addBlockEntity(BlockWithEntity<? ,?> block, BlockEntity blockEntity) {
         if (block == null || blockEntity == null) return;
 
-        TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
+        TimeSystem ts = getWorld().getSystem(TimeSystem.class);
         ts.add(blockEntity);
         this.getBlockEntities().put(block, blockEntity);
 
@@ -302,7 +302,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         BlockEntity removed = this.getBlockEntities().remove(block);
         if (removed == null) return null;
 
-        TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
+        TimeSystem ts = getWorld().getSystem(TimeSystem.class);
         ts.remove(removed);
         removed.beDestroyed(getWorld(), this.player);
 

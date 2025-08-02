@@ -52,7 +52,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
 
     @Override
     public void initialize () {
-        this.playerSystem = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
+        this.playerSystem = getWorld().getSystem(PlayerSystem.class);
 
         Gdx.input.setInputProcessor(this);
     }
@@ -60,7 +60,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
 
     @Override
     public void update(float delta) {
-        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);

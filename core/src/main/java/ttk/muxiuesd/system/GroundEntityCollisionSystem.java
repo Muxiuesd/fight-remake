@@ -24,9 +24,9 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
     public GroundEntityCollisionSystem (World world) {
         super(world);
-        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
-        this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        this.es = getWorld().getSystem(EntitySystem.class);
+        this.ps = getWorld().getSystem(PlayerSystem.class);
+        this.cs = getWorld().getSystem(ChunkSystem.class);
     }
 
     @Override
@@ -51,12 +51,12 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
         ChunkPosition chunkPosition = this.cs.getChunkPosition(nextX, nextY);
         Chunk chunk = cs.getChunk(chunkPosition);
-        Array<Wall> collidingWalls = new Array<>();
+        Array<Wall<?>> collidingWalls = new Array<>();
 
         // X轴移动
         player.hitbox.x += movement.x;
         chunk.traversal((x, y) -> {
-            Wall wall = chunk.getWall(x, y);
+            Wall<?> wall = chunk.getWall(x, y);
             if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
                 resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(movement.x, 0));
                 collidingWalls.add(wall);
@@ -66,7 +66,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         // Y轴移动
         player.hitbox.y += movement.y;
         chunk.traversal((x, y) -> {
-            Wall wall = chunk.getWall(x, y);
+            Wall<?> wall = chunk.getWall(x, y);
             if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
                 resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(0, movement.y));
                 collidingWalls.add(wall);

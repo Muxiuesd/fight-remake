@@ -39,9 +39,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void update(float delta) {
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        ChunkSystem  cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        EntitySystem es = getWorld().getSystem(EntitySystem.class);
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
+        ChunkSystem  cs = getManager().getSystem(ChunkSystem.class);
 
         Player player = ps.getPlayer();
 
@@ -324,7 +324,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        EntitySystem es = getWorld().getSystem(EntitySystem.class);
         Array<Bullet> playerBulletEntity = es.getPlayerBulletEntity();
         Array<Bullet> enemyBulletEntity = es.getEnemyBulletEntity();
         for (Bullet bullet : playerBulletEntity) {

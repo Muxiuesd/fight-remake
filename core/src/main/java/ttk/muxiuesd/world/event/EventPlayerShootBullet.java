@@ -18,12 +18,10 @@ public class EventPlayerShootBullet extends BulletShootEvent {
     @Override
     public void handle (World world, Entity<?> shooter, Bullet bullet) {
         if (shooter.getType() == EntityTypes.PLAYER) {
-            SoundEffectSystem ses = (SoundEffectSystem) world
-                .getSystemManager()
-                .getSystem("SoundEffectSystem");
+            SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
             ses.newSpatialSound(Sounds.ENTITY_SHOOT, bullet);
 
-            ParticleSystem pts = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
+            ParticleSystem pts = world.getSystem(ParticleSystem.class);
 
             pts.emitParticle(Fight.getId("player_shoot"), MathUtils.random(7, 15),
                 bullet.getPosition(), bullet.getVelocity().scl(3f),

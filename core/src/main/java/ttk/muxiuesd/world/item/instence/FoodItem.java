@@ -33,7 +33,7 @@ public class FoodItem extends ConsumptionItem {
         Log.print(this.toString(), user.getID() + " 在吃鱼");
         //随机吃鱼音效
         String useSoundId = this.property.getUseSoundId() + MathUtils.random(1, 3);
-        SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
+        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
         ses.newSpatialSound(useSoundId, user);
         return true;
     }

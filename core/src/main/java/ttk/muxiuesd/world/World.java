@@ -27,6 +27,14 @@ public abstract class World implements Updateable, Disposable {
         return this;
     }
 
+    /**
+     * 获取世界的系统
+     * */
+    public <T extends WorldSystem> T getSystem(Class<T> systemClass) {
+        return this.getSystemManager().getSystem(systemClass);
+    }
+
+
     @Override
     public void update(float delta) {
         if (this.worldSystemsManager != null) {

@@ -60,14 +60,14 @@ public class ItemFishPole extends Item {
             fishingHook.setOwner(user)
                 .setPole(itemStack)
                 .setThrowDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
-                .setChunkSystem((ChunkSystem) world.getSystemManager().getSystem("ChunkSystem"))
-                .setParticleSystem((ParticleSystem) world.getSystemManager().getSystem("ParticleSystem"));
+                .setChunkSystem(world.getSystem(ChunkSystem.class))
+                .setParticleSystem(world.getSystem(ParticleSystem.class));
 
             this.throwHook(itemStack, world, fishingHook);
             return super.use(itemStack, world, user);
         }else if (!hook.onCasting() && !hook.isReturning){ //鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
             Vector2 hookPos = hook.getCenter();
-            ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
+            ChunkSystem cs = world.getSystem(ChunkSystem.class);
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
                 //需要鱼钩在水中才能钓到鱼

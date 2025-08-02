@@ -75,7 +75,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
      * 方块实体被破坏
      * */
     public void beDestroyed (World world, Player destroyer) {
-        EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+        EntitySystem es = world.getSystemManager().getSystem(EntitySystem.class);
         //掉落物品
         for (int i = 0; i < this.getInventory().getSize(); i++) {
             ItemStack itemStack = this.getInventory().getItemStack(i);

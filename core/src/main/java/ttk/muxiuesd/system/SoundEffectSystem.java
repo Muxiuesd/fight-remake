@@ -44,10 +44,9 @@ public class SoundEffectSystem extends WorldSystem {
         this.activeSounds = new LinkedHashMap<>();
         this.activeSpatialSounds = new Array<>();
 
-        this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
-        this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
-
+        this.ps = getWorld().getSystem(PlayerSystem.class);
+        this.cs = getWorld().getSystem(ChunkSystem.class);
+        this.es = getWorld().getSystem(EntitySystem.class);
 
         String[] devices = Gdx.audio.getAvailableOutputDevices();
         StringBuilder deviceName = new StringBuilder();
@@ -58,7 +57,7 @@ public class SoundEffectSystem extends WorldSystem {
             }
             deviceName.append(devices[i]).append(" | ");
         }
-        Log.print(TAG, "游戏音效系统加载完成，可用的音频播放设备有：\n" + deviceName);
+        Log.print(TAG(), "游戏音效系统加载完成，可用的音频播放设备有：\n" + deviceName);
     }
 
     @Override

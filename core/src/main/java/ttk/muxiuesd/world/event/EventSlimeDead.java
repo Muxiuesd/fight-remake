@@ -21,7 +21,7 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
     public void handle (World world, LivingEntity<?> entity) {
         //史莱姆死亡分裂
         if (entity instanceof Slime mom) {
-            EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+            EntitySystem es = world.getSystem(EntitySystem.class);
             int generation = mom.generation;
             if (generation == maxGeneration) {
                 return;
@@ -37,7 +37,7 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
                 child.setBounds(x, y, width, height);
                 es.add(child);
             }
-            SoundEffectSystem ses = (SoundEffectSystem) world.getSystemManager().getSystem("SoundEffectSystem");
+            SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
             ses.newSpatialSound(Sounds.ENTITY_SLIME_SMALL, entity);
         }
     }

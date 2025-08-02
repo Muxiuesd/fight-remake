@@ -14,9 +14,7 @@ public class EventEnemyAttacked extends EntityHurtEvent {
     @Override
     public void handle (World world, Entity<?> attackObject, Entity<?> victim) {
         //播放收到攻击的音效
-        SoundEffectSystem ses = (SoundEffectSystem) world
-            .getSystemManager()
-            .getSystem("SoundEffectSystem");
+        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
         ses.newSpatialSound(Sounds.ENTITY_HURT_3, victim);
     }
 }

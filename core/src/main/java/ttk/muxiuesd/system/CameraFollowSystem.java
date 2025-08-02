@@ -12,12 +12,10 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 public class CameraFollowSystem extends WorldSystem {
-    public final String TAG = this.getClass().getName();
     public static final float MAX_ZOOM = 10.0f;
     public static final float MIN_ZOOM = 0.3f;
 
-    //private CameraController cameraController;
-    private Entity follower;
+    private Entity<?> follower;
 
     public CameraFollowSystem(World world) {
         super(world);
@@ -26,9 +24,10 @@ public class CameraFollowSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.setFollower(ps.getPlayer());
-        Log.print(TAG, "CameraFollowSystem初始化完成！");
+
+        Log.print(TAG(), "CameraFollowSystem初始化完成！");
     }
 
     @Override
@@ -55,11 +54,11 @@ public class CameraFollowSystem extends WorldSystem {
             follower.y + follower.height / 2 + yOffset);
     }
 
-    public Entity getFollower() {
+    public Entity<?> getFollower() {
         return this.follower;
     }
 
-    public void setFollower(Entity follower) {
+    public void setFollower(Entity<?> follower) {
         this.follower = follower;
     }
 }

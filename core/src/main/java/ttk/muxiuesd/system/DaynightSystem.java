@@ -25,7 +25,7 @@ public class DaynightSystem extends WorldSystem {
     public void initialize () {
         //this.daynightShader = new DaynightShader(this);
         this.camera = PlayerCamera.INSTANCE.getCamera();
-        this.timeSystem = (TimeSystem) getManager().getSystem("TimeSystem");
+        this.timeSystem = getWorld().getSystem(TimeSystem.class);
     }
 
     public void begin(Batch batch) {

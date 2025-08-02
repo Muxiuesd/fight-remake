@@ -19,14 +19,12 @@ public class EventEnemyShootBullet extends BulletShootEvent {
     @Override
     public void handle (World world, Entity<?> shooter, Bullet bullet) {
         if (shooter.getType() == EntityTypes.ENEMY) {
-            SoundEffectSystem ses = (SoundEffectSystem) world
-                .getSystemManager()
-                .getSystem("SoundEffectSystem");
+            SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
 
             //TODO 不同子弹不同音效，不同实体不同音效
             ses.newSpatialSound(Sounds.ENTITY_SHOOT, bullet);
 
-            ParticleSystem pts = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
+            ParticleSystem pts = world.getSystem(ParticleSystem.class);
             pts.emitParticle(Fight.getId("enemy_shoot"), MathUtils.random(3, 5),
                 bullet.getPosition(), bullet.getVelocity(),
                 1.5f, ParticleDefaultConfig.ShootParticle);

@@ -38,7 +38,7 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
         this.delayAddEmitters = new Array<>();
         this.delayRemoveEmitters = new Array<>();
 
-        Log.print(TAG, "粒子系统初始化完成");
+        Log.print(TAG(), "粒子系统初始化完成");
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         for (ParticleEmitter<?> emitter : this.activeEmitters) {
             emitter.draw(batch);
-            LightSystem lightSystem = (LightSystem)getManager().getSystem("LightSystem");
+            LightSystem lightSystem = getManager().getSystem(LightSystem.class);
             lightSystem.useLight(emitter.getActiveParticles());
         }
         // 恢复默认混合模式

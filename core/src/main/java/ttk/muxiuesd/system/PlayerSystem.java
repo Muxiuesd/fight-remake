@@ -36,8 +36,6 @@ import java.util.Optional;
  * 玩家系统
  * */
 public class PlayerSystem extends WorldSystem {
-    public final String TAG = this.getClass().getName();
-
     private Player player;
     private Vector2 playerLastPosition;
 
@@ -67,7 +65,7 @@ public class PlayerSystem extends WorldSystem {
         }
 
 
-        Log.print(TAG, "PlayerSystem初始化完成！");
+        Log.print(TAG(), "PlayerSystem初始化完成！");
     }
 
     @Override
@@ -80,14 +78,14 @@ public class PlayerSystem extends WorldSystem {
             return;
         }
         //玩家速度计算
-        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Vector2 playerCenter = this.player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
             //发射气泡粒子
-            ParticleSystem pts = (ParticleSystem) getManager().getSystem("ParticleSystem");
+            ParticleSystem pts = getManager().getSystem(ParticleSystem.class);
             pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(3, 7),
                 playerCenter.set(playerCenter.x, playerCenter.y - 0.4f),
                 new Vector2(MathUtils.random(1, 2), 0),
@@ -111,7 +109,7 @@ public class PlayerSystem extends WorldSystem {
      * */
     private void remakePlayer () {
         //移除旧的玩家实体
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
+        EntitySystem es = getManager().getSystem(EntitySystem.class);
         es.remove(this.player);
 
         //生成新的玩家实体
@@ -121,7 +119,7 @@ public class PlayerSystem extends WorldSystem {
         es.add(player);
 
         //更新其他与玩家有关的配置
-        CameraFollowSystem cfs = (CameraFollowSystem) getManager().getSystem("CameraFollowSystem");
+        CameraFollowSystem cfs = getManager().getSystem(CameraFollowSystem.class);
         cfs.setFollower(this.player);
 
         AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);

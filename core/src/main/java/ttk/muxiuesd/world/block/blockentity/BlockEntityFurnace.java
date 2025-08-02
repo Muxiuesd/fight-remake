@@ -195,7 +195,7 @@ public class BlockEntityFurnace extends BlockEntity {
      * */
     public void workingParticle (World world) {
         if (this.isWorking() && MathUtils.random() < 0.07f) {
-            ParticleSystem ps = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
+            ParticleSystem ps = world.getSystemManager().getSystem(ParticleSystem.class);
             ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
                 new Vector2(getBlockPos()).add(0.45f, 0), new Vector2(0, 1.7f), new Vector2(),
                 new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
@@ -208,7 +208,7 @@ public class BlockEntityFurnace extends BlockEntity {
     public void update (float delta) {
         //应用光源
         if (this.isWorking()) {
-            LightSystem lightSystem = (LightSystem) getWorld().getSystemManager().getSystem("LightSystem");
+            LightSystem lightSystem = getWorld().getSystem(LightSystem.class);
             lightSystem.useLight(this.light);
         }
     }
@@ -232,14 +232,6 @@ public class BlockEntityFurnace extends BlockEntity {
     public int getFuelSlotIndex () {
         return 2;
     }
-
-    /*public Slot getSlot (GridPoint2 interactGridPos) {
-        if (interactGridPos == null) return null;
-        if (this.inputSlot.touch(interactGridPos)) return this.inputSlot;
-        if (this.outputSlot.touch(interactGridPos)) return this.outputSlot;
-        if (this.fuelSlot.touch(interactGridPos)) return this.fuelSlot;
-        return null;
-    }*/
 
     public boolean isWorking () {
         BlockFurnace furnace = (BlockFurnace) getBlock();

@@ -100,7 +100,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放物品使用音效
         String useSoundId = this.property.getUseSoundId();
-        SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
+        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
         ses.newSpatialSound(useSoundId, user);
 
         return true;

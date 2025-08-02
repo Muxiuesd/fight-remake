@@ -16,7 +16,7 @@ public class PufferFishGenFactory implements CreatureGenFactory<PufferFish> {
     public static final int ONCE_MAX_GAN = 3;
     @Override
     public PufferFish[] create (World world, float genX, float genY) {
-        ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
+        ChunkSystem cs = world.getSystem(ChunkSystem.class);
         Block block = cs.getBlock(genX, genY);
         //生成的位置不是水就直接跳过
         if (block != Blocks.WATER) return null;

@@ -3,6 +3,7 @@ package ttk.muxiuesd.system;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.event.*;
 
@@ -18,6 +19,7 @@ public class EventSystem extends WorldSystem {
     @Override
     public void initialize () {
         this.initAllEvents();
+        Log.print(TAG(), "世界内事件注册完成");
     }
 
     /**

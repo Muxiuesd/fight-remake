@@ -17,7 +17,7 @@ public abstract class EntityRenderSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        this.curEntitySystem = (EntitySystem) getManager().getSystem("EntitySystem");
+        this.curEntitySystem = getManager().getSystem(EntitySystem.class);
     }
 
     public EntitySystem getCurEntitySystem () {
@@ -30,7 +30,7 @@ public abstract class EntityRenderSystem extends WorldSystem {
     }
 
     public Player getPlayer () {
-        PlayerSystem playerSystem = (PlayerSystem) this.getManager().getSystem("PlayerSystem");
+        PlayerSystem playerSystem = this.getManager().getSystem(PlayerSystem.class);
         return playerSystem.getPlayer();
     }
 }

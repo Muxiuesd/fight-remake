@@ -51,7 +51,7 @@ public class PufferFish extends LivingEntity<PufferFish> {
      * 生成简单的随机游走路线
      * */
     public void randomWalkPath (World world) {
-        ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
+        ChunkSystem cs = world.getSystem(ChunkSystem.class);
         Vector2 position = getCenter();
         float dx;
         float dy;

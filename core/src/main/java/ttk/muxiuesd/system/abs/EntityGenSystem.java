@@ -35,10 +35,10 @@ public class EntityGenSystem<T extends EntityGenFactory<?>> extends WorldSystem 
 
     @Override
     public void initialize () {
-        this.timeSystem = (TimeSystem) getManager().getSystem("TimeSystem");
-        this.playerSystem = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.entitySystem = (EntitySystem) getManager().getSystem("EntitySystem");
-        this.chunkSystem = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        this.timeSystem = getManager().getSystem(TimeSystem.class);
+        this.playerSystem = getManager().getSystem(PlayerSystem.class);
+        this.entitySystem = getManager().getSystem(EntitySystem.class);
+        this.chunkSystem = getManager().getSystem(ChunkSystem.class);
     }
 
     /**
@@ -58,7 +58,7 @@ public class EntityGenSystem<T extends EntityGenFactory<?>> extends WorldSystem 
         if (this.getGenFactories().containsKey(id)) {
             return this.getGenFactories().remove(id);
         }
-        Log.error(tag(), "输入的工厂id：" + id + " 不存在！");
+        Log.error(TAG(), "输入的工厂id：" + id + " 不存在！");
         return null;
     }
 

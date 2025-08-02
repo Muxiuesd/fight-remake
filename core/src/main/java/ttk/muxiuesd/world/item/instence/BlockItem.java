@@ -30,7 +30,7 @@ public class BlockItem extends ConsumptionItem {
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         Vector2 worldPosition = Util.getMouseWorldPosition();
-        ChunkSystem cs = (ChunkSystem) world.getSystemManager().getSystem("ChunkSystem");
+        ChunkSystem cs = world.getSystem(ChunkSystem.class);
 
         //替换鼠标点到的方块
         Block replacedBlock = cs.replaceBlock(block, worldPosition.x, worldPosition.y);

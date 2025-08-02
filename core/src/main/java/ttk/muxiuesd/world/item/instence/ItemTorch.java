@@ -38,7 +38,7 @@ public class ItemTorch extends Sword {
         float yOffset = holder.getHeight()* 1.014f * MathUtils.sinDeg(deg);
 
         World world = holder.getEntitySystem().getWorld();
-        LightSystem lightSystem = (LightSystem) world.getSystemManager().getSystem("LightSystem");
+        LightSystem lightSystem = world.getSystem(LightSystem.class);
         PointLight light = new PointLight(
             new Vector2(holderCenter).add(xOffset, yOffset),
             Color.WHITE,
