@@ -15,6 +15,7 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.RenderLayers;
+import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
@@ -57,6 +58,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     public EntitySystem (World world) {
         super(world);
+        WorldInformationType.FLOAT.putIfNull(Fight.ENTITY_UPDATE_RANGE);
+        WorldInformationType.FLOAT.putIfNull(Fight.ENTITY_RENDER_RANGE);
+        WorldInformationType.FLOAT.putIfNull(Fight.ITEM_ENTITY_PICKUP_SPAN);
+        WorldInformationType.FLOAT.putIfNull(Fight.MAX_ITEM_ENTITY_LIVING_TIME);
     }
 
     @Override
@@ -209,7 +214,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PICKUP_RANGE.getValue() && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue() && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
                 itemEntity.setVelocity(direction);

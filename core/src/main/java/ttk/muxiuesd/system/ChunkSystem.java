@@ -11,7 +11,7 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.WorldInformation;
+import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
@@ -63,13 +63,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public ChunkSystem(World world) {
         super(world);
-        WorldInformation.INT.putIfAbsent("seed", 114514);
+        WorldInformationType.INT.putIfAbsent("seed", 114514);
     }
 
     @Override
     public void initialize () {
         //this.noise = new WorldMapNoise((int) (Math.random() * 10000));
-        this.noise = new WorldMapNoise(WorldInformation.INT.get("seed"));
+        this.noise = new WorldMapNoise(WorldInformationType.INT.get("seed"));
 
         PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
         this.player = ps.getPlayer();

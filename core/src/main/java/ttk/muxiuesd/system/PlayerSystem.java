@@ -45,7 +45,9 @@ public class PlayerSystem extends WorldSystem {
 
     public PlayerSystem(World world) {
         super(world);
-        WorldInformation.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
+        WorldInformationType.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
+        WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
+        WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class MainGameScreen implements Screen {
         Walls.init();
         EntityTypes.init();
         Entities.init();
-        WorldInformation.init();
+        WorldInformationType.init();
 
         //初始化着色器调度器
         ShaderScheduler.init();

@@ -12,8 +12,6 @@ import ttk.muxiuesd.util.Log;
 /**世界的基类
  * */
 public abstract class World implements Updateable, Disposable {
-    public final String TAG = this.getClass().getName();
-
     private final MainGameScreen screen;
     private WorldSystemsManager worldSystemsManager;
 
@@ -47,16 +45,21 @@ public abstract class World implements Updateable, Disposable {
     }
 
     private void writeWorldInfo () {
-        JsonDataWriter dataWriter = new JsonDataWriter();
-        dataWriter.objStart();
-        WorldInfo.CODEC.encode(WorldInfo.INSTANCE, dataWriter);
-        dataWriter.objEnd();
-        new WorldInfoDataOutput().output(dataWriter);
+        try {
+            JsonDataWriter dataWriter = new JsonDataWriter();
+            dataWriter.objStart();
+            WorldInfo.CODEC.encode(WorldInfo.INSTANCE, dataWriter);
+            dataWriter.objEnd();
+            new WorldInfoDataOutput().output(dataWriter);
+        }catch (Exception e) {
+            Log.error(TAG(), "世界信息写入失败！！！原因：", e);
+        }
+        Log.print(TAG(), "世界信息写入完成。");
     }
 
     public WorldSystemsManager getSystemManager() {
         if (this.worldSystemsManager == null) {
-            Log.error(TAG, "这个world的系统管理是null！！！");
+            Log.error(TAG(), "这个world的系统管理是null！！！");
             throw new RuntimeException();
         }
         return this.worldSystemsManager;
@@ -68,5 +71,9 @@ public abstract class World implements Updateable, Disposable {
 
     public MainGameScreen getScreen() {
         return this.screen;
+    }
+
+    public String TAG () {
+        return this.getClass().getName();
     }
 }

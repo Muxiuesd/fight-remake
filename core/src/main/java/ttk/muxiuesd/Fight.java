@@ -10,12 +10,12 @@ public class Fight {
     public static final String ITEM_TEXTURE_ROOT = "texture/item/";
 
     //玩家的听觉范围，单位：世界中的1米
-    public static final Info<Float> HEARING_RANGE = Info.create("player_hearing_range", 16f);
+    public static final Info<Float> PLAYER_HEARING_RANGE = Info.create("player_hearing_range", 16f);
     //物品实体最大存活时间，单位：秒
     public static final Info<Float> MAX_ITEM_ENTITY_LIVING_TIME = Info.create("max_item_entity_living_time", 300f);
     //玩家捡起掉落物的范围，单位：世界的一米
-    public static final Info<Float> PICKUP_RANGE = Info.create("player_pickup_item_range", 1.5f);
-    //掉落物可以被捡起来的cd
+    public static final Info<Float> PLAYER_PICKUP_RANGE = Info.create("player_pickup_item_range", 1.5f);
+    //掉落物可以被捡起来的cd，单位：秒
     public static final Info<Float> ITEM_ENTITY_PICKUP_SPAN = Info.create("item_entity_pickup_span", 2f);
     //玩家视野，单位：区块
     public static final Info<Integer> PLAYER_VISUAL_RANGE = Info.create("player_vision", 4);

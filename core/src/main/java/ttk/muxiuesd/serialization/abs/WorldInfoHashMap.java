@@ -16,6 +16,9 @@ public abstract class WorldInfoHashMap<T, V> extends HashMapCodec<T, String, V, 
         return this;
     }
 
+    /**
+     * 如果不存在这个信息，就加进来
+     * */
     public void putIfNull (Info<V> pair) {
         if (containsKey(pair.getKey())) return;
         put(pair.getKey(), pair.getValue());
