@@ -18,12 +18,15 @@ import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.EntityUnloadTask;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -33,7 +36,8 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.concurrent.*;
 
 /**
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
@@ -53,6 +57,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
     private final ConcurrentHashMap<RenderLayer, Array<Entity<?>>> renderableEntities = new ConcurrentHashMap<>();
+
+    // 线程池
+    private ExecutorService executor;
+    private ConcurrentHashMap<ChunkPosition, Future<Array<Entity<?>>>> entityLoadingTasks;
+    private ConcurrentHashMap<ChunkPosition, Future<Array<Entity<?>>>> entityUnloadingTasks;
+
 
     public EntitySystem (World world) {
         super(world);
@@ -77,7 +87,20 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.renderableEntities.put(RenderLayers.ENTITY_UNDERGROUND, new Array<>());
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
 
+        this.initPool();
+
         Log.print(TAG(), "EntitySystem初始化完成！");
+    }
+
+    /**
+     * 初始化线程池
+     */
+    private void initPool() {
+        int coreSize = Runtime.getRuntime().availableProcessors();
+        Log.print(TAG(), "初始化实体加载卸载线程池，核心线程数：" + coreSize);
+        this.executor = Executors.newFixedThreadPool(coreSize);
+        this.entityLoadingTasks = new ConcurrentHashMap<>();
+        this.entityUnloadingTasks = new ConcurrentHashMap<>();
     }
 
     /**
@@ -172,8 +195,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 this.updateItemEntity(itemEntity, delta);
             }
         }
-        this.updatableEntity.clear();
-        this.incationEntity.clear();
+
+
+        this.checkTasks();
+
+        /*this.updatableEntity.clear();
+        this.incationEntity.clear();*/
     }
 
     private void updateLivingEntity(LivingEntity livingEntity, float delta) {
@@ -304,7 +331,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 激活实体
      * */
     private void activateEntity (Entity<?> entity) {
-        this.updatableEntity.add(entity);
+        if (!this.updatableEntity.contains(entity, true)) {
+            this.updatableEntity.add(entity);
+        }
         if (this.incationEntity.contains(entity, true)) {
             this.incationEntity.removeValue(entity, true);
         }
@@ -314,10 +343,75 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 静默实体
      * */
     private void deactivateEntity (Entity<?> entity) {
-        this.incationEntity.add(entity);
+        if (!this.incationEntity.contains(entity, true)) {
+            this.incationEntity.add(entity);
+        }
         if (this.updatableEntity.contains(entity, true)) {
             this.updatableEntity.removeValue(entity, true);
         }
+    }
+
+    /**
+     * 检查多线程的任务
+     * */
+    private void checkTasks () {
+        if (! this.entityUnloadingTasks.isEmpty()) {
+            for (ChunkPosition chunkPosition : this.entityUnloadingTasks.keySet()) {
+                Future<Array<Entity<?>>> future = this.entityUnloadingTasks.get(chunkPosition);
+                if (future != null && future.isDone()) {
+                    this.entityUnloadingTasks.remove(chunkPosition);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 卸载某一区块内的实体
+     * @param chunk 需要被卸载的区块
+     * */
+    public void unloadEntities (ChunkSystem cs, Chunk chunk) {
+        Array<Entity<?>> copy = new Array<>(this.getIncationEntity()); //复制一份
+        Array<Entity<?>> unload = new Array<>();    //需要被卸载的实体组
+
+        for (Entity<?> entity: copy) {
+            Chunk entityChunk = cs.getChunk(entity.getPosition());
+            //检查实体所在区块是否为传入的需要被卸载的区块
+            if (entityChunk.getChunkPosition().equals(chunk.getChunkPosition())) {
+                unload.add(entity);
+            }
+        }
+        EntityUnloadTask unloadTask = new EntityUnloadTask(this, unload, chunk.getChunkPosition());
+        Future<Array<Entity<?>>> submit = this.executor.submit(unloadTask);
+        this.entityUnloadingTasks.put(chunk.getChunkPosition(), submit);
+    }
+
+    /**
+     * 卸载所有实体
+     * */
+    public void unloadAllEntities () {
+        HashMap<String, ChunkPosition> chunkPos = new HashMap<>();
+        HashMap<ChunkPosition, Array<Entity<?>>> unloadArray = new HashMap<>();
+        Array<Entity<?>> allEntities = this.getEntities();
+        ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
+
+        for (Entity<?> entity: allEntities) {
+            Vector2 position = entity.getCenter();
+            ChunkPosition chunkPosition = chunkSystem.getChunkPosition(position.x, position.y);
+            String name = chunkPosition.toString();
+            //没有就新建一个
+            if (!chunkPos.containsKey(name)) {
+                chunkPos.put(name, chunkPosition);
+                unloadArray.put(chunkPosition, new Array<>());
+            }
+            //添加进对应区块的实体组
+            unloadArray.get(chunkPos.get(name)).add(entity);
+        }
+
+        //对每一个区块的实体组进行卸载任务
+        unloadArray.forEach((chunkPosition, array) -> {
+            new EntityUnloadTask(this, array, chunkPosition).call();
+        });
     }
 
     @Override
@@ -343,10 +437,26 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     @Override
     public void dispose() {
-        for (Entity<?> entity : this.getEntities()) {
-            entity.dispose();
+        this.unloadAllEntities();
+        this.shutdownPool();
+    }
+
+    /**
+     * 关闭线程池
+     */
+    private void shutdownPool () {
+        this.executor.shutdown();
+        try {
+            if (!this.executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                this.executor.shutdownNow();
+                Log.print(TAG(), "实体加载卸载任务线程池关闭");
+            }
+        } catch (InterruptedException e) {
+            this.executor.shutdownNow();
+            throw new RuntimeException(e);
         }
     }
+
 
     public Player getPlayer() {
         PlayerSystem ps = getManager().getSystem(PlayerSystem.class);
@@ -358,6 +468,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     public Array<Entity<?>> getEntities () {
         return this.entities;
+    }
+
+    /**
+     * 获取不活跃的实体
+     * */
+    public Array<Entity<?>> getIncationEntity () {
+        return this.incationEntity;
     }
 
     /**

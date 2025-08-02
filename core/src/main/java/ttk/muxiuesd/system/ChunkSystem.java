@@ -466,6 +466,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
         // 执行到这就是要卸载的区块在活跃队列里，延迟卸载
         this._unloadChunks.add(chunk);
+
+        //通知实体系统卸载区块上的实体
+        EntitySystem es = getWorld().getSystem(EntitySystem.class);
+        es.unloadEntities(this, chunk);
+
         // Log.print(TAG, "卸载编号为：(" + chunk.chunkX +","+ chunk.chunkY +")的区块");
     }
 
