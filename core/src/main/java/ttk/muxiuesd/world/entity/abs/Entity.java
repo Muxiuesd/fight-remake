@@ -7,16 +7,19 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.data.JsonPropertiesMap;
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.interfaces.*;
+import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
 
 /**
@@ -24,7 +27,7 @@ import ttk.muxiuesd.world.entity.EntityType;
  * <p>
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
-public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, Drawable, Updateable, ShapeRenderable {
+public abstract class Entity<T extends Entity<?>> implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
 
     public float speed, curSpeed;
@@ -34,19 +37,54 @@ public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, 
     public float originX, originY;
     public float scaleX = 1, scaleY = 1;
     public float rotation;
+    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
+
     public TextureRegion bodyTexture;
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
-    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
     private EntitySystem es;    //此实体所属的实体系统
     private EntityType<?> type;
+    private Property property;  //实体的属性
 
-    public Entity() {}
-    public Entity (EntityType<?> type) {
-        setType(type);
-    }
     public Entity (World world, EntityType<?> type) {
-        setType(type);
+        this.setType(type);
+        this.property = new Property();
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        this.speed = values.getFloat("speed");
+        this.curSpeed = values.getFloat("curSpeed");
+        this.x = values.getFloat("x");
+        this.y = values.getFloat("y");
+        this.velX = values.getFloat("velX");
+        this.velY = values.getFloat("velY");
+        this.width = values.getFloat("width");
+        this.height = values.getFloat("height");
+        this.originX = values.getFloat("originX");
+        this.originY = values.getFloat("originY");
+        this.scaleX = values.getFloat("scaleX");
+        this.scaleY = values.getFloat("scaleY");
+        this.rotation = values.getFloat("rotation");
+        this.onGround = values.getBoolean("onGround");
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        cat.set("speed", speed);
+        cat.set("curSpeed", curSpeed);
+        cat.set("x", x);
+        cat.set("y", y);
+        cat.set("velX", velX);
+        cat.set("velY", velY);
+        cat.set("width", width);
+        cat.set("height", height);
+        cat.set("originX", originX);
+        cat.set("originY", originY);
+        cat.set("scaleX", scaleX);
+        cat.set("scaleY", scaleY);
+        cat.set("rotation", rotation);
+        cat.set("onGround", onGround);
     }
 
     /**
@@ -81,6 +119,8 @@ public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, 
             this.bodyTexture = null;
         }
     }
+
+
 
     public T setCullingArea(float x, float y, float width, float height) {
         this.hitbox.set(x, y, width, height);
@@ -221,6 +261,15 @@ public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, 
         return (T) this;
     }
 
+    public Property getProperty () {
+        return this.property;
+    }
+
+    public T setProperty (Property property) {
+        this.property = property;
+        return (T) this;
+    }
+
     /**
      * 加载身体材质
      * */
@@ -269,5 +318,46 @@ public abstract class Entity<T extends Entity<?>> implements ID<T>, Disposable, 
     public T setID (String id) {
         this.id = id;
         return (T) this;
+    }
+
+    /**
+     * 实体的属性
+     * */
+    public static class Property {
+        //属性映射
+        private PropertiesDataMap<?, ?, ?> propertiesMap;
+
+        public Property () {
+            setPropertiesMap(
+                new JsonPropertiesMap()
+                    .add(PropertyTypes.CAT, new CAT())
+            );
+        }
+
+        public <T> T get (PropertyType<T> propertyType) {
+            return getPropertiesMap().get(propertyType);
+        }
+
+        public <T> Entity.Property add (PropertyType<T> propertyType, T value) {
+            getPropertiesMap().add(propertyType, value);
+            return this;
+        }
+
+        public CAT getCAT () {
+            return this.get(PropertyTypes.CAT);
+        }
+
+        public Entity.Property setCAT (CAT cat) {
+            return this.add(PropertyTypes.CAT, cat);
+        }
+
+        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
+            return this.propertiesMap;
+        }
+
+        public Entity.Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
+            this.propertiesMap = propertiesMap;
+            return this;
+        }
     }
 }

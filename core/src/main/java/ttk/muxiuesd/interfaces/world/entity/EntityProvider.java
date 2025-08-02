@@ -9,6 +9,8 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * */
 
 public class EntityProvider<T extends Entity<?>> {
+    private String id;
+
     private Factory<T> factory;
     private EntityType<? super T> defaultType;
 
@@ -20,14 +22,29 @@ public class EntityProvider<T extends Entity<?>> {
     /**
      * 新建一个实体实例
      * */
-    public T create (World world, EntityType<T> type) {
-        return factory.create(world, type);
-    }
-
     public T create (World world) {
-        return factory.create(world, this.defaultType);
+        return this.create(world, this.defaultType);
     }
 
+    /**
+     * 新建一个实体实例
+     * */
+    public T create (World world, EntityType<? super T> type) {
+        T entity = factory.create(world, type);
+        entity.setID(this.getId());
+        return entity;
+    }
+
+
+
+    public String getId () {
+        return this.id;
+    }
+
+    public EntityProvider<T> setId (String id) {
+        this.id = id;
+        return this;
+    }
 
     public static class Builder<T extends Entity<?>> {
         final Factory<T> factory;

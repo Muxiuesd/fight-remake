@@ -10,6 +10,7 @@ import java.util.HashMap;
  * 用于注册的实体类型
  * */
 public class EntityType<T extends Entity<?>> {
+    private String id;
     //改实体类型的附属类型，比如玩家类型实体附属玩家子弹类型实体
     private final HashMap<String, EntityType<?>> childTypes = new HashMap<>();
 
@@ -33,5 +34,14 @@ public class EntityType<T extends Entity<?>> {
      * */
     public EntityType<?> getChildType (String name) {
         return this.childTypes.get(name);
+    }
+
+    public String getId () {
+        return this.id;
+    }
+
+    public EntityType<T> setId (String id) {
+        this.id = id;
+        return this;
     }
 }

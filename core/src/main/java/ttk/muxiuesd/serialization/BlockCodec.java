@@ -65,10 +65,10 @@ public class BlockCodec extends JsonCodec<Block> {
             }*/
             //属性解码
             JsonValue propertyValue = dataReader.readObj("property");
-            Optional<Block.Property> propertyOptional = Codecs.BLOCK_PROPERTY.decode(new JsonDataReader(propertyValue));
-            if (propertyOptional.isPresent()) {
-                self.setProperty(propertyOptional.get());
-            }
+            Optional<Block.Property> propertyOptional = Codecs.BLOCK_PROPERTY.decode(
+                new JsonDataReader(propertyValue)
+            );
+            propertyOptional.ifPresent(self::setProperty);
 
             //读取cat
             self.readCAT(propertyValue.get(Fight.getId("cat")));

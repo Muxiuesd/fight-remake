@@ -18,6 +18,7 @@ public final class PropertyTypes {
     }
 
     public static final PropertyType<CAT> CAT = register("cat", new PropertyCAT());
+
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
     public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());

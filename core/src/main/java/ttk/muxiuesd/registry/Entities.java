@@ -13,6 +13,9 @@ import ttk.muxiuesd.world.entity.creature.PufferFish;
 import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
 
+/**
+ * 所有实体的注册
+ * */
 public final class Entities {
     public static void init () {
     }
@@ -73,6 +76,6 @@ public final class Entities {
 
     public static <T extends Entity<?>> EntityProvider<T> register (String name, EntityProvider<T> provider) {
         Identifier identifier = new Identifier(Fight.NAMESPACE, name);
-        return (EntityProvider<T>) Registries.ENTITY.register(identifier, provider);
+        return (EntityProvider<T>) Registries.ENTITY.register(identifier, provider.setId(identifier.getId()));
     }
 }
