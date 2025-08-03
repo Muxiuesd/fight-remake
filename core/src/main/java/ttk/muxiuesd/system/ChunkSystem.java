@@ -612,6 +612,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.getChunkPosition(playerCenter.x, playerCenter.y);
     }
 
+    public ChunkPosition getChunkPosition (Vector2 position) {
+        return this.getChunkPosition(position.x, position.y);
+    }
     /**
      * 获取世界坐标所对应的区块编号
      *
