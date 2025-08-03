@@ -460,12 +460,15 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * （主线程）初始化加载实体
      * */
     public void initLoadEntities (ChunkPosition chunkPosition) {
+        String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString() + ".json")) return;
+        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
+
+        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, fileName);
     }
 
     @Override

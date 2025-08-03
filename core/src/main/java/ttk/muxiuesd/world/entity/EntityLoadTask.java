@@ -40,7 +40,8 @@ public class EntityLoadTask extends EntityTask {
                 optionalEntity.ifPresent(entities::add);
             }
         }
-
+        //读取完成后删除文件
+        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, chunkPosName + ".json");
         return entities;
     }
 }
