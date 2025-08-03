@@ -113,6 +113,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                             }
                         }
                         if (!exit) this._loadChunks.add(chunk);
+                        EntitySystem entitySystem = getManager().getSystem(EntitySystem.class);
+                        entitySystem.loadEntities(this, chunk);
                     }
                     //移除任务
                     this.chunkLoadingTasks.remove(position);

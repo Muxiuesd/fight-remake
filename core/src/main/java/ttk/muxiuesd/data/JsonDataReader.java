@@ -22,6 +22,30 @@ public class JsonDataReader implements DataReader<JsonReader> {
         this.parse  = this.reader.parse(jsonString);
     }
 
+    /**
+     * 读obj
+     * */
+    public JsonValue readObj (String key) {
+        if (!this.getParse().has(key)) {
+            Log.error(TAG, "json中不存在名为：" + key + " 的obj！！！" +
+                "原文：\n" + this.getParse().toString());
+            throw new IllegalArgumentException(key);
+        }
+        return this.getParse().get(key);
+    }
+
+    /**
+     * 读array
+     * */
+    public JsonValue readArray (String key) {
+        if (!this.getParse().has(key)) {
+            Log.error(TAG, "json中不存在名为：" + key + " 的array！！！" +
+                "原文：\n" + this.getParse().toString());
+            throw new IllegalArgumentException(key);
+        }
+        return this.getParse().get(key);
+    }
+
     @Override
     public int readInt (String key) {
         this.check(key);
@@ -76,17 +100,6 @@ public class JsonDataReader implements DataReader<JsonReader> {
         return this.getParse().getString(key);
     }
 
-    /**
-     * 读obj
-     * */
-    public JsonValue readObj (String key) {
-        if (!this.getParse().has(key)) {
-            Log.error(TAG, "json中不存在名为：" + key + " 的obj！！！" +
-                "原文：\n" + this.getParse().toString());
-            throw new IllegalArgumentException(key);
-        }
-        return this.getParse().get(key);
-    }
 
     public JsonValue getParse() {
         return this.parse;

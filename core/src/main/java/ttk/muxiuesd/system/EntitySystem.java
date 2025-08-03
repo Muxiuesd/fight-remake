@@ -19,17 +19,11 @@ import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
-import ttk.muxiuesd.world.entity.EntityType;
-import ttk.muxiuesd.world.entity.EntityUnloadTask;
-import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.*;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -363,6 +357,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 检查多线程的任务
      * */
     private void checkTasks () {
+        //检查卸载任务
         if (! this.entityUnloadingTasks.isEmpty()) {
             for (ChunkPosition chunkPosition : this.entityUnloadingTasks.keySet()) {
                 Future<Array<Entity<?>>> future = this.entityUnloadingTasks.get(chunkPosition);
@@ -372,6 +367,22 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
         }
 
+        //检查加载任务
+        if (! this.entityLoadingTasks.isEmpty()) {
+            for (ChunkPosition chunkPosition : this.entityLoadingTasks.keySet()) {
+                Future<Array<Entity<?>>> future = this.entityLoadingTasks.get(chunkPosition);
+                if (future != null && future.isDone()) {
+                    try {
+                        Array<Entity<?>> entityArray = future.get();
+                        //添加到延迟队列
+                        this._delayAdd.addAll(entityArray);
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                    this.entityLoadingTasks.remove(chunkPosition);
+                }
+            }
+        }
     }
 
     /**
@@ -421,6 +432,21 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             new EntityUnloadTask(this, array, chunkPosition).call();
         });
     }
+
+    /**
+     * 加载对应区块上的所有实体
+     * */
+    public void loadEntities (ChunkSystem cs, Chunk chunk) {
+        ChunkPosition chunkPosition = chunk.getChunkPosition();
+        //文件不存在就是区块上没有实体，直接跳过
+        if (! FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString() + ".json")) {
+            return;
+        }
+        EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
+        Future<Array<Entity<?>>> submit = this.executor.submit(loadTask);
+        this.entityLoadingTasks.put(chunkPosition, submit);
+    }
+
 
     @Override
     public void render (Batch batch, ShapeRenderer shapeRenderer) {

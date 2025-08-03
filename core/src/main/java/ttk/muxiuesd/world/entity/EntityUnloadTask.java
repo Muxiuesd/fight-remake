@@ -13,11 +13,11 @@ import ttk.muxiuesd.world.entity.abs.EntityTask;
  * 实体卸载任务
  * */
 public class EntityUnloadTask extends EntityTask {
-    private final ChunkPosition chunkPosition;
+    private final Array<Entity<?>> entities;
 
     public EntityUnloadTask (EntitySystem entitySystem, Array<Entity<?>> entities, ChunkPosition chunkPosition) {
-        super(entitySystem, entities);
-        this.chunkPosition = chunkPosition;
+        super(entitySystem, chunkPosition);
+        this.entities = entities;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class EntityUnloadTask extends EntityTask {
         //TODO 修改实体保存的格式
         JsonDataWriter dataWriter = new JsonDataWriter();
         dataWriter.arrayStart();
-        for (Entity<?> entity: getEntities()) {
+        for (Entity<?> entity: this.getEntities()) {
             dataWriter.objStart();
             Codecs.ENTITY.encode(entity, dataWriter);
             dataWriter.objEnd();
@@ -49,10 +49,10 @@ public class EntityUnloadTask extends EntityTask {
             entityDataOutput.output(dataWriter);
         }*/
 
-        return getEntities();
+        return this.getEntities();
     }
 
-    public ChunkPosition getChunkPosition () {
-        return this.chunkPosition;
+    public Array<Entity<?>> getEntities () {
+        return this.entities;
     }
 }
