@@ -437,6 +437,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         unloadArray.forEach((chunkPosition, array) -> {
             new EntityUnloadTask(this, array, chunkPosition).call();
         });
+
+        Log.print(TAG(), "全部实体的数据保存完成。");
     }
 
     /**
@@ -458,7 +460,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     public void initLoadEntities (ChunkPosition chunkPosition) {
         //没有实体数据就跳过
-        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString())) return;
+        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString() + ".json")) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
