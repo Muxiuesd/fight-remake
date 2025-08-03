@@ -44,6 +44,31 @@ public class JsonDataWriter implements DataWriter<Json> {
         return this;
     }
 
+    /**
+     * 开始一个有名称的json数组
+     * */
+    public JsonDataWriter arrayStart (String objName) {
+        this.writer.writeArrayStart(objName);
+        return this;
+    }
+
+    /**
+     * 开始一个无名称的json数组
+     * */
+    public JsonDataWriter arrayStart () {
+        this.writer.writeArrayStart();
+        return this;
+    }
+
+    /**
+     * 结束当前的json数组
+     * */
+    public JsonDataWriter arrayEnd () {
+        this.writer.writeArrayEnd();
+        return this;
+    }
+
+
     @Override
     public JsonDataWriter writeInt (String key, int value) {
         this.writer.writeValue(key, value);
@@ -94,7 +119,6 @@ public class JsonDataWriter implements DataWriter<Json> {
 
     @Override
     public JsonDataWriter writeString (String key, String value) {
-
         this.writer.writeValue(key, value);
         return this;
     }

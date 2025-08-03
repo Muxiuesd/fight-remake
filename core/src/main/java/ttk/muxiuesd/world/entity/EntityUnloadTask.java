@@ -26,8 +26,19 @@ public class EntityUnloadTask extends EntityTask {
         String chunkPosName = chunkPosition.toString();
 
         //TODO 修改实体保存的格式
-
+        JsonDataWriter dataWriter = new JsonDataWriter();
+        dataWriter.arrayStart();
         for (Entity<?> entity: getEntities()) {
+            dataWriter.objStart();
+            Codecs.ENTITY.encode(entity, dataWriter);
+            dataWriter.objEnd();
+        }
+        dataWriter.arrayEnd();
+
+        EntityDataOutput entityDataOutput = new EntityDataOutput(chunkPosName);
+        entityDataOutput.output(dataWriter);
+
+        /*for (Entity<?> entity: getEntities()) {
             JsonDataWriter dataWriter = new JsonDataWriter();
             dataWriter.objStart();
             Codecs.ENTITY.encode(entity, dataWriter);
@@ -36,7 +47,7 @@ public class EntityUnloadTask extends EntityTask {
                 chunkPosName + "/" + entity.getClass().getSimpleName() + "@" + entity.hashCode()
             );
             entityDataOutput.output(dataWriter);
-        }
+        }*/
 
         return getEntities();
     }
