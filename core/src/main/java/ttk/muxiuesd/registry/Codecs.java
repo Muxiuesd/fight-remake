@@ -5,6 +5,7 @@ import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.Backpack;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -26,5 +27,6 @@ public final class Codecs {
 
     public static final JsonCodec<Entity<?>> ENTITY = new EntityCodec();
     public static final JsonCodec<Player> PLAYER = new PlayerCodec();
+    public static final JsonCodec<ItemEntity> ITEM_ENTITY = new ItemEntityCodec();
     public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = new EntityPropertyCodec();
 }

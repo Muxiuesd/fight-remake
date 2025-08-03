@@ -30,7 +30,11 @@ public class EntityUnloadTask extends EntityTask {
         dataWriter.arrayStart();
         for (Entity<?> entity: this.getEntities()) {
             dataWriter.objStart();
-            Codecs.ENTITY.encode(entity, dataWriter);
+            if (entity instanceof ItemEntity itemEntity) {
+                Codecs.ITEM_ENTITY.encode(itemEntity, dataWriter);
+            }else {
+                Codecs.ENTITY.encode(entity, dataWriter);
+            }
             dataWriter.objEnd();
         }
         dataWriter.arrayEnd();

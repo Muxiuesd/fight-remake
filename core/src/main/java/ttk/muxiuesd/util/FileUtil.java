@@ -109,6 +109,10 @@ public class FileUtil {
      * @param fileName 默认.json后缀
      * */
     public static JsonValue readJsonFile(String path, String fileName) {
+        if (fileName.endsWith(".json")) {
+            String string = getFile(path, fileName).readString();
+            return new JsonReader().parse(string);
+        }
         String string = getFile(path, fileName + ".json").readString();
         return new JsonReader().parse(string);
     }

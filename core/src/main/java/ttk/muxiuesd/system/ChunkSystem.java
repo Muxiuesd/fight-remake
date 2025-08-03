@@ -90,6 +90,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             ChunkPosition playerChunkPosition = this.getPlayerChunkPosition();
             Chunk chunk = this.initChunk(playerChunkPosition.getX(), playerChunkPosition.getY());
             this.activeChunks.add(chunk);
+
+            EntitySystem es = getWorld().getSystem(EntitySystem.class);
+            es.initLoadEntities(playerChunkPosition);
             return;
         }
 

@@ -3,9 +3,11 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -29,6 +31,37 @@ public class ItemEntity extends Entity<ItemEntity> {
         super(world, EntityTypes.ITEM_ENTITY);
         this.positionOffset = new Vector2();
         setSize(DEFAULT_SIZE);
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.cycle = values.getFloat("cycle");
+        this.livingTime = values.getFloat("living_time");
+
+
+        if (values.has("on_air")) {
+            if (values.getBoolean("on_air")) {
+                this.onAirTimer = new TaskTimer(
+                    values.getFloat("on_air_max_span"),
+                    values.getFloat("on_air_cur_span"),
+                    () -> this.setOnAirTimer(null)
+                );
+            }
+        }
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("cycle", this.cycle);
+        cat.set("living_time", this.livingTime);
+
+        if (this.onAirTimer != null) {
+            cat.set("on_air", true);
+            cat.set("on_air_max_span", this.onAirTimer.getMaxSpan());
+            cat.set("on_air_cur_span", this.onAirTimer.getCurSpan());
+        }
     }
 
     @Override

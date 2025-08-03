@@ -453,6 +453,17 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.entityLoadingTasks.put(chunkPosition, submit);
     }
 
+    /**
+     * （主线程）初始化加载实体
+     * */
+    public void initLoadEntities (ChunkPosition chunkPosition) {
+        //没有实体数据就跳过
+        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString())) return;
+
+        EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
+        Array<Entity<?>> entities = loadTask.call();
+        this._delayAdd.addAll(entities);
+    }
 
     @Override
     public void render (Batch batch, ShapeRenderer shapeRenderer) {
