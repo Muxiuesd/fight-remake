@@ -25,6 +25,8 @@ public class EntityUnloadTask extends EntityTask {
         ChunkPosition chunkPosition = this.getChunkPosition();
         String chunkPosName = chunkPosition.toString();
 
+        //TODO 修改实体保存的格式
+
         for (Entity<?> entity: getEntities()) {
             JsonDataWriter dataWriter = new JsonDataWriter();
             dataWriter.objStart();

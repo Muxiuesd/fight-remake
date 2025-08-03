@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.event;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.event.abs.LivingEntityDeathEvent;
-import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
@@ -23,18 +23,21 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
         if (entity instanceof Slime mom) {
             EntitySystem es = world.getSystem(EntitySystem.class);
             int generation = mom.generation;
-            if (generation == maxGeneration) {
+
+            if (generation >= maxGeneration) {
                 return;
             }
-            for (int i = 0; i < MathUtils.random(generation, generation + 3); i++) {
-                Slime child = Entities.SLIME.create(world);
-                child.generation = generation + 1;
-                child.setEntitySystem(es);
+
+            for (int i = 0; i < MathUtils.random(generation, generation + 1); i++) {
+                //Slime child = Entities.SLIME.create(world);
+                Slime child = new Slime(world, EntityTypes.ENEMY, generation + 1);
+
                 float x = (float) (mom.x + MathUtils.random(mom.getWidth(), 2f) * Util.randomCos());
                 float y = (float) (mom.y + MathUtils.random(mom.getHeight(), 2f) * Util.randomSin());
                 float width = mom.getWidth() * 0.8f;
                 float height = mom.getHeight() * 0.8f;
                 child.setBounds(x, y, width, height);
+                child.setEntitySystem(es);
                 es.add(child);
             }
             SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);

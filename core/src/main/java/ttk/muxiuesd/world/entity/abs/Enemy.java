@@ -35,6 +35,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     public Enemy (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10, 10, 5, 2, 3);
     }
+
     public Enemy (World world, EntityType<?> entityType,
                   float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {

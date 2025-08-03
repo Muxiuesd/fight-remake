@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.enemy;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.EntityTypes;
@@ -8,6 +9,7 @@ import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -31,6 +33,17 @@ public class Slime extends Enemy<Slime> {
         renderHandItem = false;
     }
 
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.generation = values.getInt("generation");
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("generation", this.generation);
+    }
 
     @Override
     public void updateTarget (float delta, EntitySystem es) {

@@ -95,6 +95,7 @@ public class PlayerSystem extends WorldSystem {
         }
 
         //this.test();
+
     }
 
     public void setItemStack (int index, String itemId) {

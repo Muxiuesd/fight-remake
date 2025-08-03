@@ -10,6 +10,7 @@ import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
+import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
@@ -42,7 +43,7 @@ import java.util.concurrent.*;
 /**
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
-public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender {
+public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender, Tickable {
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -88,6 +89,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
 
         this.initPool();
+        //添加tick任务
+        TimeSystem timeSystem = getManager().getSystem(TimeSystem.class);
+        timeSystem.add(this);
 
         Log.print(TAG(), "EntitySystem初始化完成！");
     }
@@ -133,7 +137,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             entityArray.add(entity);
         }
         this.entities.add(entity);
-        //this.updatableEntity.add(entity);
         //把实体添加进相应的渲染层级
         if (this.renderableEntities.containsKey(entity.getRenderLayer()))
             this.renderableEntities.get(entity.getRenderLayer()).add(entity);
@@ -148,12 +151,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      */
     private <T extends Entity> void _remove (T entity) {
         Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
-        if (entityArray.contains(entity, true)) {
-            //避免重复移除
-            entityArray.removeValue(entity, true);
-        }
+        entityArray.removeValue(entity, true);
+
         this.entities.removeValue(entity, true);
-        //this.updatableEntity.removeValue(entity, true);
+        this.updatableEntity.removeValue(entity, true);
+        this.incationEntity.removeValue(entity, true);
         //把实体移除出渲染层级
         this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
     }
@@ -175,11 +177,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             _delayAdd.clear();
         }
 
-        this.calculateNeedActiveEntity();
-        this.calculateInactionEntity();
-
+        //先把所有实体更新一次
         for (Entity entity : this.updatableEntity) {
-            //先把所有实体更新一次
+
             if (!(entity instanceof ItemEntity)) {
                 //对于非物品实体进行当前速度更新
                 this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
@@ -197,10 +197,16 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         }
 
 
-        this.checkTasks();
-
         /*this.updatableEntity.clear();
         this.incationEntity.clear();*/
+    }
+
+    @Override
+    public void tick (World world, float delta) {
+        this.calculateNeedActiveEntity();
+        this.calculateInactionEntity();
+
+        this.checkTasks();
     }
 
     private void updateLivingEntity(LivingEntity livingEntity, float delta) {
@@ -350,6 +356,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             this.updatableEntity.removeValue(entity, true);
         }
     }
+
+
 
     /**
      * 检查多线程的任务
