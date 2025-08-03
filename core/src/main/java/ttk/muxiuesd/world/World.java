@@ -44,12 +44,12 @@ public abstract class World implements Updateable, Disposable {
 
     @Override
     public void dispose() {
-        //编写信息文件
-        this.writeWorldInfo();
-
         if (this.worldSystemsManager != null) {
             this.getSystemManager().dispose();
         }
+
+        //编写信息文件
+        this.writeWorldInfo();
     }
 
     private void writeWorldInfo () {

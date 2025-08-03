@@ -23,4 +23,9 @@ public abstract class WorldInfoHashMap<T, V> extends HashMapCodec<T, String, V, 
         if (containsKey(pair.getKey())) return;
         put(pair.getKey(), pair.getValue());
     }
+
+    public V get (Info<V> pair) {
+        if (containsKey(pair.getKey())) return get(pair.getKey());
+        return pair.getValue();
+    }
 }
