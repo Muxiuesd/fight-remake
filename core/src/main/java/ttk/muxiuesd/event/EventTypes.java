@@ -2,13 +2,15 @@ package ttk.muxiuesd.event;
 
 import ttk.muxiuesd.event.abs.*;
 import ttk.muxiuesd.event.poster.*;
+import ttk.muxiuesd.util.Log;
 
 /**
  * 所有类型的事件
  * */
 public class EventTypes {
     public static void init (){
-    };
+        Log.print(EventTypes.class.getName(), "所有游戏事件注册完毕");
+    }
 
     public static final String BULLET_SHOOT = EventBus.register("BulletShoot",
         new EventHandler<BulletShootEvent, EventPosterBulletShoot>() {
@@ -27,7 +29,7 @@ public class EventTypes {
     });
 
     public static final String ENTITY_DEATH = EventBus.register("EntityDeath",
-        new EventHandler<EntityDeathEvent, EventPosterEntityDeath>() {
+        new EventHandler<LivingEntityDeathEvent, EventPosterEntityDeath>() {
         @Override
         public void callEvents (EventPosterEntityDeath poster) {
             getEvents().forEach(event -> event.handle(poster.world, poster.entity));
@@ -54,9 +56,7 @@ public class EventTypes {
         new EventHandler<BlockReplaceEvent, EventPosterBlockReplace>() {
         @Override
         public void callEvents (EventPosterBlockReplace poster) {
-            getEvents().forEach(event -> {
-                event.handle(poster.world, poster.newBlock, poster.newBlock, poster.wx, poster.wy);
-            });
+            getEvents().forEach(event -> event.handle(poster.world, poster.newBlock, poster.newBlock, poster.wx, poster.wy));
         }
     });
 
@@ -64,9 +64,7 @@ public class EventTypes {
         new EventHandler<WorldKeyInputEvent, EventPosterWorldKeyInput>() {
         @Override
         public void callEvents (EventPosterWorldKeyInput poster) {
-            getEvents().forEach(event -> {
-                event.process(poster.world, poster.key);
-            });
+            getEvents().forEach(event -> event.process(poster.world, poster.key));
         }
     });
 
@@ -74,9 +72,7 @@ public class EventTypes {
         new EventHandler<WorldButtonInputEvent, EventPosterWorldButtonInput>() {
             @Override
             public void callEvents (EventPosterWorldButtonInput poster) {
-                getEvents().forEach(event -> {
-                    event.process(poster.world, poster.screenX, poster.screenY, poster.pointer, poster.button);
-                });
+                getEvents().forEach(event -> event.process(poster.world, poster.screenX, poster.screenY, poster.pointer, poster.button));
             }
         });
 }

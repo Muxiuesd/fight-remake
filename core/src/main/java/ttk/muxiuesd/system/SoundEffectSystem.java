@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.audio.SoundInstance;
 import ttk.muxiuesd.audio.SpatialSoundInstance;
@@ -43,10 +44,9 @@ public class SoundEffectSystem extends WorldSystem {
         this.activeSounds = new LinkedHashMap<>();
         this.activeSpatialSounds = new Array<>();
 
-        this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
-        this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
-
+        this.ps = getWorld().getSystem(PlayerSystem.class);
+        this.cs = getWorld().getSystem(ChunkSystem.class);
+        this.es = getWorld().getSystem(EntitySystem.class);
 
         String[] devices = Gdx.audio.getAvailableOutputDevices();
         StringBuilder deviceName = new StringBuilder();
@@ -57,7 +57,7 @@ public class SoundEffectSystem extends WorldSystem {
             }
             deviceName.append(devices[i]).append(" | ");
         }
-        Log.print(TAG, "游戏音效系统加载完成，可用的音频播放设备有：\n" + deviceName);
+        Log.print(TAG(), "游戏音效系统加载完成，可用的音频播放设备有：\n" + deviceName);
     }
 
     @Override
@@ -132,12 +132,15 @@ public class SoundEffectSystem extends WorldSystem {
         }
     }
 
+    public void newSpatialSound (Audio audio, Entity<?> sounder) {
+        this.newSpatialSound(audio.getId(), sounder);
+    }
     /**
      * 新建一个空间音效
      * @param id 音效的Id，但必须是Music
      * @param sounder 发出声音的实体
      * */
-    public void newSpatialSound (String id, Entity sounder) {
+    public void newSpatialSound (String id, Entity<?> sounder) {
         Music music = AudioLoader.getInstance().newMusic(id);
         SpatialSoundInstance instance = new SpatialSoundInstance(music, sounder, this.ps.getPlayer());
         //播放结束回调

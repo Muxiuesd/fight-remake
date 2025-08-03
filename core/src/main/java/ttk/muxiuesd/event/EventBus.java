@@ -8,15 +8,6 @@ public class EventBus {
     public static final String TAG = EventBus.class.getName();
     private static final ConcurrentHashMap<String, EventHandler> eventHandlersTable = new ConcurrentHashMap<>();
 
-    /*static {
-        register("BulletShoot", new EventHandler<BulletShootEvent, EventPosterBulletShoot>() {
-            @Override
-            public void callEvents (EventPosterBulletShoot poster) {
-                getEvents().forEach(event -> event.handle(poster.shooter, poster.bullet));
-            }
-        });
-    }*/
-
     /**
      * 注册一种事件类型
      * */

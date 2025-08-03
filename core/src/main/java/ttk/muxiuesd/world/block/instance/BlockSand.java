@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.block.instance;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioReg;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.block.abs.Block;
 
 /**
@@ -9,9 +9,9 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockSand extends Block {
     public BlockSand() {
-        super(new Block.Property()
+        super(createProperty()
                 .setFriction(0.9f)
-                .setSounds(AudioReg.SAND),
+                .setSounds(Sounds.SAND),
             Fight.getId("sand"),
             Fight.BlockTexturePath("sand.png"));
     }

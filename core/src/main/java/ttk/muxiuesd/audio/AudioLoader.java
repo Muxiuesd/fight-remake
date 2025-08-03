@@ -43,10 +43,10 @@ public class AudioLoader {
      * @param id    音效的id
      * @param path  音效在audio文件夹里的路径
      * */
-    public void loadSound(String id, String path) {
+    public String loadSound(String id, String path) {
         if (getInstance().getSoundCache().containsKey(id)) {
             Log.error(TAG, "Id为：" + id + " 的音效已经存在！！！");
-            return;
+            return id;
         }
 
         String soundPath = this.getPath(path);
@@ -68,6 +68,7 @@ public class AudioLoader {
         }
         //添加映射
         soundIdToPath.put(id, soundPath);
+        return id;
     }
 
     /**
@@ -75,10 +76,10 @@ public class AudioLoader {
      * @param id    音乐的id
      * @param path  音乐在audio文件夹里的路径
      * */
-    public void loadMusic(String id, String path) {
+    public String loadMusic(String id, String path) {
         if (getInstance().getMusicCache().containsKey(id)) {
             Log.error(TAG, "Id为：" + id + " 的音乐已经存在！！！");
-            return;
+            return id;
         }
 
         String musicPath = this.getPath(path);
@@ -101,6 +102,7 @@ public class AudioLoader {
         }
         //添加映射
         musicIdToPath.put(id, musicPath);
+        return id;
     }
 
     public LinkedHashMap<String, Sound> getSoundCache () {

@@ -2,9 +2,8 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.camera.CameraController;
+import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -13,12 +12,10 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 public class CameraFollowSystem extends WorldSystem {
-    public final String TAG = this.getClass().getName();
     public static final float MAX_ZOOM = 10.0f;
     public static final float MIN_ZOOM = 0.3f;
 
-    private CameraController cameraController;
-    private Entity follower;
+    private Entity<?> follower;
 
     public CameraFollowSystem(World world) {
         super(world);
@@ -27,11 +24,10 @@ public class CameraFollowSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        MainGameScreen screen = getWorld().getScreen();
-        this.cameraController = screen.cameraController;
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.setFollower(ps.getPlayer());
-        Log.print(TAG, "CameraFollowSystem初始化完成！");
+
+        Log.print(TAG(), "CameraFollowSystem初始化完成！");
     }
 
     @Override
@@ -39,7 +35,7 @@ public class CameraFollowSystem extends WorldSystem {
         if (this.getFollower() == null) return;
 
         //相机视野范围变化
-        OrthographicCamera camera = this.cameraController.camera;
+        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
         if (KeyBindings.PlayerCameraZoomIn.wasPressed()) {
             camera.zoom -= delta * 2;
         }
@@ -54,15 +50,15 @@ public class CameraFollowSystem extends WorldSystem {
         Vector2 vector2 = Util.getMousePosition();
         float xOffset = Math.abs(vector2.x) * direction.getxDirection() / 300;
         float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
-        this.cameraController.setPosition(follower.x + follower.width / 2 + xOffset,
+        PlayerCamera.INSTANCE.setPosition(follower.x + follower.width / 2 + xOffset,
             follower.y + follower.height / 2 + yOffset);
     }
 
-    public Entity getFollower() {
+    public Entity<?> getFollower() {
         return this.follower;
     }
 
-    public void setFollower(Entity follower) {
+    public void setFollower(Entity<?> follower) {
         this.follower = follower;
     }
 }

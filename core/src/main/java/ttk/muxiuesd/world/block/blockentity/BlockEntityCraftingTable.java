@@ -30,7 +30,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
     }
 
     @Override
-    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
+    public InteractResult interact (World world, LivingEntity<?> user, GridPoint2 interactGridPos) {
         //空手交互就是取出物品
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
@@ -50,7 +50,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
     }
 
     @Override
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
+    public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //手持物品放入
         Slot slot = this.getSlot(interactGridPos);
         ItemStack slotItemStack = slot.getItemStack();

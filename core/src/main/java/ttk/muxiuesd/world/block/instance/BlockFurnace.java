@@ -5,19 +5,18 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
-import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
 
 /**
  * 熔炉方块
  * */
-public class BlockFurnace extends BlockWithEntity<BlockFurnace> {
+public class BlockFurnace extends BlockWithEntity<BlockFurnace, BlockEntityFurnace> {
     private TextureRegion workingTexture;
     private boolean isWorking = false;
 
     public BlockFurnace () {
-        super(new Property().setFriction(1f), Fight.getId("furnace"), Fight.BlockTexturePath("furnace.png"));
+        super(createProperty().setFriction(0.5f), Fight.getId("furnace"), Fight.BlockTexturePath("furnace.png"));
         this.workingTexture = loadTextureRegion(Fight.getId("furnace_on"), Fight.BlockTexturePath("furnace_on.png"));
     }
 
@@ -48,7 +47,7 @@ public class BlockFurnace extends BlockWithEntity<BlockFurnace> {
     }
 
     @Override
-    public BlockEntity createBlockEntity (BlockPos blockPos, World world) {
+    public BlockEntityFurnace createBlockEntity (BlockPos blockPos, World world) {
         return new BlockEntityFurnace(world,this, blockPos);
     }
 

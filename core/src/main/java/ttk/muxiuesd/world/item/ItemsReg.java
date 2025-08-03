@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public class ItemsReg {
     public static final Registrant<Item> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Item.class);
 
-    public static final Item TEST_ITEM = register("test_item", TestItem::new);
+    public static final Item TEST_ITEM = register("test_item", IronSword::new);
     public static final Item STICK = register("stick", ItemStick::new);
     public static final Item TEST_WEAPON = register("test_weapon", WeaponDiamondSword::new);
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new);

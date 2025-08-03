@@ -47,7 +47,7 @@ public class BlockEntityFurnace extends BlockEntity {
     }
 
     @Override
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
+    public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //TODO 根据物品类型或者配方来判断是否可以把东西放进来当原料或者燃料
 
         Slot interactSlot = getSlot(interactGridPos);
@@ -97,7 +97,7 @@ public class BlockEntityFurnace extends BlockEntity {
     }
 
     @Override
-    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
+    public InteractResult interact (World world, LivingEntity<?> user, GridPoint2 interactGridPos) {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
         //获取交互槽位
@@ -118,8 +118,6 @@ public class BlockEntityFurnace extends BlockEntity {
 
     @Override
     public void tick (World world, float delta) {
-        //TODO 熔炉的熔炼配方
-
         this.workingParticle(world);
 
         Inventory inventory = getInventory();
@@ -165,36 +163,39 @@ public class BlockEntityFurnace extends BlockEntity {
                 this.curTick++;
                 this.curEnergy--;
                 this.setWorking(true);
-                return;
-            }
-            //到这里就是一次烧炼完成
-            //产出
-            this.curTick = 0;
-            inputStack.fastDecrease();
 
-            if (outputStack == null) {
-                //输出槽位位空时
-                inventory.setItemStack(this.getOutputSlotIndex(), resultStack.copy(1));
             }else {
-                //输出槽位不为空但物品相同
-                outputStack.setAmount(outputStack.getAmount() + 1);
-            }
-            //记得清理
-            inventory.clear();
-            return;
-        }
+                //到这里就是一次烧炼完成
+                //产出
+                this.curTick = 0;
+                inputStack.fastDecrease();
 
-        if (this.curEnergy > 0) {
-            this.setWorking(true);
-            this.curEnergy--;
+                if (outputStack == null) {
+                    //输出槽位位空时
+                    inventory.setItemStack(this.getOutputSlotIndex(), resultStack.copy(1));
+                } else {
+                    //输出槽位不为空但物品相同
+                    outputStack.setAmount(outputStack.getAmount() + 1);
+                }
+            }
+            inventory.clear();
         }else {
-            this.setWorking(false);
+            //输入槽位没物品时
+            if (this.curEnergy > 0) {
+                this.setWorking(true);
+                this.curEnergy--;
+            } else {
+                this.setWorking(false);
+            }
         }
     }
 
+    /**
+     * 工作时的粒子效果
+     * */
     public void workingParticle (World world) {
-        if (this.isWorking() && MathUtils.random() < 0.05f) {
-            ParticleSystem ps = (ParticleSystem) world.getSystemManager().getSystem("ParticleSystem");
+        if (this.isWorking() && MathUtils.random() < 0.07f) {
+            ParticleSystem ps = world.getSystemManager().getSystem(ParticleSystem.class);
             ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
                 new Vector2(getBlockPos()).add(0.45f, 0), new Vector2(0, 1.7f), new Vector2(),
                 new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
@@ -207,7 +208,7 @@ public class BlockEntityFurnace extends BlockEntity {
     public void update (float delta) {
         //应用光源
         if (this.isWorking()) {
-            LightSystem lightSystem = (LightSystem) getWorld().getSystemManager().getSystem("LightSystem");
+            LightSystem lightSystem = getWorld().getSystem(LightSystem.class);
             lightSystem.useLight(this.light);
         }
     }
@@ -231,14 +232,6 @@ public class BlockEntityFurnace extends BlockEntity {
     public int getFuelSlotIndex () {
         return 2;
     }
-
-    /*public Slot getSlot (GridPoint2 interactGridPos) {
-        if (interactGridPos == null) return null;
-        if (this.inputSlot.touch(interactGridPos)) return this.inputSlot;
-        if (this.outputSlot.touch(interactGridPos)) return this.outputSlot;
-        if (this.fuelSlot.touch(interactGridPos)) return this.fuelSlot;
-        return null;
-    }*/
 
     public boolean isWorking () {
         BlockFurnace furnace = (BlockFurnace) getBlock();

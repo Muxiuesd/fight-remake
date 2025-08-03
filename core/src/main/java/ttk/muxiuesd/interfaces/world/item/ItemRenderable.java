@@ -9,6 +9,6 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 物品的渲染
  * */
 public interface ItemRenderable {
-    void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack);
+    void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack);
     void drawOnWorld (Batch batch, ItemEntity itemEntity);
 }

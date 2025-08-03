@@ -22,6 +22,10 @@ public class AudioPlayer {
         return AudioPlayer.Holder.INSTANCE;
     }
 
+    public Sound playSound (Audio audio) {
+        return playSound(audio.getId());
+    }
+
     public Sound playSound(String id) {
         return this.playSound(id, 1f);
     }
@@ -42,6 +46,9 @@ public class AudioPlayer {
         return sound;
     }
 
+    public void playMusic (Audio audio) {
+        this.playMusic(audio.getId());
+    }
     /**
      * 播放音乐，若已经在播放则中途停下来再重头播放
      * */

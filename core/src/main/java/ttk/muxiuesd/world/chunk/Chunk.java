@@ -44,11 +44,15 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     //储存一个区块里的方块
     private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
-    private final Wall[][]  walls;
+    private final Wall<?>[][]  walls;
     private final int[][] heights;
 
+
     public Chunk(ChunkSystem chunkSystem) {
+        this();
         this.chunkSystem = chunkSystem;
+    }
+    public Chunk () {
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
@@ -64,7 +68,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             }
         });
         this.traversal((x, y) -> {
-            Wall wall = walls[y][x];
+            Wall<?> wall = walls[y][x];
             if (wall != null) {
                 wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
@@ -78,25 +82,28 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void dispose() {
-        this.traversal((x, y) -> {
+        /*this.traversal((x, y) -> {
             Block block = blocks[y][x];
             if (block != null) {
                 blocks[y][x] = null;
             }
 
-            Wall wall = walls[y][x];
+            Wall<?> wall = walls[y][x];
             if (wall != null) {
                 walls[y][x] = null;
             }
-        });
+        });*/
     }
 
     /**
      * 在对应坐标上设置方块
      * */
     public void setBlock (Block block, int cx, int cy) {
-        //TODO 判断方块是否存在
         this.blocks[cy][cx] = block;
+        //确保区块系统里存在这个方块
+        if (this.chunkSystem != null) {
+            this.chunkSystem.addBlock(block, this.getWorldX(cx), this.getWorldY(cy));
+        }
     }
     /**
      * 获取区块中的方块
@@ -108,11 +115,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         return this.blocks[cy][cx];
     }
 
-    public Wall getWall(int cx, int cy) {
+    public Wall<?> getWall(int cx, int cy) {
         return this.walls[cy][cx];
     }
 
-    public void setWall(Wall wall, int cx, int cy) {
+    public void setWall(Wall<?> wall, int cx, int cy) {
         this.walls[cy][cx] = wall;
     }
 
@@ -314,5 +321,14 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             cp.y = (int) (wy % ChunkHeight);
         }
         return cp;
+    }
+
+    public ChunkSystem getChunkSystem () {
+        return this.chunkSystem;
+    }
+
+    public Chunk setChunkSystem (ChunkSystem chunkSystem) {
+        this.chunkSystem = chunkSystem;
+        return this;
     }
 }

@@ -2,9 +2,6 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
-  //implementation 'org.graalvm.polyglot:polyglot:24.1.0'
-  //implementation 'org.graalvm.js:js:24.1.0'
-  // https://mvnrepository.com/artifact/com.google.code.gson/gson
   implementation 'com.google.code.gson:gson:2.11.0'
   implementation 'org.openjdk.nashorn:nashorn-core:15.4'
   api "com.badlogicgames.ashley:ashley:$ashleyVersion"

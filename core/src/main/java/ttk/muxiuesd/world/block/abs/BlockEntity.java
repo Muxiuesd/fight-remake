@@ -53,14 +53,14 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     /**
      * 空手与方块互动
      * */
-    public InteractResult interact (World world, LivingEntity user, GridPoint2 interactGridPos) {
+    public InteractResult interact (World world, LivingEntity<?> user, GridPoint2 interactGridPos) {
         return InteractResult.FAILURE;
     }
 
     /**
      * 手持物品与方块互动
      * */
-    public InteractResult interactWithItem (World world, LivingEntity user, ItemStack handItemStack, GridPoint2 interactGridPos) {
+    public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         return InteractResult.FAILURE;
     }
 
@@ -75,7 +75,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
      * 方块实体被破坏
      * */
     public void beDestroyed (World world, Player destroyer) {
-        EntitySystem es = (EntitySystem) world.getSystemManager().getSystem("EntitySystem");
+        EntitySystem es = world.getSystemManager().getSystem(EntitySystem.class);
         //掉落物品
         for (int i = 0; i < this.getInventory().getSize(); i++) {
             ItemStack itemStack = this.getInventory().getItemStack(i);
@@ -92,6 +92,7 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
             double radian = Util.randomRadian();
             itemEntity.setSpeed(speed);
             itemEntity.setVelocity(new Vector2((float) Math.cos(radian), (float) Math.sin(radian)));
+            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
 
             this.getInventory().clear(i);
         }

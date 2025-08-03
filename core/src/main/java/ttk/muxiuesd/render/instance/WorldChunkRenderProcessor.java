@@ -3,8 +3,8 @@ package ttk.muxiuesd.render.instance;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import ttk.muxiuesd.interfaces.IRenderTask;
-import ttk.muxiuesd.interfaces.IWorldChunkRender;
+import ttk.muxiuesd.interfaces.render.IRenderTask;
+import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.render.abs.WorldRenderProcessor;
 import ttk.muxiuesd.system.DaynightSystem;
 import ttk.muxiuesd.world.World;
@@ -27,14 +27,14 @@ public class WorldChunkRenderProcessor extends WorldRenderProcessor {
     @Override
     protected void beginShader (Batch batch) {
         //这里开始日夜着色
-        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        DaynightSystem daynightSystem = getWorld().getSystem(DaynightSystem.class);
         daynightSystem.begin(batch);
     }
 
     @Override
     protected void endShader () {
         //这里结束日夜着色
-        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
+        DaynightSystem daynightSystem = getWorld().getSystem(DaynightSystem.class);
         daynightSystem.end();
     }
 

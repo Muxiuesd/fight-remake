@@ -7,22 +7,29 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.data.JsonPropertiesMap;
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.interfaces.*;
+import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.RenderLayers;
+import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.entity.EntityType;
 
 /**
- * 基础实体
+ * 游戏的基础实体
+ * <p>
+ * 拥有游戏内的坐标、运动参数以及渲染参数
  */
-public abstract class Entity implements ID<Entity>, Disposable, Drawable, Updateable, ShapeRenderable {
+public abstract class Entity<T extends Entity<?>> implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable {
     private String id;
 
-    public Group group;
     public float speed, curSpeed;
     public float x, y;
     public float velX, velY;
@@ -30,123 +37,172 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
     public float originX, originY;
     public float scaleX = 1, scaleY = 1;
     public float rotation;
+    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
+
     public TextureRegion bodyTexture;
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
-    public boolean attacked = false;
-    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
     private EntitySystem es;    //此实体所属的实体系统
+    private EntityType<?> type;
+    private Property property;  //实体的属性
+
+    public Entity (World world, EntityType<?> type) {
+        this.setType(type);
+        this.property = new Property();
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        this.speed = values.getFloat("speed");
+        this.curSpeed = values.getFloat("curSpeed");
+        this.x = values.getFloat("x");
+        this.y = values.getFloat("y");
+        this.velX = values.getFloat("velX");
+        this.velY = values.getFloat("velY");
+        this.width = values.getFloat("width");
+        this.height = values.getFloat("height");
+        this.originX = values.getFloat("originX");
+        this.originY = values.getFloat("originY");
+        this.scaleX = values.getFloat("scaleX");
+        this.scaleY = values.getFloat("scaleY");
+        this.rotation = values.getFloat("rotation");
+        this.onGround = values.getBoolean("onGround");
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        cat.set("speed", speed);
+        cat.set("curSpeed", curSpeed);
+        cat.set("x", x);
+        cat.set("y", y);
+        cat.set("velX", velX);
+        cat.set("velY", velY);
+        cat.set("width", width);
+        cat.set("height", height);
+        cat.set("originX", originX);
+        cat.set("originY", originY);
+        cat.set("scaleX", scaleX);
+        cat.set("scaleY", scaleY);
+        cat.set("rotation", rotation);
+        cat.set("onGround", onGround);
+    }
 
     /**
-     * 延迟初始化
+     * 延迟初始化，在实体添加到实体系统后才会执行
      * */
-    public void initialize(Group group) {
-        this.group = group;
+    public void initialize() {
     }
 
+    @Override
     public void draw(Batch batch) {
-        //TODO 重写这部分
-        if (this.attacked) {
-            // 受到攻击变红
-            batch.setColor(255, 0, 0, 255);
+        //最基础的绘制
+        if (this.bodyTexture != null) {
+            batch.draw(this.bodyTexture, this.x, this.y,
+                this.originX, this.originY,
+                this.width, this.height,
+                this.scaleX, this.scaleY, this.rotation);
         }
-        if (bodyTexture != null) {
-            batch.draw(bodyTexture, x, y,
-                originX, originY,
-                width, height,
-                scaleX, scaleY, rotation);
-        }
-        // 还原batch
-        batch.setColor(255, 255, 255, 255);
-        attacked = false;
     }
 
+    @Override
     public void update(float delta) {
-        this.setCullingArea(x, y, this.getWidth(), this.getHeight());
+        this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
     }
 
-    public void setCullingArea(float x, float y, float width, float height) {
-        this.hitbox.set(x, y, width, height);
-    }
-
+    @Override
     public void dispose() {
         if (this.bodyTexture != null) {
             this.bodyTexture = null;
         }
     }
 
-    public float getSpeed () {
-        return speed;
+
+
+    public T setCullingArea(float x, float y, float width, float height) {
+        this.hitbox.set(x, y, width, height);
+        return (T) this;
     }
 
-    public Entity setSpeed (float speed) {
+    public float getSpeed () {
+        return this.speed;
+    }
+
+    public T setSpeed (float speed) {
         if (this.speed >= 0) {
             this.speed = speed;
         }
-        return this;
+        return (T) this;
     }
 
     public float getCurSpeed () {
         return curSpeed;
     }
 
-    public Entity setCurSpeed (float curSpeed) {
+    public T setCurSpeed (float curSpeed) {
         this.curSpeed = curSpeed;
-        return this;
+        return (T) this;
     }
 
-    public void setOrigin(float originX, float originY) {
+    public T setOrigin(float originX, float originY) {
         this.originX = originX;
         this.originY = originY;
+        return (T) this;
     }
 
-    public void setPosition(float x, float y) {
-        if (this.x != x || this.y != y) {
-            this.x = x;
-            this.y = y;
-        }
+    public Vector2 getOrigin() {
+        return new Vector2(this.originX, this.originY);
     }
 
-    public void setSize(float width, float height) {
-        if (this.width != width || this.height != height) {
-            this.width = width;
-            this.height = height;
-        }
+    public T setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        return (T) this;
     }
 
-    public void setSize (Vector2 size) {
+    public T setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
+        return (T) this;
+    }
+
+    public T setSize (Vector2 size) {
         this.setSize(size.x, size.y);
+        return (T) this;
     }
 
-    public void setBounds(float x, float y, float width, float height) {
-        setPosition(x, y);
-        setSize(width, height);
+    public T setBounds(float x, float y, float width, float height) {
+        this.setPosition(x, y);
+        this.setSize(width, height);
+        return (T) this;
     }
 
     public Vector2 getPosition() {
         return new Vector2(this.x, this.y);
     }
 
-    public void setPosition(Vector2 vector2) {
+    public T setPosition(Vector2 vector2) {
         this.x = vector2.x;
         this.y = vector2.y;
+        return (T) this;
     }
 
     public Vector2 getVelocity() {
         return new Vector2(this.velX, this.velY);
     }
 
-    public void setVelocity(Vector2 velocity) {
+    public T setVelocity(Vector2 velocity) {
         this.setVelocity(velocity.x, velocity.y);
+        return (T) this;
     }
 
-    public void setVelocity(float x, float y) {
+    public T setVelocity(float x, float y) {
         this.velX = x;
         this.velY = y;
+        return (T) this;
     }
 
     public Vector2 getSize () {
@@ -161,10 +217,6 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return this.height;
     }
 
-    public Vector2 getOrigin() {
-        return new Vector2(this.originX, this.originY);
-    }
-
     public Vector2 getCenter() {
         return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
     }
@@ -177,28 +229,52 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return rotation;
     }
 
-    public Entity setRotation (float rotation) {
+    public T setRotation (float rotation) {
         this.rotation = rotation;
-        return this;
+        return (T) this;
     }
 
-    public Entity setEntitySystem(EntitySystem es) {
+    public Rectangle getHitbox() {
+        return this.hitbox;
+    }
+
+    public T setHitbox (Rectangle hitbox) {
+        this.hitbox = hitbox;
+        return (T) this;
+    }
+
+    public T setEntitySystem(EntitySystem es) {
         this.es = es;
-        return this;
+        return (T) this;
     }
 
     public EntitySystem getEntitySystem() {
         return this.es;
     }
 
-    @Override
-    public String getID () {
-        return this.id;
+    public EntityType<?> getType () {
+        return this.type;
     }
-    @Override
-    public Entity setID (String id) {
-        this.id = id;
-        return this;
+
+    public T setType (EntityType<?> type) {
+        this.type = type;
+        return (T) this;
+    }
+
+    public Property getProperty () {
+        return this.property;
+    }
+
+    public T setProperty (Property property) {
+        this.property = property;
+        return (T) this;
+    }
+
+    /**
+     * 加载身体材质
+     * */
+    public void loadBodyTextureRegion (String textureId, String texturePath) {
+        bodyTexture = this.getTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -216,11 +292,72 @@ public abstract class Entity implements ID<Entity>, Disposable, Drawable, Update
         return new TextureRegion(texture);
     }
 
+    /**
+     * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦
+     * */
     public boolean isOnGround () {
         return onGround;
     }
 
     public void setOnGround (boolean onGround) {
         this.onGround = onGround;
+    }
+
+    /**
+     * 获取这个实体的渲染层级，默认为地面实体
+     * */
+    public RenderLayer getRenderLayer () {
+        return RenderLayers.ENTITY_GROUND;
+    }
+
+    @Override
+    public String getID () {
+        return this.id;
+    }
+    @Override
+    public T setID (String id) {
+        this.id = id;
+        return (T) this;
+    }
+
+    /**
+     * 实体的属性
+     * */
+    public static class Property {
+        //属性映射
+        private PropertiesDataMap<?, ?, ?> propertiesMap;
+
+        public Property () {
+            setPropertiesMap(
+                new JsonPropertiesMap()
+                    .add(PropertyTypes.CAT, new CAT())
+            );
+        }
+
+        public <T> T get (PropertyType<T> propertyType) {
+            return getPropertiesMap().get(propertyType);
+        }
+
+        public <T> Entity.Property add (PropertyType<T> propertyType, T value) {
+            getPropertiesMap().add(propertyType, value);
+            return this;
+        }
+
+        public CAT getCAT () {
+            return this.get(PropertyTypes.CAT);
+        }
+
+        public Entity.Property setCAT (CAT cat) {
+            return this.add(PropertyTypes.CAT, cat);
+        }
+
+        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
+            return this.propertiesMap;
+        }
+
+        public Entity.Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
+            this.propertiesMap = propertiesMap;
+            return this;
+        }
     }
 }

@@ -1,5 +1,8 @@
 package ttk.muxiuesd.world.chunk;
 
+import ttk.muxiuesd.data.ChunkJsonDataOutput;
+import ttk.muxiuesd.data.JsonDataWriter;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 
@@ -15,8 +18,13 @@ public class ChunkUnloadTask extends ChunkTask {
     }
 
     @Override
-    public Chunk call() throws Exception {
-        this.chunk.dispose();
+    public Chunk call() {
+        JsonDataWriter chunkDataWriter = new JsonDataWriter();
+        chunkDataWriter.objStart();
+        Codecs.CHUNK.encode(this.chunk, chunkDataWriter);
+        chunkDataWriter.objEnd();
+        new ChunkJsonDataOutput(chunk.getChunkPosition().toString()).output(chunkDataWriter);
+
         return this.chunk;
     }
 }

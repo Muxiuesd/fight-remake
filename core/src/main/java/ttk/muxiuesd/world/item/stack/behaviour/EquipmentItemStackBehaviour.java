@@ -10,7 +10,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class EquipmentItemStackBehaviour implements IItemStackBehaviour {
     @Override
-    public boolean use (World world, LivingEntity user, ItemStack itemStack) {
+    public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
         return false;
     }
 }

@@ -1,16 +1,13 @@
 package ttk.muxiuesd.world.block;
 
-import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registry.Sounds;
 
 /**
  * 方块音效类
  * */
 public class BlockSoundsID {
     //默认都为石头的音效
-    public static final BlockSoundsID DEFAULT = new BlockSoundsID(new String[]{
-        Fight.getId("stone_walk"),
-        Fight.getId("stone_put"),
-        Fight.getId("stone_destroy")});
+    public static final BlockSoundsID DEFAULT = Sounds.STONE;
 
     public enum Type {
         WALK(0),
@@ -35,6 +32,18 @@ public class BlockSoundsID {
     }
 
     public BlockSoundsID () {
+    }
+
+    public String walk () {
+        return ids[Type.WALK.num];
+    }
+
+    public String put () {
+        return ids[Type.PUT.num];
+    }
+
+    public String destroy () {
+        return ids[Type.DESTROY.num];
     }
 
     /**

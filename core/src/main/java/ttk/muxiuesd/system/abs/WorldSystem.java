@@ -19,7 +19,6 @@ public abstract class WorldSystem extends GameSystem {
      * 延迟初始化
      * */
     public void initialize () {
-
     }
 
     public World getWorld() {
@@ -27,22 +26,18 @@ public abstract class WorldSystem extends GameSystem {
     }
 
     @Override
-    public void dispose () {
-
+    public void update (float delta) {
     }
 
     @Override
     public void draw (Batch batch) {
-
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-
     }
 
     @Override
-    public void update (float delta) {
-
+    public void dispose () {
     }
 }

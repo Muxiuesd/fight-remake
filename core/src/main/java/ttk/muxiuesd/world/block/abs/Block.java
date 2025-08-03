@@ -11,7 +11,9 @@ import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
+import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.cat.CAT;
 
@@ -19,8 +21,20 @@ import ttk.muxiuesd.world.cat.CAT;
  * 方块
  * */
 public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICAT {
-    public static final Property DEFAULT_PROPERTY = new Property();
+    private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+        .add(PropertyTypes.BLOCK_FRICTON, 1f)
+        .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
+
     public static final float BlockWidth = 1f, BlockHeight = 1f;
+
+    /**
+     * 生成默认的属性
+     * 有些需要实例化的东西就放里面防止浅拷贝
+     * */
+    public static Property createProperty() {
+        return new Property().setCAT(new CAT());
+    }
+
 
     private String id;
     public TextureRegion textureRegion;
@@ -32,11 +46,13 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
 
     private Property property;
 
+    public Block(Property property) {
+        this.setProperty(property);
+    }
     public Block (Property property, String textureId) {
         this.setProperty(property);
         this.textureRegion = this.loadTextureRegion(textureId);
     }
-
     public Block(Property property, String textureId, String texturePath) {
         this.setProperty(property);
         this.textureRegion = this.loadTextureRegion(textureId, texturePath);
@@ -102,43 +118,28 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         return this;
     }
 
+    /**
+     * 在方块属性写入前一刻调用
+     * */
     @Override
     public void writeCAT (CAT cat) {
-        cat.set("id", this.getID());
-        cat.set("width", this.width);
-        cat.set("height", this.height);
-        cat.set("originX", this.originX);
-        cat.set("originY", this.originY);
-        cat.set("scaleX", this.scaleX);
-        cat.set("scaleY", this.scaleY);
-        cat.set("rotation", this.rotation);
     }
 
+    /**
+     * 从json中获取值
+     * */
     @Override
     public void readCAT (JsonValue values) {
-        this.setID(values.getString("id"));
-        this.width = values.getFloat("width");
-        this.height = values.getFloat("height");
-        this.originX = values.getFloat("originX");
-        this.originY = values.getFloat("originY");
-        this.scaleX = values.getFloat("scaleX");
-        this.scaleY = values.getFloat("scaleY");
-        this.rotation = values.getFloat("rotation");
     }
 
     /**方块属性
      * 使用构建者模式
      * */
     public static class Property {
-        private static final PropertiesDataMap<JsonPropertiesMap> BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-            .add(PropertyTypes.CAT, new CAT())
-            .add(PropertyTypes.BLOCK_FRICTON, 1f)
-            .add(PropertyTypes.BLOCK_SOUNDS_ID, BlockSoundsID.DEFAULT);
+        private PropertiesDataMap<?, ?, ?> propertiesDataMap;
 
-        private PropertiesDataMap<?> propertiesDataMap;
-
-
-        public Property() {
+        private Property() {
+            ////这里有可能浅拷贝
             this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
         }
 
@@ -146,33 +147,47 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
             return this.propertiesDataMap.get(PropertyTypes.CAT);
         }
 
-        public void setCAT (CAT cat) {
-            this.propertiesDataMap.add(PropertyTypes.CAT, cat);
+        public Property setCAT (CAT cat) {
+            return this.set(PropertyTypes.CAT, cat);
         }
 
         public float getFriction() {
-            return this.propertiesDataMap.get(PropertyTypes.BLOCK_FRICTON);
+            return this.get(PropertyTypes.BLOCK_FRICTON);
         }
 
         public Property setFriction(float friction) {
-            if (friction >= 0f) this.propertiesDataMap.add(PropertyTypes.BLOCK_FRICTON, friction);
+            if (friction >= 0f) return this.set(PropertyTypes.BLOCK_FRICTON, friction);
             return this;
         }
 
         public BlockSoundsID getSounds() {
-            return this.propertiesDataMap.get(PropertyTypes.BLOCK_SOUNDS_ID);
+            return this.get(PropertyTypes.BLOCK_SOUNDS_ID);
         }
 
         public Property setSounds(BlockSoundsID sounds) {
-            this.propertiesDataMap.add(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
+            return this.set(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
+        }
+
+        /**
+         * 设置属性
+         * */
+        public <T> Property set (PropertyType<T> property, T value) {
+            this.getPropertiesMap().add(property, value);
             return this;
         }
 
-        public PropertiesDataMap<?> getPropertiesMap () {
-            return propertiesDataMap;
+        /**
+         * 获取属性
+         * */
+        public <T> T get (PropertyType<T> property) {
+            return this.getPropertiesMap().get(property);
         }
 
-        public Property setPropertiesMap (PropertiesDataMap<?> propertiesDataMap) {
+        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
+            return this.propertiesDataMap;
+        }
+
+        public Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesDataMap) {
             this.propertiesDataMap = propertiesDataMap;
             return this;
         }

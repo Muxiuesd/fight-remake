@@ -6,14 +6,13 @@ import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.abs.Weapon;
-import ttk.muxiuesd.world.item.stack.behaviour.ItemStackBehaviours;
-import ttk.muxiuesd.world.item.stack.behaviour.WeaponItemStackBehaviour;
 
 /**
  * 物品堆栈
@@ -37,20 +36,22 @@ public class ItemStack implements Updateable, ShapeRenderable {
         this(item, item.property.getMaxCount());
     }
     public ItemStack (Item item, int amount) {
-        this(item, amount, ItemStackBehaviours.create(item.type), item.property.getPropertiesMap().copy());
+        this(item, amount, item.getBehaviour(), item.property.getPropertiesMap().copy());
     }
-    public ItemStack (Item item, int amount, PropertiesDataMap<?> propertiesMap) {
-        this(item, amount, ItemStackBehaviours.create(item.type), propertiesMap);
+    public ItemStack (Item item, int amount, PropertiesDataMap<?, ?, ?> propertiesMap) {
+        this(item, amount, item.getBehaviour(), propertiesMap);
     }
-    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?> propertiesMap) {
+    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?, ?, ?> propertiesMap) {
         this.item = item;
         this.amount = amount;
-        this.behaviour = behaviour;
+
+        if (behaviour != null) this.behaviour = behaviour;
+        else this.behaviour = ItemStackBehaviours.COMMON;   //防止null
+
         this.property = new Item.Property() //将原物品的属性复制一份
             .setPropertiesMap(propertiesMap.copy());
 
-        if (behaviour instanceof WeaponItemStackBehaviour) {
-            Weapon weapon = (Weapon) item;
+        if (item instanceof Weapon weapon) {
             this.useTimer = new Timer(weapon.getProperty().getUseSpan());
         }
     }
@@ -58,14 +59,14 @@ public class ItemStack implements Updateable, ShapeRenderable {
     /**
      * 使用
      * */
-    public boolean use (World world, LivingEntity user) {
+    public boolean use (World world, LivingEntity<?> user) {
         return this.behaviour.use(world, user, this);
     }
 
     /**
      * 这个物品堆叠从手上换下来
      * */
-    public void putDown (World world, LivingEntity holder) {
+    public void putDown (World world, LivingEntity<?> holder) {
         this.getItem().putDown(this, world, holder);
     }
 
@@ -79,7 +80,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
     /**
      * 物品在手上的绘制
      * */
-    public void drawItemOnHand (Batch batch, LivingEntity holder) {
+    public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
         this.getItem().drawOnHand(batch, holder, this);
     }
 

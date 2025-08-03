@@ -9,7 +9,6 @@ import ttk.muxiuesd.world.block.abs.Block;
 public class EventBlockReplace extends BlockReplaceEvent {
     @Override
     public void handle (World world, Block newBlock, Block oldBlock, float wx, float wy) {
-        //SoundEffectSystem ses = (SoundEffectSystem) world.getSystemManager().getSystem("SoundEffectSystem");
         String id = oldBlock.getProperty().getSounds().getID(BlockSoundsID.Type.DESTROY);
         AudioPlayer.getInstance().playMusic(id);
     }

@@ -10,8 +10,9 @@ import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -19,8 +20,8 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 鱼钩实体
  * */
-public class EntityFishingHook extends Entity {
-    private LivingEntity owner;
+public class EntityFishingHook extends Entity<EntityFishingHook> {
+    private LivingEntity<?> owner;
     private ItemStack poleStack;
     private Direction throwDirection;
     private ChunkSystem cs;
@@ -31,8 +32,9 @@ public class EntityFishingHook extends Entity {
     private float cycle;
     public boolean isReturning;
 
-    public EntityFishingHook() {
-        initialize(Group.player);
+
+    public EntityFishingHook(World world, EntityType<?> entityType) {
+        super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
         bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");
@@ -116,11 +118,11 @@ public class EntityFishingHook extends Entity {
         y += velY;
     }
 
-    public LivingEntity getOwner () {
+    public LivingEntity<?> getOwner () {
         return owner;
     }
 
-    public EntityFishingHook setOwner (LivingEntity owner) {
+    public EntityFishingHook setOwner (LivingEntity<?> owner) {
         this.owner = owner;
         return this;
     }

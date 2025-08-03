@@ -22,7 +22,7 @@ public class ItemJsonDataOutput extends JsonDataOutput {
         String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "item.json");
         System.out.println(s);
         JsonDataReader dataReader = new JsonDataReader(s);
-        String read = dataReader.readString(PropertyTypes.ITEM_USE_SOUND_ID.getName());
+        String read = dataReader.readString(PropertyTypes.ITEM_USE_SOUND_ID.getId());
         System.out.println(read);
 
     }

@@ -1,7 +1,7 @@
 var TAG = "Muxiuesd的mod";
 var namespace = "mymod";
 
-World.event.add("bulletShoot", function (world, shooter, bullet) {
+/*World.event.add("bulletShoot", function (world, shooter, bullet) {
     var group = Entity.getGroup(shooter);
     if (group === "Enemy") {
         var soundEffectSystem = World.systems.get("SoundEffectSystem");
@@ -20,7 +20,7 @@ World.event.add("buttonInput", function (world, screenX, screenY, pointer, butto
 });
 World.event.add("worldTick", function (world, delta) {
     //Audio.getPlayer().playMusic("testmod:ignite");
-});
+});*/
 
 File.loadFile(namespace, "mymod:sand", "assets/sand.png", Texture.class);
 

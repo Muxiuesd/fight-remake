@@ -2,57 +2,122 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Group;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
+import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
+
+import java.util.LinkedHashMap;
 
 /**
  * 活物实体
  * <p>
- * 有生命值、能持有、使用物品
+ * 有生命值、能持有、使用物品，有各种行为
  * <p>
  * TODO 活物实体能有buff影响其行为状态
  * */
-public abstract class LivingEntity extends Entity {
-    public float maxHealth; // 生命值上限
-    public float curHealth; // 当前生命值
-    public Backpack backpack;   //储存物品的背包
-    private int handIndex;  //手部物品索引
+public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> {
+    public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
+    public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
+    public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
-    public void initialize (Group group, float maxHealth, float curHealth) {
-        initialize(group, maxHealth, curHealth, 16);
+    private LinkedHashMap<String, LivingEntityState<T>> states;
+    private LivingEntityState<T> curState;
+    private float maxHealth; // 生命值上限
+    private float curHealth; // 当前生命值
+    private boolean attacked;   //是否收到攻击的状态
+    private TaskTimer attackedTimer;    //被攻击状态持续的计时器
+    public Backpack backpack;   //储存物品的背包
+    public boolean renderHandItem = false;  //是否渲染手部持有的物品（有的实体没有手，持有物品不用渲染出来）
+    private int handIndex;  //手部物品索引
+    private TaskTimer swingHandTimer;
+    private float maxSwingHandDegree;
+
+    public LivingEntity (World world, EntityType<?> entityType) {
+        this(world, entityType, 10, 10);
     }
-    public void initialize (Group group, float maxHealth, float curHealth, int backpackSize) {
-        super.initialize(group);
+    public LivingEntity(World world, EntityType<?> entityType, float maxHealth, float curHealth) {
+        this(world, entityType, maxHealth, curHealth, 16);
+    }
+    public LivingEntity(World world, EntityType<?> entityType, float maxHealth, float curHealth, int backpackSize) {
+        super(world, entityType);
+        setSize(DEFAULT_SIZE);
+        this.states = new LinkedHashMap<>();
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
+        this.attacked = false;
+        this.attackedTimer = Pools.TASK_TIMER.obtain()
+            .setMaxSpan(ATTACK_SPAN)
+            .setCurSpan(0)
+            .setTask(() -> this.attacked = false);
         this.backpack = new Backpack(backpackSize);
+        this.maxSwingHandDegree = 60f;
     }
+
 
     @Override
     public void update (float delta) {
         super.update(delta);
         this.backpack.update(delta);
+        this.attackedTimer.update(delta);
+        this.attackedTimer.isReady();
+        //处理当前状态
+        if (this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
+
+        if (this.swingHandTimer != null) {
+            this.swingHandTimer.update(delta);
+            this.swingHandTimer.isReady();
+        }
     }
 
     @Override
     public void draw (Batch batch) {
-        super.draw(batch);
+        //身体渲染
+        if (!this.isAttacked()) {
+            super.draw(batch);
+        }else {
+            // 受到攻击变红
+            batch.setColor(255, 0, 0, 255);
+            super.draw(batch);
+            // 还原batch
+            batch.setColor(255, 255, 255, 255);
+        }
+        if (this.renderHandItem) this.drawHandItem(batch);
+    }
+
+    /**
+     * 手上持有的物品绘制
+     * */
+    public void drawHandItem (Batch batch) {
         //如果手上有物品，则绘制手上的物品
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
-            //itemStack.getItem().drawOnHand(batch, this);
             itemStack.drawItemOnHand(batch, this);
         }
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
+        if (this.renderHandItem) this.renderShapeHandItem(batch);
+    }
+
+    /**
+     * 持有物品的形状渲染
+     * */
+    public void renderShapeHandItem (ShapeRenderer batch) {
         ItemStack itemStack = this.getHandItemStack();
         if (itemStack != null) {
             itemStack.renderShape(batch);
@@ -73,20 +138,28 @@ public abstract class LivingEntity extends Entity {
 
     /**
      * 丢弃物品
-     * @return 丢弃成功返回true，丢弃失败返回false
+     * @return 丢弃成功返回丢出来的物品实体，丢弃失败返回null
      * */
-    public boolean dropItem (int index, int amount) {
+    public ItemEntity dropItem (int index, int amount) {
         ItemStack itemStack = this.backpack.dropItem(index, amount);
-        if (itemStack == null) return false;
+        if (itemStack == null) return null;
 
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY("item_entity", getEntitySystem());
-        itemEntity.setPosition(getPosition());
+        //简单的生成一个物品实体而已
+        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
+        //使得物品中心与实体中心对齐
+        itemEntity.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)));
         itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> itemEntity.setOnAirTimer(null)));
+        itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
+            .setTask(() -> {
+                Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
+                itemEntity.setOnAirTimer(null);
+        }));
         itemEntity.setItemStack(itemStack);
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
-        return true;
+        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+
+        return itemEntity;
     }
 
     /**
@@ -106,16 +179,50 @@ public abstract class LivingEntity extends Entity {
         return ItemPickUpState.FAILURE;
     }
 
+    /**
+     * 应用伤害
+     * */
+    public <S> void applyDamage (DamageType<S, LivingEntity<?>> damageType, S source) {
+        //TODO 各种判定
+        damageType.apply(source, this);
+        this.setAttacked(true);
+    }
+
     public boolean isDeath () {
         return this.curHealth <= 0;
+    }
+
+    /**
+     * 活物实体死亡执行
+     * */
+    public void onDeath (World world) {
+        //死亡默认掉落所有物品
+        Backpack bp = this.getBackpack();
+        for (int i = 0; i < bp.getSize(); i++) {
+            ItemStack itemStack = bp.getItemStack(i);
+            if (itemStack == null) continue;
+
+            //赋予随机方向的速度
+            float radian = MathUtils.random() * MathUtils.PI2;
+            float speed = MathUtils.random(1.3f, 2f);
+            float velX = MathUtils.cos(radian);
+            float velY = MathUtils.sin(radian);
+
+            ItemEntity itemEntity = this.dropItem(i, itemStack.getAmount());
+            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
+            itemEntity.setSpeed(speed);
+            itemEntity.setCurSpeed(speed);
+            itemEntity.setVelocity(velX, velY);
+        }
     }
 
     public ItemStack getHandItemStack () {
         return this.backpack.getItemStack(this.handIndex);
     }
 
-    public void setHandItemStack (ItemStack itemStack) {
+    public T setHandItemStack (ItemStack itemStack) {
         this.backpack.setItemStack(this.getHandIndex(), itemStack);
+        return (T) this;
     }
 
     public int getHandIndex () {
@@ -133,5 +240,151 @@ public abstract class LivingEntity extends Entity {
                 this.handIndex = handIndex;
             }
         }
+    }
+
+    public T swingHand () {
+        return this.swingHand(SWING_HAND_TIME);
+    }
+
+    /**
+     * 挥手
+     **/
+    public T swingHand (float swingTime) {
+        if (this.swingHandTimer == null) {
+            //this.swingHandTimer = new TaskTimer(swingTime, 0, () -> this.swingHandTimer = null);
+            this.swingHandTimer = Pools.TASK_TIMER.obtain()
+                .setMaxSpan(swingTime)
+                .setCurSpan(0)
+                .setTask(() -> {
+                    Pools.TASK_TIMER.free(this.swingHandTimer);
+                    this.swingHandTimer = null;
+                });
+        }
+        return (T) this;
+    }
+
+    /**
+     * 如果在挥手状态，获取挥手角度
+     * */
+    public float getSwingHandDegreeOffset () {
+        if (this.swingHandTimer == null) return 0f;
+
+        float v = MathUtils.PI2 / this.swingHandTimer.getMaxSpan() * this.swingHandTimer.getCurSpan();
+        return this.getMaxSwingHandDegree() * MathUtils.sin(v);
+    }
+
+    /**
+     * 获取当前实体的朝向
+     * */
+    public Direction getDirection () {
+        return new Direction(velX, velY);
+    }
+
+    /**
+     * 减少一定的血量
+     * */
+    public T decreaseHealth (float value) {
+        this.setCurHealth(Math.max(this.getCurHealth() - value, 0f));
+        return (T) this;
+    }
+
+    /**
+     * 增加一定的血量
+     * */
+    public T increaseHealth (float value) {
+        float after = this.getCurHealth() + value;
+        this.setCurHealth(Math.min(after, this.getMaxHealth()));
+        return (T) this;
+    }
+
+    public float getMaxHealth () {
+        return this.maxHealth;
+    }
+
+    public T setMaxHealth (float maxHealth) {
+        this.maxHealth = maxHealth;
+        return (T) this;
+    }
+
+    public float getCurHealth () {
+        return this.curHealth;
+    }
+
+    public T setCurHealth (float curHealth) {
+        this.curHealth = curHealth;
+        return (T) this;
+    }
+
+    /**
+     * 查询是否在受攻击状态
+     * */
+    public boolean isAttacked () {
+        return this.attacked;
+    }
+
+    /**
+     * 设置是否在受攻击状态
+     * */
+    public T setAttacked (boolean attacked) {
+        if (attacked) {
+            this.attackedTimer.setCurSpan(0f);
+        }else {
+            this.attackedTimer.setCurSpan(ATTACK_SPAN);
+        }
+        this.attacked = attacked;
+        return (T) this;
+    }
+
+
+    public float getMaxSwingHandDegree () {
+        return this.maxSwingHandDegree;
+    }
+
+    public Backpack getBackpack () {
+        return this.backpack;
+    }
+
+    public T setBackpack (Backpack backpack) {
+        this.backpack = backpack;
+        return (T) this;
+    }
+
+    /**
+     * 根据id来切换状态
+     * */
+    public void setState (String id) {
+        LinkedHashMap<String, LivingEntityState<T>> states = this.getStates();
+        LivingEntityState<T> state = states.get(id);
+        this.setCurState(state);
+    }
+
+    public T addState (String id, LivingEntityState<T> state) {
+        getStates().put(id, state);
+        return (T) this;
+    }
+
+    /**
+     * 获取所有状态
+     * */
+    public LinkedHashMap<String, LivingEntityState<T>> getStates () {
+        return this.states;
+    }
+
+    /**
+     * 获取当前的状态
+     * */
+    public LivingEntityState<T> getCurState () {
+        return this.curState;
+    }
+
+    public LivingEntity<T> setCurState (LivingEntityState<T> curState) {
+        //确保不会空
+        if (getEntitySystem() != null) {
+            World world = getEntitySystem().getWorld();
+            if (this.getCurState() != null) this.curState.end(world, (T) this);
+            this.curState = curState;
+            this.curState.start(world, (T) this);
+        }
+        return this;
     }
 }

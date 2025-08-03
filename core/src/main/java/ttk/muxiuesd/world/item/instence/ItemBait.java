@@ -7,22 +7,21 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 鱼饵
  * <p>
  * 使用后对鱼产生吸引效果
  * */
-public class ItemBait extends Item {
+public class ItemBait extends ConsumptionItem {
     public ItemBait () {
-        super(Type.CONSUMPTION, new Property().setMaxCount(64),
+        super(new Property().setMaxCount(64),
             Fight.getId("bait"),
             Fight.ItemTexturePath("bait.png"));
     }
 
     @Override
-    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
+    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
         if (texture != null) {
             Direction direction = Util.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());

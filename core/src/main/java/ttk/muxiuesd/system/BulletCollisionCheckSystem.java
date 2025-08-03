@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
+import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -38,9 +39,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void update(float delta) {
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        ChunkSystem  cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        EntitySystem es = getWorld().getSystem(EntitySystem.class);
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
+        ChunkSystem  cs = getManager().getSystem(ChunkSystem.class);
 
         Player player = ps.getPlayer();
 
@@ -53,17 +54,19 @@ public class BulletCollisionCheckSystem extends WorldSystem {
         }
 
         //玩家的子弹碰撞检测
-        for (Bullet playerBullet : es.playerBulletEntity) {
+        for (Bullet playerBullet : es.getPlayerBulletEntity()) {
             if (playerBullet.getLiveTime() > playerBullet.getMaxLiveTime()) {
                 es.remove(playerBullet);
                 continue;
             }
             //敌人与玩家子弹
-            for (LivingEntity enemy : es.enemyEntity) {
+            for (LivingEntity enemy : es.getEnemyEntity()) {
                 if (playerBullet.hitbox.overlaps(enemy.hitbox)
                     || enemy.hitbox.overlaps(playerBullet.hitbox)) {
-                    enemy.curHealth -= playerBullet.damage;
-                    enemy.attacked = true;
+
+                    enemy.applyDamage(DamageTypes.BULLET, playerBullet);
+                    //enemy.decreaseHealth(playerBullet.getDamage());
+                    enemy.setAttacked(true);
                     playerBullet.setLiveTime(playerBullet.getMaxLiveTime());
                     this.callEntityAttackedEvent(playerBullet, enemy);
                     // Log.print(TAG, "敌人扣血：" + playerBullet.damage + " 目前血量：" + enemy.curHealth);
@@ -73,7 +76,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             this.bulletAndWallCollision(playerBullet, es, ps, cs);
         }
         // 玩家与子弹碰撞检测
-        for (Bullet enemyBullet : es.enemyBulletEntity) {
+        for (Bullet enemyBullet : es.getEnemyBulletEntity()) {
             if (enemyBullet.getLiveTime() > enemyBullet.getMaxLiveTime()) {
                 es.remove(enemyBullet);
                 continue;
@@ -89,9 +92,10 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
             if (enemyBullet.hitbox.contains(player.hitbox)
                 || player.hitbox.contains(enemyBullet.hitbox)) {
-                player.curHealth -= enemyBullet.damage;
+                player.applyDamage(DamageTypes.BULLET, enemyBullet);
+                //player.decreaseHealth(enemyBullet.getDamage());
                 enemyBullet.setLiveTime(enemyBullet.getMaxLiveTime());
-                player.attacked = true;
+                player.setAttacked(true);
                 this.callEntityAttackedEvent(enemyBullet, player);
                 // Log.print(TAG, "玩家扣血：" + enemyBullet.damage + " 目前血量：" + player.curHealth);
             }
@@ -320,9 +324,9 @@ public class BulletCollisionCheckSystem extends WorldSystem {
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        EntitySystem es = (EntitySystem) getManager().getSystem("EntitySystem");
-        Array<Bullet> playerBulletEntity = es.playerBulletEntity;
-        Array<Bullet> enemyBulletEntity = es.enemyBulletEntity;
+        EntitySystem es = getWorld().getSystem(EntitySystem.class);
+        Array<Bullet> playerBulletEntity = es.getPlayerBulletEntity();
+        Array<Bullet> enemyBulletEntity = es.getEnemyBulletEntity();
         for (Bullet bullet : playerBulletEntity) {
             Rectangle hurtbox = bullet.hitbox;
             batch.rect(hurtbox.getX(), hurtbox.getY(), hurtbox.getWidth(), hurtbox.getHeight());

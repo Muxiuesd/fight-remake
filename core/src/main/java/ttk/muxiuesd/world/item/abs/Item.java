@@ -5,19 +5,19 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.world.item.ItemRenderable;
 import ttk.muxiuesd.interfaces.world.item.ItemShapeRenderable;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -29,10 +29,10 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
 public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, ItemShapeRenderable {
-    public static final PropertiesDataMap<?> ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+    public static final JsonPropertiesMap ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 64)
         .add(PropertyTypes.ITEM_ON_USING, false)
-        .add(PropertyTypes.ITEM_USE_SOUND_ID, Fight.getId("click"));
+        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getId());
 
     private String id;
     public Type type;
@@ -53,14 +53,21 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * TODO 不同类型的物品不同的绘制方式
      * */
     @Override
-    public void drawOnHand (Batch batch, LivingEntity holder, ItemStack itemStack) {
-        if (this.texture != null) {
-            Direction direction = Util.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection()) - 45;
+    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
+
+        Direction direction = holder.getDirection();
+        float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+        float rotationOffset = holder.getSwingHandDegreeOffset();
+        if (rotation > 90f && rotation <= 270f) {
             batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
-                holder.scaleX, holder.scaleY, rotation);
+                - holder.scaleX, holder.scaleY, rotation + 225f + rotationOffset);
+        } else {
+            batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                0, 0,
+                holder.width, holder.height,
+                holder.scaleX, holder.scaleY, rotation - 45f + rotationOffset);
         }
     }
 
@@ -90,10 +97,10 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * 使用此物品
      * @return 是否使用成功
      * */
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放物品使用音效
         String useSoundId = this.property.getUseSoundId();
-        SoundEffectSystem ses = (SoundEffectSystem)world.getSystemManager().getSystem("SoundEffectSystem");
+        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
         ses.newSpatialSound(useSoundId, user);
 
         return true;
@@ -102,13 +109,13 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     /**
      * 物品被放下来（从手持变成非手持）
      * */
-    public void putDown (ItemStack itemStack, World world, LivingEntity holder) {
+    public void putDown (ItemStack itemStack, World world, LivingEntity<?> holder) {
     }
 
     /**
      * 当物品被丢弃的时候的行为
      * */
-    public void beDropped (ItemStack itemStack, World world, LivingEntity dropper) {
+    public void beDropped (ItemStack itemStack, World world, LivingEntity<?> dropper) {
     }
 
     /**
@@ -142,6 +149,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         return this;
     }
 
+    /**
+     * 获取这个物品的行为
+     * */
+    public abstract IItemStackBehaviour getBehaviour ();
+
     @Override
     public String getID () {
         return this.id;
@@ -167,7 +179,14 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     public static class Property {
         //属性映射
-        private PropertiesDataMap<?> propertiesMap = ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy();
+        private PropertiesDataMap<?, ?, ?> propertiesMap;
+
+        /**
+         * 实例化后默认属性
+         * */
+        public Property () {
+            this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
+        }
 
         public <T> T get (PropertyType<T> propertyType) {
             return getPropertiesMap().get(propertyType);
@@ -226,11 +245,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             return this;
         }
 
-        public PropertiesDataMap<?> getPropertiesMap () {
+        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
             return this.propertiesMap;
         }
 
-        public Property setPropertiesMap (PropertiesDataMap<?> propertiesMap) {
+        public Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
             this.propertiesMap = propertiesMap;
             return this;
         }

@@ -1,15 +1,16 @@
 package ttk.muxiuesd.world.chunk;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Walls;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.wall.Wall;
-import ttk.muxiuesd.world.wall.WallsReg;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,8 +51,7 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
             }
             int random = MathUtils.random(0, 15);
             if (random < 1) {
-                Wall wall = WallsReg.newWall("wall_smooth_stone");
-                wall.setPosition(chunk.getWorldX(x), chunk.getWorldY(y));
+                Wall<?> wall = Walls.SMOOTH_STONE.createSelf(new Vector2(chunk.getWorldX(x), chunk.getWorldY(y)));
                 chunk.setWall(wall, x, y);
             }
         });

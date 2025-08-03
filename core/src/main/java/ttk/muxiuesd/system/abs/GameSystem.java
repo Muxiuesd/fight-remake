@@ -19,4 +19,8 @@ public abstract class GameSystem implements Updateable, Drawable, ShapeRenderabl
     public void setManager(SystemManager manager) {
         this.manager = manager;
     }
+
+    public String TAG () {
+        return this.getClass().getName();
+    }
 }

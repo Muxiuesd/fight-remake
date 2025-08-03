@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.interfaces.IWorldParticleRender;
+import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
@@ -22,8 +22,6 @@ import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 public class ParticleSystem extends WorldSystem implements IWorldParticleRender {
     public final String TAG = this.getClass().getName();
 
-    //private LinkedHashMap<String, ParticleEmitter> emitters;
-
     private Array<ParticleEmitter<? extends Particle>> activeEmitters;  //活跃的粒子发射器
     private Array<ParticleEmitter<? extends Particle>> delayAddEmitters;
     private Array<ParticleEmitter<? extends Particle>> delayRemoveEmitters;
@@ -36,15 +34,11 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
     @Override
     public void initialize () {
         ParticleAssets.loadAll();
-        //this.emitters = new LinkedHashMap<>();
         this.activeEmitters = new Array<>();
         this.delayAddEmitters = new Array<>();
         this.delayRemoveEmitters = new Array<>();
 
-        /*this.registryEmitter(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
-        this.registryEmitter(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
-        this.registryEmitter(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());*/
-        Log.print(TAG, "粒子系统初始化完成");
+        Log.print(TAG(), "粒子系统初始化完成");
     }
 
     @Override
@@ -73,17 +67,13 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
         // 设置混合模式
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
-        for (ParticleEmitter emitter : this.activeEmitters) {
+        for (ParticleEmitter<?> emitter : this.activeEmitters) {
             emitter.draw(batch);
-            LightSystem lightSystem = (LightSystem)getManager().getSystem("LightSystem");
+            LightSystem lightSystem = getManager().getSystem(LightSystem.class);
             lightSystem.useLight(emitter.getActiveParticles());
         }
         // 恢复默认混合模式
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-        /*//这里结束日夜着色
-        DaynightSystem daynightSystem = (DaynightSystem) getWorld().getSystemManager().getSystem("DaynightSystem");
-        daynightSystem.end();*/
     }
 
     @Override
@@ -123,31 +113,16 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
                               Vector2 position, Vector2 velocity, Vector2 origin,
                               Vector2 startSize, Vector2 endSize, Vector2 scale,
                               float rotation, float duration) {
-        /*if (!this.emitters.containsKey(emitterId)) {
-            throw new IllegalArgumentException("id为：" + emitterId + " 的粒子发射器不存在！！！");
-        }*/
         ParticleEmitter<? extends Particle> emitter = this.activateEmitter(emitterId);
         for (int i = 0; i < count; i++) {
             emitter.summon(position, velocity, origin, startSize, endSize, scale, rotation, duration);
         }
     }
-
-    /**
-     * 添加一种粒子发射器
-     * */
-    /*public void registryEmitter (String id, ParticleEmitter<? extends Particle> emitter) {
-        if (this.emitters.containsKey(id)) {
-            throw new RuntimeException("发射器id：" + id + " 已存在，不可重复添加！！！");
-        }
-        this.emitters.put(id, emitter);
-    }*/
-
     /**
      * 激活粒子发射器
      * @return 返回激活的粒子发射器
      * */
     private ParticleEmitter<? extends Particle> activateEmitter (String id) {
-        //ParticleEmitter emitter = this.emitters.get(id);
         ParticleEmitter<? extends Particle> emitter = ParticleEmittersReg.get(id);
         if (this.activeEmitters.contains(emitter, true)) {
             //Log.error(TAG, "id为：" + id + " 的粒子发射器已经活跃！！！");

@@ -12,12 +12,12 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * 为了控制音效播放以及检测播放状态，迫不得已改为 {@link Music}
  * */
 public class SpatialSoundInstance extends MusicInstance implements Updateable {
-    private final Entity sounder;   //发声者
-    private final Entity receiver;  //接收者
+    private final Entity<?> sounder;   //发声者
+    private final Entity<?> receiver;  //接收者
 
     private boolean isFront = true; //是否在前方，在后方的音量会较小
 
-    public SpatialSoundInstance (Music music, Entity sounder, Entity receiver) {
+    public SpatialSoundInstance (Music music, Entity<?> sounder, Entity<?> receiver) {
         super(music);
         this.sounder = sounder;
         this.receiver = receiver;
@@ -45,10 +45,11 @@ public class SpatialSoundInstance extends MusicInstance implements Updateable {
      * */
     public float calculateVolume() {
         float distance = receiver.getPosition().dst(sounder.getPosition());
-        if (distance > Fight.HEARING_RANGE) {
+        Float hearingRange = Fight.PLAYER_HEARING_RANGE.getValue();
+        if (distance > hearingRange) {
             return 0f;
         }
-        return 1f - distance / Fight.HEARING_RANGE;
+        return 1f - distance / hearingRange;
     }
 
     /**

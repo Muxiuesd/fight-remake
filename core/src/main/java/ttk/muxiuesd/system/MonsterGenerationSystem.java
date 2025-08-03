@@ -2,89 +2,94 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.world.entity.EnemyGenFactory;
+import ttk.muxiuesd.system.abs.EntityGenSystem;
+import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
-import ttk.muxiuesd.world.entity.enemy.Slime;
+import ttk.muxiuesd.world.entity.genfactory.SlimeGenFactory;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 怪物生成系统
  * */
-public class MonsterGenerationSystem extends WorldSystem {
-    private TimeSystem ts;
-    private PlayerSystem ps;
-    private EntitySystem es;
-    private ChunkSystem cs;
+public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>> implements Runnable {
+    public String TAG = this.getClass().getName();
 
-    private float maxGenSpan = 2f;      //生成怪物时间间隔，现实秒
-    private float genSpan    = 0f;
+    private float maxGenSpan = 8f;      //生成怪物时间间隔，现实秒
+    private TaskTimer genTimer; //生成怪物计时器，到时间自动执行
 
-    private float minGenRange = 12f;    //小于这个范围不生怪
-    private float maxGenRange = 26f;    //大于这个范围不生怪
 
     public MonsterGenerationSystem (World world) {
-        super(world);
+        super(world, new ConcurrentHashMap<>(), 12, 18);
+        this.genTimer = new TaskTimer(this.maxGenSpan, this);
     }
 
     @Override
     public void initialize () {
-        this.ts = (TimeSystem) getManager().getSystem("TimeSystem");
-        this.ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
-        this.es = (EntitySystem) getManager().getSystem("EntitySystem");
-        this.cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        super.initialize();
+        PlayerSystem ps = getPlayerSystem();
+        EntitySystem es = getEntitySystem();
 
-        Slime slime = new Slime();
-        slime.setEntitySystem(this.es);
-        double radian = Util.randomRadian();
-        slime.setBounds((float) (this.ps.getPlayer().x + 16 * Math.cos(radian)),
-            (float) (this.ps.getPlayer().y + 16 * Math.sin(radian)),
-            1, 1);
-        this.es.add(slime);
+        /*for (int i = 0; i < 5; i++) {
+            EntityTarget fish = Entities.TARGET.create(getWorld());
+            fish.setBounds(ps.getPlayer().x + 5, ps.getPlayer().y - 2 + i, 1, 1);
+            fish.setEntitySystem(es);
+            es.add(fish);
+        }*/
 
-        /*Enemy modEnemy = (Enemy) Gets.get("testmod:zombie", Entity.class);
-        modEnemy.setEntitySystem(this.es);
-        this.es.add(modEnemy);*/
+
+        /*Slime slime = Entities.SLIME.create(getWorld());
+        slime.setBounds(ps.getPlayer().x + 10, ps.getPlayer().y + 10, 1, 1);
+        es.add(slime);*/
+
+        this.addGenFactory(Fight.getId("slime"), new SlimeGenFactory());
     }
 
     @Override
     public void update (float delta) {
         //非晚上不刷怪
-        if (!this.ts.isNight()) {
+        if (!getTimeSystem().isNight()) {
             return;
         }
 
-        this.genSpan += delta;
-        if (this.genSpan <= this.maxGenRange) {
-            //没到生成时间不刷怪
-            return;
+        //更新计时器
+        if (this.genTimer != null) {
+            this.genTimer.update(delta);
+            this.genTimer.isReady();
         }
+    }
 
-        Player player = this.ps.getPlayer();
+    /**
+     * 这里面写生成任务
+     * */
+    @Override
+    public void run () {
+        EntitySystem es = getEntitySystem();
+        Player player = getPlayerSystem().getPlayer();
         Vector2 playerCenter = player.getCenter();
 
-        //在生成范围内随机坐标
-        for (int i = 0; i < MathUtils.random(2, 5); i++) {
-            float randomRange = MathUtils.random(this.minGenRange, this.maxGenRange);
+        //对每一个生成工厂执行一次生成，具体生成取决于工厂接口的实现
+        for (EnemyGenFactory<?> factory : getGenFactories().values()) {
+            float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());
             float randomAngle = Util.randomAngle();
             float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
             float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
-            //生成怪物
-            /*Slime slime = (Slime) EntitiesReg.get("slime");
-            slime.setEntitySystem(this.es);
-            slime.setBounds(genX, genY, 1, 1);
-            this.es.add(slime);*/
-
-            Enemy modEnemy = Gets.ENEMY("testmod:zombie", this.es);
-            modEnemy.setPosition(genX, genY);
+            Enemy<?>[] enemies = factory.create(getWorld(), genX, genY);
+            //啥也没有生成就直接跳过
+            if (enemies == null) continue;
+            //防止没添加进实体系统，统一执行一遍
+            for (Enemy<?> e : enemies) {
+                if (e == null) continue;
+                //e.setEntitySystem(es);
+                es.add(e);
+            }
         }
-        //System.out.println("生成怪物");
-        //刷怪间隔归零
-        this.genSpan = 0f;
     }
-
 
     public float getMaxGenSpan () {
         return this.maxGenSpan;
@@ -92,22 +97,6 @@ public class MonsterGenerationSystem extends WorldSystem {
 
     public void setMaxGenSpan (float maxGenSpan) {
         this.maxGenSpan = maxGenSpan;
-    }
-
-    public float getMinGenRange () {
-        return this.minGenRange;
-    }
-
-    public void setMinGenRange (float minGenRange) {
-        this.minGenRange = minGenRange;
-    }
-
-    public float getMaxGenRange () {
-        return this.maxGenRange;
-    }
-
-    public void setMaxGenRange (float maxGenRange) {
-        this.maxGenRange = maxGenRange;
     }
 }
 

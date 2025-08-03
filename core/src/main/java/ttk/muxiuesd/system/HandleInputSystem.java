@@ -3,47 +3,47 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonWriter;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.camera.CameraController;
 import ttk.muxiuesd.data.BlockJsonDataOutput;
-import ttk.muxiuesd.data.ItemJsonDataOutput;
-import ttk.muxiuesd.data.JsonDataReader;
+import ttk.muxiuesd.data.ChunkJsonDataOutput;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
 import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
+import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.screen.MainGameScreen;
+import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.*;
+import ttk.muxiuesd.util.BlockPosition;
+import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 输入处理系统
  * 按键状态的更新都在这里面
  * */
-public class HandleInputSystem extends WorldSystem implements InputProcessor {
+public class HandleInputSystem extends WorldSystem implements InputProcessor, IWorldChunkRender {
     public final String TAG = this.getClass().getName();
 
     private PlayerSystem playerSystem;
-    private CameraController cameraController;
     private BlockPosition mouseBlockPosition;   //鼠标指向的方块的坐标
 
     public HandleInputSystem(World world) {
@@ -52,10 +52,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void initialize () {
-        MainGameScreen screen = getWorld().getScreen();
-        this.cameraController = screen.cameraController;
-        PlayerSystem ps = (PlayerSystem) getWorld().getSystemManager().getSystem("PlayerSystem");
-        playerSystem = ps;
+        this.playerSystem = getWorld().getSystem(PlayerSystem.class);
 
         Gdx.input.setInputProcessor(this);
     }
@@ -63,14 +60,13 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
     @Override
     public void update(float delta) {
-        ChunkSystem cs = (ChunkSystem) getManager().getSystem("ChunkSystem");
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Player player = playerSystem.getPlayer();
         Vector2 playerCenter = player.getCenter();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
-        //Log.print(TAG, "鼠标指向世界的方块坐标: (" + this.mouseBlockPosition.getX() + ", " + this.mouseBlockPosition.getY() + ")");
         if (KeyBindings.ExitGame.wasPressed()) {
             Log.print(TAG, "游戏退出！");
             Gdx.app.exit();
@@ -79,7 +75,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
         if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
             cs.chunkEdgeRender = !cs.chunkEdgeRender;
         }
-        if (KeyBindings.WallHitboxDisplay.wasJustPressed()) {
+        if (KeyBindings.HitboxDisplay.wasJustPressed()) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
 
@@ -92,7 +88,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
 
-        Vector2 mouseWorldPosition = this.getMouseWorldPosition();
+        Vector2 mouseWorldPosition = Util.getMouseWorldPosition();
         Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
 
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
@@ -104,33 +100,41 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
 
             if (handItemStack != null) {
                 //测试
-                Item item = handItemStack.getItem();
+                /*Item item = handItemStack.getItem();
                 JsonDataWriter dataWriter = new JsonDataWriter();
                 dataWriter.objStart();
                 item.property.getPropertiesMap().write(dataWriter);
                 dataWriter.objEnd();
 
-                new ItemJsonDataOutput().output(dataWriter);
+                new ItemJsonDataOutput().output(dataWriter);*/
             }
-            System.out.println("==============================================");
-            //写入测试
+            //System.out.println("==============================================");
+            //方块写入测试
             JsonDataWriter dataWriter = new JsonDataWriter();
             dataWriter.objStart();
-            mouseBlock.writeCAT(mouseBlock.getProperty().getCAT());
-            mouseBlock.getProperty().getPropertiesMap().write(dataWriter);
+            /*mouseBlock.writeCAT(mouseBlock.getProperty().getCAT());
+            mouseBlock.getProperty().getPropertiesMap().write(dataWriter);*/
+            Codecs.BLOCK.encode(mouseBlock, dataWriter);
             dataWriter.objEnd();
             new BlockJsonDataOutput().output(dataWriter);
 
+            //区块写入测试
+            JsonDataWriter chunkDataWriter = new JsonDataWriter();
+            chunkDataWriter.objStart();
+            Codecs.CHUNK.encode(cs.getChunk(playerCenter.x, playerCenter.y), chunkDataWriter);
+            chunkDataWriter.objEnd();
+            new ChunkJsonDataOutput("testChunk.json").output(chunkDataWriter);
+
             //读取测试
-            String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "block.json");
+            /*String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "block.json");
             System.out.println(s);
             JsonDataReader dataReader = new JsonDataReader(s);
             JsonValue obj = dataReader.readObj(PropertyTypes.BLOCK_SOUNDS_ID.getName());
             System.out.println(obj.toJson(JsonWriter.OutputType.json));
             JsonValue values = dataReader.readObj(PropertyTypes.CAT.getName());
-            mouseBlock.readCAT(values);
+            mouseBlock.readCAT(values);*/
 
-            if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
+            if (mouseBlock instanceof BlockWithEntity<?, ?> blockWithEntity) {
 
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
                 //计算交互区域网格坐标
@@ -153,6 +157,17 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                     }
                     //TODO 手持物品交互事件
                 }
+            }else {
+                //空手右键破坏方块
+                if (handItemStack == null && mouseBlock != Blocks.ARI) {
+                    Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
+                    ItemEntity itemEntity = ItemEntityGenFactory.create(
+                        player.getEntitySystem(),
+                        mouseWorldPosition,
+                        new ItemStack(Gets.ITEM(replacedBlock.getID()), 1)
+                    );
+                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
+                }
             }
         }
     }
@@ -163,13 +178,17 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
     }
 
     @Override
+    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+        this.renderShape(shapeRenderer);
+    }
+
+    @Override
     public boolean keyDown (int keycode) {
         return false;
     }
 
     @Override
     public boolean keyUp (int keycode) {
-        //EventBus.getInstance().callEvent(EventBus.EventType.KeyInput, keycode);
         EventBus.post(EventTypes.WORLD_KEY_INPUT, new EventPosterWorldKeyInput(getWorld(), keycode));
         return false;
     }
@@ -237,18 +256,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
      * 获取鼠标指向的方块坐标
      * */
     public BlockPosition getMouseBlockPosition() {
-        Vector2 wp = this.getMouseWorldPosition();
+        Vector2 wp = Util.getMouseWorldPosition();
         return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
-    }
-
-    /**
-     * 获取鼠标指向的世界坐标
-     * */
-    public Vector2 getMouseWorldPosition() {
-        OrthographicCamera camera = cameraController.camera;
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
     }
 
     /**
@@ -265,5 +274,10 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor {
                 0.8f);
             batch.setColor(Color.WHITE);
         }
+    }
+
+    @Override
+    public int getRenderPriority () {
+        return 5000;
     }
 }

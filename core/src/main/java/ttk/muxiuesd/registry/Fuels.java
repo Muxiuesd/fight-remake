@@ -13,6 +13,7 @@ public final class Fuels {
 
     static {
         register(Items.STICK, 120);
+        register(Items.COAL, 300);
     }
 
 

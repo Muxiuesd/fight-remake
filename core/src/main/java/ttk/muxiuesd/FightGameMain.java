@@ -12,7 +12,6 @@ public class FightGameMain extends Game {
     @Override
     public void create() {
         //先行加载
-        //EventBus eventBus = EventBus.getInstance();
         EventTypes.init();
         RegistrantGroup.init();
 

@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
  * 自定义属性标签：custom attribute tag （CAT）
  * */
 public class CAT {
-    private HashMap<String, Object> entries = new LinkedHashMap<>();
+    private final HashMap<String, Object> entries = new LinkedHashMap<>();
 
     public CAT set (String key, Object value) {
         this.getMap().put(key, value);
@@ -25,8 +25,11 @@ public class CAT {
         this.getMap().forEach((key, value) -> writer.getWriter().writeValue(key, value));
     }
 
+    /**
+     * 从json文件中读取值
+     * */
     public void read (JsonValue values) {
-
+        //TODO
     }
 
     public HashMap<String, Object> getMap () {

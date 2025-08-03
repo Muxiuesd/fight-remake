@@ -1,29 +1,25 @@
 package ttk.muxiuesd.world.item.instence;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.EntityFactory;
-import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Weapon;
+import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.world.entity.bullet.BulletFire;
 
 /**
  * 测试武器
  * */
-public class WeaponDiamondSword extends Weapon {
+public class WeaponDiamondSword extends RangedWeapon {
     public WeaponDiamondSword () {
-        super(Weapon.DEFAULT_PROPERTY,
+        super(RangedWeapon.createDefaultProperty(),
             Fight.getId("test_weapon"),
-            Fight.ItemTexturePath("diamond_sword.png"));
-    }
-
-    @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
-        EntitySystem entitySystem = user.getEntitySystem();
-        entitySystem.add(EntityFactory.createFireBullet(user, Util.getDirection()));
-
-        return super.use(itemStack, world, user);
+            Fight.ItemTexturePath("diamond_sword.png"),
+            (world, owner, entityType, direction) -> {
+                BulletFire bullet = Entities.BULLET_FIRE.create(world);
+                bullet.setOwner(owner);
+                bullet.setType(owner.getType().getChildType("bullet"));
+                bullet.setPosition(owner.x + (owner.width - bullet.width) / 2, owner.y + (owner.height - bullet.height) / 2);
+                bullet.setDirection(direction.getxDirection(), direction.getyDirection());
+                bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
+                return bullet;
+            });
     }
 }

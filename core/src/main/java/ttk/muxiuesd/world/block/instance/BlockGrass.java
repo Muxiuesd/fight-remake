@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.block.instance;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioReg;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.block.abs.Block;
 
 /**
@@ -11,8 +11,7 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockGrass extends Block {
     public BlockGrass() {
-        super(new Block.Property()
-            .setFriction(1f).setSounds(AudioReg.GRASS),
+        super(createProperty().setFriction(1f).setSounds(Sounds.GRASS),
             Fight.getId("grass"),
             Fight.BlockTexturePath("grass.png"));
     }

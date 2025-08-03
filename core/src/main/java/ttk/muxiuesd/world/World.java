@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world;
 
 import com.badlogic.gdx.utils.Disposable;
+import ttk.muxiuesd.data.JsonDataWriter;
+import ttk.muxiuesd.data.WorldInfoDataOutput;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.WorldSystemsManager;
@@ -10,8 +12,6 @@ import ttk.muxiuesd.util.Log;
 /**世界的基类
  * */
 public abstract class World implements Updateable, Disposable {
-    public final String TAG = this.getClass().getName();
-
     private final MainGameScreen screen;
     private WorldSystemsManager worldSystemsManager;
 
@@ -27,19 +27,13 @@ public abstract class World implements Updateable, Disposable {
         return this;
     }
 
-    /*@Override
-    public void draw(Batch batch) {
-        if (this.worldSystemsManager != null) {
-            this.getSystemManager().draw(batch);
-        }
+    /**
+     * 获取世界的系统
+     * */
+    public <T extends WorldSystem> T getSystem(Class<T> systemClass) {
+        return this.getSystemManager().getSystem(systemClass);
     }
 
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        if (this.worldSystemsManager != null) {
-            this.getSystemManager().renderShape(batch);
-        }
-    }*/
 
     @Override
     public void update(float delta) {
@@ -53,11 +47,27 @@ public abstract class World implements Updateable, Disposable {
         if (this.worldSystemsManager != null) {
             this.getSystemManager().dispose();
         }
+
+        //编写信息文件
+        this.writeWorldInfo();
+    }
+
+    private void writeWorldInfo () {
+        try {
+            JsonDataWriter dataWriter = new JsonDataWriter();
+            dataWriter.objStart();
+            WorldInfo.CODEC.encode(WorldInfo.INSTANCE, dataWriter);
+            dataWriter.objEnd();
+            new WorldInfoDataOutput().output(dataWriter);
+        }catch (Exception e) {
+            Log.error(TAG(), "世界信息写入失败！！！原因：", e);
+        }
+        Log.print(TAG(), "世界信息写入完成。");
     }
 
     public WorldSystemsManager getSystemManager() {
         if (this.worldSystemsManager == null) {
-            Log.error(TAG, "这个world的系统管理是null！！！");
+            Log.error(TAG(), "这个world的系统管理是null！！！");
             throw new RuntimeException();
         }
         return this.worldSystemsManager;
@@ -69,5 +79,9 @@ public abstract class World implements Updateable, Disposable {
 
     public MainGameScreen getScreen() {
         return this.screen;
+    }
+
+    public String TAG () {
+        return this.getClass().getName();
     }
 }

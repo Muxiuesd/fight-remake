@@ -3,6 +3,8 @@ package ttk.muxiuesd.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * 文件工具
@@ -20,11 +22,6 @@ public class FileUtil {
         try {
             FileHandle file = getFileHandle(path, fileName);
             if (!file.exists()) {
-                /*// 确保父目录存在
-                FileHandle parent = file.parent();
-                if (parent != null && !parent.exists()) {
-                    parent.mkdirs();
-                }*/
                 // 创建空文件
                 file.write(false);
             }
@@ -105,6 +102,19 @@ public class FileUtil {
      * */
     public static String readFileAsString(String path, String fileName) {
         return getFile(path, fileName).readString();
+    }
+
+    /**
+     * 将读取到的json文件转化为json值
+     * @param fileName 默认.json后缀
+     * */
+    public static JsonValue readJsonFile(String path, String fileName) {
+        if (fileName.endsWith(".json")) {
+            String string = getFile(path, fileName).readString();
+            return new JsonReader().parse(string);
+        }
+        String string = getFile(path, fileName + ".json").readString();
+        return new JsonReader().parse(string);
     }
 
     /**

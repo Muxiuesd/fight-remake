@@ -9,7 +9,9 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
-import ttk.muxiuesd.interfaces.IWorldChunkRender;
+import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
+import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
 import ttk.muxiuesd.world.World;
@@ -46,7 +48,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     //方块实例，不带有方块实体的同一种方块在world里只有一个实例，带有方块实体的方块都是单独一个实例
     private final ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
     //方块实体，每一个方块实体都是一个单独的实例
-    private final ConcurrentHashMap<BlockWithEntity, BlockEntity> blockEntities = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BlockWithEntity<?, ?>, BlockEntity> blockEntities = new ConcurrentHashMap<>();
 
     // 当前活跃的线程
     private ArrayList<Chunk> activeChunks = new ArrayList<>();
@@ -61,13 +63,15 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public ChunkSystem(World world) {
         super(world);
+        WorldInformationType.INT.putIfAbsent("seed", 114514);
     }
 
     @Override
     public void initialize () {
-        this.noise = new WorldMapNoise((int) (Math.random() * 10000));
+        //this.noise = new WorldMapNoise((int) (Math.random() * 10000));
+        this.noise = new WorldMapNoise(WorldInformationType.INT.get("seed"));
 
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
         this.playerLastPosition = new Vector2(this.player.x + 10000, this.player.y + 10000);
 
@@ -86,16 +90,18 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             ChunkPosition playerChunkPosition = this.getPlayerChunkPosition();
             Chunk chunk = this.initChunk(playerChunkPosition.getX(), playerChunkPosition.getY());
             this.activeChunks.add(chunk);
+
+            EntitySystem es = getWorld().getSystem(EntitySystem.class);
+            es.initLoadEntities(playerChunkPosition);
             return;
         }
 
-        PlayerSystem ps = (PlayerSystem) getManager().getSystem("PlayerSystem");
+        PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
         this.chunkLoadTimer.update(delta);
 
         // 检查线程池里的区块是否加载完成
         if (!this.chunkLoadingTasks.isEmpty()) {
-            //System.out.println(this.chunkLoadingTasks.size());
             for (ChunkPosition position : this.chunkLoadingTasks.keySet()) {
                 if (this.isChunkLoaded(position)) {
                     // 如果加载完成，则将区块加入活跃队列
@@ -110,12 +116,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                             }
                         }
                         if (!exit) this._loadChunks.add(chunk);
+                        EntitySystem entitySystem = getManager().getSystem(EntitySystem.class);
+                        entitySystem.loadEntities(this, chunk);
                     }
                     //移除任务
                     this.chunkLoadingTasks.remove(position);
                 }
             }
-            //System.out.println(this._loadChunks.size());
         }
         if (!this.chunkUnloadingTasks.isEmpty()) {
             for (ChunkPosition position : this.chunkUnloadingTasks.keySet()) {
@@ -199,19 +206,29 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void dispose() {
-        for (Chunk activeChunk : this.activeChunks) {
-            activeChunk.dispose();
-        }
+        this.saveAllChunks();
         this.shutdownChunkLoadPool();
     }
 
     /**
-     * 添加方块
+     * 卸载保存现有的所有区块
+     * */
+    private void saveAllChunks() {
+        Log.print(TAG, "保存游戏所有的区块信息。。。");
+        for (Chunk chunk : this.activeChunks) {
+            ChunkUnloadTask chunkUnloadTask = new ChunkUnloadTask(this, chunk);
+            chunkUnloadTask.call();
+        }
+        Log.print(TAG, "游戏所有的区块信息完成保存！");
+    }
+
+    /**
+     * 添加方块，确切地说，是把这个方块的实例放进区块系统里确保可以被查询到
      * */
     public void addBlock (Block block, float wx, float wy) {
         Vector2 floor = Util.fastFloor(wx, wy);
         //如果新的方块是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        if (block instanceof BlockWithEntity<?, ?> blockWithEntity) {
             //添加方块实体
             BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
             this.addBlockEntity(blockWithEntity, blockEntity);
@@ -242,7 +259,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     private void addBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        if (block instanceof BlockWithEntity<? ,?> blockWithEntity) {
             this.blockInstances.put(this.getBlockKey(blockWithEntity), blockWithEntity);
             return;
         }
@@ -258,7 +275,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     private Block removeBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        if (block instanceof BlockWithEntity<? ,?> blockWithEntity) {
             return this.blockInstances.remove(this.getBlockKey(blockWithEntity));
         }
 
@@ -273,10 +290,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 添加方块实体
      * */
-    private void addBlockEntity(BlockWithEntity block, BlockEntity blockEntity) {
+    private void addBlockEntity(BlockWithEntity<? ,?> block, BlockEntity blockEntity) {
         if (block == null || blockEntity == null) return;
 
-        TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
+        TimeSystem ts = getWorld().getSystem(TimeSystem.class);
         ts.add(blockEntity);
         this.getBlockEntities().put(block, blockEntity);
 
@@ -286,11 +303,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 移除方块实体
      * */
-    private BlockEntity removeBlockEntity(BlockWithEntity block) {
+    private BlockEntity removeBlockEntity (BlockWithEntity<?, ?> block) {
         BlockEntity removed = this.getBlockEntities().remove(block);
         if (removed == null) return null;
 
-        TimeSystem ts = (TimeSystem) getWorld().getSystemManager().getSystem("TimeSystem");
+        TimeSystem ts = getWorld().getSystem(TimeSystem.class);
         ts.remove(removed);
         removed.beDestroyed(getWorld(), this.player);
 
@@ -312,23 +329,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         Chunk chunk = this.getChunk(chunkPosition);
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
 
-        /*ConcurrentHashMap<String, Block> instancesMap = this.getBlockInstancesMap();
-        if (! instancesMap.containsKey(newBlock.getID())) {
-            //如果方块实例不存在，就加进去
-            instancesMap.put(newBlock.getID(), newBlock);
-        }*/
-
-        /*//如果新的方块是带有方块实体的方块
-        if (newBlock instanceof BlockWithEntity blockWithEntity) {
-            //添加方块实体
-            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
-            this.addBlockEntity(blockWithEntity, blockEntity);
-            //TODO 事件：添加方块实体
-        }
-        this.addBlockInstance(newBlock);*/
-
         //如果旧的方块是带有方块实体的方块
-        if (oldBlock instanceof BlockWithEntity blockWithEntity) {
+        if (oldBlock instanceof BlockWithEntity<? ,?> blockWithEntity) {
             this.removeBlockEntity(blockWithEntity);
             //TODO 事件：移除方块实体
             //移除对应的方块实例
@@ -336,9 +338,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         //如果新方块是带有方块实体的方块
-        if (newBlock instanceof BlockWithEntity blockWithEntity) {
+        if (newBlock instanceof BlockWithEntity<? ,?> blockWithEntity) {
             //需要新建一个实例再添加
-            BlockWithEntity self = blockWithEntity.createSelf();
+            BlockWithEntity<? ,?> self = blockWithEntity.createSelf();
             this.addBlock(self, wx, wy);
             chunk.setBlock(self, chunkBlockPos.x, chunkBlockPos.y);
         }else {
@@ -365,16 +367,18 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         // System.out.println("("+ player.x+ "," + player.y +")" + "("+ playerChunkX + "," + playerChunkY +")");
         // TODO 实现更好的循环
-        for (int y = -2; y < 3; y++) {
-            for (int x = -2; x < 3; x++) {
+        Integer value = Fight.PLAYER_VISUAL_RANGE.getValue();
+        for (int y = -value; y < value + 1; y++) {
+            for (int x = -value; x < value + 1; x++) {
                 int newChunkX = playerChunkX + x;
                 int newChunkY = playerChunkY + y;
                 float distance = Util.getDistance(
                     playerCenter.x, playerCenter.y,
                     newChunkX * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
-                    newChunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f);
+                    newChunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f
+                );
 
-                if (distance <= Fight.PLAYER_VISUAL_RANGE) {
+                if (distance <= value * (Chunk.ChunkWidth + Chunk.ChunkHeight) / 2f) {
                     this.loadChunk(newChunkX, newChunkY);
                 }
             }
@@ -385,11 +389,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 计算需要被卸载的区块
      */
     private void calculateNeedUnloadedChunk() {
+        Integer value = Fight.PLAYER_VISUAL_RANGE.getValue();
         for (Chunk chunk : this.activeChunks) {
             float distance = Util.getDistance(this.player.x, this.player.y,
                 chunk.getChunkPosition().getX() * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
-                chunk.getChunkPosition().getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f);
-            if (distance > Fight.PLAYER_VISUAL_RANGE) {
+                chunk.getChunkPosition().getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f
+            );
+
+            if (distance > value * (Chunk.ChunkWidth + Chunk.ChunkHeight) / 2f) {
                 this.unloadChunk(chunk);
             }
         }
@@ -403,29 +410,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //检查是否加载过或者正在加载这个区块
         boolean chunkExist = this.chunkExist(loadChunkPosition);
 
-        // 检查是否已经在加载队列里
-        /*for (Chunk chunk : this._loadChunks) {
-            ChunkPosition chunkPosition = chunk.getChunkPosition();
-            if (chunkPosition.equals(loadChunkPosition)) {
-                // Log.error(TAG, "编号为：(" + chunkX +","+ chunkY +")的区块已加载！！！");
-                chunkExist = true;
-                break;
-            }
-        }
-        // 检查是否已经在活跃队列里
-        for (Chunk chunk : this.activeChunks) {
-            ChunkPosition chunkPosition = chunk.getChunkPosition();
-            if (chunkPosition.equals(loadChunkPosition)) {
-                // Log.error(TAG, "编号为：(" + chunkX +","+ chunkY +")的区块已活跃！！！");
-                chunkExist = true;
-                break;
-            }
-        }*/
         if (chunkExist) {
             // TODO 实现如果区块已存在的更多操作，比如加载保存的此区块的数据
             return;
         }
-
 
         // 生成任务并提交到线程池里加载区块
         ChunkLoadTask task = new ChunkLoadTask(this, loadChunkPosition);
@@ -483,6 +471,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
         // 执行到这就是要卸载的区块在活跃队列里，延迟卸载
         this._unloadChunks.add(chunk);
+
+        //通知实体系统卸载区块上的实体
+        EntitySystem es = getWorld().getSystem(EntitySystem.class);
+        es.unloadEntities(this, chunk);
+
         // Log.print(TAG, "卸载编号为：(" + chunk.chunkX +","+ chunk.chunkY +")的区块");
     }
 
@@ -544,15 +537,24 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * （主线程）初始化区块
+     * （主线程）加载区块
      */
     public Chunk initChunk(int chunkX, int chunkY) {
-        return this.getChunkGenerator().generate(new ChunkPosition(chunkX, chunkY));
+        ChunkLoadTask chunkLoadTask = new ChunkLoadTask(this, new ChunkPosition(chunkX, chunkY));
+        return chunkLoadTask.call();
     }
 
     /**
+     * 获取方块
+     * @param position 世界坐标
+     */
+    public Block getBlock (Vector2 position) {
+        return this.getBlock(position.x, position.y);
+    }
+    /**
      * 获取世界坐标上对应的方块
-     *
+     * @param wx 世界x坐标
+     * @param wy 世界y坐标
      * @return
      */
     public Block getBlock(float wx, float wy) {
@@ -561,8 +563,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
-            Log.error(TAG, "获取的区块为null！！！");
-            throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");
+            /*Log.error(TAG, "获取的区块为null！！！");
+            throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");*/
+            return Blocks.ARI;
         }
 
         Block block = chunk.seekBlock(floor.x, floor.y);
@@ -576,14 +579,17 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     /**
      * 获取区块
+     * @param position 世界坐标
      */
+    public Chunk getChunk (Vector2 position) {
+        return this.getChunk(position.x, position.y);
+    }
+    public Chunk getChunk (float wx, float wy) {
+        return this.getChunk(this.getChunkPosition(wx, wy));
+    }
     public Chunk getChunk(int chunkX, int chunkY) {
         return this.getChunk(new ChunkPosition(chunkX, chunkY));
     }
-
-    /**
-     * 获取区块
-     */
     public Chunk getChunk(ChunkPosition chunkPosition) {
         for (Chunk chunk : this.activeChunks) {
             if (chunk.getChunkPosition().equals(chunkPosition)) {
@@ -593,7 +599,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
         // 如果没有这个区块,暂时就这么处理
         Chunk chunk = this.initChunk(chunkPosition.getX(), chunkPosition.getY());
-        if (!this.chunkExist(chunkPosition)) this._loadChunks.add(chunk);
+        if (chunk != null && !this.chunkExist(chunkPosition)) this._loadChunks.add(chunk);
         return chunk;
     }
 
@@ -606,6 +612,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.getChunkPosition(playerCenter.x, playerCenter.y);
     }
 
+    public ChunkPosition getChunkPosition (Vector2 position) {
+        return this.getChunkPosition(position.x, position.y);
+    }
     /**
      * 获取世界坐标所对应的区块编号
      *
@@ -687,7 +696,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.blockInstances;
     }
 
-    public ConcurrentHashMap<BlockWithEntity, BlockEntity> getBlockEntities () {
+    public ConcurrentHashMap<BlockWithEntity<?, ?>, BlockEntity> getBlockEntities () {
         return this.blockEntities;
     }
 

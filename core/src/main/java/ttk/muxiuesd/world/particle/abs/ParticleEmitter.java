@@ -66,9 +66,8 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
 
             this.motionLogic(particle, delta);
 
-            if (particle instanceof ShinyParticle) {
-                ShinyParticle sp = (ShinyParticle) particle;
-                sp.update(delta);
+            if (particle instanceof ShinyParticle shinyParticle) {
+                shinyParticle.update(delta);
             }
             particle.lifetime += delta;
         }

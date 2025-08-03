@@ -14,7 +14,5 @@ public class BlockJsonDataOutput extends JsonDataOutput {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
         FileUtil.createFile(Fight.PATH_SAVE, "block.json").writeString(json.prettyPrint(string), false);
-
-
     }
 }

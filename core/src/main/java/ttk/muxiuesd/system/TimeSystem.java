@@ -5,7 +5,9 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldTick;
 import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.Info;
 import ttk.muxiuesd.world.World;
 
 /**
@@ -14,6 +16,7 @@ import ttk.muxiuesd.world.World;
  * tick更新为不精确更新，无法保证每秒一定更新多少次，但会传入每两次tick更新的间隔以供使用
  * */
 public class TimeSystem extends WorldSystem implements Tickable {
+    public static final Info<Float> GAME_TIME = Info.create("game_time", 0f);
 
     public static final float REAL_SECOND_TO_GAME_MINUTE = 10f; // 游戏时间参数（1秒现实=10分钟游戏时间）
     public static final int TicksPerSecond = 20;
@@ -31,6 +34,9 @@ public class TimeSystem extends WorldSystem implements Tickable {
         this.tickUpdates = new Array<>();
         this._delayAdd = new Array<>();
         this._delayRemove = new Array<>();
+        WorldInformationType.FLOAT.putIfNull(GAME_TIME);
+
+        this.gameTime = WorldInformationType.FLOAT.get(GAME_TIME);
     }
 
     @Override
@@ -69,6 +75,11 @@ public class TimeSystem extends WorldSystem implements Tickable {
         //this.callWorldTickEvent(delta);
         //EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
         EventBus.post(EventTypes.WORLD_TICK, new EventPosterWorldTick(getWorld(), delta));
+    }
+
+    @Override
+    public void dispose () {
+        WorldInformationType.FLOAT.put(GAME_TIME.getKey(), this.getGameTime());
     }
 
     /**
