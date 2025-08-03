@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -35,13 +36,13 @@ import ttk.muxiuesd.world.loottable.FishingLootTable;
  * */
 public class ItemFishPole extends Item {
     public TextureRegion castTexture;
-    //public EntityFishingHook hook;
-    //public boolean isCasting = false; //是否抛竿
     public float castSpeed = 10f;
     public float pullSpeed = castSpeed * 2;
 
     public ItemFishPole () {
-        super(Type.COMMON, new Property().setMaxCount(1).add(PropertyTypes.ITEM_WITH_ENTITY, null),
+        super(Type.COMMON, new Property().setMaxCount(1)
+                .add(PropertyTypes.ITEM_WITH_ENTITY, null)
+                .add(PropertyTypes.FISHING_POLE_USING, false),
             Fight.getId("fish_pole"),
             Fight.ItemTexturePath("fish_pole.png"));
         this.castTexture = getTextureRegion(Fight.getId("fish_pole_cast"), Fight.ItemTexturePath("fish_pole_cast.png"));
@@ -51,10 +52,9 @@ public class ItemFishPole extends Item {
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
 
-        if (!itemStack.onUsing()) {//抛出鱼钩
-            EntitySystem es = user.getEntitySystem();
+        if (!this.onUsing(itemStack)) {//抛出鱼钩
             //获取鱼钩
-            EntityFishingHook fishingHook = (EntityFishingHook)Gets.ENTITY(Fight.getId("fishing_hook"), es);
+            EntityFishingHook fishingHook = Entities.FISHING_HOOK.create(world);
             fishingHook.setPosition(user.getPosition());
             fishingHook.setOnGround(false);
             fishingHook.setOwner(user)
@@ -62,7 +62,7 @@ public class ItemFishPole extends Item {
                 .setThrowDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
                 .setChunkSystem(world.getSystem(ChunkSystem.class))
                 .setParticleSystem(world.getSystem(ParticleSystem.class));
-
+            world.getSystem(EntitySystem.class).add(fishingHook);
             this.throwHook(itemStack, world, fishingHook);
             return super.use(itemStack, world, user);
         }else if (!hook.onCasting() && !hook.isReturning){ //鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
@@ -85,7 +85,6 @@ public class ItemFishPole extends Item {
                         itemEntity.setOnAirTimer(null);
                     }));
                 });
-                //ItemStack lootStack1 = FishingLootTable.generate(Fight.getId("rubbish"));
             }
 
             this.pullHook(itemStack);
@@ -98,46 +97,42 @@ public class ItemFishPole extends Item {
     @Override
     public void putDown (ItemStack itemStack, World world, LivingEntity<?> holder) {
         //放下钓鱼竿也马上让鱼钩消失
-        if (itemStack.onUsing()) {
-            EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
-            hook.removeSelf();
-            itemStack.getProperty().add(PropertyTypes.ITEM_WITH_ENTITY, null);
-            itemStack.getProperty().add(PropertyTypes.ITEM_ON_USING, false);
+        if (this.onUsing(itemStack)) {
+            this.removeHook(itemStack);
         }
     }
 
     @Override
     public void beDropped (ItemStack itemStack, World world, LivingEntity<?> dropper) {
         //钓鱼的时候被丢出来，则直接让鱼钩消失
-        if (itemStack.onUsing()) {
-            //this.hook.removeSelf();
-            //this.hook = null;
-            EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
-            hook.removeSelf();
-            itemStack.getProperty().add(PropertyTypes.ITEM_WITH_ENTITY, null);
-            //this.isCasting = false;
-            itemStack.getProperty().add(PropertyTypes.ITEM_ON_USING, false);
+        if (this.onUsing(itemStack)) {
+            this.removeHook(itemStack);
         }
     }
 
     @Override
     public void update (float delta, ItemStack itemStack) {
+        if (!this.onUsing(itemStack)) return;
+
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
-        if (itemStack.onUsing() && Util.getDistance(hook, hook.getOwner()) > 16f) {
+        if (Util.getDistance(hook, hook.getOwner()) > 16f) {
             //鱼钩与使用者距离太远直接消失
-            hook.removeSelf();
-            itemStack.getProperty().add(PropertyTypes.ITEM_WITH_ENTITY, null);
-            //this.isCasting = false;
-            itemStack.getProperty().add(PropertyTypes.ITEM_ON_USING, false);
+            this.removeHook(itemStack);
         }
+    }
+
+    private void removeHook (ItemStack itemStack) {
+        EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
+        hook.removeSelf();
+        itemStack.getProperty().add(PropertyTypes.ITEM_WITH_ENTITY, null);
+        itemStack.getProperty().add(PropertyTypes.ITEM_ON_USING, false);
+        itemStack.getProperty().add(PropertyTypes.FISHING_POLE_USING, false);
     }
 
     /**
      * 抛出鱼钩
      * */
     public void throwHook (ItemStack itemStack, World world, EntityFishingHook fishingHook) {
-        //Boolean onUsing = itemStack.getProperty().get(PropertyTypes.ITEM_ON_USING);
-
         LivingEntity<?> owner = fishingHook.getOwner();
         if (owner instanceof Player player) {
             //玩家抛竿
@@ -150,11 +145,10 @@ public class ItemFishPole extends Item {
             fishingHook.setSpeed(this.castSpeed);
         }
 
-        //this.hook = fishingHook;
         //添加鱼钩实体
         itemStack.getProperty().add(PropertyTypes.ITEM_WITH_ENTITY, fishingHook);
-        //this.isCasting = true;
         itemStack.getProperty().add(PropertyTypes.ITEM_ON_USING, true);
+        itemStack.getProperty().add(PropertyTypes.FISHING_POLE_USING, true);
     }
 
     /**
@@ -165,11 +159,16 @@ public class ItemFishPole extends Item {
         hook.isReturning = true;
         hook.setOnGround(false);
         hook.setSpeed(this.pullSpeed);
+        itemStack.getProperty().add(PropertyTypes.FISHING_POLE_USING, false);
+    }
+
+    private boolean onUsing (ItemStack itemStack) {
+        return itemStack.getProperty().get(PropertyTypes.FISHING_POLE_USING);
     }
 
     @Override
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
-        if (!itemStack.onUsing()) {
+        if (! this.onUsing(itemStack)) {
             if (this.texture == null) return;
             //没抛竿渲染
             Direction direction = holder.getDirection();
@@ -216,7 +215,7 @@ public class ItemFishPole extends Item {
 
     @Override
     public void renderShape (ShapeRenderer batch, ItemStack itemStack) {
-        if (!itemStack.onUsing()) return;
+        if (!this.onUsing(itemStack)) return;
 
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
         Direction direction = Util.getDirection();

@@ -11,12 +11,17 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 public class EntityProvider<T extends Entity<?>> {
     private String id;
 
-    private Factory<T> factory;
-    private EntityType<? super T> defaultType;
+    private final Factory<T> factory;
+    private final EntityType<? super T> defaultType;
 
-    public EntityProvider (Factory<T> factory, EntityType<? super T> defaultType) {
+    public final boolean canBeSaved;
+
+    public EntityProvider (Factory<T> factory,
+                           EntityType<? super T> defaultType,
+                           boolean canBeSaved) {
         this.factory = factory;
         this.defaultType = defaultType;
+        this.canBeSaved = canBeSaved;
     }
 
     /**
@@ -50,6 +55,8 @@ public class EntityProvider<T extends Entity<?>> {
         final Factory<T> factory;
         EntityType<? super T> defaultType;
 
+        boolean canBeSaved  = true; //实体能否被保存，默认可以
+
         private Builder (Factory<T> factory) {
             this.factory = factory;
         }
@@ -63,10 +70,16 @@ public class EntityProvider<T extends Entity<?>> {
             return this;
         }
 
+        public Builder<T> setCanBeSaved (boolean canBeSaved) {
+            this.canBeSaved = canBeSaved;
+            return this;
+        }
+
         public EntityProvider<T> build () {
             return new EntityProvider<T>(
                 factory,
-                defaultType
+                defaultType,
+                canBeSaved
             );
         }
     }

@@ -12,6 +12,7 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
@@ -395,9 +396,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         for (Entity<?> entity: copy) {
             ChunkPosition chunkPosition = cs.getChunkPosition(entity.getCenter());
-            //Chunk entityChunk = cs.getChunk(entity.getPosition());
-            //检查实体所在区块是否为传入的需要被卸载的区块
-            if (chunkPosition.equals(chunk.getChunkPosition())) {
+            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
+            if (chunkPosition.equals(chunk.getChunkPosition())
+                && entityProvider.canBeSaved) {
                 unload.add(entity);
             }
         }
@@ -422,6 +424,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
 
         for (Entity<?> entity: allEntities) {
+            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            if (!entityProvider.canBeSaved) continue;
+
             Vector2 position = entity.getCenter();
             ChunkPosition chunkPosition = chunkSystem.getChunkPosition(position.x, position.y);
             String name = chunkPosition.toString();
