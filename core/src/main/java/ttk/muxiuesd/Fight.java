@@ -32,7 +32,7 @@ public class Fight {
     public static final String PATH_SAVE_WORLD = PATH_SAVE + "world/";
     public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
     public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
-
+    public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
 
 
 

@@ -400,6 +400,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 unload.add(entity);
             }
         }
+
+        if (unload.isEmpty()) return;
+
+        unload.removeValue(this.getPlayer(), true);
         EntityUnloadTask unloadTask = new EntityUnloadTask(this, unload, chunk.getChunkPosition());
         Future<Array<Entity<?>>> submit = this.executor.submit(unloadTask);
         this.entityUnloadingTasks.put(chunk.getChunkPosition(), submit);
@@ -412,6 +416,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         HashMap<String, ChunkPosition> chunkPos = new HashMap<>();
         HashMap<ChunkPosition, Array<Entity<?>>> unloadArray = new HashMap<>();
         Array<Entity<?>> allEntities = this.getEntities();
+        //单独去除玩家实体
+        allEntities.removeValue(this.getPlayer(), true);
         ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
 
         for (Entity<?> entity: allEntities) {

@@ -3,11 +3,12 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
-import ttk.muxiuesd.data.BackpackDataOutput;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
+import ttk.muxiuesd.data.PlayerDataOutput;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
@@ -24,7 +25,6 @@ import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -36,6 +36,7 @@ import java.util.Optional;
  * 玩家系统
  * */
 public class PlayerSystem extends WorldSystem {
+    public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
     private Player player;
     private Vector2 playerLastPosition;
 
@@ -43,6 +44,8 @@ public class PlayerSystem extends WorldSystem {
 
     public PlayerSystem(World world) {
         super(world);
+        this.bubbleEmitTimer = new Timer<>(0.5f);
+
         WorldInformationType.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
         WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
         WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
@@ -50,11 +53,16 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        this.player = Entities.PLAYER.create(getWorld());
-        this.playerLastPosition = this.player.getPosition();
-        this.bubbleEmitTimer = new Timer<>(0.5f);
+        //有玩家数据就读取
+        if (FileUtil.fileExists(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME)) {
+            this.player = readPlayer();
+        }else {
+            this.player = Entities.PLAYER.create(getWorld());
+        }
 
-        if (FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, "player_backpack.json")) {
+        this.playerLastPosition = this.player.getPosition();
+
+        /*if (FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, "player_backpack.json")) {
             //测试用玩家背包解码
             String file = FileUtil.readFileAsString(Fight.PATH_SAVE_ENTITIES, "player_backpack.json");
             JsonDataReader dataReader = new JsonDataReader(file);
@@ -62,7 +70,7 @@ public class PlayerSystem extends WorldSystem {
             if (optional.isPresent()) {
                 this.player.setBackpack(optional.get());
             }
-        }
+        }*/
 
 
         Log.print(TAG(), "PlayerSystem初始化完成！");
@@ -128,13 +136,40 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void dispose () {
-        JsonDataWriter dataWriter = new JsonDataWriter();
+        /*JsonDataWriter dataWriter = new JsonDataWriter();
         dataWriter.objStart();
         Codecs.BACKPACK.encode(this.getPlayer().getBackpack(), dataWriter);
         dataWriter.objEnd();
 
-        new BackpackDataOutput("player_backpack").output(dataWriter);
+        new BackpackDataOutput("player_backpack").output(dataWriter);*/
+        this.savePlayer();
     }
+
+    /**
+     * 保存玩家数据
+     * */
+    public void savePlayer () {
+        JsonDataWriter dataWriter = new JsonDataWriter();
+        dataWriter.objStart();
+        Codecs.PLAYER.encode(this.getPlayer(), dataWriter);
+        dataWriter.objEnd();
+
+        new PlayerDataOutput().output(dataWriter);
+    }
+
+    /**
+     * 读取玩家数据
+     * */
+    public Player readPlayer () {
+        JsonValue playerValue = FileUtil.readJsonFile(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME);
+        Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
+        if (optionalPlayer.isPresent()) {
+            return optionalPlayer.get();
+        }
+        Log.error(TAG(), "玩家读取失败！json原文：" + playerValue.toString());
+        return new Player(getWorld(), EntityTypes.PLAYER);
+    }
+
 
     /**
      * 获取玩家的唯一方式，其他地方获取玩家也是通过这个方法

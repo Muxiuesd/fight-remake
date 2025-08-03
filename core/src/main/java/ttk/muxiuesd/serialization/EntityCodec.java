@@ -1,4 +1,4 @@
-package ttk.muxiuesd.serialization.abs;
+package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
@@ -7,6 +7,7 @@ import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
+import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -17,7 +18,7 @@ import java.util.Optional;
 /**
  * 实体的编解码器
  * */
-public class EntityCodec extends JsonCodec<Entity<?>>{
+public class EntityCodec extends JsonCodec<Entity<?>> {
     @Override
     public void encode (Entity<?> entity, JsonDataWriter dataWriter) {
         dataWriter
