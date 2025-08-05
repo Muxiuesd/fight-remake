@@ -76,8 +76,7 @@ public class BlockCodec extends JsonCodec<Block> {
             );
             propertyOptional.ifPresent(self::setProperty);
 
-            //读取cat
-            self.readCAT(propertyValue.get(Fight.getId("cat")));
+
 
             //读取方块实体信息
             JsonValue blockEntityValue = dataReader.readObj("block_entity");
@@ -87,6 +86,8 @@ public class BlockCodec extends JsonCodec<Block> {
                 self.setBlockEntity(blockEntity);
                 blockEntity.setBlock(self);
             }
+            //读取cat，同时会读取方块实体的cat
+            self.readCAT(propertyValue.get(Fight.getId("cat")));
 
             return Optional.of(self);
         }

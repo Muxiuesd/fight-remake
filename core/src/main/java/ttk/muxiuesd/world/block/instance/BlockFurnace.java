@@ -2,11 +2,13 @@ package ttk.muxiuesd.world.block.instance;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
+import ttk.muxiuesd.world.cat.CAT;
 
 /**
  * 熔炉方块
@@ -18,6 +20,18 @@ public class BlockFurnace extends BlockWithEntity {
     public BlockFurnace () {
         super(createProperty().setFriction(0.5f), Fight.getId("furnace"), Fight.BlockTexturePath("furnace.png"));
         this.workingTexture = loadTextureRegion(Fight.getId("furnace_on"), Fight.BlockTexturePath("furnace_on.png"));
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("is_working", this.isWorking);
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.isWorking = values.getBoolean("is_working");
     }
 
     @Override

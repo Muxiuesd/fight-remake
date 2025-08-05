@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
@@ -18,6 +19,7 @@ import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
@@ -46,6 +48,18 @@ public class BlockEntityFurnace extends BlockEntity {
 
         this.light = new PointLight(new Color(0.8f, 0.1f, 0.1f, 0.1f), 2.5f);
         this.light.setPosition(new Vector2(blockPos).add(0.5f, 0.2f));
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("curEnergy", this.curEnergy);
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.curEnergy = values.getInt("curEnergy");
     }
 
     @Override
