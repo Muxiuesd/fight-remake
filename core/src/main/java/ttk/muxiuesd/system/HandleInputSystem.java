@@ -8,9 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.BlockJsonDataOutput;
-import ttk.muxiuesd.data.ChunkJsonDataOutput;
-import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
@@ -19,7 +16,6 @@ import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.BlockPosition;
 import ttk.muxiuesd.util.ChunkPosition;
@@ -98,43 +94,9 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();
 
-            if (handItemStack != null) {
-                //测试
-                /*Item item = handItemStack.getItem();
-                JsonDataWriter dataWriter = new JsonDataWriter();
-                dataWriter.objStart();
-                item.property.getPropertiesMap().write(dataWriter);
-                dataWriter.objEnd();
 
-                new ItemJsonDataOutput().output(dataWriter);*/
-            }
-            //System.out.println("==============================================");
-            //方块写入测试
-            JsonDataWriter dataWriter = new JsonDataWriter();
-            dataWriter.objStart();
-            /*mouseBlock.writeCAT(mouseBlock.getProperty().getCAT());
-            mouseBlock.getProperty().getPropertiesMap().write(dataWriter);*/
-            Codecs.BLOCK.encode(mouseBlock, dataWriter);
-            dataWriter.objEnd();
-            new BlockJsonDataOutput().output(dataWriter);
 
-            //区块写入测试
-            JsonDataWriter chunkDataWriter = new JsonDataWriter();
-            chunkDataWriter.objStart();
-            Codecs.CHUNK.encode(cs.getChunk(playerCenter.x, playerCenter.y), chunkDataWriter);
-            chunkDataWriter.objEnd();
-            new ChunkJsonDataOutput("testChunk.json").output(chunkDataWriter);
-
-            //读取测试
-            /*String s = FileUtil.readFileAsString(Fight.PATH_SAVE, "block.json");
-            System.out.println(s);
-            JsonDataReader dataReader = new JsonDataReader(s);
-            JsonValue obj = dataReader.readObj(PropertyTypes.BLOCK_SOUNDS_ID.getName());
-            System.out.println(obj.toJson(JsonWriter.OutputType.json));
-            JsonValue values = dataReader.readObj(PropertyTypes.CAT.getName());
-            mouseBlock.readCAT(values);*/
-
-            if (mouseBlock instanceof BlockWithEntity<?, ?> blockWithEntity) {
+            if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
 
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
                 //计算交互区域网格坐标

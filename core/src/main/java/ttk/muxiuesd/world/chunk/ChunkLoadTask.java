@@ -47,6 +47,7 @@ public class ChunkLoadTask extends ChunkTask {
         Chunk chunk = optional.orElse(this.genNewChunk());
         chunk.setChunkPosition(getChunkPosition());
         chunk.setChunkSystem(getChunkSystem());
+
         return chunk;
 
     }

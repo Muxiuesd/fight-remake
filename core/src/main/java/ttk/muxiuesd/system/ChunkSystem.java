@@ -48,7 +48,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     //方块实例，不带有方块实体的同一种方块在world里只有一个实例，带有方块实体的方块都是单独一个实例
     private final ConcurrentHashMap<String, Block> blockInstances = new ConcurrentHashMap<>();
     //方块实体，每一个方块实体都是一个单独的实例
-    private final ConcurrentHashMap<BlockWithEntity<?, ?>, BlockEntity> blockEntities = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BlockWithEntity, BlockEntity> blockEntities = new ConcurrentHashMap<>();
 
     // 当前活跃的线程
     private ArrayList<Chunk> activeChunks = new ArrayList<>();
@@ -89,7 +89,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             // 先强制加载一次玩家所在的区块
             ChunkPosition playerChunkPosition = this.getPlayerChunkPosition();
             Chunk chunk = this.initChunk(playerChunkPosition.getX(), playerChunkPosition.getY());
-            this.activeChunks.add(chunk);
+            this.addChunk(chunk);
 
             EntitySystem es = getWorld().getSystem(EntitySystem.class);
             es.initLoadEntities(playerChunkPosition);
@@ -115,7 +115,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                                 break;
                             }
                         }
-                        if (!exit) this._loadChunks.add(chunk);
+                        if (!exit) this.addChunk(chunk);
                         EntitySystem entitySystem = getManager().getSystem(EntitySystem.class);
                         entitySystem.loadEntities(this, chunk);
                     }
@@ -130,6 +130,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                     Chunk chunk = this.getUnloadedChunk(position);
                     if (chunk != null) {
                         this._unloadChunks.remove(chunk);
+                        this.removeChunk(chunk);
                     }
                     this.chunkUnloadingTasks.remove(position);
                 }
@@ -140,8 +141,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             this.activeChunks.addAll(this._loadChunks);
             this._loadChunks.clear();
         }
+        //把需要被卸载的区块放进线程池
         if (!this._unloadChunks.isEmpty()) {
-            // this._unloadChunks.forEach(Chunk::dispose);
             for (Chunk chunk : this._unloadChunks) {
                 // 生成任务并提交到线程池里卸载区块
                 ChunkUnloadTask task = new ChunkUnloadTask(this, chunk);
@@ -152,24 +153,19 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         // 更新正在活跃的区块
-        //Log.print(TAG, "____________");
         for (Chunk chunk : this.activeChunks) {
             chunk.update(delta);
-            //Log.print(TAG, chunk.getChunkPosition().toString());
         }
-        //Log.print(TAG, "____________");
 
         //更新方块实体
         for (BlockEntity blockEntity : this.blockEntities.values()) {
             blockEntity.update(delta);
         }
 
-
         if (this.chunkLoadTimer.isReady() && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
             this.calculateNeedUnloadedChunk();
             this.playerLastPosition.set(this.player.x, this.player.y);
-            // Log.print(TAG, "计算需要加载和卸载的区块");
         }
     }
 
@@ -223,14 +219,46 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
+     * 添加区块
+     * */
+    public void addChunk (Chunk chunk) {
+        chunk.traversal((x, y) -> {
+            //把区块里的方块实例加进系统里
+            Block block = chunk.getBlock(x, y);
+            this.addBlock(block, chunk.getWorldX(x), chunk.getWorldY(y));
+        });
+        this._loadChunks.add(chunk);
+    }
+
+    /**
+     * 移除区块
+     * */
+    public void removeChunk (Chunk chunk) {
+        chunk.traversal((x, y) -> {
+            //把区块里的方块实体实例从系统里移除
+            Block block = chunk.getBlock(x, y);
+            if (block instanceof BlockWithEntity blockWithEntity) {
+                this.removeBlockInstance(blockWithEntity);
+                this.removeBlockEntity(blockWithEntity);
+            }
+        });
+    }
+
+    /**
      * 添加方块，确切地说，是把这个方块的实例放进区块系统里确保可以被查询到
      * */
     public void addBlock (Block block, float wx, float wy) {
         Vector2 floor = Util.fastFloor(wx, wy);
         //如果新的方块是带有方块实体的方块
-        if (block instanceof BlockWithEntity<?, ?> blockWithEntity) {
+        if (block instanceof BlockWithEntity blockWithEntity) {
             //添加方块实体
-            BlockEntity blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
+            BlockEntity blockEntity = blockWithEntity.getBlockEntity();
+            if (blockEntity == null) {
+                blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
+            }
+            blockWithEntity.setBlockEntity(blockEntity);
+            blockEntity.setBlock(blockWithEntity);
+
             this.addBlockEntity(blockWithEntity, blockEntity);
             this.addBlockInstance(blockWithEntity);
 
@@ -254,12 +282,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return removed;
     }
 
+
     /**
      * 添加方块实例
      * */
     private void addBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity<? ,?> blockWithEntity) {
+        if (block instanceof BlockWithEntity blockWithEntity) {
             this.blockInstances.put(this.getBlockKey(blockWithEntity), blockWithEntity);
             return;
         }
@@ -275,7 +304,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     private Block removeBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity<? ,?> blockWithEntity) {
+        if (block instanceof BlockWithEntity blockWithEntity) {
             return this.blockInstances.remove(this.getBlockKey(blockWithEntity));
         }
 
@@ -290,7 +319,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 添加方块实体
      * */
-    private void addBlockEntity(BlockWithEntity<? ,?> block, BlockEntity blockEntity) {
+    private void addBlockEntity(BlockWithEntity block, BlockEntity blockEntity) {
         if (block == null || blockEntity == null) return;
 
         TimeSystem ts = getWorld().getSystem(TimeSystem.class);
@@ -303,7 +332,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 移除方块实体
      * */
-    private BlockEntity removeBlockEntity (BlockWithEntity<?, ?> block) {
+    private BlockEntity removeBlockEntity (BlockWithEntity block) {
         BlockEntity removed = this.getBlockEntities().remove(block);
         if (removed == null) return null;
 
@@ -330,7 +359,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
 
         //如果旧的方块是带有方块实体的方块
-        if (oldBlock instanceof BlockWithEntity<? ,?> blockWithEntity) {
+        if (oldBlock instanceof BlockWithEntity blockWithEntity) {
             this.removeBlockEntity(blockWithEntity);
             //TODO 事件：移除方块实体
             //移除对应的方块实例
@@ -338,9 +367,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         //如果新方块是带有方块实体的方块
-        if (newBlock instanceof BlockWithEntity<? ,?> blockWithEntity) {
+        if (newBlock instanceof BlockWithEntity blockWithEntity) {
             //需要新建一个实例再添加
-            BlockWithEntity<? ,?> self = blockWithEntity.createSelf();
+            BlockWithEntity self = blockWithEntity.createSelf();
             this.addBlock(self, wx, wy);
             chunk.setBlock(self, chunkBlockPos.x, chunkBlockPos.y);
         }else {
@@ -696,7 +725,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.blockInstances;
     }
 
-    public ConcurrentHashMap<BlockWithEntity<?, ?>, BlockEntity> getBlockEntities () {
+    public ConcurrentHashMap<BlockWithEntity, BlockEntity> getBlockEntities () {
         return this.blockEntities;
     }
 

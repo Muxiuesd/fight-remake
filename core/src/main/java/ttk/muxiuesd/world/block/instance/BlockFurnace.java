@@ -11,7 +11,7 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
 /**
  * 熔炉方块
  * */
-public class BlockFurnace extends BlockWithEntity<BlockFurnace, BlockEntityFurnace> {
+public class BlockFurnace extends BlockWithEntity {
     private TextureRegion workingTexture;
     private boolean isWorking = false;
 
@@ -48,7 +48,7 @@ public class BlockFurnace extends BlockWithEntity<BlockFurnace, BlockEntityFurna
 
     @Override
     public BlockEntityFurnace createBlockEntity (BlockPos blockPos, World world) {
-        return new BlockEntityFurnace(world,this, blockPos);
+        return new BlockEntityFurnace(blockPos);
     }
 
     public boolean isWorking () {

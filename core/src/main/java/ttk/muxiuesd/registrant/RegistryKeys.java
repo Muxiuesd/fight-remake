@@ -10,6 +10,7 @@ import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -21,6 +22,7 @@ import ttk.muxiuesd.world.wall.Wall;
 public class RegistryKeys {
     public static final RegistryKey<Item> ITEM = new RegistryKey<>();
     public static final RegistryKey<Block> BLOCK = new RegistryKey<>();
+    public static final RegistryKey<BlockEntityProvider<?>> BLOCK_ENTITY = new RegistryKey<>();
     public static final RegistryKey<Wall<?>> WALL = new RegistryKey<>();
     public static final RegistryKey<EntityType<?>> ENTITY_TYPE = new RegistryKey<>();
     public static final RegistryKey<EntityProvider<?>> ENTITY = new RegistryKey<>();

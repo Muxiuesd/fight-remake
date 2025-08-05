@@ -8,6 +8,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class BlockCodec extends JsonCodec<Block> {
         dataWriter.writeString("id", block.getID());
 
         //带有方块实体的方块是一个方块一个实例，所以需要写入自定义的各种属性
-        if (block instanceof BlockWithEntity) {
+        if (block instanceof BlockWithEntity blockWithEntity) {
             dataWriter.writeFloat("width", block.width)
             .writeFloat("height", block.height)
             .writeFloat("originX", block.originX)
@@ -32,10 +33,15 @@ public class BlockCodec extends JsonCodec<Block> {
             .writeFloat("rotation", block.rotation);
 
             //记得调用一次cat写入
-            block.writeCAT(block.getProperty().getCAT());
+            blockWithEntity.writeCAT(block.getProperty().getCAT());
             //编码自定义属性
             dataWriter.objStart("property");
-            Codecs.BLOCK_PROPERTY.encode(block.getProperty(), dataWriter);
+            Codecs.BLOCK_PROPERTY.encode(blockWithEntity.getProperty(), dataWriter);
+            dataWriter.objEnd();
+
+            //写入方块实体信息
+            dataWriter.objStart("block_entity");
+            Codecs.BLOCK_ENTITY.encode(blockWithEntity.getBlockEntity(), dataWriter);
             dataWriter.objEnd();
         }
     }
@@ -46,8 +52,8 @@ public class BlockCodec extends JsonCodec<Block> {
         Block block = Registries.BLOCK.get(id);
 
         //对于有方块实体的方块
-        if (block instanceof BlockWithEntity<?,?> blockWithEntity) {
-            BlockWithEntity<?, ?> self = blockWithEntity.createSelf();
+        if (block instanceof BlockWithEntity blockWithEntity) {
+            BlockWithEntity self = blockWithEntity.createSelf();
             //读取基础属性
             self.width = dataReader.readFloat("width");
             self.height = dataReader.readFloat("height");
@@ -72,6 +78,15 @@ public class BlockCodec extends JsonCodec<Block> {
 
             //读取cat
             self.readCAT(propertyValue.get(Fight.getId("cat")));
+
+            //读取方块实体信息
+            JsonValue blockEntityValue = dataReader.readObj("block_entity");
+            Optional<BlockEntity> optionalBlockEntity = Codecs.BLOCK_ENTITY.decode(new JsonDataReader(blockEntityValue));
+            if (optionalBlockEntity.isPresent()) {
+                BlockEntity blockEntity = optionalBlockEntity.get();
+                self.setBlockEntity(blockEntity);
+                blockEntity.setBlock(self);
+            }
 
             return Optional.of(self);
         }

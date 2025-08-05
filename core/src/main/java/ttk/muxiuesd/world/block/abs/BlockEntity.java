@@ -16,6 +16,7 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
+import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
@@ -30,25 +31,26 @@ import java.util.List;
  * 方块实体
  * */
 public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable {
+    private BlockEntityProvider<? extends BlockEntity> provider;
     private World world;                    //方块实体所属的世界
-    private Block block;                    //方块
+    private BlockWithEntity block;          //方块
     private BlockPos blockPos;              //方块实体的位置
     private GridPoint2 interactGridSize;    //方块实体的交互网格大小
     private Inventory inventory;            //方块实体所拥有的容器
     private List<Slot> slots;               //交互槽位
 
-    public BlockEntity(World world, Block block, BlockPos blockPos, int inventorySize) {
-        this(world, block, blockPos, new GridPoint2(16, 16), inventorySize);
-    }
 
-    public BlockEntity (World world, Block block, BlockPos blockPos, GridPoint2 interactGridSize, int inventorySize) {
-        this.world = world;
-        this.block = block;
+    public BlockEntity (BlockEntityProvider<?> blockEntityProvider, BlockPos blockPos) {
+        this(blockPos);
+        this.provider = blockEntityProvider;
+    }
+    private BlockEntity (BlockPos blockPos) {
         this.blockPos = blockPos;
-        this.interactGridSize = interactGridSize;
-        this.inventory = new Backpack(inventorySize);
+
+        this.setInteractGridSize(new GridPoint2(16, 16));
         this.slots = new ArrayList<>();
     }
+
 
     /**
      * 空手与方块互动
@@ -180,6 +182,15 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
         batch.draw(slot.getItemStack().getItem().texture, slotX, slotY, slotWidth, slotHeight);
     }
 
+    public BlockEntityProvider<? extends BlockEntity> getProvider () {
+        return provider;
+    }
+
+    public BlockEntity setProvider (BlockEntityProvider<? extends BlockEntity> provider) {
+        this.provider = provider;
+        return this;
+    }
+
     public World getWorld () {
         return world;
     }
@@ -188,11 +199,11 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
         this.world = world;
     }
 
-    public Block getBlock () {
-        return block;
+    public BlockWithEntity getBlock () {
+        return this.block;
     }
 
-    public BlockEntity setBlock (Block block) {
+    public BlockEntity setBlock (BlockWithEntity block) {
         this.block = block;
         return this;
     }
@@ -212,6 +223,11 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
 
     public void setInteractGridSize (GridPoint2 interactGridSize) {
         this.interactGridSize = interactGridSize;
+    }
+
+    public Backpack getBackpack () {
+        if (this.inventory instanceof Backpack) return (Backpack) this.inventory;
+        return null;
     }
 
     public Inventory getInventory () {

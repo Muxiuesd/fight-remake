@@ -162,6 +162,9 @@ public class ItemFishPole extends Item {
         itemStack.getProperty().add(PropertyTypes.FISHING_POLE_USING, false);
     }
 
+    /**
+     * 检查鱼竿物品是否正在使用
+     * */
     private boolean onUsing (ItemStack itemStack) {
         return itemStack.getProperty().get(PropertyTypes.FISHING_POLE_USING);
     }

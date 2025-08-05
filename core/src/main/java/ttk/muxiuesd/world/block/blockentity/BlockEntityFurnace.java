@@ -8,6 +8,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.system.LightSystem;
@@ -15,9 +16,9 @@ import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
-import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
+import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -30,13 +31,14 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 public class BlockEntityFurnace extends BlockEntity {
     private int curEnergy = 0;  //能量，每tick减1
     private int curTick = 0;
-    private final Slot inputSlot;
-    private final Slot outputSlot;
-    private final Slot fuelSlot;
+    private Slot inputSlot;
+    private Slot outputSlot;
+    private Slot fuelSlot;
     private PointLight light;
 
-    public BlockEntityFurnace (World world, Block block, BlockPos blockPos) {
-        super(world, block, blockPos, 3);
+    public BlockEntityFurnace (BlockPos blockPos) {
+        super(BlockEntities.FURNACE, blockPos);
+        setInventory(new Backpack(3));
 
         this.inputSlot = addSlot(this.getInputSlotIndex(), 1, 8, 6, 6);
         this.outputSlot = addSlot(this.getOutputSlotIndex(), 9, 8, 6, 6);

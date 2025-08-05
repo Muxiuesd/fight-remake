@@ -46,6 +46,7 @@ public class MainGameScreen implements Screen {
         EventTypes.init();
         Sounds.init();
         Items.init();
+        BlockEntities.init();
         Blocks.init();
         Walls.init();
         EntityTypes.init();

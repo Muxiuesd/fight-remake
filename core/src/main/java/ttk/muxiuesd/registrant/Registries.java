@@ -14,6 +14,7 @@ import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -30,6 +31,7 @@ public class Registries {
 
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
+    public static final Registry<BlockEntityProvider<?>> BLOCK_ENTITY = create(RegistryKeys.BLOCK_ENTITY);
     public static final Registry<Wall<?>> WALL = create(RegistryKeys.WALL);
     public static final Registry<EntityType<?>> ENTITY_TYPE = create(RegistryKeys.ENTITY_TYPE);
     public static final Registry<EntityProvider<?>> ENTITY = create(RegistryKeys.ENTITY);
