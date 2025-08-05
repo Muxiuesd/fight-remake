@@ -231,11 +231,13 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
     }
 
     public Inventory getInventory () {
-        return inventory;
+        return this.inventory;
     }
 
     public BlockEntity setInventory (Inventory inventory) {
         this.inventory = inventory;
+        //更新槽位所指向的容器
+        getSlots().forEach(s -> s.setInventory(inventory));
         return this;
     }
 

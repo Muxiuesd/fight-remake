@@ -326,6 +326,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         ts.add(blockEntity);
         this.getBlockEntities().put(block, blockEntity);
 
+        blockEntity.setWorld(getWorld());
         blockEntity.bePlaced(getWorld(), this.player);
     }
 
