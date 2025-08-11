@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
@@ -14,6 +15,7 @@ import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -71,6 +73,21 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         this.maxSwingHandDegree = 60f;
     }
 
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.handIndex = values.getInt("hand_index");
+        this.maxHealth = values.getFloat("maxHealth");
+        this.curHealth = values.getFloat("curHealth");
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("hand_index", this.handIndex);
+        cat.set("maxHealth", this.maxHealth);
+        cat.set("curHealth", this.curHealth);
+    }
 
     @Override
     public void update (float delta) {
