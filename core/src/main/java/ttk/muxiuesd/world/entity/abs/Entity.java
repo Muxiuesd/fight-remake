@@ -55,38 +55,38 @@ public abstract class Entity<T extends Entity<?>>
 
     @Override
     public void readCAT (JsonValue values) {
-        this.speed = values.getFloat("speed");
-        this.curSpeed = values.getFloat("curSpeed");
-        this.x = values.getFloat("x");
-        this.y = values.getFloat("y");
-        this.velX = values.getFloat("velX");
-        this.velY = values.getFloat("velY");
-        this.width = values.getFloat("width");
-        this.height = values.getFloat("height");
-        this.originX = values.getFloat("originX");
-        this.originY = values.getFloat("originY");
-        this.scaleX = values.getFloat("scaleX");
-        this.scaleY = values.getFloat("scaleY");
-        this.rotation = values.getFloat("rotation");
-        this.onGround = values.getBoolean("onGround");
+        this.speed = values.getFloat("speed", 1.145f);
+        this.curSpeed = values.getFloat("curSpeed", 1.145f);
+        this.x = values.getFloat("x", 1.145f);
+        this.y = values.getFloat("y", 1.145f);
+        this.velX = values.getFloat("velX", 0);
+        this.velY = values.getFloat("velY", 0);
+        this.width = values.getFloat("width", 1f);
+        this.height = values.getFloat("height", 1f);
+        this.originX = values.getFloat("originX", 0);
+        this.originY = values.getFloat("originY", 0);
+        this.scaleX = values.getFloat("scaleX", 1f);
+        this.scaleY = values.getFloat("scaleY", 1f);
+        this.rotation = values.getFloat("rotation", 0);
+        this.onGround = values.getBoolean("onGround", true);
     }
 
     @Override
     public void writeCAT (CAT cat) {
-        cat.set("speed", speed);
-        cat.set("curSpeed", curSpeed);
-        cat.set("x", x);
-        cat.set("y", y);
-        cat.set("velX", velX);
-        cat.set("velY", velY);
-        cat.set("width", width);
-        cat.set("height", height);
-        cat.set("originX", originX);
-        cat.set("originY", originY);
-        cat.set("scaleX", scaleX);
-        cat.set("scaleY", scaleY);
-        cat.set("rotation", rotation);
-        cat.set("onGround", onGround);
+        cat.set("speed", this.speed);
+        cat.set("curSpeed", this.curSpeed);
+        cat.set("x", this.x);
+        cat.set("y", this.y);
+        cat.set("velX", this.velX);
+        cat.set("velY", this.velY);
+        cat.set("width", this.width);
+        cat.set("height", this.height);
+        cat.set("originX", this.originX);
+        cat.set("originY", this.originY);
+        cat.set("scaleX", this.scaleX);
+        cat.set("scaleY", this.scaleY);
+        cat.set("rotation", this.rotation);
+        cat.set("onGround", this.onGround);
     }
 
     /**

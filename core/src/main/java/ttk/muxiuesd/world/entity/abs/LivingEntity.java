@@ -76,9 +76,9 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     @Override
     public void readCAT (JsonValue values) {
         super.readCAT(values);
-        this.handIndex = values.getInt("hand_index");
-        this.maxHealth = values.getFloat("maxHealth");
-        this.curHealth = values.getFloat("curHealth");
+        this.handIndex = values.getInt("hand_index", 0);
+        this.maxHealth = values.getFloat("maxHealth", 10f);
+        this.curHealth = values.getFloat("curHealth", 10f);
     }
 
     @Override
