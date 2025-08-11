@@ -198,6 +198,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     @Override
     public void tick (World world, float delta) {
+        //每一个可更新实体的tick更新
+        this.updatableEntity.forEach(entity -> entity.tick(world, delta));
+
         this.calculateNeedActiveEntity();
         this.calculateInactionEntity();
 

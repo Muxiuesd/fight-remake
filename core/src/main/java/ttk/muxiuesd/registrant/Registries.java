@@ -16,6 +16,7 @@ import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
@@ -37,6 +38,7 @@ public class Registries {
     public static final Registry<EntityProvider<?>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
+    public static final Registry<StatusEffect> STATUS_EFFECT = create(RegistryKeys.STATUS_EFFECT);
 
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
     public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);

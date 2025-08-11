@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
@@ -34,8 +35,10 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
-    private LinkedHashMap<String, LivingEntityState<T>> states;
-    private LivingEntityState<T> curState;
+    private LinkedHashMap<String, LivingEntityState<T>> states; //状态机
+    private LivingEntityState<T> curState;  //当前状态
+    private LinkedHashMap<StatusEffect, StatusEffect.Data> effects;    //实体的状态效果
+
     private float maxHealth; // 生命值上限
     private float curHealth; // 当前生命值
     private boolean attacked;   //是否收到攻击的状态
@@ -56,6 +59,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         super(world, entityType);
         setSize(DEFAULT_SIZE);
         this.states = new LinkedHashMap<>();
+        this.effects = new LinkedHashMap<>();
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
         this.attacked = false;
@@ -71,15 +75,55 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     @Override
     public void update (float delta) {
         super.update(delta);
+
+        this.updateStatusEffect(delta);
+
         this.backpack.update(delta);
         this.attackedTimer.update(delta);
         this.attackedTimer.isReady();
+
         //处理当前状态
         if (this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
 
         if (this.swingHandTimer != null) {
             this.swingHandTimer.update(delta);
             this.swingHandTimer.isReady();
+        }
+    }
+
+    /**
+     * 更新状态效果
+     * */
+    private void updateStatusEffect (float delta) {
+        //需要被移除的状态效果
+        Array<StatusEffect> remove = new Array<>();
+
+        for (StatusEffect effect : this.effects.keySet()) {
+            StatusEffect.Data data = this.effects.get(effect);
+            data.decreaseDuration(delta);
+            //检查时间是否归零
+            if (data.getDuration() <= 0f) remove.add(effect);
+        }
+
+        if (remove.isEmpty()) return;
+        //移除
+        for (StatusEffect effect : remove) {
+            this.effects.remove(effect);
+        }
+    }
+
+    @Override
+    public void tick (World world, float delta) {
+        this.applyEffectTick();
+    }
+
+    /**
+     * 应用状态效果
+     * */
+    private void applyEffectTick () {
+        for (StatusEffect effect : this.effects.keySet()) {
+            StatusEffect.Data data = this.effects.get(effect);
+            effect.applyEffectTick(this, data.getLevel());
         }
     }
 
@@ -386,5 +430,23 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             this.curState.start(world, (T) this);
         }
         return this;
+    }
+
+    /**
+     * 设置一种状态效果
+     * */
+    public T setEffect (StatusEffect effect, float duration, int level) {
+        //已经存在效果
+        if (this.effects.containsKey(effect)) {
+            //覆盖
+            this.effects.get(effect)
+                .setDuration(duration)
+                .setLevel(level);
+        }else {
+            //没这个效果就直接添加
+            this.effects.put(effect, new StatusEffect.Data(duration, level));
+        }
+
+        return (T) this;
     }
 }

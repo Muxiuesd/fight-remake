@@ -27,7 +27,9 @@ import ttk.muxiuesd.world.entity.EntityType;
  * <p>
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
-public abstract class Entity<T extends Entity<?>> implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable {
+public abstract class Entity<T extends Entity<?>>
+    implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable, Tickable {
+
     private String id;
 
     public float speed, curSpeed;
@@ -107,6 +109,10 @@ public abstract class Entity<T extends Entity<?>> implements ID<T>, ICAT, Dispos
     @Override
     public void update(float delta) {
         this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
+    }
+
+    @Override
+    public void tick (World world, float delta) {
     }
 
     @Override
