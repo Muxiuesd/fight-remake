@@ -38,18 +38,18 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
     private LinkedHashMap<String, LivingEntityState<T>> states; //状态机
-    private LivingEntityState<T> curState;  //当前状态
+    private LivingEntityState<T> curState;                      //当前状态
     private LinkedHashMap<StatusEffect, StatusEffect.Data> effects;    //实体的状态效果
 
-    private float maxHealth; // 生命值上限
-    private float curHealth; // 当前生命值
-    private boolean attacked;   //是否收到攻击的状态
-    private TaskTimer attackedTimer;    //被攻击状态持续的计时器
-    public Backpack backpack;   //储存物品的背包
+    private float maxHealth;                // 生命值上限
+    private float curHealth;                // 当前生命值
+    private boolean attacked;               //是否收到攻击的状态
+    private TaskTimer attackedTimer;        //被攻击状态持续的计时器
+    public Backpack backpack;               //储存物品的背包
     public boolean renderHandItem = false;  //是否渲染手部持有的物品（有的实体没有手，持有物品不用渲染出来）
-    private int handIndex;  //手部物品索引
-    private TaskTimer swingHandTimer;
-    private float maxSwingHandDegree;
+    private int handIndex;                  //手部物品索引
+    private TaskTimer swingHandTimer;       //挥手计时器
+    private float maxSwingHandDegree;       //最大挥手角度
 
     public LivingEntity (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10);

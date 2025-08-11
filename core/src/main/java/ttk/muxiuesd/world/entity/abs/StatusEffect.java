@@ -30,6 +30,7 @@ public abstract class StatusEffect {
     public static class Data {
         //持续时间，单位：秒
         private float duration;
+        //状态效果等级
         private int level;
 
         public Data (float duration, int level) {
