@@ -61,4 +61,26 @@ public abstract class StatusEffect {
             return this;
         }
     }
+
+    /**
+     * 状态效果伤害来源
+     * <P>
+     * 如果是造成伤害的状态效果，就实现这个来应用伤害
+     * */
+    public static abstract class DamageSource {
+        private final int level;
+
+        protected DamageSource (int level) {
+            this.level = level;
+        }
+
+        /**
+         * 获取伤害
+         * */
+        public abstract float getDamage (LivingEntity<?> victim);
+
+        public int getLevel () {
+            return this.level;
+        }
+    }
 }

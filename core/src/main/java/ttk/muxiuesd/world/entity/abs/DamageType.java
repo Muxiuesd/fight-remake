@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.entity.damage;
+package ttk.muxiuesd.world.entity.abs;
 
 import ttk.muxiuesd.id.Identifier;
 

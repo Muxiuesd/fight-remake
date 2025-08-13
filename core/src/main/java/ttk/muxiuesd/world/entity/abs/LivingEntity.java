@@ -19,7 +19,6 @@ import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 

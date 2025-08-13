@@ -16,8 +16,8 @@ import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
-import ttk.muxiuesd.world.entity.damage.DamageType;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
 

@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.entity.damage;
 
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.world.entity.abs.Bullet;
+import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
 /**
