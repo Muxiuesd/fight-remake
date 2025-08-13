@@ -17,7 +17,7 @@ public class EntityTarget extends Enemy<EntityTarget> {
     }
 
     @Override
-    public void attack (float delta, EntitySystem es) {
+    public void remoteAttack (float delta, EntitySystem es) {
         //super.attack(delta, es);
     }
 }

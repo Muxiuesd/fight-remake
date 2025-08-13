@@ -17,7 +17,7 @@ public abstract class StatePufferFish implements LivingEntityState<PufferFish> {
     }
 
     public TaskTimer getTimer () {
-        return timer;
+        return this.timer;
     }
 
     public StatePufferFish setTimer (TaskTimer timer) {

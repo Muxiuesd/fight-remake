@@ -33,8 +33,8 @@ public class PufferFishRandomWalkState extends StatePufferFish {
                 //还在游走状态
                 Vector2 walkDistance = entity.getWalkDistance();
                 //设置速度
-                entity.setVelocity(walkDistance.x * delta * entity.speed, walkDistance.y * delta * entity.speed);
-                entity.setPosition(entity.getPosition().add(entity.getVelocity()));
+                entity.setVelocity(walkDistance.x * entity.speed, walkDistance.y * entity.speed);
+                entity.setPosition(entity.getPosition().add(entity.getVelocity().scl(delta)));
             }
         }
     }

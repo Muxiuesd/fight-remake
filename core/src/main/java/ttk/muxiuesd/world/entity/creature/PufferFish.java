@@ -22,7 +22,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class PufferFish extends LivingEntity<PufferFish> {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(0.7f, 0.7f);
-    public static final int MAX_RANDOM_COUNT = 5;
+    public static final int MAX_RANDOM_COUNT = 5;   //最大随机次数
 
     private Vector2 walkDistance;
 
@@ -55,6 +55,7 @@ public class PufferFish extends LivingEntity<PufferFish> {
         Vector2 position = getCenter();
         float dx;
         float dy;
+        //随机次数
         int count = 0;
         //随机路线
         do {
@@ -64,7 +65,7 @@ public class PufferFish extends LivingEntity<PufferFish> {
             dy = distance * MathUtils.sin((float) radian);
             count++;
             //目的地的坐标的方块得是水方块
-        }while (cs.getBlock(position.x + dx, position.y + dy) != Blocks.WATER || count == MAX_RANDOM_COUNT);
+        }while (cs.getBlock(position.x + dx, position.y + dy) != Blocks.WATER || count <= MAX_RANDOM_COUNT);
         this.walkDistance = new Vector2().set(dx, dy);
     }
 
