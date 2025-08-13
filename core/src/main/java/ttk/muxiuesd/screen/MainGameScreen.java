@@ -51,6 +51,7 @@ public class MainGameScreen implements Screen {
         Walls.init();
         EntityTypes.init();
         Entities.init();
+        StatusEffects.init();
         WorldInformationType.init();
 
         //初始化着色器调度器
