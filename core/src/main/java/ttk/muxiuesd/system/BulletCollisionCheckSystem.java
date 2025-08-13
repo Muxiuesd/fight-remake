@@ -60,7 +60,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
                 continue;
             }
             //敌人与玩家子弹
-            for (LivingEntity enemy : es.getEnemyEntity()) {
+            for (LivingEntity<?> enemy : es.getEnemyEntity()) {
                 if (playerBullet.hitbox.overlaps(enemy.hitbox)
                     || enemy.hitbox.overlaps(playerBullet.hitbox)) {
 
@@ -119,7 +119,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
             return;
         }
         //与子弹碰撞到的墙体
-        ArrayList<Wall> collidingWalls = new ArrayList<>();
+        ArrayList<Wall<?>> collidingWalls = new ArrayList<>();
 
         //大概率会位于这个区块的边缘
         if (cs.isChunkEdge(chunkPosition, bulletPosition.x, bulletPosition.y)) {
@@ -317,8 +317,7 @@ public class BulletCollisionCheckSystem extends WorldSystem {
     /**
      * 调用实体受攻击的事件
      * */
-    private void callEntityAttackedEvent (Entity attackedObject, Entity victim) {
-        //EventBus.getInstance().callEvent(EventBus.EventType.EntityAttacked, attackedObject, victim);
+    private void callEntityAttackedEvent (Entity<?> attackedObject, Entity<?> victim) {
         EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(getWorld(), attackedObject, victim));
     }
 

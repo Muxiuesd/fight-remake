@@ -6,10 +6,10 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 
 public class EventPosterEntityHurt extends EventPoster {
     public final World world;
-    public final Entity attackObject;
-    public final Entity victim;
+    public final Entity<?> attackObject;
+    public final Entity<?> victim;
 
-    public EventPosterEntityHurt (World world, Entity attackObject, Entity victim) {
+    public EventPosterEntityHurt (World world, Entity<?> attackObject, Entity<?> victim) {
         this.world = world;
         this.attackObject = attackObject;
         this.victim = victim;

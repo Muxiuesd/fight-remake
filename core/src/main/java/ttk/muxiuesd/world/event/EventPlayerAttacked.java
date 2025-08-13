@@ -15,7 +15,6 @@ public class EventPlayerAttacked extends EntityHurtEvent {
     @Override
     public void handle (World world, Entity<?> attackObject, Entity<?> victim) {
         if (victim instanceof Player) {
-            Player player = (Player) victim;
             AudioPlayer.getInstance().playMusic(Sounds.ENTITY_HURT_1);
         }
     }
