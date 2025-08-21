@@ -65,14 +65,6 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     }
 
     /**
-     * 更新位置，一般朝向目标方向移动
-     * */
-    public void updatePosition (float delta) {
-
-        //TODO 敌人没有目标时随意游走
-    }
-
-    /**
      * 朝向目标走去
      * */
     public void walkToTarget (float delta) {

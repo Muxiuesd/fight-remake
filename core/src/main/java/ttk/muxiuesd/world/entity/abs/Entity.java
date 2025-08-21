@@ -196,6 +196,28 @@ public abstract class Entity<T extends Entity<?>>
         return (T) this;
     }
 
+    /**
+     * 在当前的坐标基础上做出改变
+     * */
+    public T positionChange(Vector2 deltaPos) {
+        this.x += deltaPos.x;
+        this.y += deltaPos.y;
+        return (T) this;
+    }
+
+    /**
+     * 坐标根据时间间隔与速度矢量发生变化
+     * @param delta 更新间隔时间
+     * */
+    public T positionChange(float delta) {
+        this.x += this.velX * delta;
+        this.y += this.velY * delta;
+        return (T) this;
+    }
+
+    /**
+     * 获取速度矢量
+     * */
     public Vector2 getVelocity() {
         return new Vector2(this.velX, this.velY);
     }

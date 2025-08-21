@@ -19,7 +19,7 @@ public class SlimeRandomWalkState extends StateEnemy<Slime> {
 
     @Override
     public void start (World world, Slime entity) {
-        setTimer(Pools.TASK_TIMER.obtain().setMaxSpan(5f));
+        setTimer(Pools.TASK_TIMER.obtain().setMaxSpan(2f));
         this.randomWalkPath(world, entity);
     }
 
@@ -39,7 +39,8 @@ public class SlimeRandomWalkState extends StateEnemy<Slime> {
                     this.walkDistance.x * curSpeed,
                     this.walkDistance.y * curSpeed
                 );
-                entity.setPosition(entity.getPosition().add(entity.getVelocity().scl(delta)));
+                entity.positionChange(delta);
+                //entity.setPosition(entity.getPosition().add(entity.getVelocity().scl(delta)));
             }
         );
     }
