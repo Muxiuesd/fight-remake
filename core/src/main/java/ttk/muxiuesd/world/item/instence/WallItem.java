@@ -1,9 +1,11 @@
 package ttk.muxiuesd.world.item.instence;
 
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.wall.Wall;
@@ -15,7 +17,7 @@ public class WallItem extends ConsumptionItem {
     private final Wall<?> wall;
 
     public WallItem(final Wall<?> wall, String textureId) {
-        this(wall, new Property(), textureId);
+        this(wall, new Property().setUseSoundId(Sounds.STONE.getID(BlockSoundsID.Type.PUT)), textureId);
     }
 
     public WallItem (final Wall<?> wall, Property property, String textureId) {
