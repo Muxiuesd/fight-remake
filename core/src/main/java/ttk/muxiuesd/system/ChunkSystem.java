@@ -19,12 +19,15 @@ import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
+import ttk.muxiuesd.world.block.instance.BlockAir;
+import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.chunk.MainWorldChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -384,6 +387,45 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return oldBlock;
     }
 
+    /**
+     * 放置墙体
+     * @return 放置成功返回true，否则为false
+     * */
+    public boolean placeWall (Wall<?> wall, float wx, float wy) {
+        //本来就有墙体就不能放置
+        if (this.getWall(wx, wy) != null) return false;
+
+        Block block = this.getBlock(wx, wy);
+        //在空气方块或者水方块上不得放置墙体
+        if (block instanceof BlockAir || block instanceof BlockWater) return false;
+
+        Vector2 pos = Util.fastFloor(wx, wy);
+        //每一个墙体都是一个单独的实例
+        Wall<?> instance = wall.createSelf(pos);
+        Chunk chunk = this.getChunk(wx, wy);
+        GridPoint2 cp = chunk.worldToChunk(wx, wy);
+        chunk.setWall(instance, cp.x, cp.y);
+        return true;
+    }
+
+    /**
+     * 破坏墙体
+     * @return 被破坏的墙体实例
+     * */
+    public Wall<?> destroyWall (Vector2 position) {
+        return this.destroyWall(position.x, position.y);
+    }
+    public Wall<?> destroyWall (float wx, float wy) {
+        //没有墙体
+        if (this.getWall(wx, wy) == null) return null;
+
+        Chunk chunk = this.getChunk(wx, wy);
+        GridPoint2 cp = chunk.worldToChunk(wx, wy);
+        Wall<?> wall = chunk.getWall(cp.x, cp.y);
+        chunk.setWall(null, cp.x, cp.y);
+        return wall;
+    }
+
 
     /**
      * 计算需要被加载的区块
@@ -593,8 +635,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
-            /*Log.error(TAG, "获取的区块为null！！！");
-            throw new RuntimeException(chunkPosition.toString() + "这个区块坐标对应的区块为null，可能是还未加载！！！");*/
             return Blocks.ARI;
         }
 
@@ -605,6 +645,23 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
         // 运行到这里应该就是查找到方块了
         return block;
+    }
+
+    /**
+     * 获取墙体
+     * @param position 世界坐标
+     * @return 有墙体就返回对应的实例，没有就返回null
+     * */
+    public Wall<?> getWall(Vector2 position) {
+        return this.getWall(position.x, position.y);
+    }
+    public Wall<?> getWall(float wx, float wy) {
+        ChunkPosition chunkPosition = this.getChunkPosition(wx, wy);
+
+        Chunk chunk = this.getChunk(chunkPosition);
+        if (chunk == null) return null;
+
+        return chunk.seekWall(wx, wy);
     }
 
     /**

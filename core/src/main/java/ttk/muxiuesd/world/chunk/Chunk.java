@@ -62,13 +62,13 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public void draw(Batch batch) {
         ChunkPosition cp = this.chunkPosition;
         this.traversal((x, y) -> {
-            Block block = blocks[y][x];
+            Block block = this.blocks[y][x];
             if (block != null) {
                 block.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
         this.traversal((x, y) -> {
-            Wall<?> wall = walls[y][x];
+            Wall<?> wall = this.walls[y][x];
             if (wall != null) {
                 wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
@@ -105,6 +105,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             this.chunkSystem.addBlock(block, this.getWorldX(cx), this.getWorldY(cy));
         }
     }
+
     /**
      * 获取区块中的方块
      * @param cx    方块在区块中的横坐标
@@ -123,6 +124,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         this.walls[cy][cx] = wall;
     }
 
+    /**
+     * 移除墙体
+     * <p>
+     * 需要传入的世界坐标都在这个区块里，否则不准
+     */
+    public Wall<?> removeWall(float wx, float wy) {
+        GridPoint2 gridPoint2 = this.worldPos2ChunkPos(wx, wy);
+        Wall<?> wall = this.getWall(gridPoint2.x, gridPoint2.y);
+        if (wall != null) {
+            this.setWall(null, gridPoint2.x, gridPoint2.y);
+            return wall;
+        }
+        //是null就返回null;
+        return null;
+    }
+
     public void setHeight (int cx, int cy, int height) {
         if (height < LowestHeight || height > HighestHeight) {
             throw new IllegalArgumentException("传入的高度："+ height +" 不合法！！！");
@@ -138,9 +155,31 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * 查找方块
      * @param wx
      * @param wy
-     * @returnp
+     * @return 方块
      */
     public Block seekBlock (float wx, float wy) {
+        GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
+
+        return this.getBlock(chunkPos.x, chunkPos.y);
+    }
+
+    /**
+     * 查找墙体
+     * @param wx
+     * @param wy
+     * @return 墙体或者null
+     */
+    public Wall<?> seekWall (float wx, float wy) {
+        GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
+        return this.getWall(chunkPos.x, chunkPos.y);
+    }
+
+    /**
+     * 世界坐标转换为区块内部的坐标
+     * <p>
+     * 需要传入的世界坐标都在这个区块里，否则不准
+     */
+    private GridPoint2 worldPos2ChunkPos (float wx, float wy) {
         int cx;
         int cy;
         if (wx < 0) {
@@ -155,8 +194,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         }else {
             cy = (int) (wy % ChunkHeight);
         }
-
-        return this.getBlock(cx, cy);
+        return new GridPoint2(cx, cy);
     }
 
     @Override

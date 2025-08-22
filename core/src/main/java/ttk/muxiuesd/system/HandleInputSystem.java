@@ -12,6 +12,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
 import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
+import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
@@ -31,6 +32,7 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.wall.Wall;
 
 /**
  * 输入处理系统
@@ -93,11 +95,8 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();
-
-
-
+            //方块实体交互
             if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
-
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
                 //计算交互区域网格坐标
                 BlockPos blockPos = blockEntity.getBlockPos();
@@ -120,28 +119,39 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
                     //TODO 手持物品交互事件
                 }
             }else {
-                //空手右键破坏方块
-                if (handItemStack == null && mouseBlock != Blocks.ARI) {
-                    Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
-                    ItemEntity itemEntity = ItemEntityGenFactory.create(
-                        player.getEntitySystem(),
-                        mouseWorldPosition,
-                        new ItemStack(Gets.ITEM(replacedBlock.getID()), 1)
-                    );
-                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
+                //目前需要空手破坏
+                if (handItemStack == null) {
+                    //先检查这个坐标上面有无墙体
+                    if (cs.getWall(mouseWorldPosition) != null) {
+                        //有墙体就破坏墙体
+                        Wall<?> wall = cs.destroyWall(mouseWorldPosition);
+                        this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, wall, 1);
+                    } else if (mouseBlock != Blocks.ARI) {
+                        //破坏方块
+                        Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
+                        this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, replacedBlock, 1);
+                    }
                 }
             }
         }
     }
 
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        this.renderBlockCheckBox(batch);
+    private ItemEntity dropItemEntity (EntitySystem entitySystem, Vector2 pos, ID<?> idHolder, int amount) {
+        ItemEntity itemEntity = ItemEntityGenFactory.create(entitySystem, pos,
+            new ItemStack(Gets.ITEM(idHolder.getID()), amount)
+        );
+        itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
+        return itemEntity;
     }
 
     @Override
     public void render (Batch batch, ShapeRenderer shapeRenderer) {
         this.renderShape(shapeRenderer);
+    }
+
+    @Override
+    public void renderShape(ShapeRenderer batch) {
+        this.renderBlockCheckBox(batch);
     }
 
     @Override
