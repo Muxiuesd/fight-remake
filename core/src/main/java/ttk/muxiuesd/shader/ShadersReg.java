@@ -1,6 +1,7 @@
 package ttk.muxiuesd.shader;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import ttk.muxiuesd.Fight;
 
@@ -8,6 +9,8 @@ import ttk.muxiuesd.Fight;
  * 着色器注册
  * */
 public class ShadersReg {
+    //gdx默认的着色器
+    public static final String DEFAULT_SHADER = registerDefault();
 
     public static final String DAYNIGHT_SHADER = register(
         Fight.getId("daynight_shader"),
@@ -34,6 +37,13 @@ public class ShadersReg {
         String vert = Gdx.files.internal(vertPath).readString();
         String frag = Gdx.files.internal(fragPath).readString();
         ShaderProgram shader = new ShaderProgram(vert, frag);
+        ShaderScheduler.getInstance().registry(id, shader);
+        return id;
+    }
+
+    private static String registerDefault() {
+        String id = Fight.getId("default_shader");
+        ShaderProgram shader = SpriteBatch.createDefaultShader();
         ShaderScheduler.getInstance().registry(id, shader);
         return id;
     }

@@ -11,13 +11,13 @@ import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.render.RenderPipe;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
+import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
-import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
-import ttk.muxiuesd.render.instance.EntityUndergroundRenderProcessor;
-import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
-import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
+import ttk.muxiuesd.render.instance.*;
 import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.shader.ShadersReg;
+import ttk.muxiuesd.system.game.GUISystem;
+import ttk.muxiuesd.system.manager.GameSystemManager;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
@@ -28,16 +28,14 @@ import ttk.muxiuesd.world.World;
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
 
-    /*private final Batch batch = new SpriteBatch();
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer() {{
-        setAutoShapeType(true);
-    }};*/
-
     //游戏目前加载的世界，后续可能有多个世界
     private World world;
 
     @Override
     public void show() {
+        //初始化游戏底层系统
+        GameSystemManager.init();
+
         //手动注册游戏内的元素
         Pools.init();
         EventTypes.init();
@@ -89,13 +87,24 @@ public class MainGameScreen implements Screen {
                 this.world
             )
         );
-
-        this.world.getSystemManager().initAllSystems();
+        RenderProcessorManager.register(RenderProcessorsReg.GUI,
+            new GUIRenderProcessor(
+                GUICamera.INSTANCE.getCamera(),
+                ShadersReg.DEFAULT_SHADER,
+                10000
+            )
+        );
 
         //执行mod代码
         ModLibManager.getInstance().loadCoreLib();
         ModLoader.getInstance().loadAllMods();
         ModLoader.getInstance().runAllMods();
+
+        this.world.getSystemManager().initAllSystems();
+
+
+        GameSystemManager.getInstance().addSystem("GUISystem", new GUISystem());
+        GameSystemManager.getInstance().initAllSystems();
 
         Log.print(TAG, "------游戏正式开始运行------");
     }
@@ -103,6 +112,8 @@ public class MainGameScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
+
+        GameSystemManager.getInstance().update(delta);
 
         this.world.update(delta);
 
@@ -156,12 +167,4 @@ public class MainGameScreen implements Screen {
         //使mod知道当前的游戏世界的实例
         ModWorldProvider.setCurWorld(world);
     }
-
-    /*public Batch getBatch () {
-        return batch;
-    }
-
-    public ShapeRenderer getShapeRenderer () {
-        return shapeRenderer;
-    }*/
 }

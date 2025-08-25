@@ -2,10 +2,13 @@ package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -187,4 +190,15 @@ public class Util {
         return count;
     }
 
+    /**
+     * 加载纹理区域
+     * */
+    public static TextureRegion loadTextureRegion (String id, String texturePath) {
+        if (texturePath == null) {
+            texturePath = AssetsLoader.getInstance().getPath(id);
+        }
+
+        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
+        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    }
 }

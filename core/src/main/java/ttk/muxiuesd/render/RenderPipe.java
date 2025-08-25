@@ -39,8 +39,9 @@ public class RenderPipe {
         if (INSTANCE == null) {
             INSTANCE = new RenderPipe();
             Log.print(TAG, "游戏渲染管线初始化完成！");
+        }else {
+            Log.error(TAG, "不要重复初始化！！！");
         }
-        Log.error(TAG, "不要重复初始化！！！");
     }
 
     public static RenderPipe getInstance() {
@@ -56,7 +57,7 @@ public class RenderPipe {
 
         this.batch.begin();
         this.shapeRenderer.begin();
-        RenderProcessorManager.render(batch, shapeRenderer);
+        RenderProcessorManager.render(this.batch, this.shapeRenderer);
         this.batch.end();
         this.shapeRenderer.end();
     }

@@ -8,6 +8,7 @@ public class Fight {
     public static final String BLOCK_TEXTURE_ROOT = "texture/blocks/";
     public static final String ENTITY_TEXTURE_ROOT = "texture/entity/";
     public static final String ITEM_TEXTURE_ROOT = "texture/item/";
+    public static final String UI_TEXTURE_ROOT = "texture/ui/";
 
     //玩家的听觉范围，单位：世界中的1米
     public static final Info<Float> PLAYER_HEARING_RANGE = Info.create("player_hearing_range", 16f);
@@ -54,6 +55,8 @@ public class Fight {
     public static String ItemTexturePath (String path) {
         return ITEM_TEXTURE_ROOT + path;
     }
+
+    public static String UITexturePath (String path) { return UI_TEXTURE_ROOT + path; }
 
     public static String GameSavePath (String name) {
         return PATH_SAVE + name;

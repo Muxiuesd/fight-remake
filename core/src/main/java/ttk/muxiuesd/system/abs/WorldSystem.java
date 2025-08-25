@@ -15,14 +15,8 @@ public abstract class WorldSystem extends GameSystem {
         setManager(world.getSystemManager());
     }
 
-    /**
-     * 延迟初始化
-     * */
-    public void initialize () {
-    }
-
     public World getWorld() {
-        return world;
+        return this.world;
     }
 
     @Override

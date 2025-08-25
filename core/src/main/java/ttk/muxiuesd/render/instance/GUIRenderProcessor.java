@@ -3,17 +3,16 @@ package ttk.muxiuesd.render.instance;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.interfaces.render.IGUIRender;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
-import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
-import ttk.muxiuesd.render.abs.WorldRenderProcessor;
-import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.render.abs.RenderProcessor;
 
 /**
- * 粒子效果的渲染处理器
+ * GUI的渲染处理器
  * */
-public class ParticleRenderProcessor extends WorldRenderProcessor {
-    public ParticleRenderProcessor (Camera camera, String shaderId, int renderOrder, World world) {
-        super(camera, shaderId, renderOrder, world);
+public class GUIRenderProcessor extends RenderProcessor {
+    public GUIRenderProcessor (Camera camera, String shaderId, int renderOrder) {
+        super(camera, shaderId, renderOrder);
     }
 
     @Override
@@ -23,7 +22,7 @@ public class ParticleRenderProcessor extends WorldRenderProcessor {
 
     @Override
     public boolean recognize (IRenderTask task) {
-        if (task instanceof IWorldParticleRender) {
+        if (task instanceof IGUIRender) {
             addRenderTask(task);
             return true;
         }

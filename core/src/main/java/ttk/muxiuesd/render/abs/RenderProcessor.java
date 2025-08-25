@@ -35,6 +35,19 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
     public abstract void handleRender (Batch batch, ShapeRenderer shapeRenderer);
 
     /**
+     * 默认的渲染任务处理方式
+     * */
+    public void defaultHandleRender (Batch batch, ShapeRenderer shapeRenderer) {
+        batch.setProjectionMatrix(getCamera().combined);
+        shapeRenderer.setProjectionMatrix(getCamera().combined);
+        beginShader(batch);
+
+        getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
+
+        endShader();
+    }
+
+    /**
      * 添加渲染任务，自动排序
      * */
     public void addRenderTask (IRenderTask renderTask) {

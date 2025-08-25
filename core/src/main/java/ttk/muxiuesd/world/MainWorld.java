@@ -2,6 +2,7 @@ package ttk.muxiuesd.world;
 
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.*;
+import ttk.muxiuesd.system.manager.WorldSystemsManager;
 
 /**
  *  主世界
