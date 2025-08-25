@@ -52,6 +52,12 @@ public class CameraFollowSystem extends WorldSystem {
         float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
         PlayerCamera.INSTANCE.setPosition(follower.x + follower.width / 2 + xOffset,
             follower.y + follower.height / 2 + yOffset);
+
+        /*GUICamera.INSTANCE.setPosition(
+            follower.x + follower.width / 2,
+            follower.y + follower.height / 2
+        );*/
+
     }
 
     public Entity<?> getFollower() {

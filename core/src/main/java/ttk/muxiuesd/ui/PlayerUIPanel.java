@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui;
 
+import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.ui.abs.UIPanel;
 
 /**
@@ -7,6 +8,6 @@ import ttk.muxiuesd.ui.abs.UIPanel;
  * */
 public class PlayerUIPanel extends UIPanel {
     public PlayerUIPanel () {
-        addComponent(new Button(0, 0,100, 100));
+        addComponent(new Button(0, 0,10, 10, new GridPoint2(10, 10)));
     }
 }

@@ -1,10 +1,16 @@
 package ttk.muxiuesd.ui.abs;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.util.Util;
 
 import java.util.LinkedHashSet;
 
@@ -20,16 +26,43 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
 
     @Override
     public void update (float delta) {
-        this.getComponents().forEach(uiComponent -> uiComponent.update(delta));
+        if (this.getComponents().isEmpty()) return;
+
+        Vector2 mouseUIPosition = Util.getMouseUIPosition();
+        //重复利用的矩形区域
+        Rectangle rectangle = new Rectangle();
+        this.getComponents().forEach(uiComponent -> {
+            uiComponent.update(delta);
+
+            rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
+            //鼠标坐标在ui的区域上
+            if (rectangle.contains(mouseUIPosition)) {
+                //计算交互区域坐标
+                GridPoint2 interactGrid = uiComponent.getInteractGrid();
+                Vector2 position = uiComponent.getPosition();
+                Vector2 size = uiComponent.getSize();
+                int xn = (int) ((mouseUIPosition.x - position.x) / size.x * interactGrid.x);
+                int yn = (int) ((mouseUIPosition.y - position.y) / size.y * interactGrid.y);
+                GridPoint2 grid = new GridPoint2(xn, yn);
+                uiComponent.mouseOver(grid);
+
+                //如果鼠标在组件的交互区域上并且点击了鼠标左键，就是点击了组件
+                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                    uiComponent.click(grid);
+                }
+            }
+        });
     }
 
     @Override
     public void draw (Batch batch) {
+        if (this.getComponents().isEmpty()) return;
         this.getComponents().forEach(uiComponent -> uiComponent.draw(batch));
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
+        if (this.getComponents().isEmpty()) return;
         this.getComponents().forEach(uiComponent -> uiComponent.renderShape(batch));
     }
 

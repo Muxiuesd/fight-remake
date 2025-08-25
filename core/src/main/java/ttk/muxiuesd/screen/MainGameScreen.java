@@ -17,6 +17,7 @@ import ttk.muxiuesd.render.instance.*;
 import ttk.muxiuesd.shader.ShaderScheduler;
 import ttk.muxiuesd.shader.ShadersReg;
 import ttk.muxiuesd.system.game.GUISystem;
+import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
@@ -91,7 +92,7 @@ public class MainGameScreen implements Screen {
             new GUIRenderProcessor(
                 GUICamera.INSTANCE.getCamera(),
                 ShadersReg.DEFAULT_SHADER,
-                10000
+                1000
             )
         );
 
@@ -103,6 +104,7 @@ public class MainGameScreen implements Screen {
         this.world.getSystemManager().initAllSystems();
 
 
+        GameSystemManager.getInstance().addSystem("InputHandleSystem", InputHandleSystem.getInstance());
         GameSystemManager.getInstance().addSystem("GUISystem", new GUISystem());
         GameSystemManager.getInstance().initAllSystems();
 

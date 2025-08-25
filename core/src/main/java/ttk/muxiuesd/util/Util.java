@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -27,6 +28,17 @@ public class Util {
         Vector3 up = camera.unproject(mp);
         return new Vector2(up.x, up.y);
     }
+
+    /**
+     * 获取鼠标指向的游戏GUI坐标
+     * */
+    public static Vector2 getMouseUIPosition() {
+        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
+        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
+        Vector3 up = camera.unproject(mp);
+        return new Vector2(up.x, up.y);
+    }
+
 
     /**
      * 获取鼠标的位置,相对于游戏窗口的中心

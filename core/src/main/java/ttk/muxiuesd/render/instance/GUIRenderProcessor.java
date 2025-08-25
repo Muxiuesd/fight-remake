@@ -17,7 +17,13 @@ public class GUIRenderProcessor extends RenderProcessor {
 
     @Override
     public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
-        super.defaultHandleRender(batch, shapeRenderer);
+        batch.setProjectionMatrix(getCamera().combined);
+        shapeRenderer.setProjectionMatrix(getCamera().combined);
+        beginShader(batch);
+
+        getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
+
+        endShader();
     }
 
     @Override

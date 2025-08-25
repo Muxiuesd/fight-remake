@@ -9,6 +9,7 @@ public class GUICamera extends CameraController{
     public static GUICamera INSTANCE = new GUICamera();
 
     private GUICamera () {
-        super(new OrthographicCamera(), 512f, 512f);
+        super(new OrthographicCamera(), 64f, 64f);
+        setPosition(0f, 0f);
     }
 }

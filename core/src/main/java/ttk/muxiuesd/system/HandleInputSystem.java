@@ -18,6 +18,7 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.util.BlockPosition;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -35,7 +36,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.wall.Wall;
 
 /**
- * 输入处理系统
+ * 世界输入处理系统
  * 按键状态的更新都在这里面
  * */
 public class HandleInputSystem extends WorldSystem implements InputProcessor, IWorldChunkRender {
@@ -52,7 +53,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
     public void initialize () {
         this.playerSystem = getWorld().getSystem(PlayerSystem.class);
 
-        Gdx.input.setInputProcessor(this);
+        InputHandleSystem.getInstance().addProcessor(this);
     }
 
 

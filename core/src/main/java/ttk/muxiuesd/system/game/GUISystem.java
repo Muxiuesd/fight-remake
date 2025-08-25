@@ -20,7 +20,9 @@ public class GUISystem extends GameSystem implements IGUIRender {
 
     @Override
     public void update (float delta) {
-        if (this.curPanel != null) curPanel.update(delta);
+        if (this.curPanel != null) {
+            curPanel.update(delta);
+        }
     }
 
     @Override
