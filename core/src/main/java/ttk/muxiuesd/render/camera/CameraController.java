@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
  * 相机控制器
  * */
 public class CameraController {
-    private float viewportWidth = 16f;
-    private float viewportHeight = 16f;
+    private float viewportWidth;
+    private float viewportHeight;
     private OrthographicCamera camera;
 
     public CameraController(OrthographicCamera camera, float viewportWidth, float viewportHeight) {
@@ -37,7 +37,7 @@ public class CameraController {
     }
 
     public float getViewportWidth () {
-        return viewportWidth;
+        return this.viewportWidth;
     }
 
     public CameraController setViewportWidth (float viewportWidth) {
@@ -46,7 +46,7 @@ public class CameraController {
     }
 
     public float getViewportHeight () {
-        return viewportHeight;
+        return this.viewportHeight;
     }
 
     public CameraController setViewportHeight (float viewportHeight) {

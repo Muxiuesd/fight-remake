@@ -105,7 +105,7 @@ public class MainGameScreen implements Screen {
 
 
         GameSystemManager.getInstance().addSystem("InputHandleSystem", InputHandleSystem.getInstance());
-        GameSystemManager.getInstance().addSystem("GUISystem", new GUISystem());
+        GameSystemManager.getInstance().addSystem("GUISystem", GUISystem.getInstance());
         GameSystemManager.getInstance().initAllSystems();
 
         Log.print(TAG, "------游戏正式开始运行------");

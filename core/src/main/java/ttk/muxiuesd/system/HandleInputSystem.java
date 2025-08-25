@@ -52,7 +52,7 @@ public class HandleInputSystem extends WorldSystem implements InputProcessor, IW
     @Override
     public void initialize () {
         this.playerSystem = getWorld().getSystem(PlayerSystem.class);
-
+        //加入系统底层的输入处理器
         InputHandleSystem.getInstance().addProcessor(this);
     }
 

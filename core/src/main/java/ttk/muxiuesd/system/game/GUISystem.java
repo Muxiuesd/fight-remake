@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.render.IGUIRender;
 import ttk.muxiuesd.system.abs.GameSystem;
-import ttk.muxiuesd.ui.PlayerUIPanel;
 import ttk.muxiuesd.ui.abs.UIPanel;
 
 /**
@@ -13,10 +12,15 @@ import ttk.muxiuesd.ui.abs.UIPanel;
 public class GUISystem extends GameSystem implements IGUIRender {
     private UIPanel curPanel; //当前渲染的ui面板
 
-    public GUISystem() {
-        this.setCurPanel(new PlayerUIPanel());
+    private GUISystem() {
     }
-
+    private static GUISystem INSTANCE;
+    public static GUISystem getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new GUISystem();
+        }
+        return INSTANCE;
+    }
 
     @Override
     public void update (float delta) {
@@ -39,6 +43,10 @@ public class GUISystem extends GameSystem implements IGUIRender {
     public void render (Batch batch, ShapeRenderer shapeRenderer) {
         this.draw(batch);
         this.renderShape(shapeRenderer);
+    }
+
+    public void resize (float viewportWidth, float viewportHeight) {
+        if (this.curPanel != null) curPanel.resize(viewportWidth, viewportHeight);
     }
 
     public void setCurPanel (UIPanel curPanel) {

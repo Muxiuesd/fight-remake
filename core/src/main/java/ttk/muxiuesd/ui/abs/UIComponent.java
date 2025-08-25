@@ -59,6 +59,15 @@ public abstract class UIComponent implements Updateable, Drawable, ShapeRenderab
         return false;
     }
 
+    /**
+     * 当相机视口大小更改时调用
+     * @param width  视口宽度
+     * @param height 视口高度
+     * */
+    public void resize (float width, float height) {
+    }
+
+
     public Vector2 getPosition () {
         return new Vector2(x, y);
     }

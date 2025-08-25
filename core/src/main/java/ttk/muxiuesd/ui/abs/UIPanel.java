@@ -66,6 +66,13 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
         this.getComponents().forEach(uiComponent -> uiComponent.renderShape(batch));
     }
 
+    /**
+     * 当相机视口大小更改时调用
+     * */
+    public void resize (float width, float height) {
+        this.getComponents().forEach(uiComponent -> uiComponent.resize(width, height));
+    }
+
     public void addComponent (UIComponent component) {
         this.getComponents().add(component);
     }
