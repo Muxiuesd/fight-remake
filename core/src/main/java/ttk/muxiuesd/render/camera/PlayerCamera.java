@@ -1,4 +1,4 @@
-package ttk.muxiuesd.camera;
+package ttk.muxiuesd.render.camera;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 

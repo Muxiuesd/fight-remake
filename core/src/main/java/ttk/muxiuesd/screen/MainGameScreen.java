@@ -1,20 +1,17 @@
 package ttk.muxiuesd.screen;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registry.*;
+import ttk.muxiuesd.render.RenderPipe;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
+import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
 import ttk.muxiuesd.render.instance.EntityUndergroundRenderProcessor;
 import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
@@ -31,10 +28,10 @@ import ttk.muxiuesd.world.World;
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
 
-    private final Batch batch = new SpriteBatch();
+    /*private final Batch batch = new SpriteBatch();
     private final ShapeRenderer shapeRenderer = new ShapeRenderer() {{
         setAutoShapeType(true);
-    }};
+    }};*/
 
     //游戏目前加载的世界，后续可能有多个世界
     private World world;
@@ -56,17 +53,42 @@ public class MainGameScreen implements Screen {
 
         //初始化着色器调度器
         ShaderScheduler.init();
+        RenderPipe.init();
 
         this.setWorld(new MainWorld(this));
 
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
-            new EntityUndergroundRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.DAYNIGHT_SHADER, 100, this.world));
+            new EntityUndergroundRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.DAYNIGHT_SHADER,
+                100,
+                this.world
+            )
+        );
         RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
-            new WorldChunkRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.DAYNIGHT_SHADER, 200, this.world));
+            new WorldChunkRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.DAYNIGHT_SHADER,
+                200,
+                this.world
+            )
+        );
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
-            new EntityGroundRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.DAYNIGHT_SHADER, 300, this.world));
+            new EntityGroundRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.DAYNIGHT_SHADER,
+                300,
+                this.world
+            )
+        );
         RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
-            new ParticleRenderProcessor(PlayerCamera.INSTANCE.getCamera(), ShadersReg.PARTICLE_SHADER, 400, this.world));
+            new ParticleRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.PARTICLE_SHADER,
+                400,
+                this.world
+            )
+        );
 
         this.world.getSystemManager().initAllSystems();
 
@@ -84,7 +106,7 @@ public class MainGameScreen implements Screen {
 
         this.world.update(delta);
 
-        Camera camera = PlayerCamera.INSTANCE.getCamera();
+        /*Camera camera = PlayerCamera.INSTANCE.getCamera();
         camera.update();
 
         this.batch.setProjectionMatrix(camera.combined);
@@ -96,12 +118,14 @@ public class MainGameScreen implements Screen {
         RenderProcessorManager.render(this.batch, this.shapeRenderer);
 
         this.shapeRenderer.end();
-        this.batch.end();
+        this.batch.end();*/
+        //处理渲染管线
+        RenderPipe.getInstance().handleGameRender();
     }
 
     @Override
     public void resize(int width, int height) {
-        PlayerCamera.INSTANCE.resize(width, height);
+        RenderPipe.getInstance().resize(width, height);
     }
 
     @Override
@@ -133,11 +157,11 @@ public class MainGameScreen implements Screen {
         ModWorldProvider.setCurWorld(world);
     }
 
-    public Batch getBatch () {
+    /*public Batch getBatch () {
         return batch;
     }
 
     public ShapeRenderer getShapeRenderer () {
         return shapeRenderer;
-    }
+    }*/
 }

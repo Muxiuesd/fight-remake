@@ -17,6 +17,7 @@ public class WorldChunkRenderProcessor extends WorldRenderProcessor {
     @Override
     public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
         batch.setProjectionMatrix(getCamera().combined);
+        shapeRenderer.setProjectionMatrix(getCamera().combined);
         this.beginShader(batch);
 
         getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));

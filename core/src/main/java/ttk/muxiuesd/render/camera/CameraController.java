@@ -1,10 +1,10 @@
-package ttk.muxiuesd.camera;
+package ttk.muxiuesd.render.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /**
- * 相机控制
+ * 相机控制器
  * */
 public class CameraController {
     private float viewportWidth = 16f;

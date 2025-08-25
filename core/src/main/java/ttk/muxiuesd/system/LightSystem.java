@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
+import ttk.muxiuesd.render.RenderPipe;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.light.PointLight;
@@ -37,7 +38,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
 
     @Override
     public void initialize () {
-        int programID = getWorld().getScreen().getBatch().getShader().getHandle();//获取着色器句柄，以供获取Uniform Block 的索引
+        int programID = RenderPipe.getInstance().getBatch().getShader().getHandle();//获取着色器句柄，以供获取Uniform Block 的索引
         int blockIndex = Gdx.gl30.glGetUniformBlockIndex(programID, "LightBlock"); // 获取 Uniform Block 的索引
         Gdx.gl30.glUniformBlockBinding(programID, blockIndex, 0); // 绑定到绑定点 GPU会来0这个位置找数据
 

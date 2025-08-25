@@ -2,8 +2,8 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
