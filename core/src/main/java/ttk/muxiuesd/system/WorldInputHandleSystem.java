@@ -18,6 +18,7 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.util.BlockPosition;
 import ttk.muxiuesd.util.ChunkPosition;
@@ -87,6 +88,16 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
         }
 
+        //需要玩家的鼠标不指向UI组件才能与世界交互
+        if (!GUISystem.getInstance().mouseOverUI()) {
+            this.playerInteract(player, cs);
+        }
+    }
+
+    /**
+     * 玩家与世界的交互
+     * */
+    private void playerInteract (Player player, ChunkSystem cs) {
         Vector2 mouseWorldPosition = Util.getMouseWorldPosition();
         Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
 

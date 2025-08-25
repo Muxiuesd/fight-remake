@@ -37,6 +37,13 @@ public class HotbarUIComponent extends UIComponent {
     }
 
     @Override
+    public boolean click (GridPoint2 interactPos) {
+        this.playerSystem.getPlayer().setHandIndex(this.getIndex());
+
+        return super.click(interactPos);
+    }
+
+    @Override
     public void draw (Batch batch) {
         if (isVisible()) {
             batch.draw(this.textureRegion, getX(), getY(), getWidth(), getHeight());

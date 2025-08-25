@@ -3,7 +3,6 @@ package ttk.muxiuesd.ui;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.render.camera.GUICamera;
@@ -23,7 +22,7 @@ public class PlayerUIPanel extends UIPanel {
     public PlayerUIPanel (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
 
-        addComponent(new Button(0, 0,10, 10, new GridPoint2(10, 10)));
+        //addComponent(new Button(0, 0,10, 10, new GridPoint2(10, 10)));
 
         this.initHotbar();
     }

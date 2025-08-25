@@ -11,10 +11,10 @@ import ttk.muxiuesd.ui.abs.UIPanel;
  * */
 public class GUISystem extends GameSystem implements IGUIRender {
     private UIPanel curPanel; //当前渲染的ui面板
-
-    private GUISystem() {
-    }
+    //也是单例模式
+    private GUISystem() {}
     private static GUISystem INSTANCE;
+
     public static GUISystem getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new GUISystem();
@@ -45,8 +45,18 @@ public class GUISystem extends GameSystem implements IGUIRender {
         this.renderShape(shapeRenderer);
     }
 
+    /**
+     * 相机视口大小变动时调用
+     * */
     public void resize (float viewportWidth, float viewportHeight) {
         if (this.curPanel != null) curPanel.resize(viewportWidth, viewportHeight);
+    }
+
+    /**
+     * 鼠标指针是否在UI组件上
+     * */
+    public boolean mouseOverUI () {
+        return this.curPanel != null && this.curPanel.isMouseOver();
     }
 
     public void setCurPanel (UIPanel curPanel) {

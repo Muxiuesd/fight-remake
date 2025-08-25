@@ -7,6 +7,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
@@ -127,18 +128,19 @@ public class Player extends LivingEntity<Player> {
             velX += curSpeed * delta;
         }
 
-        // 左键发射攻击性子弹
-        if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            //Bullet bullet = EntityFactory.createFireBullet(this, Util.getDirection());
+        //需要玩家鼠标不在UI组件上，防止同时操作两者
+        if (!GUISystem.getInstance().mouseOverUI()) {
+            //玩家右键防御
+            if (KeyBindings.PlayerShield.wasJustPressed()) {
+                this.defendCDTimer.isReady();
+                //TODO 护盾使用成功的相关操作
+            }
+            //左键使用物品
+            if (KeyBindings.PlayerUseItem.wasJustPressed()) {
+                useItem(getEntitySystem().getWorld());
+            }
         }
-        //玩家右键防御
-        if (KeyBindings.PlayerShield.wasJustPressed()) {
-            this.defendCDTimer.isReady();
-            //TODO 护盾使用成功的相关操作
-        }
-        if (KeyBindings.PlayerUseItem.wasJustPressed()) {
-            useItem(getEntitySystem().getWorld());
-        }
+
         //头两个物品槽（0号和1号）快捷循环
         if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
             if (getHandIndex() == 0) setHandIndex(1);

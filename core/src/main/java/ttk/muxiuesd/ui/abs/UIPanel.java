@@ -18,6 +18,8 @@ import java.util.LinkedHashSet;
  * UI面板，UI组件都绘制在这里面
  * */
 public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
+    private boolean mouseOver = false;  //当鼠标指针在任意的组件上就标记为true，否则为false
+
     private final LinkedHashSet<UIComponent> uiComponents;
 
     public UIPanel () {
@@ -26,6 +28,7 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
 
     @Override
     public void update (float delta) {
+        this.setMouseOver(false);
         if (this.getComponents().isEmpty()) return;
 
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
@@ -50,6 +53,8 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                     uiComponent.click(grid);
                 }
+
+                this.setMouseOver(true);
             }
         });
     }
@@ -83,5 +88,13 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
 
     public LinkedHashSet<UIComponent> getComponents () {
         return this.uiComponents;
+    }
+
+    public boolean isMouseOver () {
+        return this.mouseOver;
+    }
+
+    public void setMouseOver (boolean mouseOver) {
+        this.mouseOver = mouseOver;
     }
 }
