@@ -39,13 +39,13 @@ import ttk.muxiuesd.world.wall.Wall;
  * 世界输入处理系统
  * 按键状态的更新都在这里面
  * */
-public class HandleInputSystem extends WorldSystem implements InputProcessor, IWorldChunkRender {
+public class WorldInputHandleSystem extends WorldSystem implements InputProcessor, IWorldChunkRender {
     public final String TAG = this.getClass().getName();
 
     private PlayerSystem playerSystem;
     private BlockPosition mouseBlockPosition;   //鼠标指向的方块的坐标
 
-    public HandleInputSystem(World world) {
+    public WorldInputHandleSystem (World world) {
         super(world);
     }
 

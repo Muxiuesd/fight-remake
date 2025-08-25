@@ -24,7 +24,7 @@ public class MainWorld extends World {
         addSystem("CameraFollowSystem", new CameraFollowSystem(this));
         addSystem("EntityCollisionSystem", new GroundEntityCollisionSystem(this));
         addSystem("BulletCollisionCheckSystem", new BulletCollisionCheckSystem(this));
-        addSystem("HandleInputSystem", new HandleInputSystem(this));
+        addSystem("WorldInputHandleSystem", new WorldInputHandleSystem(this));
         addSystem("SoundEffectSystem", new SoundEffectSystem(this));
         addSystem("MonsterGenerationSystem", new MonsterGenerationSystem(this));
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
