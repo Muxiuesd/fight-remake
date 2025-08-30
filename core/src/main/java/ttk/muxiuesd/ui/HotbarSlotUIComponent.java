@@ -12,9 +12,9 @@ import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 快捷栏UI组件
+ * 快捷栏槽位UI组件
  * */
-public class HotbarUIComponent extends UIComponent {
+public class HotbarSlotUIComponent extends UIComponent {
     public static final float HOTBAR_WIDTH = 20f;
     public static final float HOTBAR_HEIGHT = 22f;
     public static final float SELECTED_HOTBAR_WIDTH  = 24f;
@@ -23,9 +23,9 @@ public class HotbarUIComponent extends UIComponent {
     private TextureRegion textureRegion;
 
     private PlayerSystem playerSystem;
-    private int index;
+    private int index;  ///指向的玩家背包容器的索引
 
-    public HotbarUIComponent (PlayerSystem playerSystem, int index, float x, float y) {
+    public HotbarSlotUIComponent (PlayerSystem playerSystem, int index, float x, float y) {
         super(x, y, HOTBAR_WIDTH, HOTBAR_HEIGHT, new GridPoint2((int) HOTBAR_WIDTH, (int) HOTBAR_HEIGHT));
         this.textureRegion = Util.loadTextureRegion(
             Fight.getId("hotbar"),

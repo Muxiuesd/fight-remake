@@ -10,19 +10,20 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.util.Util;
 
 import java.util.LinkedHashSet;
 
 /**
- * UI面板，UI组件都绘制在这里面
+ * UI屏幕，UI组件都绘制在这个Screen里面
  * */
-public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
-    private boolean mouseOver = false;  //当鼠标指针在任意的组件上就标记为true，否则为false
+public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize {
+    private boolean mouseOver = false;  ///当鼠标指针在任意的组件上就标记为true，否则为false
 
     private final LinkedHashSet<UIComponent> uiComponents;
 
-    public UIPanel () {
+    public UIScreen () {
         this.uiComponents = new LinkedHashSet<>();
     }
 
@@ -41,7 +42,7 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
             //鼠标坐标在ui的区域上
             if (rectangle.contains(mouseUIPosition)) {
                 //计算交互区域坐标
-                GridPoint2 interactGrid = uiComponent.getInteractGrid();
+                GridPoint2 interactGrid = uiComponent.getInteractGridSize();
                 Vector2 position = uiComponent.getPosition();
                 Vector2 size = uiComponent.getSize();
                 int xn = (int) ((mouseUIPosition.x - position.x) / size.x * interactGrid.x);
@@ -74,6 +75,7 @@ public abstract class UIPanel implements Updateable, Drawable, ShapeRenderable {
     /**
      * 当相机视口大小更改时调用
      * */
+    @Override
     public void resize (float width, float height) {
         this.getComponents().forEach(uiComponent -> uiComponent.resize(width, height));
     }

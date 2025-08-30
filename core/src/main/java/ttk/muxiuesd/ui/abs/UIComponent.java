@@ -7,27 +7,27 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.gui.GUIResize;
 
 /**
- * 基础UI组件
+ * 基础 UI 组件
  * */
-public abstract class UIComponent implements Updateable, Drawable, ShapeRenderable {
+public abstract class UIComponent implements Updateable, Drawable, ShapeRenderable, GUIResize {
 
-    protected float x, y;
-    protected float width, height;
+    private float x, y;
+    private float width, height;
+    private boolean visible = true;
+    private boolean enabled = true;
+    private int zIndex = 0; // 渲染顺序
     ///交互区域网格
-    private GridPoint2 interactGrid;
+    private GridPoint2 interactGridSize;
 
-    protected boolean visible = true;
-    protected boolean enabled = true;
-    protected int zIndex = 0; // 渲染顺序
-
-    public UIComponent(float x, float y, float width, float height, GridPoint2 interactGrid) {
+    public UIComponent(float x, float y, float width, float height, GridPoint2 interactGridSize) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.interactGrid = interactGrid;
+        this.interactGridSize = interactGridSize;
     }
 
     @Override
@@ -43,14 +43,14 @@ public abstract class UIComponent implements Updateable, Drawable, ShapeRenderab
     }
 
     /**
-     * 鼠标指针放在这个UI组件上
+     * 鼠标指针放在这个UI组件上调用
      * @param interactPos 鼠标放在这个UI组件的交互区域的坐标位置
      * */
     public void mouseOver (GridPoint2 interactPos) {
     }
 
     /**
-     * 鼠标点击这个UI组件
+     * 鼠标点击这个UI组件调用
      * @param interactPos 鼠标点击这个UI组件的交互区域的坐标位置
      * @return 是否具有传递性，比如这个组件位于另一个组件之上，有传递性则执行完这个组件的方法后继续下一个组件的方法
      * */
@@ -60,27 +60,32 @@ public abstract class UIComponent implements Updateable, Drawable, ShapeRenderab
     }
 
     /**
-     * 当相机视口大小更改时调用
-     * @param width  视口宽度
-     * @param height 视口高度
+     * 当相机视口大小更改时调用，传入的参数是改变大小后相机视口所能看到的宽高大小，单位：米
+     * @param viewportWidth  视口宽度
+     * @param viewportHeight 视口高度
      * */
-    public void resize (float width, float height) {
+    @Override
+    public void resize (float viewportWidth, float viewportHeight) {
     }
 
 
     public Vector2 getPosition () {
-        return new Vector2(x, y);
+        return new Vector2(this.x, this.y);
     }
-    public float getX() { return x; }
-    public float getY() { return y; }
+    public float getX() { return this.x; }
+    public float getY() { return this.y; }
+
     public Vector2 getSize() {
-        return new Vector2(width, height);
+        return new Vector2(this.width, this.height);
     }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
-    public boolean isVisible() { return visible; }
-    public boolean isEnabled() { return enabled; }
-    public int getZIndex() { return zIndex; }
+    public float getWidth() { return this.width; }
+    public float getHeight() { return this.height; }
+
+    public boolean isVisible() { return this.visible; }
+
+    public boolean isEnabled() { return this.enabled; }
+
+    public int getZIndex() { return this.zIndex; }
 
     public void setPosition(float x, float y) {
         this.x = x;
@@ -108,12 +113,12 @@ public abstract class UIComponent implements Updateable, Drawable, ShapeRenderab
         return this;
     }
 
-    public GridPoint2 getInteractGrid () {
-        return this.interactGrid;
+    public GridPoint2 getInteractGridSize () {
+        return this.interactGridSize;
     }
 
-    public UIComponent setInteractGrid (GridPoint2 interactGrid) {
-        this.interactGrid = interactGrid;
+    public UIComponent setInteractGridSize (GridPoint2 interactGridSize) {
+        this.interactGridSize = interactGridSize;
         return this;
     }
 }

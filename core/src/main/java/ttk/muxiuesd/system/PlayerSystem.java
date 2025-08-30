@@ -19,7 +19,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
-import ttk.muxiuesd.ui.PlayerUIPanel;
+import ttk.muxiuesd.ui.PlayerHUDScreen;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Log;
@@ -74,7 +74,7 @@ public class PlayerSystem extends WorldSystem {
             }
         }*/
 
-        GUISystem.getInstance().setCurPanel(new PlayerUIPanel(this));
+        GUISystem.getInstance().setCurScreen(new PlayerHUDScreen(this));
 
         Log.print(TAG(), "PlayerSystem初始化完成！");
     }
