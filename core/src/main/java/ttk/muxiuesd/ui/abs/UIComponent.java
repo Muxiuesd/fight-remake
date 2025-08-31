@@ -4,15 +4,15 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.gui.GUIDrawable;
 import ttk.muxiuesd.interfaces.gui.GUIResize;
 
 /**
  * 基础 UI 组件
  * */
-public abstract class UIComponent implements Updateable, Drawable, ShapeRenderable, GUIResize {
+public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRenderable, GUIResize {
 
     private float x, y;
     private float width, height;
@@ -35,7 +35,7 @@ public abstract class UIComponent implements Updateable, Drawable, ShapeRenderab
     }
 
     @Override
-    public void draw (Batch batch) {
+    public void draw (Batch batch, UIComponent parent) {
     }
 
     @Override

@@ -1,62 +1,31 @@
 package ttk.muxiuesd.ui;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.Fight;
+import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.UIScreen;
-import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.ui.components.HotbarSlotUI;
 
 /**
  * 玩家的HUD屏幕
  * */
 public class PlayerHUDScreen extends UIScreen {
     private PlayerSystem playerSystem;
-    private final Array<HotbarSlotUIComponent> hotbarUIComponents = new Array<>();
-    private TextureRegion selectedHotbarTextureRegion;
+
 
     public PlayerHUDScreen (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
 
-        this.initHotbar();
-    }
-
-    private void initHotbar () {
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
         float viewportWidth = camera.viewportWidth;
         float viewportHeight = camera.viewportHeight;
-        for (int i = 0; i < 9; i ++) {
-            HotbarSlotUIComponent hotbarSlotUIComponent = new HotbarSlotUIComponent(this.playerSystem, i,
-                HotbarSlotUIComponent.HOTBAR_WIDTH * (- 0.5f + (i - 4)) /*让快捷栏整体居中*/,
-                - viewportHeight / 2  /*让快捷栏整体贴着窗口下面*/
-            );
-            addComponent(hotbarSlotUIComponent);
-            this.hotbarUIComponents.add(hotbarSlotUIComponent);
-        }
+        float width = HotbarSlotUI.HOTBAR_WIDTH * 9;
+        HotbarUIPanel hotbarUIPanel = new HotbarUIPanel(playerSystem,
+            - width / 2, - viewportHeight / 2,
+            width, HotbarSlotUI.HOTBAR_HEIGHT,
+            new GridPoint2((int) width, (int) HotbarSlotUI.HOTBAR_HEIGHT));
 
-        this.selectedHotbarTextureRegion = Util.loadTextureRegion(
-            Fight.getId("selected_hotbar"),
-            Fight.UITexturePath("selected_hotbar.png")
-        );
-    }
-
-    @Override
-    public void draw (Batch batch) {
-        super.draw(batch);
-        //绘制快捷栏选中框
-        Player player = this.playerSystem.getPlayer();
-        for (HotbarSlotUIComponent hotbar : this.hotbarUIComponents) {
-            if (player.getHandIndex() == hotbar.getIndex()) {
-                batch.draw(this.selectedHotbarTextureRegion,
-                    hotbar.getX() - 2, hotbar.getY() - 1,
-                    HotbarSlotUIComponent.SELECTED_HOTBAR_WIDTH,
-                    HotbarSlotUIComponent.SELECTED_HOTBAR_HEIGHT);
-                break;
-            }
-        }
+        addComponent(hotbarUIPanel);
     }
 }

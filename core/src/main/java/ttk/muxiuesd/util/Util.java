@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -62,6 +63,26 @@ public class Util {
         float newY = ((float) Gdx.graphics.getHeight() / 2) - y;
         return new Vector2(newX, newY);
     }
+
+    /**
+     * 获取交互内部坐标
+     * @param sourcePos 起点坐标
+     * @param targetPos 目标坐标
+     * @param size 目标大小（宽高）
+     * @param targetGridSize 目标内部区域坐标大小
+     * @return 内部网格坐标
+     * */
+    public static GridPoint2 getInteractGridPos (Vector2 sourcePos,
+                                                 Vector2 targetPos, Vector2 size,
+                                                 GridPoint2 targetGridSize) {
+        //计算交互区域坐标
+        int x = (int) ((targetPos.x - sourcePos.x) / size.x * targetGridSize.x);
+        int y = (int) ((targetPos.y - sourcePos.y) / size.y * targetGridSize.y);
+
+        return new GridPoint2(x, y);
+    }
+
+
 
     /**
      * 获取窗口中心到鼠标方向的单位向量

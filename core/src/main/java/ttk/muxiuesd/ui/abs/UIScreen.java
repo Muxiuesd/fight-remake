@@ -11,31 +11,27 @@ import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.gui.GUIResize;
+import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.util.Util;
-
-import java.util.LinkedHashSet;
 
 /**
  * UI屏幕，UI组件都绘制在这个Screen里面
  * */
-public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize {
+public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder {
     private boolean mouseOver = false;  ///当鼠标指针在任意的组件上就标记为true，否则为false
 
-    private final LinkedHashSet<UIComponent> uiComponents;
-
     public UIScreen () {
-        this.uiComponents = new LinkedHashSet<>();
     }
 
     @Override
     public void update (float delta) {
-        this.setMouseOver(false);
-        if (this.getComponents().isEmpty()) return;
+        setMouseOver(false);
+        if (getComponents().isEmpty()) return;
 
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
         //重复利用的矩形区域
         Rectangle rectangle = new Rectangle();
-        this.getComponents().forEach(uiComponent -> {
+        getComponents().forEach(uiComponent -> {
             uiComponent.update(delta);
 
             rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
@@ -62,14 +58,14 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
     @Override
     public void draw (Batch batch) {
-        if (this.getComponents().isEmpty()) return;
-        this.getComponents().forEach(uiComponent -> uiComponent.draw(batch));
+        if (getComponents().isEmpty()) return;
+        getComponents().forEach(uiComponent -> uiComponent.draw(batch, null));
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-        if (this.getComponents().isEmpty()) return;
-        this.getComponents().forEach(uiComponent -> uiComponent.renderShape(batch));
+        if (getComponents().isEmpty()) return;
+        getComponents().forEach(uiComponent -> uiComponent.renderShape(batch));
     }
 
     /**
@@ -77,19 +73,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
      * */
     @Override
     public void resize (float width, float height) {
-        this.getComponents().forEach(uiComponent -> uiComponent.resize(width, height));
-    }
-
-    public void addComponent (UIComponent component) {
-        this.getComponents().add(component);
-    }
-
-    public void removeComponent (UIComponent component) {
-        this.getComponents().remove(component);
-    }
-
-    public LinkedHashSet<UIComponent> getComponents () {
-        return this.uiComponents;
+        getComponents().forEach(uiComponent -> uiComponent.resize(width, height));
     }
 
     public boolean isMouseOver () {

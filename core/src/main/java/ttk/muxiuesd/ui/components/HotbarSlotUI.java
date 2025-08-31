@@ -1,10 +1,11 @@
-package ttk.muxiuesd.ui;
+package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.PlayerSystem;
+import ttk.muxiuesd.ui.HotbarUIPanel;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Backpack;
@@ -14,7 +15,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 快捷栏槽位UI组件
  * */
-public class HotbarSlotUIComponent extends UIComponent {
+public class HotbarSlotUI extends UIComponent {
     public static final float HOTBAR_WIDTH = 20f;
     public static final float HOTBAR_HEIGHT = 22f;
     public static final float SELECTED_HOTBAR_WIDTH  = 24f;
@@ -25,7 +26,7 @@ public class HotbarSlotUIComponent extends UIComponent {
     private PlayerSystem playerSystem;
     private int index;  ///指向的玩家背包容器的索引
 
-    public HotbarSlotUIComponent (PlayerSystem playerSystem, int index, float x, float y) {
+    public HotbarSlotUI (PlayerSystem playerSystem, int index, float x, float y) {
         super(x, y, HOTBAR_WIDTH, HOTBAR_HEIGHT, new GridPoint2((int) HOTBAR_WIDTH, (int) HOTBAR_HEIGHT));
         this.textureRegion = Util.loadTextureRegion(
             Fight.getId("hotbar"),
@@ -44,24 +45,22 @@ public class HotbarSlotUIComponent extends UIComponent {
     }
 
     @Override
-    public void draw (Batch batch) {
-        if (isVisible()) {
-            batch.draw(this.textureRegion, getX(), getY(), getWidth(), getHeight());
+    public void draw (Batch batch, UIComponent parent) {
+        //检查是否在UI面板上
+        if (isVisible() && parent instanceof HotbarUIPanel panel) {
+            //计算真正的渲染坐标
+            float renderX = getX() + panel.getX();
+            float renderY = getY() + panel.getY();
+            batch.draw(this.textureRegion, renderX, renderY, getWidth(), getHeight());
             Player player = this.playerSystem.getPlayer();
             if (player == null) return;
 
             Backpack backpack = player.getBackpack();
             ItemStack itemStack = backpack.getItemStack(this.index);
             if (itemStack != null) {
-                batch.draw(itemStack.getItem().texture, getX() + 2, getY() + 3, 16f, 16f);
+                batch.draw(itemStack.getItem().texture, renderX + 2, renderY + 3, 16f, 16f);
             }
         }
-    }
-
-    @Override
-    public void resize (float width, float height) {
-        //让快捷栏整体贴着窗口下面
-        setPosition(getX(), - height / 2);
     }
 
     public int getIndex () {
