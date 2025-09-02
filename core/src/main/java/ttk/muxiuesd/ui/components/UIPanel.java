@@ -8,18 +8,28 @@ import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.util.Util;
 
+import java.util.LinkedHashSet;
+
 /**
  * UI组件的面板
  * <p>
- * UI组件的一个容器，组件在面板里面时，组件的坐标都是相对于面板的坐标
+ * UI组件的一个容器，组件在面板里面时，组件的坐标都是相对于面板的坐标。
+ * <p>
+ * 面板可以互相嵌套
  * */
 public class UIPanel extends UIComponent implements UIComponentsHolder {
+    private LinkedHashSet<UIComponent> components;
+    //父节点面板
+    private UIPanel parent;
+
+
     public UIPanel (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
+        this.components = new LinkedHashSet<>();
     }
 
     @Override
-    public void draw (Batch batch, UIComponent parent) {
+    public void draw (Batch batch, UIPanel parent) {
         getComponents().forEach(component -> component.draw(batch, this));
     }
 
@@ -38,10 +48,55 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
                     component.getPosition(),
                     internalPos,
                     component.getSize(),
-                    component.getInteractGridSize());
+                    component.getInteractGridSize()
+                );
                 if (! component.click(interactGridPos)) break;
             }
         }
         return super.click(interactPos);
+    }
+
+    @Override
+    public void addComponent (UIComponent component) {
+        UIComponentsHolder.super.addComponent(component);
+        //当加入的组件是面板时，把子面板的父节点设置为此面板
+        if (component instanceof UIPanel childPanel) {
+            childPanel.setParent(this);
+        }
+    }
+
+    @Override
+    public void removeComponent (UIComponent component) {
+        UIComponentsHolder.super.removeComponent(component);
+        //当被移除的组件是面板时，把子面板的父节点设置为空
+        if (component instanceof UIPanel childPanel) {
+            childPanel.setParent(null);
+        }
+    }
+
+    @Override
+    public LinkedHashSet<UIComponent> getComponents () {
+        return this.components;
+    }
+
+    public UIPanel getParent () {
+        return this.parent;
+    }
+
+    public UIPanel setParent (UIPanel parent) {
+        this.parent = parent;
+        return this;
+    }
+
+    @Override
+    public float getX () {
+        float x = super.getX();
+        return this.getParent() == null ? x : x + this.getParent().getX();
+    }
+
+    @Override
+    public float getY () {
+        float y = super.getY();
+        return this.getParent() == null ? y : y + this.getParent().getY();
     }
 }

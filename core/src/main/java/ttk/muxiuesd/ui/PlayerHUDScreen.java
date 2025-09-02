@@ -13,7 +13,6 @@ import ttk.muxiuesd.ui.components.HotbarSlotUI;
 public class PlayerHUDScreen extends UIScreen {
     private PlayerSystem playerSystem;
 
-
     public PlayerHUDScreen (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
 

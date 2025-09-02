@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.components.HotbarSlotUI;
 import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.util.Util;
@@ -19,7 +18,7 @@ import ttk.muxiuesd.world.entity.Player;
 public class HotbarUIPanel extends UIPanel {
     private PlayerSystem playerSystem;
     private final Array<HotbarSlotUI> hotbarUIComponents = new Array<>();
-    private TextureRegion selectedHotbarTextureRegion;
+    private TextureRegion selectedHotbarTextureRegion;  //快捷栏选中框贴图
 
     public HotbarUIPanel (PlayerSystem playerSystem,
                           float x, float y, float width, float height, GridPoint2 interactGridSize) {
@@ -48,7 +47,7 @@ public class HotbarUIPanel extends UIPanel {
     }
 
     @Override
-    public void draw (Batch batch, UIComponent parent) {
+    public void draw (Batch batch, UIPanel parent) {
         //绘制快捷栏槽位
         this.hotbarUIComponents.forEach(hotbarSlotUI -> hotbarSlotUI.draw(batch, this));
 

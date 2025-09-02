@@ -14,10 +14,14 @@ import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.util.Util;
 
+import java.util.LinkedHashSet;
+
 /**
  * UI屏幕，UI组件都绘制在这个Screen里面
  * */
 public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder {
+    private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();;
+
     private boolean mouseOver = false;  ///当鼠标指针在任意的组件上就标记为true，否则为false
 
     public UIScreen () {
@@ -82,5 +86,10 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
     public void setMouseOver (boolean mouseOver) {
         this.mouseOver = mouseOver;
+    }
+
+    @Override
+    public LinkedHashSet<UIComponent> getComponents () {
+        return this.components;
     }
 }

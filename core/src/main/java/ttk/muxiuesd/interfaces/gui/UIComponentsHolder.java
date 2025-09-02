@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
  * UI组件持有者接口
  * */
 public interface UIComponentsHolder {
-    LinkedHashSet<UIComponent> uiComponents = new LinkedHashSet<>();
 
     default void addComponent (UIComponent component) {
         this.getComponents().add(component);
@@ -18,12 +17,13 @@ public interface UIComponentsHolder {
         this.getComponents().remove(component);
     }
 
-    default LinkedHashSet<UIComponent> getComponents () {
-        return uiComponents;
+    default void setComponents (LinkedHashSet<UIComponent> components) {
+        this.getComponents().clear();
+        this.getComponents().addAll(components);
     }
 
-    default void setComponents (LinkedHashSet<UIComponent> components) {
-        uiComponents.clear();
-        uiComponents.addAll(components);
-    }
+    /**
+     * 获取组件集合，需要主动实现
+     * */
+    LinkedHashSet<UIComponent> getComponents ();
 }

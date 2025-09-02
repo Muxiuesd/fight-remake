@@ -45,12 +45,16 @@ public class HotbarSlotUI extends UIComponent {
     }
 
     @Override
-    public void draw (Batch batch, UIComponent parent) {
-        //检查是否在UI面板上
-        if (isVisible() && parent instanceof HotbarUIPanel panel) {
+    public void draw (Batch batch, UIPanel parent) {
+        if (isVisible()) {
             //计算真正的渲染坐标
-            float renderX = getX() + panel.getX();
-            float renderY = getY() + panel.getY();
+            float renderX = getX();
+            float renderY = getY();
+            //检查是否在UI面板上
+            if (parent instanceof HotbarUIPanel panel) {
+                renderX += panel.getX();
+                renderY += panel.getY();
+            }
             batch.draw(this.textureRegion, renderX, renderY, getWidth(), getHeight());
             Player player = this.playerSystem.getPlayer();
             if (player == null) return;

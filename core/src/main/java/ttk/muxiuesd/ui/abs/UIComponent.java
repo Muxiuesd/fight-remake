@@ -8,6 +8,7 @@ import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.gui.GUIDrawable;
 import ttk.muxiuesd.interfaces.gui.GUIResize;
+import ttk.muxiuesd.ui.components.UIPanel;
 
 /**
  * 基础 UI 组件
@@ -35,7 +36,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     }
 
     @Override
-    public void draw (Batch batch, UIComponent parent) {
+    public void draw (Batch batch, UIPanel parent) {
     }
 
     @Override
@@ -70,7 +71,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
 
     public Vector2 getPosition () {
-        return new Vector2(this.x, this.y);
+        return new Vector2(this.getX(), this.getY());
     }
     public float getX() { return this.x; }
     public float getY() { return this.y; }
