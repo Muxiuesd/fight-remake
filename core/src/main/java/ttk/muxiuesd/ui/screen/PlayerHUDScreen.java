@@ -28,4 +28,11 @@ public class PlayerHUDScreen extends UIScreen {
 
         addComponent(hotbarUIPanel);
     }
+
+    @Override
+    public void show () {
+        //调整
+        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
+        resize(camera.viewportWidth, camera.viewportHeight);
+    }
 }

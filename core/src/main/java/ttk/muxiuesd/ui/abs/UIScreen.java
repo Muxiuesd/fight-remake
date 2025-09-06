@@ -28,6 +28,16 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
     public UIScreen () {
     }
 
+    /**
+     * 被展示出来时调用
+     * */
+    public void show () {}
+
+    /**
+     * 被隐藏时调用
+     * */
+    public void hide () {}
+
     @Override
     public void update (float delta) {
         setMouseOver(false);    //清理标记

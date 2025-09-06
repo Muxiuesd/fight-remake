@@ -27,6 +27,7 @@ public class PlayerInventoryUIPanel extends UIPanel {
     }
 
     private void initSlots () {
+        //快捷栏槽位
         for (int index = 0; index < 9; index++) {
             SlotUI slotUI = new SlotUI(this.playerSystem, index,
                 8 + (index * (SlotUI.SLOT_WIDTH + 2)), 8);

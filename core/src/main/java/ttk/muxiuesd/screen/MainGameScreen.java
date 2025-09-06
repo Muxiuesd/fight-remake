@@ -92,7 +92,7 @@ public class MainGameScreen implements Screen {
             new GUIRenderProcessor(
                 GUICamera.INSTANCE.getCamera(),
                 ShadersReg.DEFAULT_SHADER,
-                1000
+                10000
             )
         );
 

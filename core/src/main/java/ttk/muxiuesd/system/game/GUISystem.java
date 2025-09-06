@@ -27,19 +27,19 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
 
     @Override
     public void update (float delta) {
-        if (this.getCurScreen() != null) {
+        if (this.screenNotNull()) {
             this.getCurScreen().update(delta);
         }
     }
 
     @Override
     public void draw (Batch batch) {
-        if (this.getCurScreen() != null) this.getCurScreen().draw(batch);
+        if (this.screenNotNull()) this.getCurScreen().draw(batch);
     }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-        if (this.getCurScreen() != null) this.getCurScreen().renderShape(batch);
+        if (this.screenNotNull()) this.getCurScreen().renderShape(batch);
     }
 
     @Override
@@ -53,22 +53,30 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
      * */
     @Override
     public void resize (float viewportWidth, float viewportHeight) {
-        if (this.getCurScreen() != null) this.getCurScreen().resize(viewportWidth, viewportHeight);
+        if (this.screenNotNull()) this.getCurScreen().resize(viewportWidth, viewportHeight);
     }
 
     /**
      * 鼠标指针是否在UI组件上
      * */
     public boolean mouseOverUI () {
-        return this.getCurScreen() != null && this.getCurScreen().isMouseOver();
+        return this.screenNotNull() && this.getCurScreen().isMouseOver();
     }
 
     public void setCurScreen (UIScreen curScreen) {
+        if (this.screenNotNull()) {
+            this.getCurScreen().hide();
+        }
         this.curScreen = curScreen;
+        curScreen.show();
     }
 
     public UIScreen getCurScreen () {
         return this.curScreen;
+    }
+
+    public boolean screenNotNull () {
+        return this.curScreen != null;
     }
 
     @Override
