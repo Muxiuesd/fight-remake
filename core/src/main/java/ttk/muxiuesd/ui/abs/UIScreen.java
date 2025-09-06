@@ -5,14 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.pool.PoolableRectangle;
 
 import java.util.LinkedHashSet;
 
@@ -29,12 +30,13 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
     @Override
     public void update (float delta) {
-        setMouseOver(false);
+        setMouseOver(false);    //清理标记
+        //没东西就直接返回
         if (getComponents().isEmpty()) return;
 
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
         //重复利用的矩形区域
-        Rectangle rectangle = new Rectangle();
+        PoolableRectangle rectangle = Pools.RECT.obtain();
         getComponents().forEach(uiComponent -> {
             uiComponent.update(delta);
 
@@ -58,6 +60,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                 this.setMouseOver(true);
             }
         });
+        Pools.RECT.free(rectangle);
     }
 
     @Override

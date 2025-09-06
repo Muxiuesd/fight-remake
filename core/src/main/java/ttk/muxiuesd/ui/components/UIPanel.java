@@ -2,11 +2,12 @@ package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.pool.PoolableRectangle;
 
 import java.util.LinkedHashSet;
 
@@ -35,23 +36,27 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
 
     @Override
     public boolean click (GridPoint2 interactPos) {
-        //面板内部坐标
-        Vector2 internalPos = new Vector2(interactPos.x, interactPos.y);
-        Rectangle rectangle = new Rectangle();
+        if (! getComponents().isEmpty()) {
+            //面板内部坐标
+            Vector2 internalPos = new Vector2(interactPos.x, interactPos.y);
+            PoolableRectangle rectangle = Pools.RECT.obtain();
 
-        //遍历面板里面的组件，用内部坐标来检测
-        for (UIComponent component : getComponents()) {
-            rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
-            if (rectangle.contains(internalPos)) {
-                //计算交互区域坐标
-                GridPoint2 interactGridPos = Util.getInteractGridPos(
-                    component.getPosition(),
-                    internalPos,
-                    component.getSize(),
-                    component.getInteractGridSize()
-                );
-                if (! component.click(interactGridPos)) break;
+            //遍历面板里面的组件，用内部坐标来检测
+            for (UIComponent component : getComponents()) {
+                rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
+                if (rectangle.contains(internalPos)) {
+                    //计算交互区域坐标
+                    GridPoint2 interactGridPos = Util.getInteractGridPos(
+                        component.getPosition(),
+                        internalPos,
+                        component.getSize(),
+                        component.getInteractGridSize()
+                    );
+                    if (! component.click(interactGridPos)) break;
+                }
             }
+
+            Pools.RECT.free(rectangle);
         }
         return super.click(interactPos);
     }

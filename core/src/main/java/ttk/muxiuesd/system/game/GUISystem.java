@@ -22,7 +22,7 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
         return INSTANCE;
     }
 
-    private UIScreen curScreen; //当前渲染的ui面板
+    private UIScreen curScreen; //当前渲染的ui屏幕
 
 
     @Override
@@ -73,7 +73,7 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
 
     @Override
     public int getRenderPriority () {
-        return Integer.MAX_VALUE;
+        return Integer.MAX_VALUE / 2;
     }
 
     @Override
