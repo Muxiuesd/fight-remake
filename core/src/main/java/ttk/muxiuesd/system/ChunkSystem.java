@@ -358,7 +358,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         Block oldBlock = this.getBlock(wx, wy);
         Vector2 floor = Util.fastFloor(wx, wy);
 
-        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
+        ChunkPosition chunkPosition = this.getChunkPosition(floor);
         Chunk chunk = this.getChunk(chunkPosition);
         GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
 
@@ -399,12 +399,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //在空气方块或者水方块上不得放置墙体
         if (block instanceof BlockAir || block instanceof BlockWater) return false;
 
-        Vector2 pos = Util.fastFloor(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
         //每一个墙体都是一个单独的实例
-        Wall<?> instance = wall.createSelf(pos);
-        Chunk chunk = this.getChunk(wx, wy);
-        GridPoint2 cp = chunk.worldToChunk(wx, wy);
-        chunk.setWall(instance, cp.x, cp.y);
+        Wall<?> instance = wall.createSelf(floor);
+        Chunk chunk = this.getChunk(this.getChunkPosition(floor));
+        GridPoint2 chunkWallPos = chunk.worldToChunk(floor.x, floor.y);
+        chunk.setWall(instance, chunkWallPos.x, chunkWallPos.y);
+        System.out.println("在区块：" + chunk.getChunkPosition().toString()
+            + " 的" + chunkWallPos.toString() + "上放置墙体");
         return true;
     }
 
@@ -418,9 +420,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     public Wall<?> destroyWall (float wx, float wy) {
         //没有墙体
         if (this.getWall(wx, wy) == null) return null;
-
-        Chunk chunk = this.getChunk(wx, wy);
-        GridPoint2 cp = chunk.worldToChunk(wx, wy);
+        Vector2 floor = Util.fastFloor(wx, wy);
+        Chunk chunk = this.getChunk(this.getChunkPosition(floor));
+        GridPoint2 cp = chunk.worldToChunk(floor.x, floor.y);
         Wall<?> wall = chunk.getWall(cp.x, cp.y);
         chunk.setWall(null, cp.x, cp.y);
         return wall;
@@ -656,12 +658,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.getWall(position.x, position.y);
     }
     public Wall<?> getWall(float wx, float wy) {
-        ChunkPosition chunkPosition = this.getChunkPosition(wx, wy);
-
-        Chunk chunk = this.getChunk(chunkPosition);
+        Vector2 floor = Util.fastFloor(wx, wy);
+        Chunk chunk = this.getChunk(this.getChunkPosition(floor.x, floor.y));
         if (chunk == null) return null;
 
-        return chunk.seekWall(wx, wy);
+        return chunk.seekWall(floor.x, floor.y);
     }
 
     /**
@@ -704,7 +705,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
     /**
      * 获取世界坐标所对应的区块编号
-     *
      * @param wx
      * @param wy
      * @return

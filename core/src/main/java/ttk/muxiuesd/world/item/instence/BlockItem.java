@@ -33,7 +33,7 @@ public class BlockItem extends ConsumptionItem {
         ChunkSystem cs = world.getSystem(ChunkSystem.class);
 
         //替换鼠标点到的方块
-        Block replacedBlock = cs.replaceBlock(block, worldPosition.x, worldPosition.y);
+        Block replacedBlock = cs.replaceBlock(this.block, worldPosition.x, worldPosition.y);
         //非空气方块才能掉落出来
         if (replacedBlock != Blocks.ARI) {
             //获取方块所对应的方块物品
