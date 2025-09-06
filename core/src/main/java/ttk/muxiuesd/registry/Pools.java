@@ -7,6 +7,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
+import ttk.muxiuesd.util.pool.PoolableRectangle;
 import ttk.muxiuesd.util.pool.PoolableVec2;
 
 /**
@@ -18,6 +19,7 @@ public final class Pools {
     }
 
     public static final FightPool<PoolableVec2> VEC2 = register("vec2", PoolableVec2.class);
+    public static final FightPool<PoolableRectangle> RECT = register("rectangle", PoolableRectangle.class);
     public static final FightPool<Timer> TIMER = register("timer", Timer.class);
     public static final FightPool<TaskTimer> TASK_TIMER = register("timer", TaskTimer.class);
 
