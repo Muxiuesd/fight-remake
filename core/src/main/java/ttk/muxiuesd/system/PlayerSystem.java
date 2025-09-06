@@ -19,7 +19,8 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
-import ttk.muxiuesd.ui.PlayerHUDScreen;
+import ttk.muxiuesd.ui.screen.PlayerHUDScreen;
+import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Log;
@@ -39,6 +40,10 @@ import java.util.Optional;
  * */
 public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
+
+    public static PlayerHUDScreen PLAYER_HUD_SCREEN;
+    public static PlayerInventoryScreen PLAYER_INVENTORY_SCREEN;
+
     private Player player;
     private Vector2 playerLastPosition;
 
@@ -51,6 +56,9 @@ public class PlayerSystem extends WorldSystem {
         WorldInformationType.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
         WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
         WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
+
+        PLAYER_HUD_SCREEN = new PlayerHUDScreen(this);
+        PLAYER_INVENTORY_SCREEN = new PlayerInventoryScreen(this);
     }
 
     @Override
@@ -74,7 +82,7 @@ public class PlayerSystem extends WorldSystem {
             }
         }*/
 
-        GUISystem.getInstance().setCurScreen(new PlayerHUDScreen(this));
+        GUISystem.getInstance().setCurScreen(PLAYER_HUD_SCREEN);
 
         Log.print(TAG(), "PlayerSystem初始化完成！");
     }

@@ -341,22 +341,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 将传入的世界坐标转换为这个区块里的方块数组坐标
-     * @param wx 向下取整过的世界横坐标
-     * @param wy 向下取整过的世界纵坐标
+     * @param fwx 向下取整过的世界横坐标
+     * @param fwy 向下取整过的世界纵坐标
      * */
-    public GridPoint2 worldToChunk (float wx, float wy) {
+    public GridPoint2 worldToChunk (float fwx, float fwy) {
         GridPoint2 cp = new GridPoint2();
-        if (wx < 0) {
-            cp.x = ChunkWidth + (int)(wx % ChunkWidth);
+        if (fwx < 0) {
+            cp.x = ChunkWidth + (int)(fwx % ChunkWidth);
             cp.x %= ChunkWidth;
         }else {
-            cp.x = (int) (wx % ChunkWidth);
+            cp.x = (int) (fwx % ChunkWidth);
         }
-        if (wy < 0) {
-            cp.y = ChunkHeight + (int)(wy % ChunkHeight);
+        if (fwy < 0) {
+            cp.y = ChunkHeight + (int)(fwy % ChunkHeight);
             cp.y %= ChunkHeight;
         }else {
-            cp.y = (int) (wy % ChunkHeight);
+            cp.y = (int) (fwy % ChunkHeight);
         }
         return cp;
     }

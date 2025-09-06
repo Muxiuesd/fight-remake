@@ -67,9 +67,15 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
-        if (KeyBindings.ExitGame.wasPressed()) {
-            Log.print(TAG, "游戏退出！");
-            Gdx.app.exit();
+        if (KeyBindings.ExitGame.wasJustPressed()) {
+            //如果是玩家HUD屏幕就是退出游戏
+            if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN) {
+                Log.print(TAG(), "游戏退出！");
+                Gdx.app.exit();
+            }else {
+                //否则就把当前的屏幕调整回玩家HUD屏幕
+                GUISystem.getInstance().setCurScreen(PlayerSystem.PLAYER_HUD_SCREEN);
+            }
         }
         // C键控制区块边界是否绘制
         if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
@@ -86,6 +92,14 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
             Log.print(TAG, "玩家所在区块坐标：" + pcp.getX() + "," + pcp.getY());
             Log.print(TAG, "玩家所在方块坐标：" + pbp.getX() + "," + pbp.getY());
             Log.print(TAG, "玩家脚下的方块为：" + block.getClass().getName());
+        }
+        //切换背包界面
+        if (KeyBindings.PlayerBackpackScreen.wasJustPressed()) {
+            if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN) {
+                GUISystem.getInstance().setCurScreen(PlayerSystem.PLAYER_INVENTORY_SCREEN);
+            }else {
+                GUISystem.getInstance().setCurScreen(PlayerSystem.PLAYER_HUD_SCREEN);
+            }
         }
 
         //需要玩家的鼠标不指向UI组件才能与世界交互

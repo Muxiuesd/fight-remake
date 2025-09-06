@@ -27,6 +27,10 @@ public class KeyBindings {
         Fight.getId("key_player_drop_item"), "key_player_drop_item",
         KeyBinding.Type.Keyboard, Input.Keys.Q
     ));
+    public static KeyBinding PlayerBackpackScreen = InputBinding.registerBinding(new KeyBinding(
+        Fight.getId("key_player_backpack_screen"), "key_player_backpack_screen",
+        KeyBinding.Type.Keyboard, Input.Keys.E
+    ));
 
     public static KeyBinding PlayerShoot = InputBinding.registerBinding(new KeyBinding(
         Fight.getId("key_player_shoot"), "key_player_shoot",
