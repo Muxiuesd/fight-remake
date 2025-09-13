@@ -43,6 +43,9 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
 
             //遍历面板里面的组件，用内部坐标来检测
             for (UIComponent component : getComponents()) {
+                //如果是不可交互状态的组件就直接跳过
+                if (!component.isEnabled()) continue;
+
                 rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
                 if (rectangle.contains(internalPos)) {
                     //计算交互区域坐标

@@ -6,8 +6,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.ui.components.UIPanel;
-import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Player;
 
 /**
  * 玩家背包容器UI面板
@@ -47,10 +45,6 @@ public class PlayerInventoryUIPanel extends UIPanel {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         batch.draw(this.background, getX(), getY(), getWidth(), getHeight());
-
-        Player player = this.playerSystem.getPlayer();
-        Backpack backpack = player.getBackpack();
-
         super.draw(batch, parent);
     }
 }

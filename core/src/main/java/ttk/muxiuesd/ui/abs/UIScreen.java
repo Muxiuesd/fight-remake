@@ -23,7 +23,7 @@ import java.util.LinkedHashSet;
 public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder {
     private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();;
 
-    private boolean mouseOver = false;  ///当鼠标指针在任意的组件上就标记为true，否则为false
+    private boolean mouseOver = false;  ///当鼠标指针在任意的可交互的组件上就标记为true，否则为false
 
     public UIScreen () {
     }
@@ -47,8 +47,12 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
         //重复利用的矩形区域
         PoolableRectangle rectangle = Pools.RECT.obtain();
-        getComponents().forEach(uiComponent -> {
+
+        for (UIComponent uiComponent : getComponents()) {
+            //更新组件
             uiComponent.update(delta);
+            //不可交互状态的组件就直接跳过交互计算
+            if (!uiComponent.isEnabled()) continue;
 
             rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
             //鼠标坐标在ui的区域上
@@ -69,7 +73,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
                 this.setMouseOver(true);
             }
-        });
+        }
         Pools.RECT.free(rectangle);
     }
 
