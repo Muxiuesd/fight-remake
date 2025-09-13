@@ -37,7 +37,7 @@ public class HotbarSlotUI extends SlotUI {
     public boolean click (GridPoint2 interactPos) {
         getPlayerSystem().getPlayer().setHandIndex(this.getIndex());
 
-        return super.click(interactPos);
+        return false;
     }
 
     @Override

@@ -88,7 +88,12 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     public int getZIndex() { return this.zIndex; }
 
-    public void setPosition(float x, float y) {
+    public void setPosition (Vector2 pos) {
+        this.x = pos.x;
+        this.y = pos.y;
+    }
+
+    public void setPosition (float x, float y) {
         this.x = x;
         this.y = y;
     }

@@ -11,6 +11,9 @@ import ttk.muxiuesd.util.Util;
  * 玩家背包界面屏幕
  * */
 public class PlayerInventoryScreen extends UIScreen {
+
+    public static PlayerInventoryUIPanel inventoryUIPanel;
+
     private PlayerSystem playerSystem;
 
     public PlayerInventoryScreen(PlayerSystem playerSystem) {
@@ -20,7 +23,7 @@ public class PlayerInventoryScreen extends UIScreen {
             Fight.getId("player_inventory"),
             Fight.UITexturePath("inventory.png")
         );
-        PlayerInventoryUIPanel inventoryUIPanel = new PlayerInventoryUIPanel(
+        inventoryUIPanel = new PlayerInventoryUIPanel(
             playerSystem, background,
             background.getRegionWidth(), background.getRegionHeight()
         );

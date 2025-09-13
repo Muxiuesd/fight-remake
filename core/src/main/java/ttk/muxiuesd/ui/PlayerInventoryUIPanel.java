@@ -47,4 +47,5 @@ public class PlayerInventoryUIPanel extends UIPanel {
         batch.draw(this.background, getX(), getY(), getWidth(), getHeight());
         super.draw(batch, parent);
     }
+
 }
