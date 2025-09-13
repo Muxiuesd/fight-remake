@@ -20,6 +20,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 玩家
  */
 public class Player extends LivingEntity<Player> {
+    public static final int BACKPACK_SIZE = 36;
     public TextureRegion shield;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器
@@ -30,7 +31,7 @@ public class Player extends LivingEntity<Player> {
         this(world, entityType, 20, 20);
     }
     public Player(World world, EntityType<? super Player> entityType, float maxHealth, float curHealth) {
-        super(world, entityType, maxHealth, curHealth, 16);
+        super(world, entityType, maxHealth, curHealth, BACKPACK_SIZE);
         renderHandItem = true;
         speed = 8;
         curSpeed = speed;
@@ -53,8 +54,15 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(4, new ItemStack(Items.CRAFTING_TABLE));
         backpack.setItemStack(5, new ItemStack(Items.FISH_POLE));
         backpack.setItemStack(6, new ItemStack(Items.SMOOTH_STONE));
-        //backpack.setItemStack(6, new ItemStack(Items.FISH, 2));
         backpack.setItemStack(7, new ItemStack(Items.TORCH));
+        backpack.setItemStack(8, new ItemStack(Items.IRON_SWORD));
+        backpack.setItemStack(9, new ItemStack(Items.TEST_WEAPON));
+        backpack.setItemStack(10, new ItemStack(Items.STICK));
+        backpack.setItemStack(11, new ItemStack(Items.FURNACE));
+        backpack.setItemStack(18, new ItemStack(Items.CRAFTING_TABLE));
+        backpack.setItemStack(28, new ItemStack(Items.FISH_POLE));
+        backpack.setItemStack(30, new ItemStack(Items.SMOOTH_STONE));
+        backpack.setItemStack(35, new ItemStack(Items.TORCH));
 
 
         Log.print(this.getClass().getName(),"Player 初始化完成");

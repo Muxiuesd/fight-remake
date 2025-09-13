@@ -33,6 +33,15 @@ public class PlayerInventoryUIPanel extends UIPanel {
                 8 + (index * (SlotUI.SLOT_WIDTH + 2)), 8);
             addComponent(slotUI);
         }
+
+        //背包内部槽位
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 9; x++) {
+                SlotUI slotUI = new SlotUI(this.playerSystem, x + y * 9 + 9,
+                    8 + (x * (SlotUI.SLOT_WIDTH + 2)), 30 + y * (SlotUI.SLOT_HEIGHT + 2));
+                addComponent(slotUI);
+            }
+        }
     }
 
     @Override
