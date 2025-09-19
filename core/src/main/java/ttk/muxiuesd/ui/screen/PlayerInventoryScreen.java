@@ -9,10 +9,17 @@ import ttk.muxiuesd.util.Util;
 
 /**
  * 玩家背包界面屏幕
+ * <p>
+ * 由背景面板、各种槽位组成
  * */
 public class PlayerInventoryScreen extends UIScreen {
-
-    public static PlayerInventoryUIPanel inventoryUIPanel;
+    private static PlayerInventoryUIPanel INVENTORY_UI_PANEL_INSTANCE;
+    public static PlayerInventoryUIPanel getInventoryUIPanel() {
+        return INVENTORY_UI_PANEL_INSTANCE;
+    }
+    public static void setInventoryUIPanel(PlayerInventoryUIPanel inventoryUIPanel) {
+        if (inventoryUIPanel != null) INVENTORY_UI_PANEL_INSTANCE = inventoryUIPanel;
+    }
 
     private PlayerSystem playerSystem;
 
@@ -23,11 +30,14 @@ public class PlayerInventoryScreen extends UIScreen {
             Fight.getId("player_inventory"),
             Fight.UITexturePath("inventory.png")
         );
-        inventoryUIPanel = new PlayerInventoryUIPanel(
+
+        setInventoryUIPanel(new PlayerInventoryUIPanel(
             playerSystem, background,
             background.getRegionWidth(), background.getRegionHeight()
-        );
+        ));
 
-        addComponent(inventoryUIPanel);
+        addComponent(INVENTORY_UI_PANEL_INSTANCE);
     }
+
+
 }

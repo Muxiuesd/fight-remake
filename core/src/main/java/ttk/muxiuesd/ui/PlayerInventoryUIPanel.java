@@ -24,6 +24,9 @@ public class PlayerInventoryUIPanel extends UIPanel {
         this.initSlots();
     }
 
+    /**
+     * 初始化所有物品槽位
+     * */
     private void initSlots () {
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {

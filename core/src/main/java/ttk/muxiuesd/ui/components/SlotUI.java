@@ -9,6 +9,8 @@ import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 最基础的槽位UI组件
+ * <p>
+ * 可以与鼠标交互
  * */
 public class SlotUI extends UIComponent {
     public static final float SLOT_WIDTH = 16f;
@@ -49,26 +51,30 @@ public class SlotUI extends UIComponent {
         batch.draw(itemStack.getItem().texture, renderX, renderY, getWidth(), getHeight());
     }
 
+    /**
+     * 核心算法
+     * */
     @Override
     public boolean click (GridPoint2 interactPos) {
+        MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
         if (!this.isNullSlot()) {
             //点击这个有物品的槽位就把物品转移到鼠标物品槽里面，如果鼠标物品槽有东西就交换两者
-            if (MouseSlotUI.INSTANCE.isNullSlot()) {
+            if (mouseSlotUI.isNullSlot()) {
                 //激活鼠标物品槽
                 MouseSlotUI.activate().setItemStack(this.getItemStack());
                 this.clearItem();
             }else {
                 //交换物品
-                ItemStack mouseItem = MouseSlotUI.INSTANCE.getItemStack();
+                ItemStack mouseItem = mouseSlotUI.getItemStack();
                 ItemStack slotItem = this.getItemStack();
-                MouseSlotUI.INSTANCE.setItemStack(slotItem);
+                mouseSlotUI.setItemStack(slotItem);
                 this.setItemStack(mouseItem);
             }
-        }else if (!MouseSlotUI.INSTANCE.isNullSlot()) {
+        }else if (! mouseSlotUI.isNullSlot()) {
             //物品槽是空的，同时鼠标物品槽有物品，就把物品放进来
-            this.setItemStack(MouseSlotUI.INSTANCE.getItemStack());
+            this.setItemStack(mouseSlotUI.getItemStack());
             MouseSlotUI.deactivate();
-            MouseSlotUI.INSTANCE.clearItem();
+            mouseSlotUI.clearItem();
         }
         return super.click(interactPos);
     }

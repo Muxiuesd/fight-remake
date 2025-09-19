@@ -3,6 +3,7 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
 import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -13,7 +14,18 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class MouseSlotUI extends SlotUI {
     //单例模式
-    public static final MouseSlotUI INSTANCE = new MouseSlotUI();
+    private static MouseSlotUI INSTANCE;
+
+    public static MouseSlotUI getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new MouseSlotUI();
+        }
+        return INSTANCE;
+    }
+
+    public static void setInstance(MouseSlotUI instance) {
+        if (instance != null) INSTANCE = instance;
+    }
 
     private ItemStack itemStack;
 
@@ -23,20 +35,28 @@ public class MouseSlotUI extends SlotUI {
     }
 
     /**
-     * 激活
+     * 激活鼠标物品槽
      * */
     public static MouseSlotUI activate () {
-        if (PlayerInventoryScreen.inventoryUIPanel != null) {
-            INSTANCE.setPosition(Util.getMouseUIPosition());
-            PlayerInventoryScreen.inventoryUIPanel.addComponent(INSTANCE);
+        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+        if (inventoryUIPanel != null) {
+            MouseSlotUI instance = getInstance();
+            instance.setPosition(Util.getMouseUIPosition());
+            inventoryUIPanel.addComponent(instance);
         }
         return INSTANCE;
     }
 
-    public static void deactivate () {
-        if (PlayerInventoryScreen.inventoryUIPanel != null) {
-            PlayerInventoryScreen.inventoryUIPanel.removeComponent(INSTANCE);
+    /**
+     * 使鼠标物品槽失活
+     * */
+    public static MouseSlotUI deactivate () {
+        MouseSlotUI instance = getInstance();
+        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+        if (inventoryUIPanel != null) {
+            inventoryUIPanel.removeComponent(instance);
         }
+        return instance;
     }
 
     @Override
