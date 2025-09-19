@@ -201,25 +201,32 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * @return 丢弃成功返回丢出来的物品实体，丢弃失败返回null
      * */
     public ItemEntity dropItem (int index, int amount) {
-        ItemStack itemStack = this.backpack.dropItem(index, amount);
+        ItemStack itemStack = this.getBackpack().dropItem(index, amount);
         if (itemStack == null) return null;
 
-        //简单的生成一个物品实体而已
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
-        //使得物品中心与实体中心对齐
-        itemEntity.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)));
-        itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
-            .setTask(() -> {
-                Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
-                itemEntity.setOnAirTimer(null);
-        }));
-        itemEntity.setItemStack(itemStack);
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
         AudioPlayer.getInstance().playSound(Fight.getId("pop"));
 
-        return itemEntity;
+        return this.spawnItemEntity(itemStack);
+    }
+
+    /**
+     * 以实体为基准生成一个物品实体
+     * */
+    public ItemEntity spawnItemEntity (ItemStack stack) {
+        //简单的生成一个物品实体而已
+        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
+        //使得物品中心与实体中心对齐
+        return itemEntity
+            .setItemStack(stack)
+            .setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            .setOnGround(false)
+            .setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
+            .setTask(() -> {
+                Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
+                itemEntity.setOnAirTimer(null);
+            }));
     }
 
     /**

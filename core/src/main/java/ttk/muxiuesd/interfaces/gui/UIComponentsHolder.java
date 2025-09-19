@@ -17,6 +17,10 @@ public interface UIComponentsHolder {
         this.getComponents().remove(component);
     }
 
+    default boolean hasComponent (UIComponent component) {
+        return this.getComponents().contains(component);
+    }
+
     default void setComponents (LinkedHashSet<UIComponent> components) {
         this.getComponents().clear();
         this.getComponents().addAll(components);

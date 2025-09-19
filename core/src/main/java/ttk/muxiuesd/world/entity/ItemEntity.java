@@ -92,8 +92,9 @@ public class ItemEntity extends Entity<ItemEntity> {
         return this.itemStack;
     }
 
-    public void setItemStack (ItemStack itemStack) {
+    public ItemEntity setItemStack (ItemStack itemStack) {
         this.itemStack = itemStack;
+        return this;
     }
 
     public Vector2 getPositionOffset () {
@@ -116,7 +117,8 @@ public class ItemEntity extends Entity<ItemEntity> {
         return onAirTimer;
     }
 
-    public void setOnAirTimer (TaskTimer onAirTimer) {
+    public ItemEntity setOnAirTimer (TaskTimer onAirTimer) {
         this.onAirTimer = onAirTimer;
+        return this;
     }
 }

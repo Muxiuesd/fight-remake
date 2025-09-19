@@ -113,6 +113,21 @@ public class Player extends LivingEntity<Player> {
         return itemEntity;
     }
 
+    /**
+     * 指定丢弃的物品堆叠
+     * @return 返回生成的物品实体（已自动添加进世界）
+     * */
+    public ItemEntity dropItem (ItemStack stack) {
+        Vector2 mwp = Util.getMouseWorldPosition();
+        float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+        float v = Math.min(distance, 4f);
+
+        return spawnItemEntity(stack)
+            .setSpeed(v)
+            .setCurSpeed(v)
+            .setVelocity(getDirection());
+    }
+
     @Override
     public Direction getDirection () {
         return Util.getDirection();

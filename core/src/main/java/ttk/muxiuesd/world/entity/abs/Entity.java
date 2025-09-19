@@ -327,8 +327,9 @@ public abstract class Entity<T extends Entity<?>>
         return onGround;
     }
 
-    public void setOnGround (boolean onGround) {
+    public T setOnGround (boolean onGround) {
         this.onGround = onGround;
+        return (T) this;
     }
 
     /**

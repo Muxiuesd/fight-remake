@@ -39,11 +39,10 @@ public class MouseSlotUI extends SlotUI {
      * */
     public static MouseSlotUI activate () {
         PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
-        if (inventoryUIPanel != null) {
-            MouseSlotUI instance = getInstance();
-            instance.setPosition(Util.getMouseUIPosition());
-            inventoryUIPanel.addComponent(instance);
-        }
+        MouseSlotUI instance = getInstance();
+        instance.setPosition(Util.getMouseUIPosition());
+        inventoryUIPanel.addComponent(instance);
+
         return INSTANCE;
     }
 
@@ -53,9 +52,8 @@ public class MouseSlotUI extends SlotUI {
     public static MouseSlotUI deactivate () {
         MouseSlotUI instance = getInstance();
         PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
-        if (inventoryUIPanel != null) {
-            inventoryUIPanel.removeComponent(instance);
-        }
+        inventoryUIPanel.removeComponent(instance);
+
         return instance;
     }
 

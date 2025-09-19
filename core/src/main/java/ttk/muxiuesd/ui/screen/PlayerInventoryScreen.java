@@ -5,7 +5,9 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
 import ttk.muxiuesd.ui.abs.UIScreen;
+import ttk.muxiuesd.ui.components.MouseSlotUI;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 玩家背包界面屏幕
@@ -39,5 +41,14 @@ public class PlayerInventoryScreen extends UIScreen {
         addComponent(INVENTORY_UI_PANEL_INSTANCE);
     }
 
-
+    @Override
+    public void hide () {
+        //如果鼠标上还有物品的时候关闭玩家背包界面，就自动把鼠标上的物品丢出来
+        MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
+        if (getInventoryUIPanel().hasComponent(mouseSlotUI) && !mouseSlotUI.isNullSlot()) {
+            ItemStack itemStack = mouseSlotUI.getItemStack();
+            mouseSlotUI.clearItem();
+            this.playerSystem.getPlayer().dropItem(itemStack);
+        }
+    }
 }
