@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
@@ -18,14 +17,7 @@ import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
  * */
 public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
     public EmitterPlayerShootParticle () {
-        setParticlePool(new ParticlePool<>(100) {
-            @Override
-            protected ParticleSpell newObject () {
-                ParticleSpell particleSpell = new ParticleSpell();
-                particleSpell.init();
-                return particleSpell;
-            }
-        });
+        setParticlePool(EmitterEnemyShootParticle.POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
     }

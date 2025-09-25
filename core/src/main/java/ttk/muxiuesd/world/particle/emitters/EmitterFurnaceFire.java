@@ -1,15 +1,15 @@
 package ttk.muxiuesd.world.particle.emitters;
 
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.pool.particle.ParticleFirePool;
+import ttk.muxiuesd.pool.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleFire;
-import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
 import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
@@ -18,18 +18,10 @@ import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
  * 火焰粒子发射器
  * */
 public class EmitterFurnaceFire extends ParticleEmitter<ParticleFire> {
-    private Color color;
+    public static ParticlePool<ParticleFire> POOL = new ParticleFirePool();
 
     public EmitterFurnaceFire () {
-        this.color = new Color(0.88f, 0.1f, 0.1f, 0.2f);
-        setParticlePool(new ParticlePool<>(50) {
-            @Override
-            protected ParticleFire newObject () {
-                ParticleFire particle = new ParticleFire(color, 0.2f);
-                particle.init();
-                return particle;
-            }
-        });
+        setParticlePool(POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
     }

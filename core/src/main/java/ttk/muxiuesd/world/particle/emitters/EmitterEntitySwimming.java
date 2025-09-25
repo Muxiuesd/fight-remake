@@ -6,8 +6,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.pool.particle.ParticleBubblePool;
+import ttk.muxiuesd.pool.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.ParticleBubble;
-import ttk.muxiuesd.world.particle.ParticlePool;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
 import ttk.muxiuesd.world.particle.motion.PmcWaterFriction;
@@ -16,15 +17,9 @@ import ttk.muxiuesd.world.particle.motion.PmcWaterFriction;
  * 实体在水中游泳粒子发射器
  * */
 public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
+    public static ParticlePool<ParticleBubble> POOL = new ParticleBubblePool();
     public EmitterEntitySwimming () {
-        setParticlePool(new ParticlePool<>(100) {
-            @Override
-            protected ParticleBubble newObject () {
-                ParticleBubble particle = new ParticleBubble();
-                particle.init();
-                return particle;
-            }
-        });
+        setParticlePool(POOL);
         addMotionComp(new PmcWaterFriction());
         addMotionComp(new PmcSizeTrans());
     }
