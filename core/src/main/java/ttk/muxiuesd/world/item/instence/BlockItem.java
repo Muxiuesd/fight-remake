@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -40,7 +41,9 @@ public class BlockItem extends ConsumptionItem {
             ItemStack stack = new ItemStack(Gets.ITEM(replacedBlock.getID()), 1);
 
             //把替换下来的方块变成方块物品并且变成物品实体形式掉落在世界上
-            ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), user.getEntitySystem());
+            //ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), user.getEntitySystem());
+            ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
+            itemEntity.setEntitySystem(user.getEntitySystem());
             itemEntity.setItemStack(stack);
             itemEntity.setPosition(worldPosition.x, worldPosition.y);
             itemEntity.setSize(replacedBlock.width / 2, replacedBlock.height / 2);

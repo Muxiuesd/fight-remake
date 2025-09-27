@@ -13,6 +13,7 @@ import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
+import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
@@ -153,6 +154,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.incationEntity.removeValue(entity, true);
         //把实体移除出渲染层级
         this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
+
+        if (entity instanceof PoolableEntity poolableEntity) {
+            poolableEntity.freeSelf();
+        }
     }
 
     @Override

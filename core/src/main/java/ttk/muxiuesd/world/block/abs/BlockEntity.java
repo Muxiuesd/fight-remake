@@ -11,7 +11,7 @@ import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
-import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
@@ -100,7 +100,9 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
             if (itemStack == null) continue;
 
             itemStack.getItem().beDropped(itemStack, world, destroyer);
-            ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), es);
+            //ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), es);
+            ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
+            itemEntity.setEntitySystem(es);
             itemEntity.setItemStack(itemStack);
             itemEntity.setPosition(getBlockPos());
             itemEntity.setSize(ItemEntity.DEFAULT_SIZE);

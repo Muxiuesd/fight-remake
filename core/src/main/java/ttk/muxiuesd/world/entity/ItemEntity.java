@@ -4,7 +4,10 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.registry.EntityTypes;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CAT;
@@ -16,8 +19,9 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 掉落在地上的物品以实体形式存在
  * */
-public class ItemEntity extends Entity<ItemEntity> {
+public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, PoolableEntity {
     public static final Vector2 DEFAULT_SIZE = new Vector2(0.5f, 0.5f);
+
     private ItemStack itemStack;
     private Vector2 positionOffset;
     private TaskTimer onAirTimer;   //在空中的计时器，可以自定义物品实体在空中运动的时间
@@ -36,15 +40,15 @@ public class ItemEntity extends Entity<ItemEntity> {
     @Override
     public void readCAT (JsonValue values) {
         super.readCAT(values);
-        this.cycle = values.getFloat("cycle");
-        this.livingTime = values.getFloat("living_time");
+        this.cycle = values.getFloat("cycle", 0f);
+        this.livingTime = values.getFloat("living_time", 0f);
 
 
         if (values.has("on_air")) {
             if (values.getBoolean("on_air")) {
                 this.onAirTimer = new TaskTimer(
-                    values.getFloat("on_air_max_span"),
-                    values.getFloat("on_air_cur_span"),
+                    values.getFloat("on_air_max_span", 0f),
+                    values.getFloat("on_air_cur_span", 0f),
                     () -> this.setOnAirTimer(null)
                 );
             }
@@ -86,6 +90,18 @@ public class ItemEntity extends Entity<ItemEntity> {
     @Override
     public void draw (Batch batch) {
         if (this.itemStack != null) this.itemStack.getItem().drawOnWorld(batch, this);
+    }
+
+    @Override
+    public void reset () {
+        setEntitySystem(null);
+        setItemStack(null);
+        setLivingTime(0f);
+    }
+
+    @Override
+    public void freeSelf () {
+        Pools.ITEM_ENTITY.free(this);
     }
 
     public ItemStack getItemStack () {

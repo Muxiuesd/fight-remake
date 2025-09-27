@@ -9,8 +9,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
-import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
@@ -216,7 +214,9 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * */
     public ItemEntity spawnItemEntity (ItemStack stack) {
         //简单的生成一个物品实体而已
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
+        //ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
+        ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
+        itemEntity.setEntitySystem(getEntitySystem());
         //使得物品中心与实体中心对齐
         return itemEntity
             .setItemStack(stack)

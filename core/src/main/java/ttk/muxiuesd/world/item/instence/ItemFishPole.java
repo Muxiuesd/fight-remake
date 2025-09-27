@@ -7,9 +7,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
-import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
@@ -73,7 +73,9 @@ public class ItemFishPole extends Item {
                 //需要鱼钩在水中才能钓到鱼
                 //生成钓鱼战利品
                 FishingLootTable.fastGenerate(100, genItemStack -> {
-                    ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
+                    //ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
+                    ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
+                    itemEntity.setEntitySystem(user.getEntitySystem());
                     itemEntity.setPosition(hookPos);
                     itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
                     itemEntity.setItemStack(genItemStack);
