@@ -33,7 +33,9 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
 
     @Override
     public void initialize () {
-        ParticleAssets.loadAll();
+        ParticleAssets.init();
+        ParticleEmittersReg.init();
+
         this.activeEmitters = new Array<>();
         this.delayAddEmitters = new Array<>();
         this.delayRemoveEmitters = new Array<>();
@@ -108,6 +110,8 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
 
     /**
      * 发射粒子
+     * <p>
+     * 传入的参数都是最初始的参数，会影响后续运动逻辑
      * */
     public void emitParticle (String emitterId, int count,
                               Vector2 position, Vector2 velocity, Vector2 origin,

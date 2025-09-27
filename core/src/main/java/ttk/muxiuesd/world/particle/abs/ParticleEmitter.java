@@ -1,8 +1,11 @@
 package ttk.muxiuesd.world.particle.abs;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.pool.particle.ParticlePool;
@@ -23,6 +26,8 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
 
     private Array<ParticleMotionComp> motionComps;
 
+    private TextureRegion textureRegion;
+
     public ParticleEmitter () {
         this.activeParticles = new Array<>();
         this.delayAddParticles = new Array<>();
@@ -40,6 +45,17 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
     }
 
     /**
+     * 更新活跃粒子的运动逻辑
+     * */
+    public void updateParticlesMotion (float delta) {
+        for (Particle activeParticle : this.activeParticles) {
+            for (ParticleMotionComp motionComp : this.motionComps) {
+                motionComp.motion(activeParticle, delta);
+            }
+        }
+    }
+
+    /**
      * 粒子的生成逻辑
      * */
     public abstract void summon (Vector2 position, Vector2 velocity, Vector2 origin,
@@ -50,7 +66,7 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
     public void update (float delta) {
         if (this.delayRemoveParticles.size > 0) {
             this.activeParticles.removeAll(this.delayRemoveParticles, true);
-            this.particlePool.freeAll(this.delayRemoveParticles);
+            this.getParticlePool().freeAll(this.delayRemoveParticles);
             this.delayRemoveParticles.clear();
         }
         if (this.delayAddParticles.size > 0) {
@@ -75,9 +91,7 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
 
     @Override
     public void draw (Batch batch) {
-        for (Particle p : this.activeParticles) {
-            p.draw(batch);
-        }
+        this.getActiveParticles().forEach(particle -> particle.draw(batch));
     }
 
     /**
@@ -115,6 +129,9 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
         this.motionComps.removeValue(m, true);
     }
 
+    /**
+     * 获取粒子对象池
+     * */
     public ParticlePool<T> getParticlePool () {
         return this.particlePool;
     }
@@ -130,7 +147,20 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
         return this.activeParticles.size + this.delayAddParticles.size;
     }
 
+    /**
+     * 获取当前所有活跃的粒子
+     * */
     public Array<T> getActiveParticles () {
         return this.activeParticles;
+    }
+
+    public TextureRegion getTextureRegion () {
+        return this.textureRegion;
+    }
+
+    public void setTextureRegion (String id) {
+        if (AssetsLoader.getInstance().containsId(id)) {
+            this.textureRegion = new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+        }
     }
 }

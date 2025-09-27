@@ -1,13 +1,11 @@
 package ttk.muxiuesd.world.particle.emitters;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.pool.particle.ParticleBubblePool;
 import ttk.muxiuesd.pool.particle.ParticlePool;
+import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleBubble;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
@@ -22,6 +20,7 @@ public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
         setParticlePool(POOL);
         addMotionComp(new PmcWaterFriction());
         addMotionComp(new PmcSizeTrans());
+        setTextureRegion(ParticleAssets.BUBBLE);
     }
 
     @Override
@@ -36,7 +35,10 @@ public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
                         Vector2 scale,
                         float rotation, float duration) {
         ParticleBubble p = getParticlePool().obtain();
-        p.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("bubble"), Texture.class));
+        TextureRegion textureRegion = getTextureRegion();
+        if (p.region == null || p.region != textureRegion) {
+            p.region = textureRegion;
+        }
         p.position.set(position.x + MathUtils.random(-0.5f, 0.5f),
             position.y + MathUtils.random(-0.1f, 0.1f));
         p.origin.set(origin);

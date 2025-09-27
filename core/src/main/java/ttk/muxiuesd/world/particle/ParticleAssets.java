@@ -5,18 +5,24 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 
 /**
- * 粒子资产
+ * 粒子贴图资产注册
  * <p>
  * TODO json文件定义粒子
  * */
 public class ParticleAssets {
-    public static void loadAll (){
-        loadTexture("spell", "texture/particle/spell.png");
-        loadTexture("bubble", "texture/particle/bubble.png");
-        loadTexture("fire", "texture/entity/bullet/flame.png");
-    }
+    public static void init () {}
 
-    private static void loadTexture (String name, String path) {
-        AssetsLoader.getInstance().loadAsync(Fight.getId(name), path, Texture.class, () -> {});
+    public static final String SPELL = loadTexture("spell", "texture/particle/spell.png");
+    public static final String BUBBLE = loadTexture("bubble", "texture/particle/bubble.png");
+    public static final String FIRE = loadTexture("fire", "texture/entity/bullet/flame.png");
+
+
+    /**
+     * 加载粒子贴图
+     * */
+    public static String loadTexture (String name, String path) {
+        String id = Fight.getId(name);
+        AssetsLoader.getInstance().loadAsync(id, path, Texture.class, () -> {});
+        return id;
     }
 }

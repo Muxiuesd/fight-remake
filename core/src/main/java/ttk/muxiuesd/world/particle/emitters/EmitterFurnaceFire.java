@@ -1,14 +1,12 @@
 package ttk.muxiuesd.world.particle.emitters;
 
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.pool.particle.ParticleFirePool;
 import ttk.muxiuesd.pool.particle.ParticlePool;
+import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleFire;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
@@ -24,6 +22,7 @@ public class EmitterFurnaceFire extends ParticleEmitter<ParticleFire> {
         setParticlePool(POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
+        setTextureRegion(ParticleAssets.FIRE);
     }
 
     @Override
@@ -31,7 +30,10 @@ public class EmitterFurnaceFire extends ParticleEmitter<ParticleFire> {
                         Vector2 origin, Vector2 startSize, Vector2 endSize,
                         Vector2 scale, float rotation, float duration) {
         ParticleFire p = getParticlePool().obtain();
-        p.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("fire"), Texture.class));
+        TextureRegion textureRegion = getTextureRegion();
+        if (p.region == null || p.region != textureRegion) {
+            p.region = textureRegion;
+        }
         p.position.set(position).add(MathUtils.random(-0.2f, 0.2f), 0);
         p.origin.set(origin);
         p.startSize.set(startSize).scl(MathUtils.random(0.5f, 1.1f));
