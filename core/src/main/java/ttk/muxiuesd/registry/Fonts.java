@@ -15,7 +15,6 @@ public class Fonts {
 
 
     public static FontHolder register (String name) {
-
         String id = Fight.ID(name);
         return FontManager.registerFont(id, Gdx.files.internal(Fight.FontPath(name)));
     }

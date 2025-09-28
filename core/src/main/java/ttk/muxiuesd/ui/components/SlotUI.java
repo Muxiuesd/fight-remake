@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.UIComponent;
+import ttk.muxiuesd.ui.text.TextUI;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -20,6 +21,7 @@ public class SlotUI extends UIComponent {
     private PlayerSystem playerSystem;
     private int index;  ///指向的玩家背包容器的索引
 
+    private TextUI textUI;
 
     public SlotUI (PlayerSystem playerSystem, int index, float x, float y) {
         this(playerSystem, index, x, y, SLOT_WIDTH, SLOT_HEIGHT,
@@ -35,6 +37,9 @@ public class SlotUI extends UIComponent {
     }
     public SlotUI (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
+
+        this.textUI = new TextUI();
+        this.textUI.setPosition(x, y);
     }
 
     @Override
@@ -49,6 +54,12 @@ public class SlotUI extends UIComponent {
         }
         ItemStack itemStack = this.getItemStack();
         batch.draw(itemStack.getItem().texture, renderX, renderY, getWidth(), getHeight());
+
+        int amount = itemStack.getAmount();
+        if (amount > 1) {
+            this.textUI.setPosition(renderX, renderY);
+            this.textUI.setText(String.valueOf(amount)).draw(batch, parent);
+        }
     }
 
     /**

@@ -23,6 +23,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     ///交互区域网格
     private GridPoint2 interactGridSize;
 
+    public UIComponent() {}
     public UIComponent(float x, float y, float width, float height, GridPoint2 interactGridSize) {
         this.x = x;
         this.y = y;
@@ -41,6 +42,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     @Override
     public void renderShape (ShapeRenderer batch) {
+        //batch.rect(this.getX(), this.getY(), this.getWidth(), this.getWidth());
     }
 
     /**

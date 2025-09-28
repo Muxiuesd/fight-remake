@@ -1,10 +1,8 @@
 package ttk.muxiuesd.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.ui.components.UIPanel;
@@ -51,9 +49,6 @@ public class PlayerInventoryUIPanel extends UIPanel {
     public void draw (Batch batch, UIPanel parent) {
         batch.draw(this.background, getX(), getY(), getWidth(), getHeight());
         super.draw(batch, parent);
-
-        BitmapFont font = Fonts.MC.getFont(10);
-        font.draw(batch, "test", getX(), getY());
     }
 
 }
