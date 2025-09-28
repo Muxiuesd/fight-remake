@@ -34,6 +34,7 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void show() {
+        Fonts.init();
         //初始化游戏底层系统
         GameSystemManager.init();
 
