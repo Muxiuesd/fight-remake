@@ -45,7 +45,7 @@ public class PlayerCodec extends JsonCodec<Player> {
         );
         propertyOptional.ifPresent(player::setProperty);
         //读取cat
-        player.readCAT(propertyValue.get(Fight.getId("cat")));
+        player.readCAT(propertyValue.get(Fight.ID("cat")));
 
         //读取背包数据
         JsonValue backpackValue = dataReader.readObj("backpack");

@@ -61,7 +61,7 @@ public final class Items {
      * 物品注册的基本方法
      * */
     public static Item register (String name, Supplier<Item> factory) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         Identifier identifier = new Identifier(id);
         return Registries.ITEM.register(identifier, factory.get()).setID(id);
     }

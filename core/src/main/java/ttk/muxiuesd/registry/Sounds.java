@@ -48,7 +48,7 @@ public final class Sounds {
         String walk = name + "_walk";
         String put = name + "_put";
         String destroy = name + "_destroy";
-        BlockSoundsID ids = new BlockSoundsID(Fight.getId(walk), Fight.getId(put), Fight.getId(destroy));
+        BlockSoundsID ids = new BlockSoundsID(Fight.ID(walk), Fight.ID(put), Fight.ID(destroy));
         registerBlockSoundAsMusic(walk, "walk/" + soundFileName);
         registerBlockSoundAsMusic(put, "put/" + soundFileName);
         registerBlockSoundAsMusic(destroy, "destroy/" + soundFileName);
@@ -74,7 +74,7 @@ public final class Sounds {
      * 把sound加载成music
      * */
     public static Audio registerSoundAsMusic (String name, String path) {
-        String id = LOADER.loadMusic(Fight.getId(name), "sound/" + path);
+        String id = LOADER.loadMusic(Fight.ID(name), "sound/" + path);
         return register(id);
     }
 
@@ -83,7 +83,7 @@ public final class Sounds {
      * 最基础的sound注册
      * */
     public static Audio registerSound (String name, String path) {
-        String id = LOADER.loadSound(Fight.getId(name), "sound/" + path);
+        String id = LOADER.loadSound(Fight.ID(name), "sound/" + path);
         return register(id);
     }
 
@@ -91,7 +91,7 @@ public final class Sounds {
      * 最基础的music注册
      * */
     public static Audio registerMusic (String name, String path) {
-        String id = LOADER.loadMusic(Fight.getId(name), "music/" + path);
+        String id = LOADER.loadMusic(Fight.ID(name), "music/" + path);
         return register(id);
     }
 

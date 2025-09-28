@@ -21,7 +21,7 @@ public class ParticleAssets {
      * 加载粒子贴图
      * */
     public static String loadTexture (String name, String path) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         AssetsLoader.getInstance().loadAsync(id, path, Texture.class, () -> {});
         return id;
     }

@@ -105,7 +105,7 @@ public class PlayerSystem extends WorldSystem {
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
             //发射气泡粒子
             ParticleSystem pts = getManager().getSystem(ParticleSystem.class);
-            pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(3, 7),
+            pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(3, 7),
                 playerCenter.set(playerCenter.x, playerCenter.y - 0.4f),
                 new Vector2(MathUtils.random(1, 2), 0),
                 this.player.getOrigin(),

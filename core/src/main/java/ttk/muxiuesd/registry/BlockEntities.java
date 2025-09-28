@@ -24,7 +24,7 @@ public final class BlockEntities {
     );
 
     public static <T extends BlockEntityProvider.Factory<?>> BlockEntityProvider register (String name, T provider) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         BlockEntityProvider blockEntityProvider = new BlockEntityProvider(id, provider);
         return Registries.BLOCK_ENTITY.register(new Identifier(id), blockEntityProvider);
     }

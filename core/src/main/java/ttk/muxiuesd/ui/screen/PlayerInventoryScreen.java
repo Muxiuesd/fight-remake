@@ -29,7 +29,7 @@ public class PlayerInventoryScreen extends UIScreen {
         this.playerSystem = playerSystem;
 
         TextureRegion background = Util.loadTextureRegion(
-            Fight.getId("player_inventory"),
+            Fight.ID("player_inventory"),
             Fight.UITexturePath("inventory.png")
         );
 

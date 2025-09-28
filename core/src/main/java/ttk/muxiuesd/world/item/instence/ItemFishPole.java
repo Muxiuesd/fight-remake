@@ -43,9 +43,9 @@ public class ItemFishPole extends Item {
         super(Type.COMMON, new Property().setMaxCount(1)
                 .add(PropertyTypes.ITEM_WITH_ENTITY, null)
                 .add(PropertyTypes.FISHING_POLE_USING, false),
-            Fight.getId("fish_pole"),
+            Fight.ID("fish_pole"),
             Fight.ItemTexturePath("fish_pole.png"));
-        this.castTexture = getTextureRegion(Fight.getId("fish_pole_cast"), Fight.ItemTexturePath("fish_pole_cast.png"));
+        this.castTexture = getTextureRegion(Fight.ID("fish_pole_cast"), Fight.ItemTexturePath("fish_pole_cast.png"));
     }
 
     @Override

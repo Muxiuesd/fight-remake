@@ -23,7 +23,7 @@ public final class FurnaceRecipes {
      * 普通的配方注册，输入一个就输出一个
      * */
     public static CookingRecipe register (String name, Item input, Item output) {
-        return register(new CookingRecipe(Fight.getId(name), new ItemStack(input, 1)) {
+        return register(new CookingRecipe(Fight.ID(name), new ItemStack(input, 1)) {
             @Override
             public ItemStack getOutput () {
                 return new ItemStack(output, 1);

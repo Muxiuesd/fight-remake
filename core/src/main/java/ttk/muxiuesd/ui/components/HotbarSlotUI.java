@@ -28,7 +28,7 @@ public class HotbarSlotUI extends SlotUI {
             x, y, HOTBAR_WIDTH, HOTBAR_HEIGHT,
             new GridPoint2((int) HOTBAR_WIDTH, (int) HOTBAR_HEIGHT));
         this.textureRegion = Util.loadTextureRegion(
-            Fight.getId("hotbar"),
+            Fight.ID("hotbar"),
             Fight.UITexturePath("hotbar.png")
         );
     }

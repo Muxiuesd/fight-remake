@@ -54,7 +54,7 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         );
         propertyOptional.ifPresent(entity::setProperty);
         //读取cat
-        entity.readCAT(propertyValue.get(Fight.getId("cat")));
+        entity.readCAT(propertyValue.get(Fight.ID("cat")));
 
         //对于活物实体
         if (entity instanceof LivingEntity<?> livingEntity) {

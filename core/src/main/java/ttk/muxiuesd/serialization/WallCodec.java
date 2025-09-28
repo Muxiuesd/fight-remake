@@ -46,7 +46,7 @@ public class WallCodec extends JsonCodec<Wall<?>> {
             self.setProperty(propertyOptional.get());
         }
         //读取cat
-        self.readCAT(propertyValue.get(Fight.getId("cat")));
+        self.readCAT(propertyValue.get(Fight.ID("cat")));
 
         return Optional.of(self);
     }

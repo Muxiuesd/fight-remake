@@ -10,7 +10,7 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class ConsumptionItem extends Item {
     public ConsumptionItem(String name) {
-        super(Type.CONSUMPTION, new Property(), Fight.getId(name), Fight.ItemTexturePath(name + ".png"));
+        super(Type.CONSUMPTION, new Property(), Fight.ID(name), Fight.ItemTexturePath(name + ".png"));
     }
     public ConsumptionItem (Property property, String textureId) {
         super(Type.CONSUMPTION, property, textureId);

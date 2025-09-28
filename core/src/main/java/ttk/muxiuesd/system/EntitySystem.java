@@ -236,7 +236,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+                    AudioPlayer.getInstance().playSound(Fight.ID("pop"));
                     //整个捡起来就没必要执行下面的代码了
                     return;
                 }else if (state == ItemPickUpState.PARTIAL) {

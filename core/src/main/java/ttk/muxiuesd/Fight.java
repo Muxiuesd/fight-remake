@@ -37,7 +37,7 @@ public class Fight {
 
 
 
-    public static String getId (String name) {
+    public static String ID (String name) {
         return NAMESPACE + ":" + name;
     }
 

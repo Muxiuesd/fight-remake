@@ -131,7 +131,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
      * @param direction 子弹的运动方向
      * */
     public Bullet createBullet (Entity<?> owner, Direction direction) {
-        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.getId("bullet_fire"), owner.getEntitySystem());
+        BulletFire bullet = (BulletFire) Gets.BULLET(Fight.ID("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
         bullet.setPosition(x + (getWidth() - bullet.getWidth())/2, y + (getHeight() - bullet.getHeight())/2);

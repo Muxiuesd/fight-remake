@@ -47,7 +47,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         user.setHandItemStack(outStack);
         inventory.clear();
 
-        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+        AudioPlayer.getInstance().playSound(Fight.ID("pop"));
         return InteractResult.SUCCESS;
     }
 
@@ -77,7 +77,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         //记得清理
         user.backpack.clear();
 
-        AudioPlayer.getInstance().playSound(Fight.getId("put"), 2.5f);
+        AudioPlayer.getInstance().playSound(Fight.ID("put"), 2.5f);
         return InteractResult.SUCCESS;
     }
 

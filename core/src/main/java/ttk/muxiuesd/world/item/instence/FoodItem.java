@@ -16,7 +16,7 @@ public class FoodItem extends ConsumptionItem {
      * 默认属性，默认的吃食物的音效
      * */
     public static Property createDefaultProperty() {
-        return new Property().setMaxCount(64).setUseSoundId(Fight.getId("eat_"));
+        return new Property().setMaxCount(64).setUseSoundId(Fight.ID("eat_"));
     }
 
 

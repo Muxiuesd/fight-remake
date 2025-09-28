@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.entity.effect.EffectHealing;
 public final class StatusEffects {
     public static void init() {}
 
-    public static final StatusEffect HEALING = register(new EffectHealing(Fight.getId("healing")));
+    public static final StatusEffect HEALING = register(new EffectHealing(Fight.ID("healing")));
 
 
 

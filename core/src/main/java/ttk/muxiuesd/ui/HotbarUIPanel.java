@@ -35,7 +35,7 @@ public class HotbarUIPanel extends UIPanel {
             this.hotbarUIComponents.add(hotbarSlotUI);
         }
         this.selectedHotbarTextureRegion = Util.loadTextureRegion(
-            Fight.getId("selected_hotbar"),
+            Fight.ID("selected_hotbar"),
             Fight.UITexturePath("selected_hotbar.png")
         );
     }

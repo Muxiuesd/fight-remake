@@ -7,6 +7,6 @@ import ttk.muxiuesd.Fight;
  * */
 public class ItemPufferFish extends FoodItem{
     public ItemPufferFish () {
-        super(Fight.getId("puffer_fish"), Fight.EntityTexturePath("fish/puffer_fish.png"));
+        super(Fight.ID("puffer_fish"), Fight.EntityTexturePath("fish/puffer_fish.png"));
     }
 }

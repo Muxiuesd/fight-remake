@@ -28,7 +28,7 @@ public class PufferFishRestState extends StatePufferFish{
             timer.update(delta);
             if (timer.isReady()) {
                 entity.randomWalkPath(world);
-                entity.setState(Fight.getId("random_walk"));
+                entity.setState(Fight.ID("random_walk"));
             }
         }
     }

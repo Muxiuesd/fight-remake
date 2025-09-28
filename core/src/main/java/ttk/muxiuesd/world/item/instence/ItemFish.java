@@ -11,7 +11,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class ItemFish extends FoodItem {
     public ItemFish () {
-        super(Fight.getId("fish"), Fight.ItemTexturePath("fish.png"));
+        super(Fight.ID("fish"), Fight.ItemTexturePath("fish.png"));
     }
 
     @Override

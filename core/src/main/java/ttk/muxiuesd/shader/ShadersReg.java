@@ -13,18 +13,18 @@ public class ShadersReg {
     public static final String DEFAULT_SHADER = registerDefault();
 
     public static final String DAYNIGHT_SHADER = register(
-        Fight.getId("daynight_shader"),
+        Fight.ID("daynight_shader"),
         "shaders/daynight/daynight.vert",
         "shaders/daynight/daynight.frag");
 
     public static final String PARTICLE_SHADER = register(
-        Fight.getId("particle_1_shader"),
+        Fight.ID("particle_1_shader"),
         "shaders/particle/particle.vert",
         "shaders/particle/particle.frag"
     );
 
     public static final String PARTICLE_2_SHADER = register(
-        Fight.getId("particle_shader"),
+        Fight.ID("particle_shader"),
         "shaders/particle/particle_2.vert",
         "shaders/particle/particle_2.frag"
     );
@@ -42,7 +42,7 @@ public class ShadersReg {
     }
 
     private static String registerDefault() {
-        String id = Fight.getId("default_shader");
+        String id = Fight.ID("default_shader");
         ShaderProgram shader = SpriteBatch.createDefaultShader();
         ShaderScheduler.getInstance().registry(id, shader);
         return id;

@@ -10,7 +10,7 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
 public class WeaponDiamondSword extends RangedWeapon {
     public WeaponDiamondSword () {
         super(RangedWeapon.createDefaultProperty(),
-            Fight.getId("test_weapon"),
+            Fight.ID("test_weapon"),
             Fight.ItemTexturePath("diamond_sword.png"),
             (world, owner, entityType, direction) -> {
                 BulletFire bullet = Entities.BULLET_FIRE.create(world);

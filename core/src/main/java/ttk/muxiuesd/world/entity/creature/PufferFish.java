@@ -28,18 +28,18 @@ public class PufferFish extends LivingEntity<PufferFish> {
 
     public PufferFish (World world, EntityType<? super PufferFish> entityType) {
         super(world, entityType, 5, 5, 1);
-        loadBodyTextureRegion(Fight.getId("puffer_fish"), "fish/puffer_fish.png");
+        loadBodyTextureRegion(Fight.ID("puffer_fish"), "fish/puffer_fish.png");
         setSize(DEFAULT_SIZE);
         setSpeed(1f);
         getBackpack().addItem(new ItemStack(Items.PUFFER_FISH, 1));
 
-        addState(Fight.getId("rest"), new PufferFishRestState());
-        addState(Fight.getId("random_walk"), new PufferFishRandomWalkState());
+        addState(Fight.ID("rest"), new PufferFishRestState());
+        addState(Fight.ID("random_walk"), new PufferFishRandomWalkState());
     }
 
     @Override
     public void initialize () {
-        setState(Fight.getId("rest"));
+        setState(Fight.ID("rest"));
     }
 
     @Override

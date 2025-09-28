@@ -20,10 +20,10 @@ public class ParticleEmittersReg {
     }
     private static final LinkedHashMap<String, ParticleEmitter<? extends Particle>> emitters = new LinkedHashMap<>();
 
-    public static final String FURNACE_FIRE = register(Fight.getId("furnace_fire"), new EmitterFurnaceFire());
-    public static final String PLAYER_SHOOT = register(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
-    public static final String ENTITY_SWIMMING = register(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
-    public static final String ENTITY_SHOOT = register(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());
+    public static final String FURNACE_FIRE = register(Fight.ID("furnace_fire"), new EmitterFurnaceFire());
+    public static final String PLAYER_SHOOT = register(Fight.ID("player_shoot"), new EmitterPlayerShootParticle());
+    public static final String ENTITY_SWIMMING = register(Fight.ID("entity_swimming"), new EmitterEntitySwimming());
+    public static final String ENTITY_SHOOT = register(Fight.ID("enemy_shoot"), new EmitterEnemyShootParticle());
 
     /**
      * 添加一种粒子发射器

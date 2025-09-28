@@ -35,7 +35,7 @@ public final class PropertyTypes {
 
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         Identifier identifier = new Identifier(id);
         return (PropertyType<T>) Registries.PROPERTY_TYPE.register(identifier, type).setId(id);
     }

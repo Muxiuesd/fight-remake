@@ -47,7 +47,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
         slime.setBounds(ps.getPlayer().x + 10, ps.getPlayer().y + 10, 1, 1);
         es.add(slime);
 */
-        this.addGenFactory(Fight.getId("slime"), new SlimeGenFactory());
+        this.addGenFactory(Fight.ID("slime"), new SlimeGenFactory());
     }
 
     @Override

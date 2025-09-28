@@ -205,7 +205,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
 
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
-        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+        AudioPlayer.getInstance().playSound(Fight.ID("pop"));
 
         return this.spawnItemEntity(itemStack);
     }

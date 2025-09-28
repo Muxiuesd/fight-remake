@@ -28,7 +28,7 @@ public class PufferFishRandomWalkState extends StatePufferFish {
         if (timer != null) {
             timer.update(delta);
             if (timer.isReady()) {
-                entity.setState(Fight.getId("rest"));
+                entity.setState(Fight.ID("rest"));
             }else {
                 //还在游走状态
                 Vector2 walkDistance = entity.getWalkDistance();

@@ -54,7 +54,7 @@ public final class Pools {
     }
 
     public static <T> FightPool<T> register (String name, FightPool<T> fightPool) {
-        return (FightPool<T>) Registries.POOL.register(new Identifier(Fight.getId(name)), fightPool);
+        return (FightPool<T>) Registries.POOL.register(new Identifier(Fight.ID(name)), fightPool);
     }
 
 }

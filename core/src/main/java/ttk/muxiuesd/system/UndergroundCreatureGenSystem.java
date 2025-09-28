@@ -32,7 +32,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
     public void initialize () {
         super.initialize();
 
-        addGenFactory(Fight.getId("puffer_fish"), new PufferFishGenFactory());
+        addGenFactory(Fight.ID("puffer_fish"), new PufferFishGenFactory());
     }
 
     @Override

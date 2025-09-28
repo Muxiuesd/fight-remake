@@ -40,7 +40,7 @@ public final class Blocks {
      * 方块注册的基本方法
      * */
     public static Block register (String name, Supplier<Block> factory) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         Identifier identifier = new Identifier(id);
         return Registries.BLOCK.register(identifier, factory.get().setID(id));
     }

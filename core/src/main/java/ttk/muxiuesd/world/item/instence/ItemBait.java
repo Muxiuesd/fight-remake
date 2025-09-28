@@ -16,7 +16,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class ItemBait extends ConsumptionItem {
     public ItemBait () {
         super(new Property().setMaxCount(64),
-            Fight.getId("bait"),
+            Fight.ID("bait"),
             Fight.ItemTexturePath("bait.png"));
     }
 

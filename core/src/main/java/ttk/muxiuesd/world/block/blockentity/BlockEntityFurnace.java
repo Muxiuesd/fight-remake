@@ -108,7 +108,7 @@ public class BlockEntityFurnace extends BlockEntity {
             handItemStack.setAmount(handItemStack.getAmount() - addAmount - bePutStack.getAmount());
         }
 
-        AudioPlayer.getInstance().playSound(Fight.getId("put"), 2.5f);
+        AudioPlayer.getInstance().playSound(Fight.ID("put"), 2.5f);
         return InteractResult.SUCCESS;
     }
 

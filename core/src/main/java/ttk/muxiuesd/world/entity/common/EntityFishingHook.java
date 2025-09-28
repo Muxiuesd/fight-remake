@@ -39,12 +39,12 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
-        bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");
+        bodyTexture = getTextureRegion(Fight.ID("fishing_hook"), "fish/fishing_hook.png");
 
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
-            this.pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(2, 5),
+            this.pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(2, 5),
                 getCenter().add(0, - getHeight() / 2),
                 new Vector2(MathUtils.random(0.5f, 1.2f), 0),
                 getOrigin(),
