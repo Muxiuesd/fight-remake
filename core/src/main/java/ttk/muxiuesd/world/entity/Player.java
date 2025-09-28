@@ -171,6 +171,7 @@ public class Player extends LivingEntity<Player> {
         }
         if (KeyBindings.PlayerDropItem.wasJustPressed()) {
             dropItem(getHandIndex(), 1);
+            System.out.println("Q");
         }
     }
 }

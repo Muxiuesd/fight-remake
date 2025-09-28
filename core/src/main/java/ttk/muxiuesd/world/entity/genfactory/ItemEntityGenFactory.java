@@ -8,17 +8,27 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 物品实体生成工厂
+ * 物品实体的生成工厂
  * */
 public class ItemEntityGenFactory implements EntityGenFactory<ItemEntity> {
     public static ItemEntityPool POOL = new ItemEntityPool();
 
+    /**
+     * 拿取池中的实体，自动添加进实体系统 {@link EntitySystem}
+     * */
     public static ItemEntity create (EntitySystem entitySystem, Vector2 position, ItemStack itemStack) {
+        return create(entitySystem, itemStack).setPosition(position);
+    }
+
+    /**
+     * 拿取池中的实体，自动添加进实体系统 {@link EntitySystem}
+     * */
+    public static ItemEntity create (EntitySystem entitySystem, ItemStack itemStack) {
         ItemEntity entity = POOL.obtain();
-        //ItemEntity entity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, entitySystem);
         entity.setEntitySystem(entitySystem);
-        entity.setPosition(position);
         entity.setItemStack(itemStack);
+        entitySystem.add(entity);
+        //System.out.println("物品实体池拿取实体");
         return entity;
     }
 }

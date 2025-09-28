@@ -154,7 +154,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.incationEntity.removeValue(entity, true);
         //把实体移除出渲染层级
         this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
-
+        //执行池化实体释放逻辑
         if (entity instanceof PoolableEntity poolableEntity) {
             poolableEntity.freeSelf();
         }

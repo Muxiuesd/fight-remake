@@ -17,10 +17,4 @@ public class ItemEntityPool extends Pool<ItemEntity> {
     protected ItemEntity newObject () {
         return Entities.ITEM_ENTITY.create(null, EntityTypes.ITEM_ENTITY);
     }
-
-    @Override
-    public void free (ItemEntity object) {
-        super.free(object);
-        System.out.println("回收实体：" + object + " 当前池中数量：" + getFree());
-    }
 }
