@@ -36,10 +36,18 @@ public class Fight {
     public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
 
 
-
+    /**
+     * 游戏本体的元素获取ID
+     * */
     public static String ID (String name) {
-        return NAMESPACE + ":" + name;
+        synchronized (idStringBuilder) {
+            idStringBuilder.setLength(0);
+            idStringBuilder.append(NAMESPACE).append(":").append(name);
+            return idStringBuilder.toString();
+        }
     }
+    private static final StringBuilder idStringBuilder = new StringBuilder();
+
 
     /**
      * 从方块的材质根路径中获取方块的材质

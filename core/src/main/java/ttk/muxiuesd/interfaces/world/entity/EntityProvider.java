@@ -7,7 +7,6 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 /**
  * 实体的提供类
  * */
-
 public class EntityProvider<T extends Entity<?>> {
     private String id;
 
