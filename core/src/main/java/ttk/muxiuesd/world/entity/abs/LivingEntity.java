@@ -17,7 +17,7 @@ import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -215,7 +215,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * */
     public ItemEntity spawnItemEntity (ItemStack stack) {
         //简单的生成一个物品实体而已
-        ItemEntity itemEntity = ItemEntityGenFactory.create(getEntitySystem(), stack);
+        ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), stack);
         //使得物品中心与实体中心对齐
         return itemEntity
             .setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))

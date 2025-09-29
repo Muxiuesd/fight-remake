@@ -10,7 +10,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -42,7 +42,7 @@ public class BlockItem extends ConsumptionItem {
 
             //把替换下来的方块变成方块物品并且变成物品实体形式掉落在世界上
             //ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), user.getEntitySystem());
-            ItemEntity itemEntity = ItemEntityGenFactory.create(user.getEntitySystem(), stack)
+            ItemEntity itemEntity = ItemEntityGetter.get(user.getEntitySystem(), stack)
                 .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
                 .setPosition(worldPosition.x, worldPosition.y)
                 .setSize(replacedBlock.width / 2, replacedBlock.height / 2);

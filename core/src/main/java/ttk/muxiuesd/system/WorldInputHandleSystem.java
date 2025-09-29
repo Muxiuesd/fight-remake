@@ -32,7 +32,7 @@ import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -163,7 +163,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
     }
 
     private ItemEntity dropItemEntity (EntitySystem entitySystem, Vector2 pos, ID<?> idHolder, int amount) {
-        ItemEntity itemEntity = ItemEntityGenFactory.create(entitySystem, pos,
+        ItemEntity itemEntity = ItemEntityGetter.get(entitySystem, pos,
             new ItemStack(Gets.ITEM(idHolder.getID()), amount)
         );
         itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());

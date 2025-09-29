@@ -11,7 +11,7 @@ import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 import ttk.muxiuesd.util.pool.PoolableVec2;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGenFactory;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.particle.ParticleBubble;
 import ttk.muxiuesd.world.particle.ParticleFire;
 import ttk.muxiuesd.world.particle.ParticleSpell;
@@ -39,7 +39,7 @@ public final class Pools {
     public static final FightPool<ParticleFire> FIRE = register("fire", ParticleFire.class, EmitterFurnaceFire.POOL);
 
     /// 实体池
-    public static final FightPool<ItemEntity> ITEM_ENTITY = register("item_entity", ItemEntity.class, ItemEntityGenFactory.POOL);
+    public static final FightPool<ItemEntity> ITEM_ENTITY = register("item_entity", ItemEntity.class, ItemEntityGetter.POOL);
 
 
 
