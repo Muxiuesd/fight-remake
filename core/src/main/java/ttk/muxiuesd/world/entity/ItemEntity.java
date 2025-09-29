@@ -95,8 +95,18 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     @Override
     public void reset () {
         setEntitySystem(null);
+        setSpeed(0f);
+        setPosition(0f, 0f);
+        setVelocity(0f, 0f);
         setItemStack(null);
         setLivingTime(0f);
+        getPositionOffset().set(0f, 0f);
+
+        TaskTimer taskTimer = this.getOnAirTimer();
+        if (taskTimer != null) {
+            Pools.TASK_TIMER.free(taskTimer);
+            this.setOnAirTimer(null);
+        }
     }
 
     @Override
@@ -117,16 +127,18 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         return this.positionOffset;
     }
 
-    public void setPositionOffset (Vector2 positionOffset) {
+    public ItemEntity setPositionOffset (Vector2 positionOffset) {
         this.positionOffset = positionOffset;
+        return this;
     }
 
     public float getLivingTime () {
         return this.livingTime;
     }
 
-    public void setLivingTime (float livingTime) {
+    public ItemEntity setLivingTime (float livingTime) {
         this.livingTime = livingTime;
+        return this;
     }
 
     public TaskTimer getOnAirTimer () {

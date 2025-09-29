@@ -82,10 +82,13 @@ public class MouseSlotUI extends SlotUI {
         if (this.isNullSlot()) return;
 
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
-        Item item = this.getItemStack().getItem();
-        batch.draw(item.texture,
-            mouseUIPosition.x - getWidth() / 2,
-            mouseUIPosition.y - getHeight() / 2,
-            getWidth(), getHeight());
+        ItemStack stack = this.getItemStack();
+        Item item = stack.getItem();
+        float renderX = mouseUIPosition.x - getWidth() / 2;
+        float renderY = mouseUIPosition.y - getHeight() / 2;
+        batch.draw(item.texture, renderX, renderY, getWidth(), getHeight());
+
+        int amount = stack.getAmount();
+        drawAmount(batch, parent, renderX, renderY, amount);
     }
 }

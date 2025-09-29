@@ -56,6 +56,13 @@ public class SlotUI extends UIComponent {
         batch.draw(itemStack.getItem().texture, renderX, renderY, getWidth(), getHeight());
 
         int amount = itemStack.getAmount();
+        this.drawAmount(batch, parent, renderX, renderY, amount);
+    }
+
+    /**
+     * 绘制数量字体
+     * */
+    public void drawAmount (Batch batch, UIPanel parent, float renderX, float renderY, int amount) {
         if (amount > 1) {
             this.textUI.setPosition(renderX, renderY);
             this.textUI.setText(String.valueOf(amount)).draw(batch, parent);

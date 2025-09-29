@@ -59,6 +59,8 @@ public class HotbarSlotUI extends SlotUI {
             ItemStack itemStack = backpack.getItemStack(getIndex());
             if (itemStack != null) {
                 batch.draw(itemStack.getItem().texture, renderX + 2, renderY + 3, 16f, 16f);
+                int amount = itemStack.getAmount();
+                drawAmount(batch, parent, renderX, renderY, amount);
             }
         }
     }
