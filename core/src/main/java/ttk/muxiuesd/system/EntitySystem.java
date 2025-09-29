@@ -248,7 +248,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue() && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
+                && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
                 itemEntity.setVelocity(direction);
