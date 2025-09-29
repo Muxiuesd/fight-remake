@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.instence;
+package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;

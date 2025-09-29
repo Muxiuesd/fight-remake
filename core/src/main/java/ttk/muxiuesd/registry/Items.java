@@ -5,7 +5,17 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.instence.*;
+import ttk.muxiuesd.world.item.common.CommonItem;
+import ttk.muxiuesd.world.item.common.ItemStick;
+import ttk.muxiuesd.world.item.consumption.BlockItem;
+import ttk.muxiuesd.world.item.consumption.ItemBait;
+import ttk.muxiuesd.world.item.consumption.ItemFishPole;
+import ttk.muxiuesd.world.item.consumption.WallItem;
+import ttk.muxiuesd.world.item.food.ItemFish;
+import ttk.muxiuesd.world.item.food.ItemPufferFish;
+import ttk.muxiuesd.world.item.weapon.IronSword;
+import ttk.muxiuesd.world.item.weapon.ItemTorch;
+import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.function.Supplier;

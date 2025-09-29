@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.instence;
+package ttk.muxiuesd.world.item.weapon;
 
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;

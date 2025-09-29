@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.instence;
+package ttk.muxiuesd.world.item.consumption;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;

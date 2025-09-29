@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.instence;
+package ttk.muxiuesd.world.item.common;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;

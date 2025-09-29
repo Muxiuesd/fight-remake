@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.instence;
+package ttk.muxiuesd.world.item.food;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
@@ -7,6 +7,7 @@ import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.consumption.ConsumptionItem;
 
 /**
  * 食物类型的物品

@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.instence;
+package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.event.EventBus;

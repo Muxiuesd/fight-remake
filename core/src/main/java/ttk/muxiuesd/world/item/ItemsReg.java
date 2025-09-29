@@ -5,7 +5,13 @@ import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.instence.*;
+import ttk.muxiuesd.world.item.common.ItemRubbish;
+import ttk.muxiuesd.world.item.common.ItemStick;
+import ttk.muxiuesd.world.item.consumption.ItemBait;
+import ttk.muxiuesd.world.item.consumption.ItemFishPole;
+import ttk.muxiuesd.world.item.food.ItemFish;
+import ttk.muxiuesd.world.item.weapon.IronSword;
+import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
 
 import java.util.function.Supplier;
 
