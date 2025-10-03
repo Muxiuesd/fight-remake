@@ -16,7 +16,7 @@ public final class Sounds {
 
     public static final AudioLoader LOADER = AudioLoader.getInstance();
 
-    //实体
+    ///实体
     public static final Audio ENTITY_HURT_1 = registerSoundAsMusic("hurt_1",  "entity/damage/hit_1.ogg");
     public static final Audio ENTITY_HURT_2 = registerSoundAsMusic("hurt_2",  "entity/damage/hit_2.ogg");
     public static final Audio ENTITY_HURT_3 = registerSoundAsMusic("hurt_3",  "entity/damage/hit_3.ogg");
@@ -26,19 +26,20 @@ public final class Sounds {
 
     public static final Audio ENTITY_SLIME_SMALL = registerSoundAsMusic("slime_small",  "entity/slime/small.ogg");
 
-    //玩家
+    ///玩家
     public static final Audio ENTITY_SHOOT = registerSoundAsMusic("shoot", "player/shoot.wav");
     public static final Audio ENTITY_SWEEP = registerSoundAsMusic("sweep", "player/sweep.ogg");
     public static final Audio PLAYER_RESURRECTION = registerMusic("player_resurrection", "player_resurrection.mp3");
 
-    //方块
-
-    //物品
+    ///物品
     public static final Audio ITEM_CLICK = registerSoundAsMusic("click", "item/click.ogg");
     public static final Audio ITEM_PUT = registerSound("put", "item/put.ogg");
     public static final Audio ITEM_POP = registerSound("pop", "item/pop.ogg");
 
-    //方块
+    ///装备物品
+    public static final Audio EQUIP = registerSound("equip", "item/equipment/equip.ogg");
+
+    ///方块
     public static final BlockSoundsID STONE = registerBlockSounds("stone", "stone.ogg");
     public static final BlockSoundsID SAND =  registerBlockSounds("sand", "sand.ogg");
     public static final BlockSoundsID GRASS =  registerBlockSounds("grass", "grass.ogg");

@@ -6,11 +6,13 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 装备物品使用行为
+ * 装备物品的使用行为
  * */
 public class EquipmentItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
+        //TODO 手持装备物品并使用，自动装备这个物品进入对应的装备槽位里
+        itemStack.getItem().use(itemStack, world, user);
         return false;
     }
 }

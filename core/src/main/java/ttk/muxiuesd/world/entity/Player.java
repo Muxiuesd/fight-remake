@@ -21,6 +21,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  */
 public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
+
     public TextureRegion shield;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器

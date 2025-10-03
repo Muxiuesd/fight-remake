@@ -43,7 +43,8 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     private float curHealth;                // 当前生命值
     private boolean attacked;               //是否收到攻击的状态
     private TaskTimer attackedTimer;        //被攻击状态持续的计时器
-    public Backpack backpack;               //储存物品的背包
+    public Backpack backpack;               //储存物品的背包容器
+    private Backpack equipmentBackpack;     //持有装备的背包容器
     public boolean renderHandItem = false;  //是否渲染手部持有的物品（有的实体没有手，持有物品不用渲染出来）
     private int handIndex;                  //手部物品索引
     private TaskTimer swingHandTimer;       //挥手计时器
@@ -68,6 +69,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             .setCurSpan(0)
             .setTask(() -> this.attacked = false);
         this.backpack = new Backpack(backpackSize);
+        this.equipmentBackpack = new Backpack(4);
         this.maxSwingHandDegree = 60f;
     }
 
@@ -405,12 +407,27 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         return this.maxSwingHandDegree;
     }
 
+    /**
+     * 获取物品背包容器
+     * */
     public Backpack getBackpack () {
         return this.backpack;
     }
 
     public T setBackpack (Backpack backpack) {
-        this.backpack = backpack;
+        if (backpack != null) this.backpack = backpack;
+        return (T) this;
+    }
+
+    /**
+     * 获取装备背包容器
+     * */
+    public Backpack getEquipmentBackpack () {
+        return this.equipmentBackpack;
+    }
+
+    public T setEquipmentBackpack (Backpack equipmentBackpack) {
+        if (equipmentBackpack != null) this.equipmentBackpack = equipmentBackpack;
         return (T) this;
     }
 
