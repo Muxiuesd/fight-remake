@@ -11,7 +11,10 @@ import ttk.muxiuesd.world.item.consumption.BlockItem;
 import ttk.muxiuesd.world.item.consumption.ItemBait;
 import ttk.muxiuesd.world.item.consumption.ItemFishPole;
 import ttk.muxiuesd.world.item.consumption.WallItem;
+import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
+import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
+import ttk.muxiuesd.world.item.equipment.EquipmentDiamondLeggings;
 import ttk.muxiuesd.world.item.food.ItemFish;
 import ttk.muxiuesd.world.item.food.ItemPufferFish;
 import ttk.muxiuesd.world.item.weapon.IronSword;
@@ -45,6 +48,9 @@ public final class Items {
 
     /// 装备物品
     public static final Item DIAMOND_HELMET = register("diamond_helmet", EquipmentDiamondHelmet::new);
+    public static final Item DIAMOND_CHESTPLATE = register("diamond_chestplate", EquipmentDiamondChestplate::new);
+    public static final Item DIAMOND_LEGGINGS = register("diamond_leggings", EquipmentDiamondLeggings::new);
+    public static final Item DIAMOND_BOOTS = register("diamond_boots", EquipmentDiamondBoots::new);
 
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);

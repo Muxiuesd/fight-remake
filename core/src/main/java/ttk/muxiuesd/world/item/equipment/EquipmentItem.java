@@ -16,6 +16,14 @@ import ttk.muxiuesd.world.item.abs.Item;
  * TODO 装备的装备效果
  * */
 public class EquipmentItem extends Item {
+    /// 装备类型
+    public enum Type{
+        HELMET,     //头盔
+        CHESTPLATE, //胸甲
+        LEGGINGS,   //腿甲
+        BOOTS,      //靴子
+        OTHERS      //其他类型
+    }
 
     public static final JsonPropertiesMap EQUIPMENT_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 1)
@@ -29,13 +37,16 @@ public class EquipmentItem extends Item {
         return new Property().setPropertiesMap(EQUIPMENT_DEFAULT_PROPERTIES_DATA_MAP.copy());
     }
 
+    //装备的类型
+    public final EquipmentItem.Type equipmentType;
 
-    public EquipmentItem (Property property, String textureName) {
-        this(property, Fight.ID(textureName), Fight.ItemTexturePath(textureName + ".png"));
+    public EquipmentItem (EquipmentItem.Type equipmentType, Property property, String textureName) {
+        this(equipmentType, property, Fight.ID(textureName), Fight.ItemTexturePath(textureName + ".png"));
     }
 
-    public EquipmentItem (Property property, String textureId, String texturePath) {
-        super(Type.EQUIPMENT, property, textureId, texturePath);
+    public EquipmentItem (EquipmentItem.Type equipmentType, Property property, String textureId, String texturePath) {
+        super(Item.Type.EQUIPMENT, property, textureId, texturePath);
+        this.equipmentType = equipmentType;
     }
 
     @Override

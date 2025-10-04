@@ -5,6 +5,6 @@ package ttk.muxiuesd.world.item.equipment;
  * */
 public class EquipmentDiamondHelmet extends EquipmentItem {
     public EquipmentDiamondHelmet () {
-        super(createDefaultProperty(), "diamond_helmet");
+        super(Type.HELMET, createDefaultProperty(), "diamond_helmet");
     }
 }

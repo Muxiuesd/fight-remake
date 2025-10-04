@@ -83,20 +83,33 @@ public class SlotUI extends UIComponent {
                 MouseSlotUI.activate().setItemStack(this.getItemStack());
                 this.clearItem();
             }else {
-                //交换物品
-                ItemStack mouseItem = mouseSlotUI.getItemStack();
-                ItemStack slotItem = this.getItemStack();
-                mouseSlotUI.setItemStack(slotItem);
-                this.setItemStack(mouseItem);
+                //如果鼠标物品槽的物品通过类型检测，就交换物品
+                if (this.checkItemType(mouseSlotUI.getItemStack())) {
+                    ItemStack mouseItem = mouseSlotUI.getItemStack();
+                    ItemStack slotItem = this.getItemStack();
+                    mouseSlotUI.setItemStack(slotItem);
+                    this.setItemStack(mouseItem);
+                }
             }
         }else if (! mouseSlotUI.isNullSlot()) {
-            //物品槽是空的，同时鼠标物品槽有物品，就把物品放进来
-            this.setItemStack(mouseSlotUI.getItemStack());
-            MouseSlotUI.deactivate();
-            mouseSlotUI.clearItem();
+            //物品槽是空的，同时鼠标物品槽有物品，且物品类型检查通过，就把物品放进来
+            if (this.checkItemType(mouseSlotUI.getItemStack())) {
+                this.setItemStack(mouseSlotUI.getItemStack());
+                MouseSlotUI.deactivate();
+                mouseSlotUI.clearItem();
+            }
         }
         return super.click(interactPos);
     }
+
+    /**
+     * 物品类型检测：检查要放进来的物品是否符合可放进来的类型
+     * */
+    public boolean checkItemType (ItemStack itemStack) {
+        //默认不检查都可以放
+        return true;
+    }
+
 
     /**
      * 检查这个物品槽是否有物品
