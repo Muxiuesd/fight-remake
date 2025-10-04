@@ -2,6 +2,7 @@ package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.text.TextUI;
@@ -19,7 +20,7 @@ public class SlotUI extends UIComponent {
 
 
     private PlayerSystem playerSystem;
-    private int index;  ///指向的玩家背包容器的索引
+    private int index;  ///指向的玩家的某个容器的索引
 
     private TextUI textUI;
 
@@ -103,18 +104,16 @@ public class SlotUI extends UIComponent {
     public boolean isNullSlot () {
         Player player = getPlayerSystem().getPlayer();
         if (player == null) return true;
-        ItemStack itemStack = player.getBackpack().getItemStack(this.getIndex());
+        ItemStack itemStack = this.getInventory().getItemStack(this.getIndex());
         return itemStack == null;
     }
 
     public ItemStack getItemStack () {
-        Player player = getPlayerSystem().getPlayer();
-        return player.getBackpack().getItemStack(this.getIndex());
+        return this.getInventory().getItemStack(this.getIndex());
     }
 
     public void setItemStack (ItemStack itemStack) {
-        Player player = getPlayerSystem().getPlayer();
-        player.getBackpack().setItemStack(this.getIndex(), itemStack);
+        this.getInventory().setItemStack(this.getIndex(), itemStack);
     }
 
     /**
@@ -122,9 +121,16 @@ public class SlotUI extends UIComponent {
      * */
     public void clearItem () {
         if (this.isNullSlot()) return;
-        getPlayerSystem().getPlayer().getBackpack().clear(this.getIndex());
+        this.getInventory().clear(this.getIndex());
     }
 
+    /**
+     * 获取这个slot对应的容器
+     * */
+    public Inventory getInventory () {
+        Player player = this.getPlayerSystem().getPlayer();
+        return player.getBackpack();
+    }
 
     public PlayerSystem getPlayerSystem() {
         return this.playerSystem;

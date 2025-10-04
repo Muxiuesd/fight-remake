@@ -62,7 +62,7 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(11, new ItemStack(Items.FURNACE));
         backpack.setItemStack(18, new ItemStack(Items.CRAFTING_TABLE));
         backpack.setItemStack(28, new ItemStack(Items.FISH_POLE));
-        backpack.setItemStack(30, new ItemStack(Items.SMOOTH_STONE));
+        backpack.setItemStack(30, new ItemStack(Items.DIAMOND_HELMET));
         backpack.setItemStack(35, new ItemStack(Items.TORCH));
 
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.system.PlayerSystem;
+import ttk.muxiuesd.ui.components.EquipmentSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.ui.components.UIPanel;
 
@@ -28,20 +29,24 @@ public class PlayerInventoryUIPanel extends UIPanel {
      * 初始化所有物品槽位
      * */
     private void initSlots () {
+        float trueHeight = SlotUI.SLOT_HEIGHT + 2;
+        float trueWidth = SlotUI.SLOT_WIDTH + 2;
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {
-            SlotUI slotUI = new SlotUI(this.playerSystem, index,
-                8 + (index * (SlotUI.SLOT_WIDTH + 2)), 8);
-            addComponent(slotUI);
+            addComponent(new SlotUI(this.playerSystem, index, 8 + (index * trueWidth), 8));
         }
 
         //背包内部槽位
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
-                SlotUI slotUI = new SlotUI(this.playerSystem, x + y * 9 + 9,
-                    8 + (x * (SlotUI.SLOT_WIDTH + 2)), 30 + y * (SlotUI.SLOT_HEIGHT + 2));
-                addComponent(slotUI);
+                addComponent(new SlotUI(this.playerSystem, x + (y * 9) + 9,
+                    8 + (x * trueWidth), 30 + y * trueHeight));
             }
+        }
+
+        //装备槽位
+        for (int y = 0; y < 4; y++) {
+            addComponent(new EquipmentSlotUI(this.playerSystem, y, 8, 142 - (y * trueHeight)));
         }
     }
 

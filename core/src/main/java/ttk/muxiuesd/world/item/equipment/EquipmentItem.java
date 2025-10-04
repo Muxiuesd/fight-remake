@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.equipment;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -16,13 +17,18 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class EquipmentItem extends Item {
 
+    public static final JsonPropertiesMap EQUIPMENT_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+        .add(PropertyTypes.ITEM_MAX_COUNT, 1)
+        .add(PropertyTypes.ITEM_ON_USING, false)
+        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.EQUIP.getId());
+
     /**
      * 创建默认的装备属性类
      * */
     public static Property createDefaultProperty () {
-        return new Property()
-            .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.EQUIP.getId());
+        return new Property().setPropertiesMap(EQUIPMENT_DEFAULT_PROPERTIES_DATA_MAP.copy());
     }
+
 
     public EquipmentItem (Property property, String textureName) {
         this(property, Fight.ID(textureName), Fight.ItemTexturePath(textureName + ".png"));
