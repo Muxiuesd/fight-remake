@@ -20,7 +20,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 物品词条UI组件
  * */
 public class TooltipUI extends UIComponent {
-    public static final int TOOLTIP_TEXT_FONT_SIZE = 7;
+    public static final int TOOLTIP_TEXT_FONT_SIZE = 18;
     /// 上下左右边界大小
     public static final int LEFT = 2;
     public static final int RIGHT = 2;
@@ -98,7 +98,7 @@ public class TooltipUI extends UIComponent {
 
         Array<Text> textArray = itemStack.getTooltips();
         if (textArray.size > 0) {
-            renderHeight += (TOOLTIP_TEXT_FONT_SIZE + 3) * textArray.size;
+            renderHeight += (TOOLTIP_TEXT_FONT_SIZE + TOP + LEFT) * textArray.size;
 
             int maxLength = 0;
             for (Text text : textArray) {
@@ -122,9 +122,12 @@ public class TooltipUI extends UIComponent {
      * @param position 相对于词条背景的左上角的坐标
      * */
     public void drawTooltips (Batch batch, Vector2 position, Array<Text> textArray, BitmapFont bitmapFont, int fontSize) {
+        int leftEdge = LEFT * 2;
+        int topEdge = TOP * 2;
+
         for (int index = 0; index < textArray.size; index++) {
             Text text = textArray.get(index);
-            bitmapFont.draw(batch, text.getText(), position.x + LEFT, position.y - TOP - index * fontSize);
+            bitmapFont.draw(batch, text.getText(), position.x + leftEdge, position.y - topEdge - index * (fontSize + 2));
         }
     }
 

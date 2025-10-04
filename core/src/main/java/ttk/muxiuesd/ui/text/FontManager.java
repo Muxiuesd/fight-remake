@@ -13,7 +13,6 @@ public class FontManager {
 
     public static final ObjectMap<String, FontHolder> FONT_HOLDERS = new ObjectMap<>();
 
-
     /**
      * 注册一种字体
      * */
@@ -36,28 +35,5 @@ public class FontManager {
         }
         return generator;
     }
-
-
-    /*public BitmapFont getFont(String id, int size) {
-        if (this.fonts.containsKey(id)) {
-            return this.fonts.get(id);
-        }
-
-        FreeTypeFontGenerator generator = this.generators.get(id);
-        if (generator == null) {
-            Log.error(TAG, "无法获取id为：" + id + " 的字体！！！");
-            return null;
-        }
-
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = size;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        // 可以设置其他参数，如颜色、边框等
-
-        BitmapFont font = generator.generateFont(parameter);
-        this.fonts.put(id, font);
-        return font;
-    }*/
 
 }

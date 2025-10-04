@@ -8,6 +8,7 @@ import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -55,6 +56,14 @@ public class Sword extends Weapon {
         SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
         ses.newSpatialSound(useSoundId, user);
         return true;
+    }
+
+    @Override
+    public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
+        array.add(Text.of("攻击距离：" + itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE)));
+        array.add(Text.of("攻击间隔：" + itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
+        array.add(Text.of("攻击伤害：" + itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
+        return array;
     }
 
     @Override

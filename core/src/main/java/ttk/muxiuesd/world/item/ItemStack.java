@@ -99,8 +99,12 @@ public class ItemStack implements Updateable, ShapeRenderable {
         //基础词条
         array.add(Text.of(getItem().getID()));
 
+        //物品自定义词条
+        getItem().getTooltips(array, this);
 
-        return getItem().getTooltips(array, this);
+        //基础词条
+        //array.add(Text.of(" "));
+        return array;
     }
 
 

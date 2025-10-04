@@ -37,14 +37,25 @@ public class FontHolder {
         }
 
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = size;
-        parameter.minFilter = Texture.TextureFilter.Nearest;
+        //parameter.characters = this.fullCharacters();
+        parameter.genMipMaps = false;
         parameter.magFilter = Texture.TextureFilter.Nearest;
+        parameter.minFilter = Texture.TextureFilter.Nearest;
+        parameter.incremental = true;
+        parameter.size = size;
         // 可以设置其他参数，如颜色、边框等
 
         //根据字号生成
         BitmapFont font = this.generator.generateFont(parameter);
         this.fontsCache.put(size, font);
         return font;
+    }
+
+    private String fullCharacters () {
+        return "abcdefghijklmnopqrstuvwxyz" +
+        "0123456789" +
+        ",./;'[]-=<>?:\"\\|_+!@#$%^&*(){}" +
+        "，。/；‘【】、！￥……《》？：“”、（）" +
+        ChineseCharacters.CHARACTERS;
     }
 }
