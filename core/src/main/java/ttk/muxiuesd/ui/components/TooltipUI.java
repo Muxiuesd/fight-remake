@@ -20,7 +20,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 物品词条UI组件
  * */
 public class TooltipUI extends UIComponent {
-    public static final int TOOLTIP_TEXT_FONT_SIZE = 18;
+    public static final int TOOLTIP_TEXT_FONT_SIZE = 8;
     /// 上下左右边界大小
     public static final int LEFT = 2;
     public static final int RIGHT = 2;

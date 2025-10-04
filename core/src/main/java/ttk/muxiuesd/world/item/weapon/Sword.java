@@ -60,10 +60,8 @@ public class Sword extends Weapon {
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.of("攻击距离：" + itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE)));
-        array.add(Text.of("攻击间隔：" + itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
-        array.add(Text.of("攻击伤害：" + itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
-        return array;
+        array.add(Text.of("攻击范围：" + itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE)));
+        return super.getTooltips(array, itemStack);
     }
 
     @Override
