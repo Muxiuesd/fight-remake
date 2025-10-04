@@ -19,17 +19,23 @@ public final class PropertyTypes {
 
     public static final PropertyType<CAT> CAT = register("cat", new PropertyCAT());
 
+    /// 物品基础属性
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
     public static final PropertyType<Boolean> FISHING_POLE_USING = register("fishing_pole_using", new PropertyFishingPoleUsing());
     public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
     public static final PropertyType<Entity<?>> ITEM_WITH_ENTITY = register("item_with_entity", new PropertyItemWithEntity());
 
+    /// 武器属性
     public static final PropertyType<Float> WEAPON_USE_SAPN = register("weapon_use_span", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_DAMAGE = register("weapon_damage", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_ATTACK_RANGE = register("weapon_attack_range", new DefaultFloatPropertyType());
     public static final PropertyType<Integer> WEAPON_DURATION = register("weapon_duration", new DefaultIntPropertyType());
 
+    /// 装备物品的属性
+    public static final PropertyType<Float> DAMAGE_REDUCTION = register("damage_reduction", new DefaultFloatPropertyType());
+
+    /// 方块属性
     public static final PropertyType<Float> BLOCK_FRICTON = register("block_friction", new DefaultFloatPropertyType());
     public static final PropertyType<BlockSoundsID> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSoundsID());
 

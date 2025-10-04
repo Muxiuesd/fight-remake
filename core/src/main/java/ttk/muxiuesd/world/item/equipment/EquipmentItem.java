@@ -28,7 +28,8 @@ public class EquipmentItem extends Item {
     public static final JsonPropertiesMap EQUIPMENT_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 1)
         .add(PropertyTypes.ITEM_ON_USING, false)
-        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.EQUIP.getId());
+        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.EQUIP.getId())
+        .add(PropertyTypes.DAMAGE_REDUCTION, 1.145f);
 
     /**
      * 创建默认的装备属性类
