@@ -13,8 +13,6 @@ import ttk.muxiuesd.world.item.equipment.EquipmentItem;
 public class EquipmentItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
-        //TODO 手持装备物品并使用，自动装备这个物品进入对应的装备槽位里
-
         EquipmentItem equipment = (EquipmentItem) itemStack.getItem();
         int index = equipment.equipmentType.ordinal();
 

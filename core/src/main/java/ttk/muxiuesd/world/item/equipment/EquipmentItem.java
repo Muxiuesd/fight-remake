@@ -13,7 +13,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 装备物品
- * TODO 装备的装备效果
+ * TODO 装备的装备属性效果
  * */
 public class EquipmentItem extends Item {
     /// 装备类型
