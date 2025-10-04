@@ -111,6 +111,13 @@ public class SlotUI extends UIComponent {
     }
 
 
+    @Override
+    public void mouseOver (GridPoint2 interactPos) {
+        /*if (!this.isNullSlot()) {
+            TooltipUI.activate();
+        }*/
+    }
+
     /**
      * 检查这个物品槽是否有物品
      * */

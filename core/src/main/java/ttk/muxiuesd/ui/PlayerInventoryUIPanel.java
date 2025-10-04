@@ -3,10 +3,14 @@ package ttk.muxiuesd.ui;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.PlayerSystem;
+import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.components.EquipmentSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
+import ttk.muxiuesd.ui.components.TooltipUI;
 import ttk.muxiuesd.ui.components.UIPanel;
+import ttk.muxiuesd.util.pool.PoolableRectangle;
 
 /**
  * 玩家背包容器UI面板
@@ -56,4 +60,30 @@ public class PlayerInventoryUIPanel extends UIPanel {
         super.draw(batch, parent);
     }
 
+    @Override
+    public void mouseOver (GridPoint2 interactPos) {
+        if (getComponents().isEmpty()) return;
+
+        PoolableRectangle rectangle = Pools.RECT.obtain();
+        boolean flag = true;
+
+        for (UIComponent component : getComponents()) {
+            //当鼠标放在物品槽位上
+            if (component instanceof SlotUI slotUI) {
+                rectangle.set(slotUI.getX(), slotUI.getY(), slotUI.getWidth(), slotUI.getHeight());
+                if (rectangle.contains(interactPos.x, interactPos.y)
+                    && !slotUI.isNullSlot()) {
+                    //如果物品槽位上有物品，就激活物品的工具词条UI
+                    TooltipUI.activate().setCurItemStack(slotUI.getItemStack());
+                    flag = false;
+                    break;
+                }
+            }
+        }
+
+        if (flag) {
+            TooltipUI.deactivate();
+        }
+        Pools.RECT.free(rectangle);
+    }
 }
