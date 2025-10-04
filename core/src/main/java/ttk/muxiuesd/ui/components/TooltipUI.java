@@ -20,7 +20,8 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 物品词条UI组件
  * */
 public class TooltipUI extends UIComponent {
-    public static final int TOOLTIP_TEXT_FONT_SIZE = 8;
+    public static final int TOOLTIP_TEXT_FONT_SIZE = 18;
+    public static final float FONT_SCALE = 0.5f;
     /// 上下左右边界大小
     public static final int LEFT = 2;
     public static final int RIGHT = 2;
@@ -84,10 +85,10 @@ public class TooltipUI extends UIComponent {
         return new NinePatch(textureRegion, left, right, top, bottom);
     }
 
-
-
     @Override
     public void draw (Batch batch, UIPanel parent) {
+        int trueSize = (int) (TOOLTIP_TEXT_FONT_SIZE * FONT_SCALE);
+
         ItemStack itemStack = this.getCurItemStack();
         //基础坐标由激活时给出
         int renderX = (int) getX();
@@ -98,14 +99,14 @@ public class TooltipUI extends UIComponent {
 
         Array<Text> textArray = itemStack.getTooltips();
         if (textArray.size > 0) {
-            renderHeight += (TOOLTIP_TEXT_FONT_SIZE + TOP + LEFT) * textArray.size;
+            renderHeight += (trueSize + TOP + LEFT) * textArray.size;
 
             int maxLength = 0;
             for (Text text : textArray) {
                 if (text.getLength() > maxLength) maxLength = text.getLength();
             }
 
-            renderWidth += maxLength * TOOLTIP_TEXT_FONT_SIZE;
+            renderWidth += maxLength * trueSize;
         }
 
 
@@ -113,8 +114,13 @@ public class TooltipUI extends UIComponent {
         this.backgroundNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
 
         BitmapFont font = Fonts.MC.getFont(TOOLTIP_TEXT_FONT_SIZE);
+        font.getData().setScale(FONT_SCALE);
         //词条
-        this.drawTooltips(batch, new Vector2(renderX, renderY + renderHeight), textArray, font, TOOLTIP_TEXT_FONT_SIZE);
+        this.drawTooltips(batch,
+            new Vector2(renderX, renderY + renderHeight),
+            textArray,
+            font,
+            trueSize);
     }
 
     /**
@@ -126,8 +132,12 @@ public class TooltipUI extends UIComponent {
         int topEdge = TOP * 2;
 
         for (int index = 0; index < textArray.size; index++) {
+            float renderX = position.x + leftEdge;
+            float renderY = position.y - topEdge - index * (fontSize + 2);
+
             Text text = textArray.get(index);
-            bitmapFont.draw(batch, text.getText(), position.x + leftEdge, position.y - topEdge - index * (fontSize + 2));
+
+            bitmapFont.draw(batch, text.getText(), renderX, renderY);
         }
     }
 
