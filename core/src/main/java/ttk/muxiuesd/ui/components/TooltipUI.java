@@ -20,8 +20,8 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 物品词条UI组件
  * */
 public class TooltipUI extends UIComponent {
-    public static final int TOOLTIP_TEXT_FONT_SIZE = 18;
-    public static final float FONT_SCALE = 0.5f;
+    public static final int FONT_SIZE = 16; //字体大小，最好是8的整数倍，不然中文字体会糊
+    public static final float FONT_SCALE = 0.5f; //字体缩放，最好缩放后也是8的整数倍
     /// 上下左右边界大小
     public static final int LEFT = 2;
     public static final int RIGHT = 2;
@@ -66,6 +66,7 @@ public class TooltipUI extends UIComponent {
     }
 
     private NinePatch backgroundNinePatch;
+    private NinePatch frameNinePatch;
     private ItemStack curItemStack;
 
     public TooltipUI () {
@@ -76,18 +77,17 @@ public class TooltipUI extends UIComponent {
             ),
             LEFT, RIGHT, TOP, BOTTOM
         );
-    }
-
-    /**
-     * 创建点九
-     * */
-    private NinePatch createNinePatch(TextureRegion textureRegion, int left, int right, int top, int bottom) {
-        return new NinePatch(textureRegion, left, right, top, bottom);
+        this.frameNinePatch = this.createNinePatch(Util.loadTextureRegion(
+                Fight.ID("tooltip_frame"),
+                Fight.UITexturePath("tooltip_frame.png")
+            ),
+            LEFT, RIGHT, TOP, BOTTOM
+        );
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        int trueSize = (int) (TOOLTIP_TEXT_FONT_SIZE * FONT_SCALE);
+        int trueSize = (int) (FONT_SIZE * FONT_SCALE);
 
         ItemStack itemStack = this.getCurItemStack();
         //基础坐标由激活时给出
@@ -105,15 +105,14 @@ public class TooltipUI extends UIComponent {
             for (Text text : textArray) {
                 if (text.getLength() > maxLength) maxLength = text.getLength();
             }
-
             renderWidth += maxLength * trueSize;
         }
 
-
-        //绘制背景
+        //绘制背景和框架
         this.backgroundNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
+        this.frameNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
 
-        BitmapFont font = Fonts.MC.getFont(TOOLTIP_TEXT_FONT_SIZE);
+        BitmapFont font = Fonts.MC.getFont(FONT_SIZE);
         font.getData().setScale(FONT_SCALE);
         //词条
         this.drawTooltips(batch,
@@ -128,6 +127,7 @@ public class TooltipUI extends UIComponent {
      * @param position 相对于词条背景的左上角的坐标
      * */
     public void drawTooltips (Batch batch, Vector2 position, Array<Text> textArray, BitmapFont bitmapFont, int fontSize) {
+        //边界计算
         int leftEdge = LEFT * 2;
         int topEdge = TOP * 2;
 
@@ -136,11 +136,9 @@ public class TooltipUI extends UIComponent {
             float renderY = position.y - topEdge - index * (fontSize + 2);
 
             Text text = textArray.get(index);
-
             bitmapFont.draw(batch, text.getText(), renderX, renderY);
         }
     }
-
 
     public ItemStack getCurItemStack () {
         return this.curItemStack;
@@ -149,5 +147,12 @@ public class TooltipUI extends UIComponent {
     public TooltipUI setCurItemStack (ItemStack curItemStack) {
         this.curItemStack = curItemStack;
         return this;
+    }
+
+    /**
+     * 创建点九
+     * */
+    private NinePatch createNinePatch(TextureRegion textureRegion, int left, int right, int top, int bottom) {
+        return new NinePatch(textureRegion, left, right, top, bottom);
     }
 }
