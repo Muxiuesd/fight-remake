@@ -31,9 +31,9 @@ public abstract class Weapon extends Item {
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.of("攻击间隔：" + itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
-        array.add(Text.of("武器耐久：" + itemStack.getProperty().get(PropertyTypes.WEAPON_DURATION)));
-        array.add(Text.of("攻击伤害：" + itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
+        array.add(Text.ofText("fight:weapon_use_span").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
+        array.add(Text.ofText("fight:weapon_duration").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DURATION)));
+        array.add(Text.ofText("fight:weapon_damage").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
         return super.getTooltips(array, itemStack);
     }
 }

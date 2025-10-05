@@ -99,7 +99,7 @@ public class TooltipUI extends UIComponent {
 
         Array<Text> textArray = itemStack.getTooltips();
         if (textArray.size > 0) {
-            renderHeight += (trueSize + TOP + LEFT) * textArray.size;
+            renderHeight += (trueSize + 3) * textArray.size;
 
             int maxLength = 0;
             for (Text text : textArray) {
