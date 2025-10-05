@@ -43,7 +43,7 @@ public final class Items {
 
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
-    public static final Item TEST_WEAPON = register("test_weapon", WeaponDiamondSword::new);
+    public static final Item TEST_WEAPON = register("diamond_sword", WeaponDiamondSword::new);
     public static final Item TORCH = register("torch", ItemTorch::new);
 
     /// 装备物品

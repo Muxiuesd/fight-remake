@@ -97,7 +97,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public Array<Text> getTooltips () {
         Array<Text> array = new Array<>();
         //基础词条
-        array.add(Text.of(getItem().getID()));
+        array.add(Text.ofItem(getItem().getID()));
 
         //物品自定义词条
         getItem().getTooltips(array, this);

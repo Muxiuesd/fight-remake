@@ -6,6 +6,7 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.lang.LangPack;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
@@ -49,6 +50,8 @@ public class Registries {
 
     public static final Registry<FightPool<?>> POOL = create(RegistryKeys.POOL);
     public static final Registry<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = create(RegistryKeys.WORLD_INFO_HASH_MAP);
+    public static final Registry<LangPack> LANG_HOLDER = create(RegistryKeys.LANG_HOLDER);
+
 
     /**
      * 创建一个注册表

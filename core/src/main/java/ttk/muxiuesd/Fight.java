@@ -10,6 +10,7 @@ public class Fight {
     public static final String ITEM_TEXTURE_ROOT = "texture/item/";
     public static final String UI_TEXTURE_ROOT = "texture/ui/";
     public static final String FONT_ROOT = "font/";
+    public static final String LANG_ROOT = "lang/";
 
     //玩家的听觉范围，单位：世界中的1米
     public static final Info<Float> PLAYER_HEARING_RANGE = Info.create("player_hearing_range", 16f);
@@ -70,6 +71,11 @@ public class Fight {
     public static String FontPath (String path) {
         if (path.endsWith(".ttf")) return FONT_ROOT + path;
         return FONT_ROOT + path + ".ttf";
+    }
+
+    public static String LangPath (String path) {
+        if (path.endsWith(".json")) return LANG_ROOT + path;
+        return LANG_ROOT + path + ".json";
     }
 
     public static String GameSavePath (String name) {

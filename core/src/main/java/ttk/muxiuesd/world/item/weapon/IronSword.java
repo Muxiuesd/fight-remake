@@ -11,7 +11,7 @@ public class IronSword extends Sword {
         super(Sword.createDefaultProperty()
                 .add(PropertyTypes.WEAPON_DAMAGE, 3f)
                 .add(PropertyTypes.WEAPON_USE_SAPN, 0.2f),
-            Fight.ID("test_item"),
+            Fight.ID("iron_sword"),
             Fight.ItemTexturePath("iron_sword.png"));
     }
 }

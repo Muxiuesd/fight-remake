@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
@@ -35,6 +36,7 @@ public class MainGameScreen implements Screen {
     @Override
     public void show() {
         Fonts.init();
+        FI18N.init();
         //初始化游戏底层系统
         GameSystemManager.init();
 
@@ -50,6 +52,7 @@ public class MainGameScreen implements Screen {
         Entities.init();
         StatusEffects.init();
         WorldInformationType.init();
+
 
         //初始化着色器调度器
         ShaderScheduler.init();

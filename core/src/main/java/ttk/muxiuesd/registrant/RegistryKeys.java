@@ -3,6 +3,7 @@ package ttk.muxiuesd.registrant;
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.lang.LangPack;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
@@ -40,4 +41,5 @@ public class RegistryKeys {
 
     public static final RegistryKey<FightPool<?>> POOL = new RegistryKey<>();
     public static final RegistryKey<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = new RegistryKey<>();
+    public static final RegistryKey<LangPack> LANG_HOLDER = new RegistryKey<>();
 }
