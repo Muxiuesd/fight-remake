@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.item.weapon;
 
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
@@ -9,6 +10,7 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
@@ -39,7 +41,7 @@ public class RangedWeapon extends Weapon {
     }
 
     @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity user) {
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         if (this.getFactory() != null) {
             //生成子弹，子弹所属的实体类型为对应的实体附属的子弹类型
             EntityType<?> entityType = user.getType().getChildType("bullet");
@@ -55,6 +57,12 @@ public class RangedWeapon extends Weapon {
         return false;
     }
 
+    @Override
+    public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
+        array.add(Text.of("发射子弹：" + this.getFactory().getBulletId()));
+        return super.getTooltips(array, itemStack);
+    }
+
     /**
      * 获取子弹实体工厂
      * */
@@ -66,7 +74,7 @@ public class RangedWeapon extends Weapon {
      * 设置子弹实体工厂
      * */
     public RangedWeapon setFactory (BulletFactory<?> factory) {
-        this.factory = factory;
+        if (this.factory != factory) this.factory = factory;
         return this;
     }
 

@@ -1,13 +1,13 @@
 package ttk.muxiuesd.world.item.equipment;
 
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -51,8 +51,9 @@ public class EquipmentItem extends Item {
     }
 
     @Override
-    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        return super.use(itemStack, world, user);
+    public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
+        array.add(Text.of("减伤度：" + itemStack.getProperty().get(PropertyTypes.DAMAGE_REDUCTION)));
+        return super.getTooltips(array, itemStack);
     }
 
     @Override
