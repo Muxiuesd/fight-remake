@@ -110,7 +110,7 @@ public class TooltipUI extends UIComponent {
 
         //绘制背景和框架
         this.backgroundNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
-        this.frameNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
+        this.frameNinePatch.draw(batch, renderX + 1, renderY + 1, renderWidth - 2, renderHeight - 2);
 
         BitmapFont font = Fonts.MC.getFont(FONT_SIZE);
         font.getData().setScale(FONT_SCALE);
