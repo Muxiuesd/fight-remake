@@ -48,7 +48,7 @@ public class TooltipUI extends UIComponent {
         PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
         TooltipUI instance = getInstance();
         //由鼠标坐标来给出基础坐标
-        instance.setPosition(Util.getMouseUIPosition().add(3, 3));
+        instance.setPosition(Util.getMouseUIPosition().add(1, 1));
         inventoryUIPanel.addComponent(instance);
 
         return INSTANCE;
@@ -95,19 +95,20 @@ public class TooltipUI extends UIComponent {
         //基础坐标由激活时给出
         int renderX = (int) getX();
         int renderY = (int) getY();
+
         //计算词条总的宽度和高度
         int renderWidth = LEFT + RIGHT;
         int renderHeight = TOP + BOTTOM;
-
         Array<Text> textArray = itemStack.getTooltips();
         if (textArray.size > 0) {
             renderHeight += (trueSize + 3) * textArray.size;
 
             int maxLength = 0;
+            //查找最大
             for (Text text : textArray) {
-                if (text.getLength() > maxLength) maxLength = text.getLength();
+                maxLength = Math.max(maxLength, text.getLength());
             }
-            renderWidth += maxLength * trueSize;
+            renderWidth += maxLength * trueSize + 4;
         }
 
         //绘制背景和框架
