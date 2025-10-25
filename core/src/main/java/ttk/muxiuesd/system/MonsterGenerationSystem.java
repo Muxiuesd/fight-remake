@@ -55,7 +55,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void update (float delta) {
         //非晚上不刷怪
         if (!getTimeSystem().isNight()) {
-            //return;
+            return;
         }
 
         //更新计时器
