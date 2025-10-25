@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.EnemyGenFactory;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -85,10 +86,11 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
             //防止没添加进实体系统，统一执行一遍
             for (Enemy<?> e : enemies) {
                 if (e == null) continue;
-                //e.setEntitySystem(es);
                 es.add(e);
             }
         }
+
+        Log.print(TAG, "刷怪");
     }
 
     public float getMaxGenSpan () {

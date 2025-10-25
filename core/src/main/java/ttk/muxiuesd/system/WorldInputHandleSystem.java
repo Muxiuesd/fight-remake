@@ -271,6 +271,8 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                 0.8f,
                 0.8f);
             batch.setColor(Color.WHITE);
+            //没有这个flush()就会渲染线条后渲染其他贴图而发生错误
+            batch.flush();
         }
     }
 

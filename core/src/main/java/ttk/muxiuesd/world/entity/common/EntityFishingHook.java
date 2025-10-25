@@ -11,6 +11,7 @@ import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.cat.CAT;
@@ -39,7 +40,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
-        bodyTexture = getTextureRegion(Fight.ID("fishing_hook"), "fish/fishing_hook.png");
+        bodyTexture = Util.loadTextureRegion(
+            Fight.ID("fishing_hook"),
+            Fight.EntityTexturePath("fish/fishing_hook.png")
+        );
 
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
@@ -52,7 +56,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
                 getScale(), MathUtils.random(0, 360), 1.5f);
         });
 
-        this.positionOffset = new Vector2();
+        this.positionOffset = new Vector2(0, 0);
         this.isReturning = false;
     }
 
@@ -101,10 +105,12 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     @Override
     public void draw (Batch batch) {
         if (bodyTexture != null) {
-            batch.draw(bodyTexture, x, y + this.positionOffset.y,
+            batch.draw(bodyTexture,
+                x, y + this.positionOffset.y,
                 originX, originY,
                 width, height,
-                scaleX, scaleY, rotation);
+                scaleX, scaleY,
+                rotation);
         }
     }
 
@@ -113,10 +119,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 抛钩移动
      * */
     private void throwMovement (float delta) {
-        velX = speed * throwDirection.x * delta;
-        velY = speed * throwDirection.y * delta;
-        x += velX;
-        y += velY;
+        velX = speed * throwDirection.x;
+        velY = speed * throwDirection.y;
+        x += velX * delta;
+        y += velY * delta;
     }
 
     /**
@@ -124,10 +130,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * */
     private void returningMovement (float delta) {
         Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
-        velX = speed * dir.x * delta;
-        velY = speed * dir.y * delta;
-        x += velX;
-        y += velY;
+        velX = speed * dir.x;
+        velY = speed * dir.y;
+        x += velX * delta;
+        y += velY * delta;
     }
 
     public LivingEntity<?> getOwner () {

@@ -45,7 +45,11 @@ public class ItemFishPole extends Item {
                 .add(PropertyTypes.FISHING_POLE_USING, false),
             Fight.ID("fish_pole"),
             Fight.ItemTexturePath("fish_pole.png"));
-        this.castTexture = getTextureRegion(Fight.ID("fish_pole_cast"), Fight.ItemTexturePath("fish_pole_cast.png"));
+
+        this.castTexture = getTextureRegion(
+            Fight.ID("fish_pole_cast"),
+            Fight.ItemTexturePath("fish_pole_cast.png")
+        );
     }
 
     @Override
@@ -62,7 +66,9 @@ public class ItemFishPole extends Item {
                 .setThrowDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
                 .setChunkSystem(world.getSystem(ChunkSystem.class))
                 .setParticleSystem(world.getSystem(ParticleSystem.class));
-            world.getSystem(EntitySystem.class).add(fishingHook);
+            EntitySystem es = world.getSystem(EntitySystem.class);
+            es.add(fishingHook);
+            fishingHook.setEntitySystem(es);
             this.throwHook(itemStack, world, fishingHook);
             return super.use(itemStack, world, user);
         }else if (!hook.onCasting() && !hook.isReturning){ //鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩

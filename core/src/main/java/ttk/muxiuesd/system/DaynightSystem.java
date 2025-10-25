@@ -29,7 +29,6 @@ public class DaynightSystem extends WorldSystem {
     }
 
     public void begin(Batch batch) {
-        //Batch batch = getWorld().getScreen().batch;
         ShaderProgram shader = ShaderScheduler.getInstance().begin(ShadersReg.DAYNIGHT_SHADER, batch);
         shader.setUniformMatrix("u_projTrans", camera.combined);
         //转换为0 ~ 1.0
