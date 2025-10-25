@@ -39,40 +39,55 @@ public class GroundEntityCollisionSystem extends WorldSystem {
      * */
     private void playerCollisionCheck (float delta) {
         Player player = this.es.getPlayer();
+        Rectangle hitbox = player.getHitbox();
         Vector2 perPosition = player.getPosition();
         float perX = perPosition.x;
         float perY = perPosition.y;
 
         //下一帧的移动速度
         Vector2 movement = player.getVelocity().scl(delta);
-        //下一帧的移动距离
+        //下一帧的坐标
         float nextX = perX + movement.x;
         float nextY = perY + movement.y;
-        Rectangle nextHitbox = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
+        Rectangle nextHitbox = new Rectangle(nextX, nextY, hitbox.getWidth(), hitbox.getHeight());
 
         ChunkPosition chunkPosition = this.cs.getChunkPosition(nextX, nextY);
-        Chunk chunk = cs.getChunk(chunkPosition);
+        Chunk centerChunk = cs.getChunk(chunkPosition);
+        Chunk leftChunk = cs.getChunk(chunkPosition.getX() - 1, chunkPosition.getY());
+        Chunk rightChunk = cs.getChunk(chunkPosition.getX() + 1, chunkPosition.getY());
+        Chunk upChunk = cs.getChunk(chunkPosition.getX(), chunkPosition.getY() + 1);
+        Chunk downChunk = cs.getChunk(chunkPosition.getX(), chunkPosition.getY() - 1);
+        Chunk leftUpChunk = cs.getChunk(chunkPosition.getX() - 1, chunkPosition.getY() + 1);
+        Chunk rightUpChunk = cs.getChunk(chunkPosition.getX() + 1, chunkPosition.getY() + 1);
+        Chunk leftDownChunk = cs.getChunk(chunkPosition.getX() - 1, chunkPosition.getY() - 1);
+        Chunk rightDownChunk = cs.getChunk(chunkPosition.getX() + 1, chunkPosition.getY() - 1);
+        Chunk[] chunks = new Chunk[]{centerChunk, leftChunk, rightChunk, upChunk, downChunk, leftUpChunk, rightUpChunk, leftDownChunk, rightDownChunk};
+
         Array<Wall<?>> collidingWalls = new Array<>();
 
-        // X轴移动
-        player.hitbox.x += movement.x;
-        chunk.traversal((x, y) -> {
-            Wall<?> wall = chunk.getWall(x, y);
-            if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
-                resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(movement.x, 0));
-                collidingWalls.add(wall);
-            }
-        });
+        for (Chunk chunk: chunks) {
+            // X轴移动
+            player.hitbox.x += movement.x;
+            chunk.traversal((x, y) -> {
+                Wall<?> wall = chunk.getWall(x, y);
 
-        // Y轴移动
-        player.hitbox.y += movement.y;
-        chunk.traversal((x, y) -> {
-            Wall<?> wall = chunk.getWall(x, y);
-            if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
-                resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(0, movement.y));
-                collidingWalls.add(wall);
-            }
-        });
+                if (wall != null && nextHitbox.overlaps(wall.getHitbox())) {
+                    this.resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(movement.x, 0));
+                    collidingWalls.add(wall);
+                }
+            });
+
+            // Y轴移动
+            player.hitbox.y += movement.y;
+            chunk.traversal((x, y) -> {
+                Wall<?> wall = chunk.getWall(x, y);
+
+                if (wall != null && nextHitbox.overlaps(wall.getHitbox())) {
+                    this.resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(0, movement.y));
+                    collidingWalls.add(wall);
+                }
+            });
+        }
 
         player.setPosition(nextHitbox.x, nextHitbox.y);
         //速度最后要归零，否则有惯性
@@ -103,8 +118,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         float overlapBottom = wallRect.y + wallRect.height - playerRect.y;
 
         // 找最小重叠方向
-        float minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
-            Math.min(overlapTop, overlapBottom));
+        float minOverlap = Math.min(Math.min(overlapLeft, overlapRight), Math.min(overlapTop, overlapBottom));
 
         if (minOverlap == overlapLeft) return new Vector2(-1, 0);
         if (minOverlap == overlapRight) return new Vector2(1, 0);
