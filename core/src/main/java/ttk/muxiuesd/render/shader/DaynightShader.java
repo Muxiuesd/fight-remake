@@ -1,4 +1,4 @@
-package ttk.muxiuesd.shader;
+package ttk.muxiuesd.render.shader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;

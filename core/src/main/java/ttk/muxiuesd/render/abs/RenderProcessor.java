@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.interfaces.render.IRenderTaskRecognizer;
-import ttk.muxiuesd.shader.ShaderScheduler;
+import ttk.muxiuesd.render.shader.ShaderScheduler;
 
 import java.util.ArrayList;
 import java.util.Collections;
