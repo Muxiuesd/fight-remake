@@ -18,6 +18,7 @@ public abstract class WorldEntityRenderProcessor extends WorldRenderProcessor {
     public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
         batch.setProjectionMatrix(getCamera().combined);
         shapeRenderer.setProjectionMatrix(getCamera().combined);
+        shapeRenderer.flush();
         beginShader(batch);
 
         getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));

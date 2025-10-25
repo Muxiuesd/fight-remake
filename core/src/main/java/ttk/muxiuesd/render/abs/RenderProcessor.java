@@ -40,6 +40,7 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
     public void defaultHandleRender (Batch batch, ShapeRenderer shapeRenderer) {
         batch.setProjectionMatrix(getCamera().combined);
         shapeRenderer.setProjectionMatrix(getCamera().combined);
+        shapeRenderer.flush();
         beginShader(batch);
 
         getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
