@@ -264,7 +264,6 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
     private void renderBlockCheckBox (ShapeRenderer batch) {
         if (this.mouseBlockPosition != null) {
             batch.setColor(Color.BLACK);
-            //batch.set(ShapeRenderer.ShapeType.Filled);
             batch.rect(
                 this.mouseBlockPosition.getX() + 0.1f,
                 this.mouseBlockPosition.getY() + 0.1f,

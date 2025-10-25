@@ -92,6 +92,8 @@ public class ItemFishPole extends Item {
                     itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
                         itemEntity.setOnAirTimer(null);
                     }));
+
+                    user.getEntitySystem().add(itemEntity);
                 });
             }
 
