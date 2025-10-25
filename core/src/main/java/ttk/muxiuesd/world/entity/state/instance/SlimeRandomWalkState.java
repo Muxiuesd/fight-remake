@@ -51,22 +51,22 @@ public class SlimeRandomWalkState extends StateEnemy<Slime> {
     public void randomWalkPath (World world, Slime entity) {
         ChunkSystem cs = world.getSystem(ChunkSystem.class);
         Vector2 position = entity.getCenter();
-        float dx;
-        float dy;
-        //随机次数
-        int count = 0;
-        //随机路线
-        do {
+        float dx = 0;
+        float dy = 0;
+
+        //随机生成路径
+        for (int count = 0; count < Enemy.MAX_RANDOM_COUNT; count++) {
             double radian = Util.randomRadian();
             float distance = MathUtils.random(1.5f, 2.5f);
-            dx = distance * MathUtils.cos((float) radian);
-            dy = distance * MathUtils.sin((float) radian);
-            count++;
-            //不会主动游走到水方块上
-        }while (
-            cs.getBlock(position.x + dx, position.y + dy) == Blocks.WATER
-            || count <= Enemy.MAX_RANDOM_COUNT
-        );
+            float x = distance * MathUtils.cos((float) radian);
+            float y = distance * MathUtils.sin((float) radian);
+            //遇到不是水的方块直接确认路径
+            if (cs.getBlock(position.x + x, position.y + y) != Blocks.WATER) {
+                dx = x;
+                dy = y;
+                break;
+            }
+        }
 
         this.walkDistance = new Vector2().set(dx, dy);
     }
