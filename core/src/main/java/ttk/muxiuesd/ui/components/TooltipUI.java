@@ -48,7 +48,7 @@ public class TooltipUI extends UIComponent {
         PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
         TooltipUI instance = getInstance();
         //由鼠标坐标来给出基础坐标
-        instance.setPosition(Util.getMouseUIPosition());
+        instance.setPosition(Util.getMouseUIPosition().add(3, 3));
         inventoryUIPanel.addComponent(instance);
 
         return INSTANCE;
@@ -83,6 +83,8 @@ public class TooltipUI extends UIComponent {
             ),
             LEFT, RIGHT, TOP, BOTTOM
         );
+
+        setEnabled(false);
     }
 
     @Override

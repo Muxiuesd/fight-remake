@@ -1,11 +1,14 @@
 package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.text.TextUI;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -18,11 +21,14 @@ public class SlotUI extends UIComponent {
     public static final float SLOT_WIDTH = 16f;
     public static final float SLOT_HEIGHT = 16f;
 
-
+    private TextureRegion slotHighlight;
     private PlayerSystem playerSystem;
     private int index;  ///指向的玩家的某个容器的索引
 
     private TextUI textUI;
+    private boolean mouseIsOver;
+
+
 
     public SlotUI (PlayerSystem playerSystem, int index, float x, float y) {
         this(playerSystem, index, x, y, SLOT_WIDTH, SLOT_HEIGHT,
@@ -38,26 +44,35 @@ public class SlotUI extends UIComponent {
     }
     public SlotUI (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
-
+        this.slotHighlight = Util.loadTextureRegion(
+            Fight.ID("slot_highlight"),
+            Fight.UITexturePath("slot_highlight.png")
+        );
         this.textUI = new TextUI();
         this.textUI.setPosition(x, y);
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        if (!isVisible() || this.isNullSlot()) return;
-
         float renderX = getX();
         float renderY = getY();
         if (parent != null) {
             renderX += parent.getX();
             renderY += parent.getY();
         }
-        ItemStack itemStack = this.getItemStack();
-        batch.draw(itemStack.getItem().texture, renderX, renderY, getWidth(), getHeight());
 
-        int amount = itemStack.getAmount();
-        this.drawAmount(batch, parent, renderX, renderY, amount);
+        //空物品不绘制
+        if (isVisible() && !this.isNullSlot()){
+            ItemStack itemStack = this.getItemStack();
+            batch.draw(itemStack.getItem().texture, renderX, renderY, getWidth(), getHeight());
+
+            int amount = itemStack.getAmount();
+            this.drawAmount(batch, parent, renderX, renderY, amount);
+        }
+        //绘制鼠标放在槽位上的高光
+        if (this.slotHighlight != null && this.mouseIsOver()) {
+            batch.draw(this.slotHighlight, renderX - 1, renderY - 1);
+        }
     }
 
     /**
@@ -113,9 +128,7 @@ public class SlotUI extends UIComponent {
 
     @Override
     public void mouseOver (GridPoint2 interactPos) {
-        /*if (!this.isNullSlot()) {
-            TooltipUI.activate();
-        }*/
+        //this.setMouseIsOver(true);
     }
 
     /**
@@ -158,5 +171,14 @@ public class SlotUI extends UIComponent {
 
     public int getIndex() {
         return this.index;
+    }
+
+    public boolean mouseIsOver () {
+        return this.mouseIsOver;
+    }
+
+    public SlotUI setMouseIsOver (boolean mouseIsOver) {
+        this.mouseIsOver = mouseIsOver;
+        return this;
     }
 }
