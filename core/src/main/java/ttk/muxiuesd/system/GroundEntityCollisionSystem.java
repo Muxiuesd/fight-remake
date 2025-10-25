@@ -43,8 +43,9 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         float perX = perPosition.x;
         float perY = perPosition.y;
 
-        Vector2 movement = player.getVelocity();
-        //下一步位置
+        //下一帧的移动速度
+        Vector2 movement = player.getVelocity().scl(delta);
+        //下一帧的移动距离
         float nextX = perX + movement.x;
         float nextY = perY + movement.y;
         Rectangle nextHitbox = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
@@ -80,7 +81,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     }
 
     private void resolveCollision(Player player, Rectangle nextHitbox, Rectangle wallRect, Vector2 moveDir) {
-        Vector2 normal = getCollisionNormal(nextHitbox, wallRect);
+        Vector2 normal = this.getCollisionNormal(nextHitbox, wallRect);
 
         // 计算实际允许移动量
         float allowedX = moveDir.x * (1 - Math.abs(normal.x));
@@ -88,15 +89,13 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
         nextHitbox.x -= moveDir.x - allowedX;
         nextHitbox.y -= moveDir.y - allowedY;
-        /*player.x -= moveDir.x - allowedX;
-        player.y -= moveDir.y - allowedY;*/
 
         // 速度归零
         if (normal.x != 0) player.velX = 0;
         if (normal.y != 0) player.velY = 0;
     }
 
-    public Vector2 getCollisionNormal(Rectangle playerRect, Rectangle wallRect) {
+    private Vector2 getCollisionNormal(Rectangle playerRect, Rectangle wallRect) {
         // 计算重叠区域
         float overlapLeft = playerRect.x + playerRect.width - wallRect.x;
         float overlapRight = wallRect.x + wallRect.width - playerRect.x;

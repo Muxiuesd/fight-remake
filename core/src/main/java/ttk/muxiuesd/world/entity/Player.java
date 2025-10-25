@@ -138,23 +138,6 @@ public class Player extends LivingEntity<Player> {
     }
 
     private void handleInput(float delta) {
-        if (KeyBindings.PlayerWalkUp.wasPressed()) {
-            //this.y = y + curSpeed * delta;
-            velY += curSpeed * delta;
-        }
-        if (KeyBindings.PlayerWalkDown.wasPressed()) {
-            //this.y = y - curSpeed * delta;
-            velY -= curSpeed * delta;
-        }
-        if (KeyBindings.PlayerWalkLeft.wasPressed()) {
-            //this.x = x - curSpeed * delta;
-            velX -= curSpeed * delta;
-        }
-        if (KeyBindings.PlayerWalkRight.wasPressed()) {
-            //this.x = x + curSpeed * delta;
-            velX += curSpeed * delta;
-        }
-
         //需要玩家鼠标不在UI组件上，防止同时操作两者
         if (!GUISystem.getInstance().mouseOverUI()) {
             //玩家右键防御

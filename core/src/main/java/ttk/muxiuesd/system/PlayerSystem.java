@@ -12,6 +12,7 @@ import ttk.muxiuesd.data.PlayerDataOutput;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
@@ -37,6 +38,8 @@ import java.util.Optional;
 
 /**
  * 玩家系统
+ * <p>
+ * 游戏的玩家实体必须由此系统管理，由此系统提供玩家实体才是合法的
  * */
 public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
@@ -91,8 +94,10 @@ public class PlayerSystem extends WorldSystem {
     public void update (float delta) {
         this.bubbleEmitTimer.update(delta);
 
-        if (this.player.isDeath()) {
-            EventBus.post(EventTypes.PLAYER_DEATH, new EventPosterPlayerDeath(getWorld(), this.player));
+        Player player = this.getPlayer();
+
+        if (player.isDeath()) {
+            EventBus.post(EventTypes.PLAYER_DEATH, new EventPosterPlayerDeath(getWorld(), player));
             this.remakePlayer();
             return;
         }
@@ -108,13 +113,38 @@ public class PlayerSystem extends WorldSystem {
             pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(3, 7),
                 playerCenter.set(playerCenter.x, playerCenter.y - 0.4f),
                 new Vector2(MathUtils.random(1, 2), 0),
-                this.player.getOrigin(),
-                this.player.getSize().scl(0.2f), this.player.getSize().scl(0.05f),
-                this.player.getScale(), MathUtils.random(0, 360), 2f);
+                player.getOrigin(),
+                player.getSize().scl(0.2f), player.getSize().scl(0.05f),
+                player.getScale(), MathUtils.random(0, 360), 2f);
         }
 
-        //this.test();
+        //移动方向
+        int inputX = 0;
+        int inputY = 0;
 
+        //玩家移动
+        if (KeyBindings.PlayerWalkUp.wasPressed()) {
+            inputY += 1;
+        }
+        if (KeyBindings.PlayerWalkDown.wasPressed()) {
+            inputY -= 1;
+        }
+        if (KeyBindings.PlayerWalkLeft.wasPressed()) {
+            inputX -= 1;
+        }
+        if (KeyBindings.PlayerWalkRight.wasPressed()) {
+            inputX += 1;
+        }
+
+        if (inputX != 0 || inputY != 0) {
+            // 计算方向向量的长度
+            float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
+            // 归一化并乘以速度
+            float playerSpeed = player.getSpeed();
+            float velX = (inputX / length) * playerSpeed;
+            float velY = (inputY / length) * playerSpeed;
+            player.setVelocity(velX, velY);
+        }
     }
 
     public void setItemStack (int index, String itemId) {
@@ -147,12 +177,6 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void dispose () {
-        /*JsonDataWriter dataWriter = new JsonDataWriter();
-        dataWriter.objStart();
-        Codecs.BACKPACK.encode(this.getPlayer().getBackpack(), dataWriter);
-        dataWriter.objEnd();
-
-        new BackpackDataOutput("player_backpack").output(dataWriter);*/
         this.savePlayer();
     }
 
