@@ -69,6 +69,15 @@ public abstract class Entity<T extends Entity<?>>
         this.scaleY = values.getFloat("scaleY", 1f);
         this.rotation = values.getFloat("rotation", 0);
         this.onGround = values.getBoolean("onGround", true);
+
+        //更新hitbox
+        Vector2 position = getPosition();
+        setCullingArea(
+            position.x,
+            position.y,
+            getWidth(),
+            getHeight()
+        );
     }
 
     @Override
