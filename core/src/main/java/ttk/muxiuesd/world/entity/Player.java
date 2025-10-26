@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Items;
@@ -76,6 +77,20 @@ public class Player extends LivingEntity<Player> {
     }
 
     @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+
+        //更新hitbox
+        Vector2 position = getPosition();
+        setCullingArea(
+            position.x + HITBOX_OFFSET.x,
+            position.y + HITBOX_OFFSET.y,
+            getWidth() - HITBOX_OFFSET.z,
+            getHeight() - HITBOX_OFFSET.w
+        );
+    }
+
+    @Override
     public void update(float delta) {
         super.update(delta);
 
@@ -91,11 +106,13 @@ public class Player extends LivingEntity<Player> {
             }
         }
         this.handleInput(delta);
+
+        Vector2 position = getPosition();
         setCullingArea(
-            x + HITBOX_OFFSET.x,
-            y + HITBOX_OFFSET.y,
-            width - HITBOX_OFFSET.z,
-            height - HITBOX_OFFSET.w
+            position.x + HITBOX_OFFSET.x,
+            position.y + HITBOX_OFFSET.y,
+            getWidth() - HITBOX_OFFSET.z,
+            getHeight() - HITBOX_OFFSET.w
         );
         //setCullingArea(x, y, width, height);
     }
