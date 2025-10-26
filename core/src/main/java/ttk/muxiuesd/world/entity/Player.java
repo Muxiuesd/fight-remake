@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector4;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Items;
@@ -21,6 +22,8 @@ import ttk.muxiuesd.world.item.ItemStack;
  */
 public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
+    public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, 0.2f, 0.2f);
+
 
     public TextureRegion shield;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
@@ -88,7 +91,13 @@ public class Player extends LivingEntity<Player> {
             }
         }
         this.handleInput(delta);
-        setCullingArea(x + 0.1f, y + 0.1f, width - 0.2f, height - 0.2f);
+        setCullingArea(
+            x + HITBOX_OFFSET.x,
+            y + HITBOX_OFFSET.y,
+            width - HITBOX_OFFSET.z,
+            height - HITBOX_OFFSET.w
+        );
+        //setCullingArea(x, y, width, height);
     }
 
     @Override

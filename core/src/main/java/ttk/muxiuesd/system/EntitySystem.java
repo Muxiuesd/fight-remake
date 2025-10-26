@@ -76,6 +76,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             this.entityTypes.put(entityType, entityType.createEntityArray());
         }
 
+        //把玩家实体加进来
         PlayerSystem ps = getManager().getSystem(PlayerSystem.class);
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
@@ -85,6 +86,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
 
         this.initPool();
+
         //添加tick任务
         TimeSystem timeSystem = getManager().getSystem(TimeSystem.class);
         timeSystem.add(this);
@@ -95,7 +97,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 初始化线程池
      */
-    private void initPool() {
+    private void initPool () {
         int coreSize = Runtime.getRuntime().availableProcessors();
         Log.print(TAG(), "初始化实体加载卸载线程池，核心线程数：" + coreSize);
         this.executor = Executors.newFixedThreadPool(coreSize);
@@ -518,7 +520,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     private void shutdownPool () {
         this.executor.shutdown();
         try {
-            if (!this.executor.awaitTermination(5, TimeUnit.SECONDS)) {
+            if (!this.executor.awaitTermination(1, TimeUnit.SECONDS)) {
                 this.executor.shutdownNow();
                 Log.print(TAG(), "实体加载卸载任务线程池关闭");
             }

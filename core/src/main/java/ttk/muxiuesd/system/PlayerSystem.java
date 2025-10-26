@@ -69,8 +69,10 @@ public class PlayerSystem extends WorldSystem {
         //有玩家数据就读取
         if (FileUtil.fileExists(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME)) {
             this.player = readPlayer();
+            Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
             this.player = Entities.PLAYER.create(getWorld());
+            Log.print(TAG(), "未探查到玩家数据文件，新建玩家实体");
         }
 
         this.playerLastPosition = this.player.getPosition();
