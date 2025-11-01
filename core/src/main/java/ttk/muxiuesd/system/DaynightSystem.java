@@ -32,7 +32,7 @@ public class DaynightSystem extends WorldSystem {
         ShaderProgram shader = ShaderScheduler.getInstance().begin(ShadersReg.DAYNIGHT_SHADER, batch);
         shader.setUniformMatrix("u_projTrans", camera.combined);
         //转换为0 ~ 1.0
-        shader.setUniformf("u_time", this.getGameTime() / 24f);
+        // shader.setUniformf("u_time", this.getGameTime() / 24f);
     }
 
     public void end() {

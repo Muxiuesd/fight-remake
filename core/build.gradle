@@ -6,6 +6,7 @@ dependencies {
   implementation 'org.openjdk.nashorn:nashorn-core:15.4'
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation "com.github.aliasifk:HackLights:$hackLightsVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

@@ -1,8 +1,14 @@
 package ttk.muxiuesd.screen;
 
+import com.aliasifkhan.hackLights.HackLight;
+import com.aliasifkhan.hackLights.HackLightEngine;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ScreenUtils;
+
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.mod.ModLibManager;
@@ -17,6 +23,7 @@ import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.render.instance.*;
 import ttk.muxiuesd.render.shader.ShaderScheduler;
 import ttk.muxiuesd.render.shader.ShadersReg;
+import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
@@ -26,15 +33,24 @@ import ttk.muxiuesd.world.World;
 
 /**
  * 主游戏屏幕
- * */
+ */
 public class MainGameScreen implements Screen {
     public static String TAG = MainGameScreen.class.getName();
 
     //游戏目前加载的世界，后续可能有多个世界
     private World world;
+    HackLightEngine lightEngine;
 
     @Override
     public void show() {
+        ShaderProgram.pedantic = false;
+        lightEngine = new HackLightEngine();
+        TextureRegion lightRegion = new TextureRegion(new Texture("texture/light/light.png"));
+        HackLight light = new HackLight(lightRegion, 1, 1, 1, 1f);
+        light.setScale(0.04f);
+        light.setOriginBasedPosition(0, 0);
+        lightEngine.addLight(light);
+        lightEngine.update(640, 480);
         Fonts.init();
         FI18N.init();
         //初始化游戏底层系统
@@ -138,6 +154,8 @@ public class MainGameScreen implements Screen {
         this.batch.end();*/
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
+        LightSystem lightSystem = world.getSystem(LightSystem.class);
+        lightSystem.afterProcess();
     }
 
     @Override
@@ -167,7 +185,7 @@ public class MainGameScreen implements Screen {
 
     /**
      * 设置当前世界
-     * */
+     */
     public void setWorld(World world) {
         this.world = world;
         //使mod知道当前的游戏世界的实例
