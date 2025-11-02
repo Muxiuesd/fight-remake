@@ -61,26 +61,26 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
 
     @Override
     public String chooseBlock (int height) {
-        String blockId = Fight.getId("block_test");
+        String blockId = Fight.ID("block_test");
         switch (height) {
             case 0:
             case 1:
             case 2:{
-                blockId = Fight.getId("water");
+                blockId = Fight.ID("water");
                 break;
             }
             case 3:{
-                blockId = Fight.getId("sand");
+                blockId = Fight.ID("sand");
                 break;
             }
             case 4:{
-                blockId = Fight.getId("stone");
+                blockId = Fight.ID("stone");
                 break;
             }
             case 5:
             case 6:
             case 7:{
-                blockId = Fight.getId("grass");
+                blockId = Fight.ID("grass");
                 break;
             }
         }

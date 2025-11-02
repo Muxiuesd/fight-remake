@@ -12,7 +12,7 @@ public class BlockSand extends Block {
         super(createProperty()
                 .setFriction(0.9f)
                 .setSounds(Sounds.SAND),
-            Fight.getId("sand"),
+            Fight.ID("sand"),
             Fight.BlockTexturePath("sand.png"));
     }
 }

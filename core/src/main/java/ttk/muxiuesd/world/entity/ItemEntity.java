@@ -4,7 +4,10 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.registry.EntityTypes;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CAT;
@@ -16,8 +19,9 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 掉落在地上的物品以实体形式存在
  * */
-public class ItemEntity extends Entity<ItemEntity> {
+public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, PoolableEntity {
     public static final Vector2 DEFAULT_SIZE = new Vector2(0.5f, 0.5f);
+
     private ItemStack itemStack;
     private Vector2 positionOffset;
     private TaskTimer onAirTimer;   //在空中的计时器，可以自定义物品实体在空中运动的时间
@@ -36,15 +40,15 @@ public class ItemEntity extends Entity<ItemEntity> {
     @Override
     public void readCAT (JsonValue values) {
         super.readCAT(values);
-        this.cycle = values.getFloat("cycle");
-        this.livingTime = values.getFloat("living_time");
+        this.cycle = values.getFloat("cycle", 0f);
+        this.livingTime = values.getFloat("living_time", 0f);
 
 
         if (values.has("on_air")) {
             if (values.getBoolean("on_air")) {
                 this.onAirTimer = new TaskTimer(
-                    values.getFloat("on_air_max_span"),
-                    values.getFloat("on_air_cur_span"),
+                    values.getFloat("on_air_max_span", 0f),
+                    values.getFloat("on_air_cur_span", 0f),
                     () -> this.setOnAirTimer(null)
                 );
             }
@@ -88,35 +92,61 @@ public class ItemEntity extends Entity<ItemEntity> {
         if (this.itemStack != null) this.itemStack.getItem().drawOnWorld(batch, this);
     }
 
+    @Override
+    public void reset () {
+        setEntitySystem(null);
+        setSpeed(0f);
+        setPosition(0f, 0f);
+        setVelocity(0f, 0f);
+        setItemStack(null);
+        setLivingTime(0f);
+        getPositionOffset().set(0f, 0f);
+
+        TaskTimer taskTimer = this.getOnAirTimer();
+        if (taskTimer != null) {
+            Pools.TASK_TIMER.free(taskTimer);
+            this.setOnAirTimer(null);
+        }
+    }
+
+    @Override
+    public void freeSelf () {
+        Pools.ITEM_ENTITY.free(this);
+    }
+
     public ItemStack getItemStack () {
         return this.itemStack;
     }
 
-    public void setItemStack (ItemStack itemStack) {
+    public ItemEntity setItemStack (ItemStack itemStack) {
         this.itemStack = itemStack;
+        return this;
     }
 
     public Vector2 getPositionOffset () {
         return this.positionOffset;
     }
 
-    public void setPositionOffset (Vector2 positionOffset) {
+    public ItemEntity setPositionOffset (Vector2 positionOffset) {
         this.positionOffset = positionOffset;
+        return this;
     }
 
     public float getLivingTime () {
         return this.livingTime;
     }
 
-    public void setLivingTime (float livingTime) {
+    public ItemEntity setLivingTime (float livingTime) {
         this.livingTime = livingTime;
+        return this;
     }
 
     public TaskTimer getOnAirTimer () {
         return onAirTimer;
     }
 
-    public void setOnAirTimer (TaskTimer onAirTimer) {
+    public ItemEntity setOnAirTimer (TaskTimer onAirTimer) {
         this.onAirTimer = onAirTimer;
+        return this;
     }
 }

@@ -9,7 +9,7 @@ import ttk.muxiuesd.Fight;
 public class WallTest extends Wall<WallTest>{
     public WallTest() {
         super(createProperty().setFriction(1f),
-            Fight.getId("test_wall"),
+            Fight.ID("test_wall"),
             Fight.BlockTexturePath("block_test.png"));
     }
 

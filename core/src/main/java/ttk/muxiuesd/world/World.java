@@ -5,8 +5,8 @@ import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.screen.MainGameScreen;
-import ttk.muxiuesd.system.WorldSystemsManager;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.system.manager.WorldSystemsManager;
 import ttk.muxiuesd.util.Log;
 
 /**世界的基类

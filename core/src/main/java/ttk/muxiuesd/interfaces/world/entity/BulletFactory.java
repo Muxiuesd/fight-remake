@@ -10,5 +10,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * 接口：子弹生成
  * */
 public interface BulletFactory<T extends Bullet> {
-    T create (World world, Entity owner, EntityType<?> entityType, Direction direction);
+    T create (World world, Entity<?> owner, EntityType<?> entityType, Direction direction);
+
+    String getBulletId ();
 }

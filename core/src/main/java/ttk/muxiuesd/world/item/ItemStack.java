@@ -2,12 +2,14 @@ package ttk.muxiuesd.world.item;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -88,6 +90,23 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public void renderShape (ShapeRenderer batch) {
         this.getItem().renderShape(batch, this);
     }
+
+    /**
+     * 获取物品的词条文本
+     * */
+    public Array<Text> getTooltips () {
+        Array<Text> array = new Array<>();
+        //基础词条
+        array.add(Text.ofItem(getItem().getID()));
+
+        //物品自定义词条
+        getItem().getTooltips(array, this);
+
+        //基础词条
+        //array.add(Text.of(" "));
+        return array;
+    }
+
 
     /**
      * 指定数量的复制，数量最少为1

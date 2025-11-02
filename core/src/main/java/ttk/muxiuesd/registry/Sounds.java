@@ -16,7 +16,7 @@ public final class Sounds {
 
     public static final AudioLoader LOADER = AudioLoader.getInstance();
 
-    //实体
+    ///实体
     public static final Audio ENTITY_HURT_1 = registerSoundAsMusic("hurt_1",  "entity/damage/hit_1.ogg");
     public static final Audio ENTITY_HURT_2 = registerSoundAsMusic("hurt_2",  "entity/damage/hit_2.ogg");
     public static final Audio ENTITY_HURT_3 = registerSoundAsMusic("hurt_3",  "entity/damage/hit_3.ogg");
@@ -26,19 +26,20 @@ public final class Sounds {
 
     public static final Audio ENTITY_SLIME_SMALL = registerSoundAsMusic("slime_small",  "entity/slime/small.ogg");
 
-    //玩家
+    ///玩家
     public static final Audio ENTITY_SHOOT = registerSoundAsMusic("shoot", "player/shoot.wav");
     public static final Audio ENTITY_SWEEP = registerSoundAsMusic("sweep", "player/sweep.ogg");
     public static final Audio PLAYER_RESURRECTION = registerMusic("player_resurrection", "player_resurrection.mp3");
 
-    //方块
-
-    //物品
+    ///物品
     public static final Audio ITEM_CLICK = registerSoundAsMusic("click", "item/click.ogg");
     public static final Audio ITEM_PUT = registerSound("put", "item/put.ogg");
     public static final Audio ITEM_POP = registerSound("pop", "item/pop.ogg");
 
-    //方块
+    ///装备物品
+    public static final Audio EQUIP = registerSound("equip", "item/equipment/equip.ogg");
+
+    ///方块
     public static final BlockSoundsID STONE = registerBlockSounds("stone", "stone.ogg");
     public static final BlockSoundsID SAND =  registerBlockSounds("sand", "sand.ogg");
     public static final BlockSoundsID GRASS =  registerBlockSounds("grass", "grass.ogg");
@@ -48,7 +49,7 @@ public final class Sounds {
         String walk = name + "_walk";
         String put = name + "_put";
         String destroy = name + "_destroy";
-        BlockSoundsID ids = new BlockSoundsID(Fight.getId(walk), Fight.getId(put), Fight.getId(destroy));
+        BlockSoundsID ids = new BlockSoundsID(Fight.ID(walk), Fight.ID(put), Fight.ID(destroy));
         registerBlockSoundAsMusic(walk, "walk/" + soundFileName);
         registerBlockSoundAsMusic(put, "put/" + soundFileName);
         registerBlockSoundAsMusic(destroy, "destroy/" + soundFileName);
@@ -74,7 +75,7 @@ public final class Sounds {
      * 把sound加载成music
      * */
     public static Audio registerSoundAsMusic (String name, String path) {
-        String id = LOADER.loadMusic(Fight.getId(name), "sound/" + path);
+        String id = LOADER.loadMusic(Fight.ID(name), "sound/" + path);
         return register(id);
     }
 
@@ -83,7 +84,7 @@ public final class Sounds {
      * 最基础的sound注册
      * */
     public static Audio registerSound (String name, String path) {
-        String id = LOADER.loadSound(Fight.getId(name), "sound/" + path);
+        String id = LOADER.loadSound(Fight.ID(name), "sound/" + path);
         return register(id);
     }
 
@@ -91,7 +92,7 @@ public final class Sounds {
      * 最基础的music注册
      * */
     public static Audio registerMusic (String name, String path) {
-        String id = LOADER.loadMusic(Fight.getId(name), "music/" + path);
+        String id = LOADER.loadMusic(Fight.ID(name), "music/" + path);
         return register(id);
     }
 

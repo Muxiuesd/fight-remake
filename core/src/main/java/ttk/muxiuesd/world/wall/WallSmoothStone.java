@@ -6,7 +6,7 @@ import ttk.muxiuesd.Fight;
 public class WallSmoothStone extends Wall<WallSmoothStone> {
     public WallSmoothStone () {
         super(createProperty().setFriction(1f),
-            Fight.getId("smooth_stone"),
+            Fight.ID("smooth_stone"),
             Fight.BlockTexturePath("smooth_stone.png"));
     }
 

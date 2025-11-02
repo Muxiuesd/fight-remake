@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.block.abs.Block;
 public class BlockGrass extends Block {
     public BlockGrass() {
         super(createProperty().setFriction(1f).setSounds(Sounds.GRASS),
-            Fight.getId("grass"),
+            Fight.ID("grass"),
             Fight.BlockTexturePath("grass.png"));
     }
 

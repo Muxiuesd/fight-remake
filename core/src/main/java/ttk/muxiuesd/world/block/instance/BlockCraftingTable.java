@@ -9,10 +9,10 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityCraftingTable;
 /**
  * 工作台
  * */
-public class BlockCraftingTable extends BlockWithEntity<BlockCraftingTable, BlockEntityCraftingTable> {
+public class BlockCraftingTable extends BlockWithEntity {
     public BlockCraftingTable () {
         super(createProperty().setFriction(0.7f),
-            Fight.getId("crafting_table"),
+            Fight.ID("crafting_table"),
             Fight.BlockTexturePath("crafting_table.png"));
     }
 
@@ -26,6 +26,6 @@ public class BlockCraftingTable extends BlockWithEntity<BlockCraftingTable, Bloc
 
     @Override
     public BlockEntityCraftingTable createBlockEntity (BlockPos blockPos, World world) {
-        return new BlockEntityCraftingTable(world, this, blockPos);
+        return new BlockEntityCraftingTable(blockPos);
     }
 }

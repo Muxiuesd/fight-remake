@@ -83,6 +83,10 @@ public abstract class Bullet extends Entity<Bullet> {
         return this;
     }
 
+    public boolean isAlive() {
+        return this.getLiveTime() <= this.getMaxLiveTime();
+    }
+
     public float getMaxLiveTime() {
         return this.maxLiveTime;
     }

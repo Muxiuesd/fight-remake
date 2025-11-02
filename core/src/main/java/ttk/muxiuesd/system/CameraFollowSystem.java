@@ -2,8 +2,8 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.camera.PlayerCamera;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -52,6 +52,12 @@ public class CameraFollowSystem extends WorldSystem {
         float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
         PlayerCamera.INSTANCE.setPosition(follower.x + follower.width / 2 + xOffset,
             follower.y + follower.height / 2 + yOffset);
+
+        /*GUICamera.INSTANCE.setPosition(
+            follower.x + follower.width / 2,
+            follower.y + follower.height / 2
+        );*/
+
     }
 
     public Entity<?> getFollower() {

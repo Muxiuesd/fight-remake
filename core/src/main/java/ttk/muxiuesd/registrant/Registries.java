@@ -6,6 +6,7 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.lang.LangPack;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
@@ -14,8 +15,10 @@ import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
-import ttk.muxiuesd.world.entity.damage.DamageType;
+import ttk.muxiuesd.world.entity.abs.DamageType;
+import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -30,11 +33,13 @@ public class Registries {
 
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
+    public static final Registry<BlockEntityProvider<?>> BLOCK_ENTITY = create(RegistryKeys.BLOCK_ENTITY);
     public static final Registry<Wall<?>> WALL = create(RegistryKeys.WALL);
     public static final Registry<EntityType<?>> ENTITY_TYPE = create(RegistryKeys.ENTITY_TYPE);
     public static final Registry<EntityProvider<?>> ENTITY = create(RegistryKeys.ENTITY);
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
+    public static final Registry<StatusEffect> STATUS_EFFECT = create(RegistryKeys.STATUS_EFFECT);
 
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
     public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);
@@ -45,6 +50,8 @@ public class Registries {
 
     public static final Registry<FightPool<?>> POOL = create(RegistryKeys.POOL);
     public static final Registry<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = create(RegistryKeys.WORLD_INFO_HASH_MAP);
+    public static final Registry<LangPack> LANG_HOLDER = create(RegistryKeys.LANG_HOLDER);
+
 
     /**
      * 创建一个注册表

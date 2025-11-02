@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Pools;
 public class FightPool<T> {
     private final Class<T> clazz;
 
-    public FightPool (Class<T> clazz, Pool<T> pool) {
+    public <P extends Pool<T>> FightPool (Class<T> clazz, P pool) {
         this.clazz = clazz;
         Pools.set(clazz, pool);
     }

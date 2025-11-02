@@ -5,11 +5,12 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
-import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -18,15 +19,16 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 工作台方块实体
  * */
 public class BlockEntityCraftingTable extends BlockEntity {
-    public BlockEntityCraftingTable (World world, Block block, BlockPos blockPos) {
-        super(world, block, blockPos, 9);
+    public BlockEntityCraftingTable (BlockPos blockPos) {
+        super(BlockEntities.CRAFTING_TABLE, blockPos);
+
+        setInventory(new Backpack(9));
         setInteractGridSize(new GridPoint2(9, 9));
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 addSlot(x + y * 3, x * 3, y * 3, 3, 3);
             }
         }
-        System.out.println('a');
     }
 
     @Override
@@ -45,7 +47,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         user.setHandItemStack(outStack);
         inventory.clear();
 
-        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+        AudioPlayer.getInstance().playSound(Fight.ID("pop"));
         return InteractResult.SUCCESS;
     }
 
@@ -75,7 +77,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         //记得清理
         user.backpack.clear();
 
-        AudioPlayer.getInstance().playSound(Fight.getId("put"), 2.5f);
+        AudioPlayer.getInstance().playSound(Fight.ID("put"), 2.5f);
         return InteractResult.SUCCESS;
     }
 

@@ -1,26 +1,17 @@
 package ttk.muxiuesd.render.instance;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
 import ttk.muxiuesd.render.abs.WorldRenderProcessor;
 import ttk.muxiuesd.world.World;
 
+/**
+ * 粒子效果的渲染处理器
+ * */
 public class ParticleRenderProcessor extends WorldRenderProcessor {
     public ParticleRenderProcessor (Camera camera, String shaderId, int renderOrder, World world) {
         super(camera, shaderId, renderOrder, world);
-    }
-
-    @Override
-    public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
-        batch.setProjectionMatrix(getCamera().combined);
-        beginShader(batch);
-
-        getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
-
-        endShader();
     }
 
     @Override

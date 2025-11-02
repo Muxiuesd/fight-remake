@@ -2,11 +2,16 @@ package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.camera.PlayerCamera;
+import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.render.camera.GUICamera;
+import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -24,6 +29,17 @@ public class Util {
         Vector3 up = camera.unproject(mp);
         return new Vector2(up.x, up.y);
     }
+
+    /**
+     * 获取鼠标指向的游戏GUI坐标
+     * */
+    public static Vector2 getMouseUIPosition() {
+        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
+        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
+        Vector3 up = camera.unproject(mp);
+        return new Vector2(up.x, up.y);
+    }
+
 
     /**
      * 获取鼠标的位置,相对于游戏窗口的中心
@@ -47,6 +63,26 @@ public class Util {
         float newY = ((float) Gdx.graphics.getHeight() / 2) - y;
         return new Vector2(newX, newY);
     }
+
+    /**
+     * 获取交互内部坐标
+     * @param sourcePos 起点坐标
+     * @param targetPos 目标坐标
+     * @param size 目标大小（宽高）
+     * @param targetGridSize 目标内部区域坐标大小
+     * @return 内部网格坐标
+     * */
+    public static GridPoint2 getInteractGridPos (Vector2 sourcePos,
+                                                 Vector2 targetPos, Vector2 size,
+                                                 GridPoint2 targetGridSize) {
+        //计算交互区域坐标
+        int x = (int) ((targetPos.x - sourcePos.x) / size.x * targetGridSize.x);
+        int y = (int) ((targetPos.y - sourcePos.y) / size.y * targetGridSize.y);
+
+        return new GridPoint2(x, y);
+    }
+
+
 
     /**
      * 获取窗口中心到鼠标方向的单位向量
@@ -187,4 +223,15 @@ public class Util {
         return count;
     }
 
+    /**
+     * 加载纹理区域
+     * */
+    public static TextureRegion loadTextureRegion (String id, String texturePath) {
+        if (texturePath == null) {
+            texturePath = AssetsLoader.getInstance().getPath(id);
+        }
+
+        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
+        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    }
 }

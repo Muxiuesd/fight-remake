@@ -8,7 +8,7 @@ import ttk.muxiuesd.interfaces.data.DataWriter;
  * */
 public class DefaultBoolPropertyType extends PropertyType<Boolean>{
     @Override
-    public void write (DataWriter writer, Boolean data) {
+    public void write (DataWriter<?> writer, Boolean data) {
         writer.writeBoolean(getId(), data);
     }
 

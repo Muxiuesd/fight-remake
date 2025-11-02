@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.system.LightSystem;
@@ -15,9 +17,10 @@ import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
-import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
+import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -30,13 +33,14 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 public class BlockEntityFurnace extends BlockEntity {
     private int curEnergy = 0;  //能量，每tick减1
     private int curTick = 0;
-    private final Slot inputSlot;
-    private final Slot outputSlot;
-    private final Slot fuelSlot;
+    private Slot inputSlot;
+    private Slot outputSlot;
+    private Slot fuelSlot;
     private PointLight light;
 
-    public BlockEntityFurnace (World world, Block block, BlockPos blockPos) {
-        super(world, block, blockPos, 3);
+    public BlockEntityFurnace (BlockPos blockPos) {
+        super(BlockEntities.FURNACE, blockPos);
+        setInventory(new Backpack(3));
 
         this.inputSlot = addSlot(this.getInputSlotIndex(), 1, 8, 6, 6);
         this.outputSlot = addSlot(this.getOutputSlotIndex(), 9, 8, 6, 6);
@@ -44,6 +48,18 @@ public class BlockEntityFurnace extends BlockEntity {
 
         this.light = new PointLight(new Color(0.8f, 0.1f, 0.1f, 0.1f), 2.5f);
         this.light.setPosition(new Vector2(blockPos).add(0.5f, 0.2f));
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("curEnergy", this.curEnergy);
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.curEnergy = values.getInt("curEnergy");
     }
 
     @Override
@@ -92,7 +108,7 @@ public class BlockEntityFurnace extends BlockEntity {
             handItemStack.setAmount(handItemStack.getAmount() - addAmount - bePutStack.getAmount());
         }
 
-        AudioPlayer.getInstance().playSound(Fight.getId("put"), 2.5f);
+        AudioPlayer.getInstance().playSound(Fight.ID("put"), 2.5f);
         return InteractResult.SUCCESS;
     }
 

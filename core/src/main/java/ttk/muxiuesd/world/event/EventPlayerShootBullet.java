@@ -23,7 +23,7 @@ public class EventPlayerShootBullet extends BulletShootEvent {
 
             ParticleSystem pts = world.getSystem(ParticleSystem.class);
 
-            pts.emitParticle(Fight.getId("player_shoot"), MathUtils.random(7, 15),
+            pts.emitParticle(Fight.ID("player_shoot"), MathUtils.random(7, 15),
                 bullet.getPosition(), bullet.getVelocity().scl(3f),
                 bullet.getOrigin(),
                 bullet.getSize().scl(0.9f), bullet.getSize().scl(0.1f),

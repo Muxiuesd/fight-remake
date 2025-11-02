@@ -8,6 +8,9 @@ public class Fight {
     public static final String BLOCK_TEXTURE_ROOT = "texture/blocks/";
     public static final String ENTITY_TEXTURE_ROOT = "texture/entity/";
     public static final String ITEM_TEXTURE_ROOT = "texture/item/";
+    public static final String UI_TEXTURE_ROOT = "texture/ui/";
+    public static final String FONT_ROOT = "font/";
+    public static final String LANG_ROOT = "lang/";
 
     //玩家的听觉范围，单位：世界中的1米
     public static final Info<Float> PLAYER_HEARING_RANGE = Info.create("player_hearing_range", 16f);
@@ -35,10 +38,18 @@ public class Fight {
     public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
 
 
-
-    public static String getId (String name) {
-        return NAMESPACE + ":" + name;
+    /**
+     * 游戏本体的元素获取ID
+     * */
+    public static String ID (String name) {
+        synchronized (idStringBuilder) {
+            idStringBuilder.setLength(0);
+            idStringBuilder.append(NAMESPACE).append(":").append(name);
+            return idStringBuilder.toString();
+        }
     }
+    private static final StringBuilder idStringBuilder = new StringBuilder();
+
 
     /**
      * 从方块的材质根路径中获取方块的材质
@@ -53,6 +64,18 @@ public class Fight {
 
     public static String ItemTexturePath (String path) {
         return ITEM_TEXTURE_ROOT + path;
+    }
+
+    public static String UITexturePath (String path) { return UI_TEXTURE_ROOT + path; }
+
+    public static String FontPath (String path) {
+        if (path.endsWith(".ttf")) return FONT_ROOT + path;
+        return FONT_ROOT + path + ".ttf";
+    }
+
+    public static String LangPath (String path) {
+        if (path.endsWith(".json")) return LANG_ROOT + path;
+        return LANG_ROOT + path + ".json";
     }
 
     public static String GameSavePath (String name) {

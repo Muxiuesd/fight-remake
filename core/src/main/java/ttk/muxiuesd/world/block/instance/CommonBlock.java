@@ -8,6 +8,6 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class CommonBlock extends Block {
     public CommonBlock (String name, Property property) {
-        super(property, Fight.getId(name), Fight.BlockTexturePath(name + ".png"));
+        super(property, Fight.ID(name), Fight.BlockTexturePath(name + ".png"));
     }
 }

@@ -43,7 +43,7 @@ public final class WorldInformationType {
      * 注册一种信息类型的hashmap
      * */
     public static <T, V> WorldInfoHashMap<T, V> register (String name, WorldInfoHashMap<T, V> map) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         map.setId(id);
         Registries.WORLD_INFO_HASH_MAP.register(new Identifier(id), map);
         return map;

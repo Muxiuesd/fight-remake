@@ -25,10 +25,10 @@ public class FishingLootTable extends LootTable {
 
     static {
         FishingLootTable table = getInstance();
-        table.register(Fight.getId("fish"),
-            new LootEntry(Fight.getId("fish"), 1, 1, 100, "fishing"));
-        table.register(Fight.getId("rubbish"),
-            new LootEntry(Fight.getId("rubbish"), 1, 1, 300, "fishing"));
+        table.register(Fight.ID("fish"),
+            new LootEntry(Fight.ID("fish"), 1, 1, 100, "fishing"));
+        table.register(Fight.ID("rubbish"),
+            new LootEntry(Fight.ID("rubbish"), 1, 1, 300, "fishing"));
     }
 
     @Override

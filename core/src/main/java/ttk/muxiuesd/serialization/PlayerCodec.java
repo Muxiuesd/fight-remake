@@ -33,6 +33,11 @@ public class PlayerCodec extends JsonCodec<Player> {
         dataWriter.objStart("backpack");
         Codecs.BACKPACK.encode(player.getBackpack(), dataWriter);
         dataWriter.objEnd();
+
+        //编码装备背包数据
+        dataWriter.objStart("equipment");
+        Codecs.BACKPACK.encode(player.getEquipmentBackpack(), dataWriter);
+        dataWriter.objEnd();
     }
 
     @Override
@@ -45,12 +50,17 @@ public class PlayerCodec extends JsonCodec<Player> {
         );
         propertyOptional.ifPresent(player::setProperty);
         //读取cat
-        player.readCAT(propertyValue.get(Fight.getId("cat")));
+        player.readCAT(propertyValue.get(Fight.ID("cat")));
 
         //读取背包数据
         JsonValue backpackValue = dataReader.readObj("backpack");
         Optional<Backpack> optionalBackpack = Codecs.BACKPACK.decode(new JsonDataReader(backpackValue));
         optionalBackpack.ifPresent(player::setBackpack);
+
+        //读取装备背包数据
+        JsonValue equipmentValue = dataReader.readObj("equipment");
+        Optional<Backpack> optionalEquipment = Codecs.BACKPACK.decode(new JsonDataReader(equipmentValue));
+        optionalEquipment.ifPresent(player::setEquipmentBackpack);
 
         return Optional.of(player);
     }

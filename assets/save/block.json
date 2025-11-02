@@ -1,3 +1,49 @@
 {
-"id": "fight:grass"
+"id": "fight:crafting_table",
+"width": 1,
+"height": 1,
+"originX": 0,
+"originY": 0,
+"scaleX": 1,
+"scaleY": 1,
+"rotation": 0,
+"property": {
+	"fight:block_friction": 0.7,
+	"fight:block_sounds": {
+		"WALK": "fight:stone_walk",
+		"PUT": "fight:stone_put",
+		"DESTROY": "fight:stone_destroy"
+	},
+	"fight:cat": {}
+},
+"block_entity": {
+	"id": "fight:crafting_table",
+	"blockPos": {
+		"x": 3,
+		"y": -1
+	},
+	"inventory": {
+		"size": 9,
+		"itemStacks": {
+			"1": {
+				"id": "fight:coal_ore",
+				"amount": 2,
+				"property": {
+					"fight:item_max_count": 64,
+					"fight:item_on_using": false,
+					"fight:item_use_sound_id": "fight:click"
+				}
+			},
+			"4": {
+				"id": "fight:coal_ore",
+				"amount": 2,
+				"property": {
+					"fight:item_max_count": 64,
+					"fight:item_on_using": false,
+					"fight:item_use_sound_id": "fight:click"
+				}
+			}
+		}
+	}
+}
 }

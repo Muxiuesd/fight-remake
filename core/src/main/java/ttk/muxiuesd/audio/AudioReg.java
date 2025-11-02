@@ -51,9 +51,9 @@ public class AudioReg {
     public static BlockSoundsID fastRegisterBlockSoundAsMusic (String name, String soundFileName) {
 
         BlockSoundsID ids = new BlockSoundsID(
-            Fight.getId(name+"_walk"),
-            Fight.getId(name+"_put"),
-            Fight.getId(name+"_destroy"));
+            Fight.ID(name+"_walk"),
+            Fight.ID(name+"_put"),
+            Fight.ID(name+"_destroy"));
         registerBlockSoundAsMusic(name+"_walk", "walk/" + soundFileName);
         registerBlockSoundAsMusic(name+"_put", "put/" + soundFileName);
         registerBlockSoundAsMusic(name+"_destroy", "destroy/" + soundFileName);
@@ -75,17 +75,17 @@ public class AudioReg {
     }
 
     public static void registerSound (String name, String path) {
-        loader.loadSound(Fight.getId(name), "sound/" + path);
+        loader.loadSound(Fight.ID(name), "sound/" + path);
     }
 
     /**
      * 把sound加载成music
      * */
     public static void registerSoundAsMusic (String name, String path) {
-        loader.loadMusic(Fight.getId(name), "sound/" + path);
+        loader.loadMusic(Fight.ID(name), "sound/" + path);
     }
 
     public static void registerMusic (String name, String path) {
-        loader.loadMusic(Fight.getId(name), "music/" + path);
+        loader.loadMusic(Fight.ID(name), "music/" + path);
     }
 }

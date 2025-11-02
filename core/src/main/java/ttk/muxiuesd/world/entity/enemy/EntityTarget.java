@@ -13,11 +13,11 @@ import ttk.muxiuesd.world.entity.abs.Enemy;
 public class EntityTarget extends Enemy<EntityTarget> {
     public EntityTarget (World world, EntityType<?> entityType) {
         super(world, EntityTypes.ENEMY, 1000, 1000, 1, 1, 1, 0);
-        bodyTexture = getTextureRegion(Fight.getId("fish"), "fish/fish.png");
+        bodyTexture = getTextureRegion(Fight.ID("fish"), "fish/fish.png");
     }
 
     @Override
-    public void attack (float delta, EntitySystem es) {
+    public void remoteAttack (float delta, EntitySystem es) {
         //super.attack(delta, es);
     }
 }

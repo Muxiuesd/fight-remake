@@ -1,8 +1,11 @@
 package ttk.muxiuesd.world.item.abs;
 
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 武器类
@@ -24,5 +27,13 @@ public abstract class Weapon extends Item {
 
     public Weapon (Property property, String textureId, String texturePath) {
         super(Type.WEAPON, property, textureId, texturePath);
+    }
+
+    @Override
+    public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
+        array.add(Text.ofText("fight:weapon_use_span").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
+        array.add(Text.ofText("fight:weapon_duration").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DURATION)));
+        array.add(Text.ofText("fight:weapon_damage").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
+        return super.getTooltips(array, itemStack);
     }
 }

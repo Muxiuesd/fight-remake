@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.entity.enemy.Slime;
 public class SlimeGenFactory implements EnemyGenFactory<Slime> {
     @Override
     public Slime[] create (World world, float genX, float genY) {
-        Slime[] slimes = new Slime[MathUtils.random(1, 3)];
+        Slime[] slimes = new Slime[MathUtils.random(2, 3)];
         for (int i = 0; i < slimes.length; i++) {
             Slime slime = Entities.SLIME.create(world);
             float x = genX + MathUtils.random(-1f, 1f);

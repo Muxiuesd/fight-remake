@@ -8,7 +8,7 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 public class BulletFire extends Bullet {
     public BulletFire (World world, EntityType<?> entityType) {
         super(world, entityType,
-            Fight.getId("bullet_fire"), "bullet/flame.png",
+            Fight.ID("bullet_fire"), "bullet/flame.png",
             1f, 15f, 3f, 0f);
     }
 }

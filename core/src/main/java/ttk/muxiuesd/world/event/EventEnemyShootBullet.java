@@ -25,7 +25,7 @@ public class EventEnemyShootBullet extends BulletShootEvent {
             ses.newSpatialSound(Sounds.ENTITY_SHOOT, bullet);
 
             ParticleSystem pts = world.getSystem(ParticleSystem.class);
-            pts.emitParticle(Fight.getId("enemy_shoot"), MathUtils.random(3, 5),
+            pts.emitParticle(Fight.ID("enemy_shoot"), MathUtils.random(3, 5),
                 bullet.getPosition(), bullet.getVelocity(),
                 1.5f, ParticleDefaultConfig.ShootParticle);
         }

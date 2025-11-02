@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.particle;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.particle.abs.Particle;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.emitters.EmitterEnemyShootParticle;
@@ -14,12 +15,15 @@ import java.util.LinkedHashMap;
  * 粒子发射器注册
  * */
 public class ParticleEmittersReg {
+    public static void init() {
+        Log.print(ParticleEmittersReg.class.getName(), "粒子发射器注册完成");
+    }
     private static final LinkedHashMap<String, ParticleEmitter<? extends Particle>> emitters = new LinkedHashMap<>();
 
-    public static final String FURNACE_FIRE = register(Fight.getId("furnace_fire"), new EmitterFurnaceFire());
-    public static final String PLAYER_SHOOT = register(Fight.getId("player_shoot"), new EmitterPlayerShootParticle());
-    public static final String ENTITY_SWIMMING = register(Fight.getId("entity_swimming"), new EmitterEntitySwimming());
-    public static final String ENTITY_SHOOT = register(Fight.getId("enemy_shoot"), new EmitterEnemyShootParticle());
+    public static final String FURNACE_FIRE = register(Fight.ID("furnace_fire"), new EmitterFurnaceFire());
+    public static final String PLAYER_SHOOT = register(Fight.ID("player_shoot"), new EmitterPlayerShootParticle());
+    public static final String ENTITY_SWIMMING = register(Fight.ID("entity_swimming"), new EmitterEntitySwimming());
+    public static final String ENTITY_SHOOT = register(Fight.ID("enemy_shoot"), new EmitterEnemyShootParticle());
 
     /**
      * 添加一种粒子发射器

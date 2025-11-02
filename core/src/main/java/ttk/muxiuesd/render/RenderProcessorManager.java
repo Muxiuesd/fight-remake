@@ -22,6 +22,8 @@ public class RenderProcessorManager {
     private static final ConcurrentHashMap<String, RenderProcessor> processors = new ConcurrentHashMap<>();
     private static final ArrayList<Map.Entry<String, Integer>> orderList = new ArrayList<>();
 
+    private static ArrayList<Map.Entry<String, Integer>> sortedList = new ArrayList<>();
+
     /**
      * 获取指定名称的渲染处理器
      * */
@@ -67,21 +69,34 @@ public class RenderProcessorManager {
     }
 
     /**
-     * 执行所有的渲染处理器的渲染
+     * 排序
      * */
-    public static void render(Batch batch, ShapeRenderer shapeRenderer) {
-        //复制排序列表以避免并发修改
-        ArrayList<Map.Entry<String, Integer>> sortedList;
-        synchronized (orderList) {
-            sortedList = new ArrayList<>(orderList);
-        }
+    public static void sort() {
+        //TODO 排序
+        sortedList.clear();
+        sortedList.addAll(orderList);
+    }
 
+    public static void batchRender(Batch batch) {
         // 按照排序后的顺序执行渲染
         for (Map.Entry<String, Integer> entry : sortedList) {
             String key = entry.getKey();
             RenderProcessor processor = processors.get(key);
             if (processor != null) {
-                processor.handleRender(batch, shapeRenderer);
+                processor.beginShader(batch);
+                processor.handleBatchRender(batch);
+                processor.endShader();
+            }
+        }
+    }
+
+    public static void shapeRender(ShapeRenderer shapeRenderer) {
+        // 按照排序后的顺序执行渲染
+        for (Map.Entry<String, Integer> entry : sortedList) {
+            String key = entry.getKey();
+            RenderProcessor processor = processors.get(key);
+            if (processor != null) {
+                processor.handleShapeRender(shapeRenderer);
             }
         }
     }

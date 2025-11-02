@@ -4,19 +4,20 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
-import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.damage.DamageType;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -34,17 +35,20 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
-    private LinkedHashMap<String, LivingEntityState<T>> states;
-    private LivingEntityState<T> curState;
-    private float maxHealth; // 生命值上限
-    private float curHealth; // 当前生命值
-    private boolean attacked;   //是否收到攻击的状态
-    private TaskTimer attackedTimer;    //被攻击状态持续的计时器
-    public Backpack backpack;   //储存物品的背包
+    private LinkedHashMap<String, LivingEntityState<T>> states; //状态机
+    private LivingEntityState<T> curState;                      //当前状态
+    private LinkedHashMap<StatusEffect, StatusEffect.Data> effects;    //实体的状态效果
+
+    private float maxHealth;                // 生命值上限
+    private float curHealth;                // 当前生命值
+    private boolean attacked;               //是否收到攻击的状态
+    private TaskTimer attackedTimer;        //被攻击状态持续的计时器
+    public Backpack backpack;               //储存物品的背包容器
+    private Backpack equipmentBackpack;     //持有装备的背包容器
     public boolean renderHandItem = false;  //是否渲染手部持有的物品（有的实体没有手，持有物品不用渲染出来）
-    private int handIndex;  //手部物品索引
-    private TaskTimer swingHandTimer;
-    private float maxSwingHandDegree;
+    private int handIndex;                  //手部物品索引
+    private TaskTimer swingHandTimer;       //挥手计时器
+    private float maxSwingHandDegree;       //最大挥手角度
 
     public LivingEntity (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10);
@@ -56,6 +60,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         super(world, entityType);
         setSize(DEFAULT_SIZE);
         this.states = new LinkedHashMap<>();
+        this.effects = new LinkedHashMap<>();
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
         this.attacked = false;
@@ -64,22 +69,78 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             .setCurSpan(0)
             .setTask(() -> this.attacked = false);
         this.backpack = new Backpack(backpackSize);
+        this.equipmentBackpack = new Backpack(4);
         this.maxSwingHandDegree = 60f;
     }
 
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+        this.handIndex = values.getInt("hand_index", 0);
+        this.maxHealth = values.getFloat("maxHealth", 10f);
+        this.curHealth = values.getFloat("curHealth", 10f);
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
+        cat.set("hand_index", this.handIndex);
+        cat.set("maxHealth", this.maxHealth);
+        cat.set("curHealth", this.curHealth);
+    }
 
     @Override
     public void update (float delta) {
         super.update(delta);
+
+        this.updateStatusEffect(delta);
+
         this.backpack.update(delta);
         this.attackedTimer.update(delta);
         this.attackedTimer.isReady();
+
         //处理当前状态
         if (this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
 
         if (this.swingHandTimer != null) {
             this.swingHandTimer.update(delta);
             this.swingHandTimer.isReady();
+        }
+    }
+
+    /**
+     * 更新状态效果
+     * */
+    private void updateStatusEffect (float delta) {
+        //需要被移除的状态效果
+        Array<StatusEffect> remove = new Array<>();
+
+        for (StatusEffect effect : this.effects.keySet()) {
+            StatusEffect.Data data = this.effects.get(effect);
+            data.decreaseDuration(delta);
+            //检查时间是否归零
+            if (data.getDuration() <= 0f) remove.add(effect);
+        }
+
+        if (remove.isEmpty()) return;
+        //移除
+        for (StatusEffect effect : remove) {
+            this.effects.remove(effect);
+        }
+    }
+
+    @Override
+    public void tick (World world, float delta) {
+        this.applyEffectTick();
+    }
+
+    /**
+     * 应用状态效果
+     * */
+    private void applyEffectTick () {
+        for (StatusEffect effect : this.effects.keySet()) {
+            StatusEffect.Data data = this.effects.get(effect);
+            effect.applyEffectTick(this, data.getLevel());
         }
     }
 
@@ -141,25 +202,31 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * @return 丢弃成功返回丢出来的物品实体，丢弃失败返回null
      * */
     public ItemEntity dropItem (int index, int amount) {
-        ItemStack itemStack = this.backpack.dropItem(index, amount);
+        ItemStack itemStack = this.getBackpack().dropItem(index, amount);
         if (itemStack == null) return null;
 
+        itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
+
+        AudioPlayer.getInstance().playSound(Fight.ID("pop"));
+
+        return this.spawnItemEntity(itemStack);
+    }
+
+    /**
+     * 以实体为基准生成一个物品实体
+     * */
+    public ItemEntity spawnItemEntity (ItemStack stack) {
         //简单的生成一个物品实体而已
-        ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, getEntitySystem());
+        ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), stack);
         //使得物品中心与实体中心对齐
-        itemEntity.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)));
-        itemEntity.setOnGround(false);
-        itemEntity.setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
+        return itemEntity
+            .setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            .setOnGround(false)
+            .setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
             .setTask(() -> {
                 Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
                 itemEntity.setOnAirTimer(null);
-        }));
-        itemEntity.setItemStack(itemStack);
-        itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
-
-        AudioPlayer.getInstance().playSound(Fight.getId("pop"));
-
-        return itemEntity;
+            }));
     }
 
     /**
@@ -340,12 +407,27 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         return this.maxSwingHandDegree;
     }
 
+    /**
+     * 获取物品背包容器
+     * */
     public Backpack getBackpack () {
         return this.backpack;
     }
 
     public T setBackpack (Backpack backpack) {
-        this.backpack = backpack;
+        if (backpack != null) this.backpack = backpack;
+        return (T) this;
+    }
+
+    /**
+     * 获取装备背包容器
+     * */
+    public Backpack getEquipmentBackpack () {
+        return this.equipmentBackpack;
+    }
+
+    public T setEquipmentBackpack (Backpack equipmentBackpack) {
+        if (equipmentBackpack != null) this.equipmentBackpack = equipmentBackpack;
         return (T) this;
     }
 
@@ -386,5 +468,23 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             this.curState.start(world, (T) this);
         }
         return this;
+    }
+
+    /**
+     * 设置一种状态效果
+     * */
+    public T setEffect (StatusEffect effect, float duration, int level) {
+        //已经存在效果
+        if (this.effects.containsKey(effect)) {
+            //覆盖
+            this.effects.get(effect)
+                .setDuration(duration)
+                .setLevel(level);
+        }else {
+            //没这个效果就直接添加
+            this.effects.put(effect, new StatusEffect.Data(duration, level));
+        }
+
+        return (T) this;
     }
 }

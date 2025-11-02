@@ -63,8 +63,6 @@ public class TimeSystem extends WorldSystem implements Tickable {
         }else {
             this.tickSpan += delta;
         }
-        //System.out.println(20f / this.tickSpan);
-        //System.out.println(getGameTime());
     }
 
     @Override
@@ -72,8 +70,6 @@ public class TimeSystem extends WorldSystem implements Tickable {
         //更新所有的tick
         this.tickUpdates.forEach(t -> t.tick(world, delta));
 
-        //this.callWorldTickEvent(delta);
-        //EventBus.getInstance().callEvent(EventBus.EventType.TickUpdate, getWorld(), delta);
         EventBus.post(EventTypes.WORLD_TICK, new EventPosterWorldTick(getWorld(), delta));
     }
 
@@ -86,6 +82,10 @@ public class TimeSystem extends WorldSystem implements Tickable {
      * 添加tick更新
      * */
     public void add (Tickable tickable) {
+        //防止重复添加
+        if (this._delayAdd.contains(tickable, true)
+            || this.tickUpdates.contains(tickable, true)) return;
+
         this._delayAdd.add(tickable);
     }
 

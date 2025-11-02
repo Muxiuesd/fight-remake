@@ -24,8 +24,12 @@ public class GroundEntityRenderSystem extends EntityRenderSystem implements IWor
 
 
     @Override
-    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+    public void batchRender (Batch batch) {
         this.draw(batch);
+    }
+
+    @Override
+    public void shapeRender (ShapeRenderer shapeRenderer) {
         this.renderShape(shapeRenderer);
     }
 

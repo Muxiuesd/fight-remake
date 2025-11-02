@@ -5,7 +5,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.instence.RangedWeapon;
+import ttk.muxiuesd.world.item.weapon.RangedWeapon;
 
 /**
  * 远程武器的使用行为

@@ -1,14 +1,13 @@
 package ttk.muxiuesd.world.particle.emitters;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.world.particle.ParticlePool;
+import ttk.muxiuesd.pool.particle.ParticlePool;
+import ttk.muxiuesd.pool.particle.ParticleSpellPool;
+import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
@@ -18,18 +17,13 @@ import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
  * 敌人射出子弹的粒子发射器
  * */
 public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
+    public static ParticlePool<ParticleSpell> POOL = new ParticleSpellPool();
+
     public EmitterEnemyShootParticle () {
-        setParticlePool(new ParticlePool<>(100) {
-            @Override
-            protected ParticleSpell newObject () {
-                ParticleSpell spell = new ParticleSpell();
-                spell.init();
-                spell.getLight().setColor(new Color(0.9f, 0.1f, 0.3f, 0.6f));
-                return spell;
-            }
-        });
+        setParticlePool(POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
+        setTextureRegion(ParticleAssets.SPELL);
     }
 
     @Override
@@ -39,9 +33,14 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
     }
 
     @Override
-    public void summon (Vector2 position, Vector2 velocity, Vector2 origin, Vector2 startSize, Vector2 endSize, Vector2 scale, float rotation, float duration) {
+    public void summon (Vector2 position, Vector2 velocity, Vector2 origin,
+                        Vector2 startSize, Vector2 endSize,
+                        Vector2 scale, float rotation, float duration) {
         ParticleSpell p = getParticlePool().obtain();
-        p.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("spell"), Texture.class));
+        TextureRegion textureRegion = getTextureRegion();
+        if (p.region == null || p.region != textureRegion) {
+            p.region = textureRegion;
+        }
         p.position.set(position);
         p.origin.set(origin);
         p.startSize.set(startSize);

@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.common;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -10,8 +11,10 @@ import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Timer;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -37,12 +40,15 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
-        bodyTexture = getTextureRegion(Fight.getId("fishing_hook"), "fish/fishing_hook.png");
+        bodyTexture = Util.loadTextureRegion(
+            Fight.ID("fishing_hook"),
+            Fight.EntityTexturePath("fish/fishing_hook.png")
+        );
 
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
-            this.pts.emitParticle(Fight.getId("entity_swimming"), MathUtils.random(2, 5),
+            this.pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(2, 5),
                 getCenter().add(0, - getHeight() / 2),
                 new Vector2(MathUtils.random(0.5f, 1.2f), 0),
                 getOrigin(),
@@ -50,8 +56,18 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
                 getScale(), MathUtils.random(0, 360), 1.5f);
         });
 
-        this.positionOffset = new Vector2();
+        this.positionOffset = new Vector2(0, 0);
         this.isReturning = false;
+    }
+
+    @Override
+    public void readCAT (JsonValue values) {
+        super.readCAT(values);
+    }
+
+    @Override
+    public void writeCAT (CAT cat) {
+        super.writeCAT(cat);
     }
 
     @Override
@@ -89,10 +105,12 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     @Override
     public void draw (Batch batch) {
         if (bodyTexture != null) {
-            batch.draw(bodyTexture, x, y + this.positionOffset.y,
+            batch.draw(bodyTexture,
+                x, y + this.positionOffset.y,
                 originX, originY,
                 width, height,
-                scaleX, scaleY, rotation);
+                scaleX, scaleY,
+                rotation);
         }
     }
 
@@ -101,10 +119,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 抛钩移动
      * */
     private void throwMovement (float delta) {
-        velX = speed * throwDirection.x * delta;
-        velY = speed * throwDirection.y * delta;
-        x += velX;
-        y += velY;
+        velX = speed * throwDirection.x;
+        velY = speed * throwDirection.y;
+        x += velX * delta;
+        y += velY * delta;
     }
 
     /**
@@ -112,10 +130,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * */
     private void returningMovement (float delta) {
         Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
-        velX = speed * dir.x * delta;
-        velY = speed * dir.y * delta;
-        x += velX;
-        y += velY;
+        velX = speed * dir.x;
+        velY = speed * dir.y;
+        x += velX * delta;
+        y += velY * delta;
     }
 
     public LivingEntity<?> getOwner () {

@@ -12,6 +12,8 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.render.IWorldGroundEntityRender;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
+import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
@@ -74,6 +76,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             this.entityTypes.put(entityType, entityType.createEntityArray());
         }
 
+        //把玩家实体加进来
         PlayerSystem ps = getManager().getSystem(PlayerSystem.class);
         Player player = ps.getPlayer();
         player.setEntitySystem(this);
@@ -83,6 +86,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.renderableEntities.put(RenderLayers.ENTITY_GROUND, new Array<>());
 
         this.initPool();
+
         //添加tick任务
         TimeSystem timeSystem = getManager().getSystem(TimeSystem.class);
         timeSystem.add(this);
@@ -93,7 +97,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 初始化线程池
      */
-    private void initPool() {
+    private void initPool () {
         int coreSize = Runtime.getRuntime().availableProcessors();
         Log.print(TAG(), "初始化实体加载卸载线程池，核心线程数：" + coreSize);
         this.executor = Executors.newFixedThreadPool(coreSize);
@@ -152,6 +156,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.incationEntity.removeValue(entity, true);
         //把实体移除出渲染层级
         this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
+        //执行池化实体释放逻辑
+        if (entity instanceof PoolableEntity poolableEntity) {
+            poolableEntity.freeSelf();
+        }
     }
 
     @Override
@@ -197,6 +205,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     @Override
     public void tick (World world, float delta) {
+        //每一个可更新实体的tick更新
+        this.updatableEntity.forEach(entity -> entity.tick(world, delta));
+
         this.calculateNeedActiveEntity();
         this.calculateInactionEntity();
 
@@ -227,7 +238,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    AudioPlayer.getInstance().playSound(Fight.getId("pop"));
+                    AudioPlayer.getInstance().playSound(Fight.ID("pop"));
                     //整个捡起来就没必要执行下面的代码了
                     return;
                 }else if (state == ItemPickUpState.PARTIAL) {
@@ -239,7 +250,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue() && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
+                && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
                 itemEntity.setVelocity(direction);
@@ -395,9 +407,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         for (Entity<?> entity: copy) {
             ChunkPosition chunkPosition = cs.getChunkPosition(entity.getCenter());
-            //Chunk entityChunk = cs.getChunk(entity.getPosition());
-            //检查实体所在区块是否为传入的需要被卸载的区块
-            if (chunkPosition.equals(chunk.getChunkPosition())) {
+            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
+            if (chunkPosition.equals(chunk.getChunkPosition())
+                && entityProvider.canBeSaved) {
                 unload.add(entity);
             }
         }
@@ -422,6 +435,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
 
         for (Entity<?> entity: allEntities) {
+            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            if (!entityProvider.canBeSaved) continue;
+
             Vector2 position = entity.getCenter();
             ChunkPosition chunkPosition = chunkSystem.getChunkPosition(position.x, position.y);
             String name = chunkPosition.toString();
@@ -460,16 +476,23 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * （主线程）初始化加载实体
      * */
     public void initLoadEntities (ChunkPosition chunkPosition) {
+        String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString() + ".json")) return;
+        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
+
+        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, fileName);
     }
 
     @Override
-    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+    public void batchRender (Batch batch) {
+    }
+
+    @Override
+    public void shapeRender (ShapeRenderer shapeRenderer) {
         this.renderShape(shapeRenderer);
     }
 
@@ -501,7 +524,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     private void shutdownPool () {
         this.executor.shutdown();
         try {
-            if (!this.executor.awaitTermination(5, TimeUnit.SECONDS)) {
+            if (!this.executor.awaitTermination(1, TimeUnit.SECONDS)) {
                 this.executor.shutdownNow();
                 Log.print(TAG(), "实体加载卸载任务线程池关闭");
             }

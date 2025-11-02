@@ -1,13 +1,10 @@
 package ttk.muxiuesd.world.particle.emitters;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.world.particle.ParticlePool;
+import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
@@ -18,16 +15,10 @@ import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
  * */
 public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
     public EmitterPlayerShootParticle () {
-        setParticlePool(new ParticlePool<>(100) {
-            @Override
-            protected ParticleSpell newObject () {
-                ParticleSpell particleSpell = new ParticleSpell();
-                particleSpell.init();
-                return particleSpell;
-            }
-        });
+        setParticlePool(EmitterEnemyShootParticle.POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
+        setTextureRegion(ParticleAssets.SPELL);
     }
 
     @Override
@@ -42,8 +33,11 @@ public class EmitterPlayerShootParticle extends ParticleEmitter<ParticleSpell> {
                         Vector2 startSize, Vector2 endSize, Vector2 scale,
                         float rotation, float duration) {
         ParticleSpell p = getParticlePool().obtain();
-        p.region = new TextureRegion(AssetsLoader.getInstance().getById(Fight.getId("spell"), Texture.class));
-        p.position.set(position);
+        TextureRegion textureRegion = getTextureRegion();
+        if (p.region == null || p.region != textureRegion) {
+            p.region = textureRegion;
+        }
+        p.position.set(position).add(MathUtils.random(-0.2f, 0.2f), MathUtils.random(-0.2f, 0.2f));
         p.origin.set(origin);
         p.startSize.set(startSize).scl(MathUtils.random(0.8f, 1.3f));
         p.endSize.set(endSize);

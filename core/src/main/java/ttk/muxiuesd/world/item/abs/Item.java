@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
@@ -17,6 +18,7 @@ import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -92,6 +94,15 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     @Override
     public void renderShape (ShapeRenderer batch, ItemStack itemStack) {
     }
+
+    /**
+     * 获取物品的词条文本
+     * */
+    public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
+        //TODO 物品自己的词条
+        return array;
+    }
+
 
     /**
      * 使用此物品

@@ -15,7 +15,7 @@ public final class Walls {
 
 
     public static <T extends Wall<?>> T register (String name, Supplier<T> supplier) {
-        String id = Fight.getId(name);
+        String id = Fight.ID(name);
         T t = supplier.get();
         t.setID(id);
         Registries.WALL.register(new Identifier(id), t);

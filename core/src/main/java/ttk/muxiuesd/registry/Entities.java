@@ -70,6 +70,7 @@ public final class Entities {
         "fishing_hook",
         EntityProvider.Builder.<EntityFishingHook>create(EntityFishingHook::new)
             .setDefaultType(EntityTypes.PLAYER_FIASHING_HOOK)
+            .setCanBeSaved(false)
             .build()
     );
 

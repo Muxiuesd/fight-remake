@@ -56,7 +56,7 @@ public abstract class Particle implements Drawable, Pool.Poolable, Disposable {
 
     @Override
     public void reset () {
-        this.region = null;
+        //this.region = null;
         this.position.setZero();
         this.velocity.setZero();
         this.origin.setZero();

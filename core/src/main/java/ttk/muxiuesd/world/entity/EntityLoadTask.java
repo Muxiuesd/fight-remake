@@ -32,7 +32,7 @@ public class EntityLoadTask extends EntityTask {
         for (JsonValue entityValue : entitiesValue) {
             JsonDataReader dataReader = new JsonDataReader(entityValue);
             String id = dataReader.readString("id");
-            if (Objects.equals(id, Fight.getId("item_entity"))) {
+            if (Objects.equals(id, Fight.ID("item_entity"))) {
                 Optional<ItemEntity> optionalItemEntity = Codecs.ITEM_ENTITY.decode(dataReader);
                 optionalItemEntity.ifPresent(entities::add);
             }else {
@@ -40,7 +40,8 @@ public class EntityLoadTask extends EntityTask {
                 optionalEntity.ifPresent(entities::add);
             }
         }
-
+        //读取完成后删除文件
+        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, chunkPosName + ".json");
         return entities;
     }
 }

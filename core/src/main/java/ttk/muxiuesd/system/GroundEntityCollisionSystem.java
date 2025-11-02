@@ -18,98 +18,199 @@ import ttk.muxiuesd.world.wall.Wall;
 public class GroundEntityCollisionSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
+
+    // 精度控制
+    private static final float EPS = 0.0001f;
+    // 最大碰撞修正次数
+    private static final int MAX_FIXES = 5;
+    // 连续碰撞检测的最大步长（越小越精确但性能消耗略高）
+    // 建议设置为墙体最小单位的1/2（这里假设墙体最小单位是1x1）
+    private static final float MAX_STEP = 0.5f;
+
     private final EntitySystem es;
-    private final PlayerSystem ps;
     private final ChunkSystem cs;
 
-    public GroundEntityCollisionSystem (World world) {
+    public GroundEntityCollisionSystem(World world) {
         super(world);
         this.es = getWorld().getSystem(EntitySystem.class);
-        this.ps = getWorld().getSystem(PlayerSystem.class);
         this.cs = getWorld().getSystem(ChunkSystem.class);
     }
 
     @Override
-    public void update (float delta) {
-        this.playerCollisionCheck(delta);
-    }
+    public void update(float delta) {
+        Player player = es.getPlayer();
+        if (player == null) return;
 
-    /**
-     * 玩家相关碰撞
-     * */
-    private void playerCollisionCheck (float delta) {
-        Player player = this.es.getPlayer();
-        Vector2 perPosition = player.getPosition();
-        float perX = perPosition.x;
-        float perY = perPosition.y;
+        Rectangle hitbox = player.getHitbox();
+        Vector2 vel = player.getVelocity();
 
-        Vector2 movement = player.getVelocity();
-        //下一步位置
-        float nextX = perX + movement.x;
-        float nextY = perY + movement.y;
-        Rectangle nextHitbox = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
+        // 计算总移动距离
+        float totalMoveX = vel.x * delta;
+        float totalMoveY = vel.y * delta;
 
-        ChunkPosition chunkPosition = this.cs.getChunkPosition(nextX, nextY);
-        Chunk chunk = cs.getChunk(chunkPosition);
-        Array<Wall<?>> collidingWalls = new Array<>();
+        // 计算需要分解的步数（解决高速移动隧穿问题的核心）
+        float totalDistance = (float) Math.sqrt(totalMoveX * totalMoveX + totalMoveY * totalMoveY);
+        int steps = (int) Math.ceil(totalDistance / MAX_STEP);
+        if (steps == 0) steps = 1; // 至少一步
 
-        // X轴移动
-        player.hitbox.x += movement.x;
-        chunk.traversal((x, y) -> {
-            Wall<?> wall = chunk.getWall(x, y);
-            if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
-                resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(movement.x, 0));
-                collidingWalls.add(wall);
+        // 每步的移动量
+        float stepX = totalMoveX / steps;
+        float stepY = totalMoveY / steps;
+
+        // 分步移动并检测碰撞
+        for (int i = 0; i < steps; i++) {
+            // X轴分步移动
+            if (Math.abs(stepX) > EPS) {
+                hitbox.x += stepX;
+                if (fixCollisions(hitbox, 1, 0, stepX)) {
+                    // 如果发生碰撞，剩余步数不再移动X轴
+                    stepX = 0;
+                }
             }
-        });
 
-        // Y轴移动
-        player.hitbox.y += movement.y;
-        chunk.traversal((x, y) -> {
-            Wall<?> wall = chunk.getWall(x, y);
-            if (wall != null && player.hitbox.overlaps(wall.getHitbox())) {
-                resolveCollision(player, nextHitbox, wall.getHitbox(), new Vector2(0, movement.y));
-                collidingWalls.add(wall);
+            // Y轴分步移动
+            if (Math.abs(stepY) > EPS) {
+                hitbox.y += stepY;
+                if (fixCollisions(hitbox, 0, 1, stepY)) {
+                    // 如果发生碰撞，剩余步数不再移动Y轴
+                    stepY = 0;
+                }
             }
-        });
 
-        player.setPosition(nextHitbox.x, nextHitbox.y);
-        //速度最后要归零，否则有惯性
+            // 如果X和Y轴都发生碰撞，提前退出循环
+            if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
+                break;
+            }
+        }
+
+        // 更新玩家位置
+        player.setPosition(
+            hitbox.x - Player.HITBOX_OFFSET.x,
+            hitbox.y - Player.HITBOX_OFFSET.y
+        );
+        // 重置速度
         player.velX = 0;
         player.velY = 0;
     }
 
-    private void resolveCollision(Player player, Rectangle nextHitbox, Rectangle wallRect, Vector2 moveDir) {
-        Vector2 normal = getCollisionNormal(nextHitbox, wallRect);
+    /**
+     * 修正碰撞并返回是否发生了碰撞
+     */
+    private boolean fixCollisions(Rectangle hitbox, int axisX, int axisY, float move) {
+        Array<Wall<?>> collidingWalls = getCollidingWalls(hitbox);
+        if (collidingWalls.isEmpty()) {
+            return false; // 无碰撞
+        }
 
-        // 计算实际允许移动量
-        float allowedX = moveDir.x * (1 - Math.abs(normal.x));
-        float allowedY = moveDir.y * (1 - Math.abs(normal.y));
+        int fixes = 0;
+        boolean collided = false;
 
-        nextHitbox.x -= moveDir.x - allowedX;
-        nextHitbox.y -= moveDir.y - allowedY;
-        /*player.x -= moveDir.x - allowedX;
-        player.y -= moveDir.y - allowedY;*/
+        while (!collidingWalls.isEmpty() && fixes < MAX_FIXES) {
+            float totalSeparation = 0;
+            for (Wall<?> wall : collidingWalls) {
+                Rectangle wallBox = wall.getHitbox();
+                if (hitbox.overlaps(wallBox)) {
+                    float overlap = calculateOverlap(hitbox, wallBox, axisX, axisY, move);
+                    totalSeparation += overlap;
+                    collided = true;
+                }
+            }
 
-        // 速度归零
-        if (normal.x != 0) player.velX = 0;
-        if (normal.y != 0) player.velY = 0;
+            if (Math.abs(totalSeparation) > EPS) {
+                float avgSeparation = totalSeparation / collidingWalls.size;
+                float separation = (move > 0) ? -avgSeparation : avgSeparation;
+                separation += (separation > 0) ? EPS : -EPS;
+
+                hitbox.x += axisX * separation;
+                hitbox.y += axisY * separation;
+            }
+
+            collidingWalls = getCollidingWalls(hitbox);
+            fixes++;
+        }
+
+        return collided;
     }
 
-    public Vector2 getCollisionNormal(Rectangle playerRect, Rectangle wallRect) {
-        // 计算重叠区域
-        float overlapLeft = playerRect.x + playerRect.width - wallRect.x;
-        float overlapRight = wallRect.x + wallRect.width - playerRect.x;
-        float overlapTop = playerRect.y + playerRect.height - wallRect.y;
-        float overlapBottom = wallRect.y + wallRect.height - playerRect.y;
+    /**
+     * 计算精确的重叠量
+     */
+    private float calculateOverlap(Rectangle player, Rectangle wall, int axisX, int axisY, float move) {
+        if (axisX == 1) {
+            // X轴碰撞计算
+            float playerRight = player.x + player.width;
+            float wallLeft = wall.x;
+            float wallRight = wall.x + wall.width;
 
-        // 找最小重叠方向
-        float minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
-            Math.min(overlapTop, overlapBottom));
+            if (move > 0) {
+                // 向右移动：玩家右侧与墙体左侧重叠
+                return Math.max(0, playerRight - wallLeft);
+            } else {
+                // 向左移动：玩家左侧与墙体右侧重叠
+                return Math.max(0, wallRight - player.x);
+            }
+        } else {
+            // Y轴碰撞计算
+            float playerTop = player.y + player.height;
+            float wallBottom = wall.y;
+            float wallTop = wall.y + wall.height;
 
-        if (minOverlap == overlapLeft) return new Vector2(-1, 0);
-        if (minOverlap == overlapRight) return new Vector2(1, 0);
-        if (minOverlap == overlapTop) return new Vector2(0, 1);
-        return new Vector2(0, -1);
+            if (move > 0) {
+                // 向上移动：玩家顶部与墙体底部重叠
+                return Math.max(0, playerTop - wallBottom);
+            } else {
+                // 向下移动：玩家底部与墙体顶部重叠
+                return Math.max(0, wallTop - player.y);
+            }
+        }
+    }
+
+    /**
+     * 优化墙体检测范围，只检测移动路径上可能接触的区块
+     */
+    private Array<Wall<?>> getCollidingWalls(Rectangle hitbox) {
+        Array<Wall<?>> result = new Array<>();
+
+        // 计算玩家碰撞箱四角所在的区块，确保覆盖所有可能接触的区块
+        int[] xChecks = {
+            (int) hitbox.x,
+            (int) (hitbox.x + hitbox.width)
+        };
+        int[] yChecks = {
+            (int) hitbox.y,
+            (int) (hitbox.y + hitbox.height)
+        };
+
+        // 收集所有需要检测的区块坐标
+        Array<ChunkPosition> positions = new Array<>();
+        for (int x : xChecks) {
+            for (int y : yChecks) {
+                ChunkPosition pos = cs.getChunkPosition(x, y);
+                if (!positions.contains(pos, false)) {
+                    positions.add(pos);
+                }
+            }
+        }
+
+        // 检测这些区块内的墙体
+        for (ChunkPosition pos : positions) {
+            // 检测当前区块及相邻区块（3x3范围）
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    Chunk chunk = cs.getChunk(pos.getX() + dx, pos.getY() + dy);
+                    if (chunk == null) continue;
+
+                    chunk.traversal((x, y) -> {
+                        Wall<?> wall = chunk.getWall(x, y);
+                        if (wall != null && wall.getHitbox() != null &&
+                            hitbox.overlaps(wall.getHitbox())) {
+                            result.add(wall);
+                        }
+                    });
+                }
+            }
+        }
+
+        return result;
     }
 }
