@@ -89,6 +89,7 @@
 - ### [zqll](https://gitee.com/zqll4) （优化游戏代码架构）
 - ### [wabrara](https://gitee.com/wabrara) （解决草地渲染与着色器问题、解决区块问题、解决区块方块查找问题）
 - ### 沙雕纯白（为本游戏提供贴图资源；QQ：3122702351）
+- ### [xiaomuziftz](https://gitee.com/xiaomuziftz)（提供光源优化、渲染架构优化指导）
 - ### LibGDX吧官方交流群的各位 （群号：1051955354）
 
 
