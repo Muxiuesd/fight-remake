@@ -41,7 +41,7 @@ public class ChunkLoadTask extends ChunkTask {
                 dataReader
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             //尝试从正在卸载的区块里获取
             Chunk unloadedChunk = getChunkSystem().getUnloadedChunk(getChunkPosition());
             if (unloadedChunk != null) return unloadedChunk;
