@@ -186,17 +186,22 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     @Override
+    public void batchRender (Batch batch) {
+        this.draw(batch);
+    }
+
+    @Override
+    public void shapeRender (ShapeRenderer shapeRenderer) {
+        this.renderShape(shapeRenderer);
+    }
+
+    @Override
     public void renderShape(ShapeRenderer batch) {
         for (Chunk chunk : this.activeChunks) {
             chunk.renderShape(batch);
         }
     }
 
-    @Override
-    public void render (Batch batch, ShapeRenderer shapeRenderer) {
-        this.draw(batch);
-        this.renderShape(shapeRenderer);
-    }
 
     @Override
     public int getRenderPriority () {

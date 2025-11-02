@@ -7,7 +7,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * 渲染任务
  * */
 public interface IRenderTask {
-    void render(Batch batch, ShapeRenderer shapeRenderer);
+    /**
+     * 关于batch的渲染操作
+     * */
+    void batchRender (Batch batch);
+
+    /**
+     * 关于shape的渲染操作
+     * */
+    void shapeRender (ShapeRenderer shapeRenderer);
 
     /**
      * 渲染优先级，优先级值越小，渲染顺序越靠前（即 1 比 2 先渲染）

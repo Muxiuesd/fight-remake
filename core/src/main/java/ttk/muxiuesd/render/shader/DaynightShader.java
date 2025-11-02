@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import ttk.muxiuesd.system.DaynightSystem;
 import ttk.muxiuesd.util.Log;
 
 /**
@@ -12,10 +11,8 @@ import ttk.muxiuesd.util.Log;
  * */
 public class DaynightShader {
     private final ShaderProgram shader;
-    private DaynightSystem daynightSystem;
 
-    public DaynightShader(DaynightSystem daynightSystem) {
-        this.daynightSystem = daynightSystem;
+    public DaynightShader() {
         String vert = Gdx.files.internal("shaders/daynight/daynight.vert").readString();
         String frag = Gdx.files.internal("shaders/daynight/daynight.frag").readString();
         this.shader = new ShaderProgram(vert, frag);

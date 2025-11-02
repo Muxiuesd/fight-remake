@@ -19,7 +19,7 @@ public class MainWorld extends World {
         addSystem("EntitySystem", new EntitySystem(this));
         addSystem("UndergroundEntityRenderSystem", new UndergroundEntityRenderSystem(this));
         addSystem("GroundEntityRenderSystem", new GroundEntityRenderSystem(this));
-        addSystem("DaynightSystem", new DaynightSystem(this));
+        //addSystem("DaynightSystem", new DaynightSystem(this));
         addSystem("ParticleSystem", new ParticleSystem(this));
         addSystem("CameraFollowSystem", new CameraFollowSystem(this));
         addSystem("EntityCollisionSystem", new GroundEntityCollisionSystem(this));

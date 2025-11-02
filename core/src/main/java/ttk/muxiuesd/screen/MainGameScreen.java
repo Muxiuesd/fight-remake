@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.mod.ModLibManager;
@@ -51,6 +50,7 @@ public class MainGameScreen implements Screen {
         light.setOriginBasedPosition(0, 0);
         lightEngine.addLight(light);
         lightEngine.update(640, 480);
+
         Fonts.init();
         FI18N.init();
         //初始化游戏底层系统
@@ -139,22 +139,9 @@ public class MainGameScreen implements Screen {
 
         this.world.update(delta);
 
-        /*Camera camera = PlayerCamera.INSTANCE.getCamera();
-        camera.update();
-
-        this.batch.setProjectionMatrix(camera.combined);
-        this.batch.begin();
-
-        this.shapeRenderer.setProjectionMatrix(camera.combined);
-        this.shapeRenderer.begin();
-
-        RenderProcessorManager.render(this.batch, this.shapeRenderer);
-
-        this.shapeRenderer.end();
-        this.batch.end();*/
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
-        LightSystem lightSystem = world.getSystem(LightSystem.class);
+        LightSystem lightSystem = this.world.getSystem(LightSystem.class);
         lightSystem.afterProcess();
     }
 

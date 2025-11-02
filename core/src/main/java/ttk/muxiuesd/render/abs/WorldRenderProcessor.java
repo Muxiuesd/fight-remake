@@ -1,6 +1,8 @@
 package ttk.muxiuesd.render.abs;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.world.World;
 
 /**
@@ -14,6 +16,16 @@ public abstract class WorldRenderProcessor extends RenderProcessor {
     public WorldRenderProcessor (Camera camera, String shaderId, int renderOrder, World world) {
         super(camera, shaderId, renderOrder);
         this.world = world;
+    }
+
+    @Override
+    public void handleBatchRender (Batch batch) {
+        defaultHandleBatchRender(batch);
+    }
+
+    @Override
+    public void handleShapeRender (ShapeRenderer shapeRenderer) {
+        defaultHandleShapeRender(shapeRenderer);
     }
 
     public World getWorld () {

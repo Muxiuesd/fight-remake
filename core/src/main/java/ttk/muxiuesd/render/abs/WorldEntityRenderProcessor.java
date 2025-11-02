@@ -2,8 +2,7 @@ package ttk.muxiuesd.render.abs;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import ttk.muxiuesd.system.DaynightSystem;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import ttk.muxiuesd.world.World;
 
 /**
@@ -15,29 +14,17 @@ public abstract class WorldEntityRenderProcessor extends WorldRenderProcessor {
     }
 
     @Override
-    public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
-        batch.setProjectionMatrix(getCamera().combined);
-        shapeRenderer.setProjectionMatrix(getCamera().combined);
-        shapeRenderer.flush();
-        beginShader(batch);
-
-        getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
-
-        endShader();
-    }
-
-    @Override
-    protected void beginShader (Batch batch) {
+    public ShaderProgram beginShader (Batch batch) {
         //这里开始日夜着色
-        DaynightSystem daynightSystem = getWorld().getSystem(DaynightSystem.class);
-        daynightSystem.begin(batch);
+        ShaderProgram shaderProgram = super.beginShader(batch);
+        shaderProgram.setUniformMatrix("u_projTrans", getCamera().combined);
+
+        return shaderProgram;
     }
 
     @Override
-    protected void endShader () {
+    public void endShader () {
         //这里结束日夜着色
-        DaynightSystem daynightSystem = getWorld().getSystem(DaynightSystem.class);
-        daynightSystem.end();
+        super.endShader();
     }
-
 }

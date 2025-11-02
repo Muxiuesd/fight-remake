@@ -16,8 +16,13 @@ public class GUIRenderProcessor extends RenderProcessor {
     }
 
     @Override
-    public void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
-        defaultHandleRender(batch, shapeRenderer);
+    public void handleBatchRender (Batch batch) {
+        defaultHandleBatchRender(batch);
+    }
+
+    @Override
+    public void handleShapeRender (ShapeRenderer shapeRenderer) {
+        defaultHandleShapeRender(shapeRenderer);
     }
 
     @Override

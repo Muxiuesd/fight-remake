@@ -488,7 +488,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     }
 
     @Override
-    public void render (Batch batch, ShapeRenderer shapeRenderer) {
+    public void batchRender (Batch batch) {
+    }
+
+    @Override
+    public void shapeRender (ShapeRenderer shapeRenderer) {
         this.renderShape(shapeRenderer);
     }
 

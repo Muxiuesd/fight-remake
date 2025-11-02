@@ -38,7 +38,6 @@ public class ShaderScheduler {
 
         ShaderProgram shader = this.shaders.get(shaderId);
         shader.bind();
-        batch.flush();
         batch.setShader(shader);
         this.activeShaders.put(shaderId, batch);
 
@@ -53,7 +52,6 @@ public class ShaderScheduler {
             throw new RuntimeException("着色器：" + shaderId + " 没有在使用！！！");
         }
         Batch batch = this.activeShaders.get(shaderId);
-        batch.flush();
         batch.setShader(null);
         //从活跃列表中移除
         this.activeShaders.remove(shaderId);

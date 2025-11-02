@@ -2,6 +2,7 @@ package ttk.muxiuesd.render.abs;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.interfaces.render.IRenderTaskRecognizer;
@@ -30,22 +31,28 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
     }
 
     /**
-     * 处理渲染任务
+     * 处理batch渲染任务
      * */
-    public abstract void handleRender (Batch batch, ShapeRenderer shapeRenderer);
+    public abstract void handleBatchRender (Batch batch);
+
+    /**
+     * 处理shape渲染任务
+     * */
+    public abstract void handleShapeRender (ShapeRenderer shapeRenderer);
 
     /**
      * 默认的渲染任务处理方式
      * */
-    public void defaultHandleRender (Batch batch, ShapeRenderer shapeRenderer) {
+    public void defaultHandleBatchRender (Batch batch) {
         batch.setProjectionMatrix(getCamera().combined);
-        shapeRenderer.setProjectionMatrix(getCamera().combined);
-        shapeRenderer.flush();
-        beginShader(batch);
+        getRenderTasks().forEach(task -> task.batchRender(batch));
+    }
 
-        getRenderTasks().forEach(task -> task.render(batch, shapeRenderer));
-
-        endShader();
+    /**
+     * 默认的渲染任务处理方式
+     * */
+    public void defaultHandleShapeRender (ShapeRenderer shapeRenderer) {
+        getRenderTasks().forEach(task -> task.shapeRender(shapeRenderer));
     }
 
     /**
@@ -66,15 +73,17 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
     /**
      * 开始着色器
      * */
-    protected void beginShader(Batch batch) {
-        if (this.getShaderId() == null) return;
-        ShaderScheduler.getInstance().begin(this.getShaderId(), batch);
+    public ShaderProgram beginShader (Batch batch) {
+        if (this.getShaderId() == null) {
+            throw new IllegalStateException("Shader ID 不存在！！！");
+        }
+        return ShaderScheduler.getInstance().begin(this.getShaderId(), batch);
     }
 
     /**
      * 结束着色器
      * */
-    protected void endShader() {
+    public void endShader () {
         if (this.getShaderId() == null) return;
         ShaderScheduler.getInstance().end(this.getShaderId());
     }

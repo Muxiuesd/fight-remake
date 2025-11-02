@@ -33,6 +33,16 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
     }
 
     @Override
+    public void batchRender (Batch batch) {
+        this.draw(batch);
+    }
+
+    @Override
+    public void shapeRender (ShapeRenderer shapeRenderer) {
+        this.renderShape(shapeRenderer);
+    }
+
+    @Override
     public void draw (Batch batch) {
         if (this.screenNotNull()) this.getCurScreen().draw(batch);
     }
@@ -40,12 +50,6 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
     @Override
     public void renderShape (ShapeRenderer batch) {
         if (this.screenNotNull()) this.getCurScreen().renderShape(batch);
-    }
-
-    @Override
-    public void render (Batch batch, ShapeRenderer shapeRenderer) {
-        this.draw(batch);
-        this.renderShape(shapeRenderer);
     }
 
     /**

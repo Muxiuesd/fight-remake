@@ -55,10 +55,14 @@ public class RenderPipe {
         //更新相机
         this.cameraControllers.forEach(controller-> controller.getCamera().update());
 
+        RenderProcessorManager.sort();
+
         this.batch.begin();
-        this.shapeRenderer.begin();
-        RenderProcessorManager.render(this.batch, this.shapeRenderer);
+        RenderProcessorManager.batchRender(batch);
         this.batch.end();
+
+        this.shapeRenderer.begin();
+        RenderProcessorManager.shapeRender(this.shapeRenderer);
         this.shapeRenderer.end();
     }
 
