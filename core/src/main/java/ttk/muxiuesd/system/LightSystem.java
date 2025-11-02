@@ -56,7 +56,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
 
     @Override
     public void shapeRender (ShapeRenderer shapeRenderer) {
-        this.afterProcess();
+        //this.afterProcess();
     }
 
     @Override
