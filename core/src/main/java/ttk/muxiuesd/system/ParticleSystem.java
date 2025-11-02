@@ -64,16 +64,11 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
 
     @Override
     public void draw (Batch batch) {
-        // 设置混合模式
-        /*Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);*/
         for (ParticleEmitter<?> emitter : this.activeEmitters) {
             emitter.draw(batch);
             LightSystem lightSystem = getManager().getSystem(LightSystem.class);
             lightSystem.useLight(emitter.getActiveParticles());
         }
-        // 恢复默认混合模式
-        /*Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);*/
     }
 
     @Override

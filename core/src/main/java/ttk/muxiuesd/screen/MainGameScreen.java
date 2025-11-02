@@ -22,7 +22,6 @@ import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.render.instance.*;
 import ttk.muxiuesd.render.shader.ShaderScheduler;
 import ttk.muxiuesd.render.shader.ShadersReg;
-import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
@@ -112,7 +111,8 @@ public class MainGameScreen implements Screen {
             new GUIRenderProcessor(
                 GUICamera.INSTANCE.getCamera(),
                 ShadersReg.DEFAULT_SHADER,
-                10000
+                10000,
+                this
             )
         );
 
@@ -141,8 +141,8 @@ public class MainGameScreen implements Screen {
 
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
-        LightSystem lightSystem = this.world.getSystem(LightSystem.class);
-        lightSystem.afterProcess();
+        /*LightSystem lightSystem = this.world.getSystem(LightSystem.class);
+        lightSystem.afterProcess();*/
     }
 
     @Override
@@ -168,6 +168,10 @@ public class MainGameScreen implements Screen {
     @Override
     public void dispose() {
         this.world.dispose();
+    }
+
+    public World getWorld() {
+        return this.world;
     }
 
     /**

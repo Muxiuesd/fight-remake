@@ -51,12 +51,12 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
 
     @Override
     public void batchRender (Batch batch) {
-        this.draw(batch);
+        //this.afterProcess();
     }
 
     @Override
     public void shapeRender (ShapeRenderer shapeRenderer) {
-        this.renderShape(shapeRenderer);
+        this.afterProcess();
     }
 
     @Override

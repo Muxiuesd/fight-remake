@@ -52,6 +52,7 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
      * 默认的渲染任务处理方式
      * */
     public void defaultHandleShapeRender (ShapeRenderer shapeRenderer) {
+        shapeRenderer.setProjectionMatrix(getCamera().combined);
         getRenderTasks().forEach(task -> task.shapeRender(shapeRenderer));
     }
 

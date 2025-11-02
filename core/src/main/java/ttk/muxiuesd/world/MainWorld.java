@@ -32,5 +32,8 @@ public class MainWorld extends World {
 
     }
 
-
+    @Override
+    public void update (float delta) {
+        super.update(delta);
+    }
 }

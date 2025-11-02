@@ -6,17 +6,23 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.render.IGUIRender;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.render.abs.RenderProcessor;
+import ttk.muxiuesd.screen.MainGameScreen;
+import ttk.muxiuesd.system.LightSystem;
 
 /**
  * GUI的渲染处理器
  * */
 public class GUIRenderProcessor extends RenderProcessor {
-    public GUIRenderProcessor (Camera camera, String shaderId, int renderOrder) {
+    private MainGameScreen mainGameScreen;
+    public GUIRenderProcessor (Camera camera, String shaderId, int renderOrder, MainGameScreen mainGameScreen) {
         super(camera, shaderId, renderOrder);
+        this.mainGameScreen = mainGameScreen;
     }
 
     @Override
     public void handleBatchRender (Batch batch) {
+        this.mainGameScreen.getWorld().getSystem(LightSystem.class).afterProcess();
+
         defaultHandleBatchRender(batch);
     }
 
