@@ -10,7 +10,9 @@ import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.StatusEffect;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -38,6 +40,11 @@ public class PlayerCodec extends JsonCodec<Player> {
         dataWriter.objStart("equipment");
         Codecs.BACKPACK.encode(player.getEquipmentBackpack(), dataWriter);
         dataWriter.objEnd();
+
+        //编码状态效果
+        dataWriter.objStart("buffs");
+        Codecs.STATUS_EFFECTS.encode(player.getEffects(), dataWriter);
+        dataWriter.objEnd();
     }
 
     @Override
@@ -61,6 +68,13 @@ public class PlayerCodec extends JsonCodec<Player> {
         JsonValue equipmentValue = dataReader.readObj("equipment");
         Optional<Backpack> optionalEquipment = Codecs.BACKPACK.decode(new JsonDataReader(equipmentValue));
         optionalEquipment.ifPresent(player::setEquipmentBackpack);
+
+        //读取状态效果
+        JsonValue buffs = dataReader.readObj("buffs");
+        Optional<LinkedHashMap<StatusEffect, StatusEffect.Data>> optionalEffectsMap = Codecs.STATUS_EFFECTS.decode(
+            new JsonDataReader(buffs)
+        );
+        optionalEffectsMap.ifPresent(player::setEffects);
 
         return Optional.of(player);
     }

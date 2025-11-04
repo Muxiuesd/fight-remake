@@ -474,17 +474,30 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * 设置一种状态效果
      * */
     public T setEffect (StatusEffect effect, float duration, int level) {
+        LinkedHashMap<StatusEffect, StatusEffect.Data> effectsMap = this.getEffects();
         //已经存在效果
-        if (this.effects.containsKey(effect)) {
+        if (effectsMap.containsKey(effect)) {
             //覆盖
-            this.effects.get(effect)
+            effectsMap.get(effect)
                 .setDuration(duration)
                 .setLevel(level);
         }else {
             //没这个效果就直接添加
-            this.effects.put(effect, new StatusEffect.Data(duration, level));
+            effectsMap.put(effect, new StatusEffect.Data(duration, level));
         }
 
+        return (T) this;
+    }
+
+    /**
+     * 获取实体当前所有的状态效果
+     * */
+    public LinkedHashMap<StatusEffect, StatusEffect.Data> getEffects () {
+        return this.effects;
+    }
+
+    public T setEffects (LinkedHashMap<StatusEffect, StatusEffect.Data> effectsMap) {
+        this.effects = effectsMap;
         return (T) this;
     }
 }

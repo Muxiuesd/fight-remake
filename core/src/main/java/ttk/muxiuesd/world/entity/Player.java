@@ -9,6 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.registry.StatusEffects;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
@@ -72,6 +73,7 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(33, new ItemStack(Items.DIAMOND_BOOTS));
         backpack.setItemStack(35, new ItemStack(Items.TORCH));
 
+        setEffect(StatusEffects.HEALING, 20f, 2);
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }

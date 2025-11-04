@@ -9,9 +9,12 @@ import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
+
+import java.util.LinkedHashMap;
 
 /**
  * 所有编解码器
@@ -31,4 +34,5 @@ public final class Codecs {
     public static final JsonCodec<Player> PLAYER = new PlayerCodec();
     public static final JsonCodec<ItemEntity> ITEM_ENTITY = new ItemEntityCodec();
     public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = new EntityPropertyCodec();
+    public static final JsonCodec<LinkedHashMap<StatusEffect, StatusEffect.Data>> STATUS_EFFECTS = new BuffCodec();
 }
