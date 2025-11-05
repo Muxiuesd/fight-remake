@@ -1,5 +1,9 @@
 package ttk.muxiuesd.registry;
 
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.serialization.Codec;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.*;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -17,10 +21,10 @@ import ttk.muxiuesd.world.wall.Wall;
 import java.util.LinkedHashMap;
 
 /**
- * 所有编解码器
+ * 所有编解码器的注册
  * */
 public final class Codecs {
-    public static final JsonCodec<Block> BLOCK = new BlockCodec();
+    public static final JsonCodec<Block> BLOCK = register("block", new BlockCodec());
     public static final JsonCodec<BlockEntity> BLOCK_ENTITY = new BlockEntityCodec();
     public static final JsonCodec<Block.Property> BLOCK_PROPERTY = new BlockPropertyCodec();
     public static final JsonCodec<Wall<?>> WALL = new WallCodec();
@@ -35,4 +39,13 @@ public final class Codecs {
     public static final JsonCodec<ItemEntity> ITEM_ENTITY = new ItemEntityCodec();
     public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = new EntityPropertyCodec();
     public static final JsonCodec<LinkedHashMap<StatusEffect, StatusEffect.Data>> STATUS_EFFECTS = new BuffCodec();
+
+
+    /**
+     * 注册一种编解码器
+     * */
+    public static <C extends Codec<?, ?, ?>> C register (String name, C codec) {
+        Registries.CODEC.register(new Identifier(Fight.ID(name)), codec);
+        return codec;
+    }
 }

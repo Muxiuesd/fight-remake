@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
+import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.lang.LangPack;
@@ -30,6 +31,8 @@ import java.util.LinkedHashMap;
  * */
 public class Registries {
     public static final Array<Registry<?>> ALL_REGISTRY = new Array<>();
+
+    public static final Registry<Codec<?, ?, ?>> CODEC = create(RegistryKeys.CODEC);
 
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);

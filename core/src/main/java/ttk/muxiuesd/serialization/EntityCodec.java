@@ -16,7 +16,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import java.util.Optional;
 
 /**
- * 实体的编解码器
+ * 基础实体的编解码器
  * */
 public class EntityCodec extends JsonCodec<Entity<?>> {
     @Override

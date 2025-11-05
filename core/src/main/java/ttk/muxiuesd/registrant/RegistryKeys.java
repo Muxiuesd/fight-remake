@@ -1,6 +1,7 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.audio.Audio;
+import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.lang.LangPack;
@@ -22,6 +23,9 @@ import ttk.muxiuesd.world.wall.Wall;
  * 注册键
  * */
 public class RegistryKeys {
+
+    public static final RegistryKey<Codec<?, ?, ?>> CODEC = new RegistryKey<>();
+
     public static final RegistryKey<Item> ITEM = new RegistryKey<>();
     public static final RegistryKey<Block> BLOCK = new RegistryKey<>();
     public static final RegistryKey<BlockEntityProvider<?>> BLOCK_ENTITY = new RegistryKey<>();
