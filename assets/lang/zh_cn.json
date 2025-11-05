@@ -4,7 +4,7 @@
   "text.fight:weapon_duration":     "武器耐久：{0}",
   "text.fight:weapon_damage":       "武器伤害：{0}",
   "text.fight:weapon_attack_range": "攻击范围：{0}",
-
+  "text.fight:effect_duration":     "持续时间：{0}",
 
   "item.fight:diamond_sword":       "钻石剑",
   "item.fight:diamond_helmet":      "钻石头盔",
@@ -23,5 +23,7 @@
 
   "item.fight:rubbish": "垃圾",
 
-  "item.fight:coal": "煤炭"
+  "item.fight:coal": "煤炭",
+
+  "effect.fight:healing": "治疗 等级：{0}"
 }

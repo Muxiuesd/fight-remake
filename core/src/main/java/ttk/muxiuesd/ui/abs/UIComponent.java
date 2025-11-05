@@ -101,9 +101,10 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
         this.y = pos.y;
     }
 
-    public void setPosition (float x, float y) {
+    public UIComponent setPosition (float x, float y) {
         this.x = x;
         this.y = y;
+        return this;
     }
 
     public UIComponent setSize(float width, float height) {
