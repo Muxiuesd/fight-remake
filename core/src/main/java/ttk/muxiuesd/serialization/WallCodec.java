@@ -21,6 +21,7 @@ public class WallCodec extends JsonCodec<Wall<?>> {
     public void encode (Wall<?> wall, JsonDataWriter dataWriter) {
         dataWriter
             .writeString("id", wall.getID())
+            .writeString("codec_id", Fight.ID("wall"))
             .writeFloat("x", wall.x)
             .writeFloat("y", wall.y);
 

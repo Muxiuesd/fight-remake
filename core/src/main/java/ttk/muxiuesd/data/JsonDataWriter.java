@@ -8,6 +8,8 @@ import java.io.StringWriter;
 
 /**
  * Json格式的数据写入类
+ * <p>
+ * 相同层级下的同名称的值无法检测或者覆盖
  * */
 public class JsonDataWriter implements DataWriter<Json> {
     private Json writer;
@@ -22,104 +24,104 @@ public class JsonDataWriter implements DataWriter<Json> {
 
     /**
      * 开始一个有名称的json对象
-     * */
-    public JsonDataWriter objStart (String objName) {
-        this.writer.writeObjectStart(objName);
+     **/
+    public JsonDataWriter objStart (String objName){
+        this.getWriter().writeObjectStart(objName);
         return this;
     }
 
     /**
      * 开始一个无名称的json对象
-     * */
+     **/
     public JsonDataWriter objStart () {
-        this.writer.writeObjectStart();
+        this.getWriter().writeObjectStart();
         return this;
     }
 
     /**
      * 结束当前的json对象
-     * */
+     **/
     public JsonDataWriter objEnd () {
-        this.writer.writeObjectEnd();
+        this.getWriter().writeObjectEnd();
         return this;
     }
 
     /**
      * 开始一个有名称的json数组
-     * */
+     **/
     public JsonDataWriter arrayStart (String objName) {
-        this.writer.writeArrayStart(objName);
+        this.getWriter().writeArrayStart(objName);
         return this;
     }
 
     /**
      * 开始一个无名称的json数组
-     * */
+     **/
     public JsonDataWriter arrayStart () {
-        this.writer.writeArrayStart();
+        this.getWriter().writeArrayStart();
         return this;
     }
 
     /**
      * 结束当前的json数组
-     * */
+     **/
     public JsonDataWriter arrayEnd () {
-        this.writer.writeArrayEnd();
+        this.getWriter().writeArrayEnd();
         return this;
     }
 
 
     @Override
     public JsonDataWriter writeInt (String key, int value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeLong (String key, long value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeFloat (String key, float value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeDouble (String key, double value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeBoolean (String key, boolean value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeChar (String key, char value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeByte (String key, byte value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeShort (String key, short value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 
     @Override
     public JsonDataWriter writeString (String key, String value) {
-        this.writer.writeValue(key, value);
+        this.getWriter().writeValue(key, value);
         return this;
     }
 

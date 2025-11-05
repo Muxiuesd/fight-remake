@@ -8,10 +8,8 @@ import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
-import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
-import ttk.muxiuesd.world.entity.abs.LivingEntity;
 
 import java.util.Optional;
 
@@ -32,12 +30,12 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         dataWriter.objEnd();
 
         //对于活物实体
-        if (entity instanceof LivingEntity<?> livingEntity) {
+        /*if (entity instanceof LivingEntity<?> livingEntity) {
             //编码背包数据
             dataWriter.objStart("backpack");
             Codecs.BACKPACK.encode(livingEntity.getBackpack(), dataWriter);
             dataWriter.objEnd();
-        }
+        }*/
     }
 
     @Override
@@ -57,12 +55,12 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         entity.readCAT(propertyValue.get(Fight.ID("cat")));
 
         //对于活物实体
-        if (entity instanceof LivingEntity<?> livingEntity) {
+        /*if (entity instanceof LivingEntity<?> livingEntity) {
             //读取背包数据
             JsonValue backpackValue = dataReader.readObj("backpack");
             Optional<Backpack> optionalBackpack = Codecs.BACKPACK.decode(new JsonDataReader(backpackValue));
             optionalBackpack.ifPresent(livingEntity::setBackpack);
-        }
+        }*/
 
         return Optional.of(entity);
     }

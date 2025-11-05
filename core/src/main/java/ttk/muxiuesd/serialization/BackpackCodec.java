@@ -1,5 +1,6 @@
 package ttk.muxiuesd.serialization;
 
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.registry.Codecs;
@@ -15,7 +16,10 @@ import java.util.Optional;
 public class BackpackCodec extends InventoryCodec<Backpack> {
     @Override
     public void encode (Backpack backpack, JsonDataWriter dataWriter) {
-        dataWriter.writeInt("size", backpack.getSize());
+        dataWriter
+            .writeString("codec_id", Fight.ID("backpack"))
+            .writeInt("size", backpack.getSize());
+
         dataWriter.objStart("itemStacks");
         //背包为空直接结束
         if (backpack.isEmpty()) {

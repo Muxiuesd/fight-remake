@@ -1,5 +1,7 @@
 package ttk.muxiuesd.interfaces.world.entity;
 
+import ttk.muxiuesd.interfaces.serialization.Codec;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -12,14 +14,16 @@ public class EntityProvider<T extends Entity<?>> {
 
     private final Factory<T> factory;
     private final EntityType<? super T> defaultType;
+    public final Codec<T, ?, ?> codec;
 
     public final boolean canBeSaved;
 
     public EntityProvider (Factory<T> factory,
-                           EntityType<? super T> defaultType,
+                           EntityType<? super T> defaultType, Codec<T, ?, ?> codec,
                            boolean canBeSaved) {
         this.factory = factory;
         this.defaultType = defaultType;
+        this.codec = codec;
         this.canBeSaved = canBeSaved;
     }
 
@@ -39,8 +43,6 @@ public class EntityProvider<T extends Entity<?>> {
         return entity;
     }
 
-
-
     public String getId () {
         return this.id;
     }
@@ -50,10 +52,13 @@ public class EntityProvider<T extends Entity<?>> {
         return this;
     }
 
+
+
     public static class Builder<T extends Entity<?>> {
         final Factory<T> factory;
         EntityType<? super T> defaultType;
 
+        Codec codec = Codecs.ENTITY;    //默认的实体的编解码器
         boolean canBeSaved  = true; //实体能否被保存，默认可以
 
         private Builder (Factory<T> factory) {
@@ -69,16 +74,22 @@ public class EntityProvider<T extends Entity<?>> {
             return this;
         }
 
+        public Builder<T> setCodec (Codec<? super T, ?, ?> codec) {
+            this.codec = codec;
+            return this;
+        }
+
         public Builder<T> setCanBeSaved (boolean canBeSaved) {
             this.canBeSaved = canBeSaved;
             return this;
         }
 
         public EntityProvider<T> build () {
-            return new EntityProvider<T>(
-                factory,
-                defaultType,
-                canBeSaved
+            return new EntityProvider<>(
+                this.factory,
+                this.defaultType,
+                this.codec,
+                this.canBeSaved
             );
         }
     }

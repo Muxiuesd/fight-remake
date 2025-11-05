@@ -24,6 +24,7 @@ public final class Entities {
         "item_entity",
         EntityProvider.Builder.<ItemEntity>create(ItemEntity::new)
             .setDefaultType(EntityTypes.ITEM_ENTITY)
+            .setCodec(Codecs.ITEM_ENTITY)
             .build()
     );
     //活物实体
@@ -31,6 +32,7 @@ public final class Entities {
         "player",
         EntityProvider.Builder.<Player>create(Player::new)
             .setDefaultType(EntityTypes.PLAYER)
+            .setCodec(Codecs.PLAYER)
             .build()
     );
 
@@ -39,6 +41,7 @@ public final class Entities {
         "slime",
         EntityProvider.Builder.<Slime>create(Slime::new)
             .setDefaultType(EntityTypes.ENEMY)
+            .setCodec(Codecs.LIVING_ENTITY)
             .build()
     );
 
@@ -46,6 +49,7 @@ public final class Entities {
         "target",
         EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
             .setDefaultType(EntityTypes.ENEMY)
+            .setCodec(Codecs.LIVING_ENTITY)
             .build()
     );
 
@@ -54,6 +58,7 @@ public final class Entities {
         "puffer_fish",
         EntityProvider.Builder.<PufferFish>create(PufferFish::new)
             .setDefaultType(EntityTypes.CREATURE)
+            .setCodec(Codecs.LIVING_ENTITY)
             .build()
     );
 
@@ -62,6 +67,7 @@ public final class Entities {
         "bullet_fire",
         EntityProvider.Builder.<BulletFire>create(BulletFire::new)
             .setDefaultType(EntityTypes.ENEMY_BULLET)
+            .setCodec(Codecs.ENTITY)
             .build()
     );
 
@@ -70,6 +76,7 @@ public final class Entities {
         "fishing_hook",
         EntityProvider.Builder.<EntityFishingHook>create(EntityFishingHook::new)
             .setDefaultType(EntityTypes.PLAYER_FIASHING_HOOK)
+            .setCodec(Codecs.ENTITY)
             .setCanBeSaved(false)
             .build()
     );

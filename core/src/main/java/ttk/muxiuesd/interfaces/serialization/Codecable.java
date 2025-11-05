@@ -9,6 +9,7 @@ import ttk.muxiuesd.interfaces.data.DataWriter;
 public interface Codecable<T, W extends DataWriter<?>, R extends DataReader<?>> {
     /**
      * 获取编解码器
+     * @return 返回注册过的编解码器
      * */
     Codec<T, W, R> getCodec();
 }

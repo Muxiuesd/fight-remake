@@ -20,7 +20,9 @@ public class BlockCodec extends JsonCodec<Block> {
     @Override
     public void encode (Block block, JsonDataWriter dataWriter) {
         //基础属性（所有类型的方块必须写入）
-        dataWriter.writeString("id", block.getID());
+        dataWriter
+            .writeString("id", block.getID())
+            .writeString("codec_id", Fight.ID("block"));
 
         //带有方块实体的方块是一个方块一个实例，所以需要写入自定义的各种属性
         if (block instanceof BlockWithEntity blockWithEntity) {

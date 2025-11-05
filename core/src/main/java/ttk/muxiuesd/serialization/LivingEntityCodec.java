@@ -24,7 +24,7 @@ public class LivingEntityCodec extends JsonCodec<LivingEntity<?>> {
 
     @Override
     public void encode (LivingEntity<?> livingEntity, JsonDataWriter dataWriter) {
-        dataWriter
+        /*dataWriter
             .writeString("id", livingEntity.getID())
             .writeString("type", livingEntity.getType().getId());
 
@@ -32,7 +32,8 @@ public class LivingEntityCodec extends JsonCodec<LivingEntity<?>> {
         //记得调用一次cat写入
         livingEntity.writeCAT(livingEntity.getProperty().getCAT());
         Codecs.ENTITY_PROPERTY.encode(livingEntity.getProperty(), dataWriter);
-        dataWriter.objEnd();
+        dataWriter.objEnd();*/
+        Codecs.ENTITY.encode(livingEntity, dataWriter);
 
         //编码背包数据
         dataWriter.objStart("backpack");
@@ -67,7 +68,7 @@ public class LivingEntityCodec extends JsonCodec<LivingEntity<?>> {
 
         //读取cat
         livingEntity.readCAT(propertyValue.get(Fight.ID("cat")));
-        
+
         //读取背包数据
         JsonValue backpackValue = dataReader.readObj("backpack");
         Optional<Backpack> optionalBackpack = Codecs.BACKPACK.decode(new JsonDataReader(backpackValue));

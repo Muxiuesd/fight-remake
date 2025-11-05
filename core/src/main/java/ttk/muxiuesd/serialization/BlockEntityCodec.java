@@ -1,6 +1,7 @@
 package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
@@ -20,7 +21,9 @@ public class BlockEntityCodec extends JsonCodec<BlockEntity> {
     @Override
     public void encode (BlockEntity blockEntity, JsonDataWriter dataWriter) {
         String id = blockEntity.getProvider().getId();
-        dataWriter.writeString("id", id);
+        dataWriter
+            .writeString("id", id)
+            .writeString("codec_id", Fight.ID("block_entity"));
 
         BlockPos blockPos = blockEntity.getBlockPos();
         Backpack backpack = blockEntity.getBackpack();

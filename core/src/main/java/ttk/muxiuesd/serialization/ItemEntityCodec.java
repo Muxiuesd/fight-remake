@@ -18,6 +18,7 @@ public class ItemEntityCodec extends JsonCodec<ItemEntity> {
     @Override
     public void encode (ItemEntity itemEntity, JsonDataWriter dataWriter) {
         Codecs.ENTITY.encode(itemEntity, dataWriter);
+
         dataWriter.objStart("itemStack");
         Codecs.ITEM_STACK.encode(itemEntity.getItemStack(), dataWriter);
         dataWriter.objEnd();
