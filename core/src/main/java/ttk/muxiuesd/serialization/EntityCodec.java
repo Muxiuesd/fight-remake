@@ -29,13 +29,6 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         Codecs.ENTITY_PROPERTY.encode(entity.getProperty(), dataWriter);
         dataWriter.objEnd();
 
-        //对于活物实体
-        /*if (entity instanceof LivingEntity<?> livingEntity) {
-            //编码背包数据
-            dataWriter.objStart("backpack");
-            Codecs.BACKPACK.encode(livingEntity.getBackpack(), dataWriter);
-            dataWriter.objEnd();
-        }*/
     }
 
     @Override
@@ -54,13 +47,6 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         //读取cat
         entity.readCAT(propertyValue.get(Fight.ID("cat")));
 
-        //对于活物实体
-        /*if (entity instanceof LivingEntity<?> livingEntity) {
-            //读取背包数据
-            JsonValue backpackValue = dataReader.readObj("backpack");
-            Optional<Backpack> optionalBackpack = Codecs.BACKPACK.decode(new JsonDataReader(backpackValue));
-            optionalBackpack.ifPresent(livingEntity::setBackpack);
-        }*/
 
         return Optional.of(entity);
     }

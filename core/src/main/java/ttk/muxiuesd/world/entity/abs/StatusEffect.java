@@ -1,10 +1,14 @@
 package ttk.muxiuesd.world.entity.abs;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import ttk.muxiuesd.util.Util;
+
 /**
  * 状态效果抽象类
  * */
 public abstract class StatusEffect {
     private final String id;
+    private TextureRegion icon;
 
     public StatusEffect (String id) {
         this.id = id;
@@ -23,6 +27,14 @@ public abstract class StatusEffect {
         return this.id;
     }
 
+    public StatusEffect loadIcon (String textureId, String path) {
+        this.icon = Util.loadTextureRegion(textureId, path);
+        return this;
+    }
+
+    public TextureRegion getIcon () {
+        return this.icon;
+    }
 
     /**
      * 状态效果的数据类

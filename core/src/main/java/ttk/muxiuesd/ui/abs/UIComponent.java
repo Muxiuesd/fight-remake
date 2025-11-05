@@ -24,6 +24,10 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     private GridPoint2 interactGridSize;
 
     public UIComponent() {}
+
+    public UIComponent(float width, float height, GridPoint2 interactGridSize) {
+        this(0, 0, width, height, interactGridSize);
+    }
     public UIComponent(float x, float y, float width, float height, GridPoint2 interactGridSize) {
         this.x = x;
         this.y = y;
@@ -31,6 +35,8 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
         this.height = height;
         this.interactGridSize = interactGridSize;
     }
+
+
 
     @Override
     public void update (float delta) {
