@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 
@@ -118,5 +119,10 @@ public abstract class Bullet extends Entity<Bullet> {
         // 计算旋转角度
         Vector2 velocity = getVelocity();
         setRotation(MathUtils.atan2Deg(velY, velX));
+    }
+
+    @Override
+    public Codec getCodec () {
+        return super.getCodec();
     }
 }

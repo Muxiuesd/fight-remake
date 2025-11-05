@@ -5,7 +5,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.TaskTimer;
@@ -148,5 +150,10 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     public ItemEntity setOnAirTimer (TaskTimer onAirTimer) {
         this.onAirTimer = onAirTimer;
         return this;
+    }
+
+    @Override
+    public Codec getCodec () {
+        return Codecs.ITEM_ENTITY;
     }
 }

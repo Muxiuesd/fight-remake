@@ -6,7 +6,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.StatusEffects;
@@ -188,5 +190,10 @@ public class Player extends LivingEntity<Player> {
             dropItem(getHandIndex(), 1);
             System.out.println("Q");
         }
+    }
+
+    @Override
+    public Codec getCodec () {
+        return Codecs.PLAYER;
     }
 }

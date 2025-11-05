@@ -13,7 +13,10 @@ import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.*;
+import ttk.muxiuesd.interfaces.serialization.Codec;
+import ttk.muxiuesd.interfaces.serialization.Codecable;
 import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
@@ -28,7 +31,7 @@ import ttk.muxiuesd.world.entity.EntityType;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<?>>
-    implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable, Tickable {
+    implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable, Tickable, Codecable {
 
     private String id;
 
@@ -352,10 +355,16 @@ public abstract class Entity<T extends Entity<?>>
     public String getID () {
         return this.id;
     }
+
     @Override
     public T setID (String id) {
         this.id = id;
         return (T) this;
+    }
+
+    @Override
+    public Codec getCodec () {
+        return Codecs.ENTITY;
     }
 
     /**
