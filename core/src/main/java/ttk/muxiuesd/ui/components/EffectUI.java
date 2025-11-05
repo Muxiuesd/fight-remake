@@ -104,7 +104,7 @@ public class EffectUI extends UIComponent {
         //绘制剩余时间
         font.draw(batch, this.getEffectDurationText().getText(),
             textRenderX + ICON_WIDTH,
-            textRenderY + TRUE_FONT_SIZE
+            textRenderY + TRUE_FONT_SIZE - 2
         );
     }
 
