@@ -21,30 +21,8 @@ import java.util.Optional;
 public class PlayerCodec extends JsonCodec<Player> {
     @Override
     public void encode (Player player, JsonDataWriter dataWriter) {
-        dataWriter
-            .writeString("id", player.getID())
-            .writeString("type", player.getType().getId());
-
-        dataWriter.objStart("property");
-        //记得调用一次cat写入
-        player.writeCAT(player.getProperty().getCAT());
-        Codecs.ENTITY_PROPERTY.encode(player.getProperty(), dataWriter);
-        dataWriter.objEnd();
-
-        //编码背包数据
-        dataWriter.objStart("backpack");
-        Codecs.BACKPACK.encode(player.getBackpack(), dataWriter);
-        dataWriter.objEnd();
-
-        //编码装备背包数据
-        dataWriter.objStart("equipment");
-        Codecs.BACKPACK.encode(player.getEquipmentBackpack(), dataWriter);
-        dataWriter.objEnd();
-
-        //编码状态效果
-        dataWriter.objStart("status_effect");
-        Codecs.STATUS_EFFECTS.encode(player.getEffects(), dataWriter);
-        dataWriter.objEnd();
+        //基础的活物实体编码
+        Codecs.LIVING_ENTITY.encode(player, dataWriter);
     }
 
     @Override

@@ -43,9 +43,9 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
     @Override
     public Optional<Entity<?>> parse (JsonDataReader dataReader) {
         String id = dataReader.readString("id");
-        EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
+        EntityProvider<Entity<?>> entityProvider = (EntityProvider<Entity<?>>) Registries.ENTITY.get(id);
         String typeId = dataReader.readString("type");
-        EntityType entityType = Registries.ENTITY_TYPE.get(typeId);
+        EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.get(typeId);
         Entity<?> entity = entityProvider.create(null, entityType);
 
         JsonValue propertyValue = dataReader.readObj("property");
