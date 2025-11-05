@@ -42,7 +42,7 @@ public class PlayerCodec extends JsonCodec<Player> {
         dataWriter.objEnd();
 
         //编码状态效果
-        dataWriter.objStart("buffs");
+        dataWriter.objStart("status_effect");
         Codecs.STATUS_EFFECTS.encode(player.getEffects(), dataWriter);
         dataWriter.objEnd();
     }
@@ -70,7 +70,7 @@ public class PlayerCodec extends JsonCodec<Player> {
         optionalEquipment.ifPresent(player::setEquipmentBackpack);
 
         //读取状态效果
-        JsonValue buffs = dataReader.readObj("buffs");
+        JsonValue buffs = dataReader.readObj("status_effect");
         Optional<LinkedHashMap<StatusEffect, StatusEffect.Data>> optionalEffectsMap = Codecs.STATUS_EFFECTS.decode(
             new JsonDataReader(buffs)
         );

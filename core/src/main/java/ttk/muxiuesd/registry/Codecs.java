@@ -25,20 +25,20 @@ import java.util.LinkedHashMap;
  * */
 public final class Codecs {
     public static final JsonCodec<Block> BLOCK = register("block", new BlockCodec());
-    public static final JsonCodec<BlockEntity> BLOCK_ENTITY = new BlockEntityCodec();
-    public static final JsonCodec<Block.Property> BLOCK_PROPERTY = new BlockPropertyCodec();
-    public static final JsonCodec<Wall<?>> WALL = new WallCodec();
-    public static final JsonCodec<Chunk> CHUNK = new ChunkCodec();
+    public static final JsonCodec<BlockEntity> BLOCK_ENTITY = register("block_entity", new BlockEntityCodec());
+    public static final JsonCodec<Block.Property> BLOCK_PROPERTY = register("block_property", new BlockPropertyCodec());
+    public static final JsonCodec<Wall<?>> WALL = register("wall", new WallCodec());
+    public static final JsonCodec<Chunk> CHUNK = register("chunk", new ChunkCodec());
 
-    public static final JsonCodec<Backpack> BACKPACK = new BackpackCodec();
-    public static final JsonCodec<ItemStack> ITEM_STACK = new ItemStackCodec();
-    public static final JsonCodec<Item.Property> ITEM_PROPERTY = new ItemPropertyCodec();
+    public static final JsonCodec<Backpack> BACKPACK = register("backpack", new BackpackCodec());
+    public static final JsonCodec<ItemStack> ITEM_STACK = register("item_stack", new ItemStackCodec());
+    public static final JsonCodec<Item.Property> ITEM_PROPERTY = register("item_property", new ItemPropertyCodec());
 
-    public static final JsonCodec<Entity<?>> ENTITY = new EntityCodec();
-    public static final JsonCodec<Player> PLAYER = new PlayerCodec();
-    public static final JsonCodec<ItemEntity> ITEM_ENTITY = new ItemEntityCodec();
-    public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = new EntityPropertyCodec();
-    public static final JsonCodec<LinkedHashMap<StatusEffect, StatusEffect.Data>> STATUS_EFFECTS = new BuffCodec();
+    public static final JsonCodec<Entity<?>> ENTITY = register("entity", new EntityCodec());
+    public static final JsonCodec<Player> PLAYER = register("player", new PlayerCodec());
+    public static final JsonCodec<ItemEntity> ITEM_ENTITY = register("item_entity", new ItemEntityCodec());
+    public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = register("item_property", new EntityPropertyCodec());
+    public static final JsonCodec<LinkedHashMap<StatusEffect, StatusEffect.Data>> STATUS_EFFECTS = register("status_effect", new BuffCodec());
 
 
     /**
