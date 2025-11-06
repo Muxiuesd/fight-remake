@@ -41,7 +41,7 @@ public class Player extends LivingEntity<Player> {
     public Player(World world, EntityType<? super Player> entityType, float maxHealth, float curHealth) {
         super(world, entityType, maxHealth, curHealth, BACKPACK_SIZE);
         renderHandItem = true;
-        speed = 8;
+        speed = 2.3f;
         curSpeed = speed;
         bodyTexture = getTextureRegion(Fight.ID("player"), "player/player.png");
         this.shield = getTextureRegion(Fight.ID("player_shield"), "player/shield.png");
