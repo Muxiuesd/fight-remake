@@ -141,8 +141,8 @@ public class PlayerSystem extends WorldSystem {
         if (inputX != 0 || inputY != 0) {
             // 计算方向向量的长度
             float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
-            // 归一化并乘以速度
-            float playerSpeed = player.getSpeed();
+            // 归一化并乘以当前速度
+            float playerSpeed = player.getCurSpeed();
             float velX = (inputX / length) * playerSpeed;
             float velY = (inputY / length) * playerSpeed;
             player.setVelocity(velX, velY);

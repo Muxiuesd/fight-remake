@@ -42,7 +42,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         if (player == null) return;
 
         Rectangle hitbox = player.getHitbox();
-        Vector2 vel = player.getVelocity().scl(player.getCurSpeed());
+        Vector2 vel = player.getVelocity();
 
         // 计算总移动距离
         float totalMoveX = vel.x * delta;
