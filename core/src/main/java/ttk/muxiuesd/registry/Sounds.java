@@ -29,6 +29,7 @@ public final class Sounds {
     ///玩家
     public static final Audio ENTITY_SHOOT = registerSoundAsMusic("shoot", "player/shoot.wav");
     public static final Audio ENTITY_SWEEP = registerSoundAsMusic("sweep", "player/sweep.ogg");
+    public static final Audio PLAYER_KILL = registerSoundAsMusic("player_kill", "player/kill.wav");
     public static final Audio PLAYER_RESURRECTION = registerMusic("player_resurrection", "player_resurrection.mp3");
 
     ///物品
