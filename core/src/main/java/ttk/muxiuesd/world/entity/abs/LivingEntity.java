@@ -12,6 +12,7 @@ import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
@@ -34,12 +35,14 @@ import java.util.LinkedHashMap;
  * */
 public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
-    public static final float ATTACK_SPAN = 0.1f;   //受攻击状态维持时间
+    public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
     private LinkedHashMap<String, LivingEntityState<T>> states; //状态机
     private LivingEntityState<T> curState;                      //当前状态
     private LinkedHashMap<StatusEffect, StatusEffect.Data> effects;    //实体的状态效果
+    private TaskTimer effectPreTickTimer;
+    private TaskTimer effectPreSecondTimer;
 
     private float maxHealth;                // 生命值上限
     private float curHealth;                // 当前生命值
@@ -63,6 +66,26 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         setSize(DEFAULT_SIZE);
         this.states = new LinkedHashMap<>();
         this.effects = new LinkedHashMap<>();
+        this.effectPreTickTimer = Pools.TASK_TIMER.obtain()
+            .setMaxSpan(TimeSystem.TickMaxSpan)
+            .setCurSpan(0)
+            .setTask(() -> {
+                this.getEffects().forEach((statusEffect, data) -> {
+                    statusEffect.applyEffectTick(this, data.getLevel());
+                });
+            }
+            );
+        this.effectPreSecondTimer = Pools.TASK_TIMER.obtain()
+            .setMaxSpan(1f)
+            .setCurSpan(0)
+            .setTask(() -> {
+                    this.getEffects().forEach((statusEffect, data) -> {
+                        statusEffect.applyEffectPreSecond(this, data.getLevel());
+                    });
+                }
+            );
+
+
         this.maxHealth = maxHealth;
         this.curHealth = curHealth;
         this.attacked = false;
@@ -100,6 +123,10 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         this.backpack.update(delta);
         this.attackedTimer.update(delta);
         this.attackedTimer.isReady();
+        this.effectPreSecondTimer.update(delta);
+        this.effectPreSecondTimer.isReady();
+        this.effectPreTickTimer.update(delta);
+        this.effectPreTickTimer.isReady();
 
         //处理当前状态
         if (this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
@@ -133,17 +160,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
 
     @Override
     public void tick (World world, float delta) {
-        this.applyEffectTick();
-    }
-
-    /**
-     * 应用状态效果
-     * */
-    private void applyEffectTick () {
-        for (StatusEffect effect : this.effects.keySet()) {
-            StatusEffect.Data data = this.effects.get(effect);
-            effect.applyEffectTick(this, data.getLevel());
-        }
+        //this.applyEffectTick();
     }
 
     @Override

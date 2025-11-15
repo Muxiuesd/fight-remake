@@ -76,6 +76,7 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(35, new ItemStack(Items.TORCH));
 
         setEffect(StatusEffects.HEALING, 2000f, 2);
+        setEffect(StatusEffects.POISON, 1000f, 1);
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }
