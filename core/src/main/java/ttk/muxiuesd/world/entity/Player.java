@@ -7,12 +7,10 @@ import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.serialization.Codec;
-import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.StatusEffects;
-import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.TaskTimer;
@@ -110,7 +108,6 @@ public class Player extends LivingEntity<Player> {
                 this.defendDurationTimer.update(delta);
             }
         }
-        this.handleInput(delta);
 
         Vector2 position = getPosition();
         setCullingArea(
@@ -166,31 +163,6 @@ public class Player extends LivingEntity<Player> {
     @Override
     public Direction getDirection () {
         return Util.getDirection();
-    }
-
-    private void handleInput(float delta) {
-        //需要玩家鼠标不在UI组件上，防止同时操作两者
-        if (!GUISystem.getInstance().mouseOverUI()) {
-            //玩家右键防御
-            if (KeyBindings.PlayerShield.wasJustPressed()) {
-                this.defendCDTimer.isReady();
-                //TODO 护盾使用成功的相关操作
-            }
-            //左键使用物品
-            if (KeyBindings.PlayerUseItem.wasJustPressed()) {
-                useItem(getEntitySystem().getWorld());
-            }
-        }
-
-        //头两个物品槽（0号和1号）快捷循环
-        if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
-            if (getHandIndex() == 0) setHandIndex(1);
-            else if (getHandIndex() == 1) setHandIndex(0);
-        }
-        if (KeyBindings.PlayerDropItem.wasJustPressed()) {
-            dropItem(getHandIndex(), 1);
-            System.out.println("Q");
-        }
     }
 
     @Override
