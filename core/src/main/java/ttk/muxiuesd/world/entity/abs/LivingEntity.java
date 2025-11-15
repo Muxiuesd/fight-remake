@@ -524,4 +524,13 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     public Codec getCodec () {
         return Codecs.LIVING_ENTITY;
     }
+
+    @Override
+    public void dispose () {
+        super.dispose();
+        //回收计时器
+        Pools.TASK_TIMER.free(this.attackedTimer);
+        Pools.TASK_TIMER.free(this.effectPreTickTimer);
+        Pools.TASK_TIMER.free(this.effectPreSecondTimer);
+    }
 }

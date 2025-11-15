@@ -160,6 +160,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (entity instanceof PoolableEntity poolableEntity) {
             poolableEntity.freeSelf();
         }
+        //释放实体自己的资源
+        entity.dispose();
     }
 
     @Override
