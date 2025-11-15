@@ -8,11 +8,11 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 
 /**
- * 治疗效果
+ * 中毒效果
  * */
-public class EffectHealing extends StatusEffect{
-    public EffectHealing (String id) {
-        super(id, Fight.UITexturePath("effect/healing.png"));
+public class EffectPoison extends StatusEffect {
+    public EffectPoison (String id) {
+        super(id, Fight.UITexturePath("effect/poison.png"));
     }
 
     @Override
@@ -21,17 +21,16 @@ public class EffectHealing extends StatusEffect{
 
     @Override
     public void applyEffectPreSecond (LivingEntity<?> entity, int level) {
-        float value = 2 * level;
-        if (entity instanceof Player) {
-            entity.increaseHealth(value);
-        }else if (entity instanceof Enemy<?> enemy) {
-            //对敌对实体来说，治疗就是伤害
-            enemy.applyDamage(DamageTypes.STATUS_EFFECT, new DamageSource(level) {
+        if (entity instanceof Player player) {
+            player.applyDamage(DamageTypes.STATUS_EFFECT, new DamageSource(level) {
                 @Override
                 public float getDamage (LivingEntity<?> victim) {
-                    return 3 * getLevel();
+                    return 2 * level;
                 }
             });
+        }else if (entity instanceof Enemy<?> enemy) {
+            //对敌对实体来说，中毒就是治疗
+            enemy.increaseHealth(level);
         }
     }
 }

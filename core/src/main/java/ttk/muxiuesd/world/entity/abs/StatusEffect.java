@@ -10,6 +10,10 @@ public abstract class StatusEffect {
     private final String id;
     private TextureRegion icon;
 
+    public StatusEffect (String id, String iconPath) {
+        this(id);
+        loadIcon(id, iconPath);
+    }
     public StatusEffect (String id) {
         this.id = id;
     }
@@ -21,6 +25,14 @@ public abstract class StatusEffect {
      * @param level 当前效果的等级
      * */
     public abstract void applyEffectTick(LivingEntity<?> entity, int level);
+
+    /**
+     * 每秒对实体触发的效果
+     *
+     * @param entity 作用效果的实体
+     * @param level 当前效果的等级
+     * */
+    public abstract void applyEffectPreSecond(LivingEntity<?> entity, int level);
 
 
     public String getId () {
