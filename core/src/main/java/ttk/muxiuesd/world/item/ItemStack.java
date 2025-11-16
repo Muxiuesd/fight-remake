@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.item;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -46,7 +47,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?, ?, ?> propertiesMap) {
         this.item = item;
         this.amount = amount;
-
+        //传入的属性是原始的属性
         if (behaviour != null) this.behaviour = behaviour;
         else this.behaviour = ItemStackBehaviours.COMMON;   //防止null
 
@@ -97,13 +98,20 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public Array<Text> getTooltips () {
         Array<Text> array = new Array<>();
         //基础词条
-        array.add(Text.ofItem(getItem().getID()));
+        array.add(Text.ofItem(this.getItem().getID()));  //物品名称
 
         //物品自定义词条
-        getItem().getTooltips(array, this);
+        this.getItem().getTooltips(array, this);
 
         //基础词条
-        //array.add(Text.of(" "));
+        //持有耐久属性就添加词条
+        if (this.getItem().getProperty().contain(PropertyTypes.WEAPON_DURATION)) {
+            array.add(
+                Text.ofText(Fight.ID("item_duration"))
+                    .set(0, this.getProperty().getDuration())
+                    .set(1, this.getItem().getProperty().getDuration())
+            );
+        }
         return array;
     }
 

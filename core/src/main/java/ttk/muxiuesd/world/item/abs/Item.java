@@ -38,6 +38,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
 
     private String id;
     public Type type;
+    //物品最原始的属性，原则上不直接对这个原始数据进行操作
     public Property property;
     public TextureRegion texture;
 
@@ -199,6 +200,16 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
         }
 
+        /**
+         * 获取一个属性，如果不存在这个属性就返回指定的默认值
+         * */
+        public <T> T get (PropertyType<T> propertyType, T defaultValue) {
+            return this.contain(propertyType) ? this.get(propertyType) : defaultValue;
+        }
+
+        /**
+         * 获取一个属性
+         * */
         public <T> T get (PropertyType<T> propertyType) {
             return getPropertiesMap().get(propertyType);
         }
@@ -238,22 +249,29 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             return this;
         }
 
+        /**
+         * 获取武器物品耐久
+         * */
         public int getDuration () {
-            return get(PropertyTypes.WEAPON_DURATION);
+            return this.get(PropertyTypes.WEAPON_DURATION);
         }
 
         public Property setDuration (int duration) {
-            add(PropertyTypes.WEAPON_DURATION, duration);
+            this.add(PropertyTypes.WEAPON_DURATION, duration);
             return this;
         }
 
         public float getUseSpan () {
-            return get(PropertyTypes.WEAPON_USE_SAPN);
+            return this.get(PropertyTypes.WEAPON_USE_SAPN);
         }
 
         public Property setUseSpan (float useSpan) {
-            add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
+            this.add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
             return this;
+        }
+
+        public boolean contain (PropertyType<?> type) {
+            return this.getPropertiesMap().contain(type);
         }
 
         public PropertiesDataMap<?, ?, ?> getPropertiesMap () {

@@ -14,7 +14,8 @@ public class RangedWeaponItemStackBehaviour implements IItemStackBehaviour {
     @Override
     public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
         RangedWeapon weapon = (RangedWeapon) itemStack.getItem();
-        Item.Property property = weapon.getProperty();
+        //获取物品堆叠的属性
+        Item.Property property = itemStack.getProperty();
         if (!itemStack.isReady()) {
             //使用CD未冷却完
             return false;

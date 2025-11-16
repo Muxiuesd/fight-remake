@@ -5,6 +5,7 @@
   "text.fight:weapon_damage":       "武器伤害：{0}",
   "text.fight:weapon_attack_range": "攻击范围：{0}",
   "text.fight:effect_duration":     "持续时间：{0}",
+  "text.fight:item_duration":       "剩余耐久：{0} / {1}",
 
   "item.fight:diamond_sword":       "钻石剑",
   "item.fight:diamond_helmet":      "钻石头盔",
