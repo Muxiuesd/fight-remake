@@ -250,14 +250,14 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         }
 
         /**
-         * 获取武器物品耐久
+         * 获取物品耐久
          * */
         public int getDuration () {
-            return this.get(PropertyTypes.WEAPON_DURATION);
+            return this.get(PropertyTypes.ITEM_DURATION);
         }
 
         public Property setDuration (int duration) {
-            this.add(PropertyTypes.WEAPON_DURATION, duration);
+            this.add(PropertyTypes.ITEM_DURATION, duration);
             return this;
         }
 

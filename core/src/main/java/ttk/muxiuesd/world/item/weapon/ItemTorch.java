@@ -22,7 +22,7 @@ public class ItemTorch extends Sword {
     public ItemTorch () {
         super(createDefaultProperty()
                 .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2f)
-                .add(PropertyTypes.WEAPON_DURATION, 50),
+                .add(PropertyTypes.ITEM_DURATION, 50),
             Fight.ID("torch"),
             Fight.ItemTexturePath("torch.png"));
     }

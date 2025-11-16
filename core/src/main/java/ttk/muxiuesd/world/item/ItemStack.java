@@ -105,7 +105,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
 
         //基础词条
         //持有耐久属性就添加词条
-        if (this.getItem().getProperty().contain(PropertyTypes.WEAPON_DURATION)) {
+        if (this.getItem().getProperty().contain(PropertyTypes.ITEM_DURATION)) {
             array.add(
                 Text.ofText(Fight.ID("item_duration"))
                     .set(0, this.getProperty().getDuration())
