@@ -142,7 +142,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
         }
         //没达到最大数量
         ItemStack newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
-        this.decrease(amount);
+        this.amountDecrease(amount);
         return newStack;
     }
 
@@ -161,7 +161,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
      * 物品是否在使用中
      * */
     public boolean onUsing () {
-        return this.getProperty().get(PropertyTypes.ITEM_ON_USING);
+        return this.getProperty().get(PropertyTypes.ITEM_ON_USING, false);
     }
 
 
@@ -189,31 +189,58 @@ public class ItemStack implements Updateable, ShapeRenderable {
     }
 
     /**
-     * 减少指定数量
-     * */
-    public void decrease (int amount) {
-        this.setAmount(this.getAmount() - amount);
-    }
-
-    /**
-     * 增加指定数量
-     * */
-    public void increase (int amount) {
-        this.setAmount(this.getAmount() + amount);
-    }
-
-    /**
      * 快速减少一个数量
      * */
-    public void fastDecrease () {
-        this.decrease(1);
+    public ItemStack amountFastDecrease () {
+        return this.amountDecrease(1);
     }
 
     /**
      * 快速增加一个数量
      * */
-    public void fastIncrease () {
-        this.increase(1);
+    public ItemStack amountFastIncrease () {
+        return this.amountIncrease(1);
+    }
+
+    /**
+     * 减少指定数量
+     * */
+    public ItemStack amountDecrease (int amount) {
+        this.setAmount(this.getAmount() - amount);
+        return this;
+    }
+
+    /**
+     * 增加指定数量
+     * */
+    public ItemStack amountIncrease (int amount) {
+        this.setAmount(this.getAmount() + amount);
+        return this;
+    }
+
+    /**
+     * 减少指定的耐久值
+     * */
+    public ItemStack durationDecrease (int value) {
+        if (this.getProperty().contain(PropertyTypes.ITEM_DURATION)
+            && this.getProperty().getDuration() > 0) {
+            int d = this.getProperty().getDuration() - value;
+            this.getProperty().setDuration(Math.max(d, 0));
+        }
+        return this;
+    }
+
+    /**
+     * 增加指定的耐久值
+     * */
+    public ItemStack durationIncrease (int value) {
+        if (this.getProperty().contain(PropertyTypes.ITEM_DURATION)) {
+            int maxDuration = this.getItem().getProperty().getDuration();
+            //确保不会超过耐久上限
+            int d = this.getProperty().getDuration() + value;
+            this.getProperty().setDuration(Math.min(d, maxDuration));
+        }
+        return this;
     }
 
     /**

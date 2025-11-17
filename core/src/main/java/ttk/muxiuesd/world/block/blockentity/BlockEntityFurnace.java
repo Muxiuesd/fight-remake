@@ -170,7 +170,7 @@ public class BlockEntityFurnace extends BlockEntity {
                     return;
                 }
                 //消耗物品增加能量值
-                fuelStack.fastDecrease();
+                fuelStack.amountFastDecrease();
                 this.curEnergy += energy;
             }
             //到这里就是可以开始工作了
@@ -184,7 +184,7 @@ public class BlockEntityFurnace extends BlockEntity {
                 //到这里就是一次烧炼完成
                 //产出
                 this.curTick = 0;
-                inputStack.fastDecrease();
+                inputStack.amountFastDecrease();
 
                 if (outputStack == null) {
                     //输出槽位位空时

@@ -71,8 +71,8 @@ public class BlockEntityCraftingTable extends BlockEntity {
             //检查假如把手持的数量全部加进去是否超出限制，超过就重新设为上限值，没超过则还是原本的值
             if (afterAmount > maxCount) addAmount = maxCount;
             //按照指定数量增减
-            handItemStack.decrease(addAmount);
-            slotItemStack.increase(addAmount);
+            handItemStack.amountDecrease(addAmount);
+            slotItemStack.amountIncrease(addAmount);
         }
         //记得清理
         user.backpack.clear();
