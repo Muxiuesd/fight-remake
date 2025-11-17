@@ -24,8 +24,6 @@ public class RangedWeaponItemStackBehaviour extends HasDurationItemStackBehaviou
         if (!used) {
             return false;
         }
-        //武器使用挥手
-        user.swingHand(itemStack.useTimer.getMaxSpan());
 
         return super.hasDuration(world, user, itemStack);
     }
