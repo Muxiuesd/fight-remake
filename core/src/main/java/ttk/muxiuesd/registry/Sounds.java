@@ -33,9 +33,10 @@ public final class Sounds {
     public static final Audio PLAYER_RESURRECTION = registerMusic("player_resurrection", "player_resurrection.mp3");
 
     ///物品
-    public static final Audio ITEM_CLICK = registerSoundAsMusic("click", "item/click.ogg");
-    public static final Audio ITEM_PUT = registerSound("put", "item/put.ogg");
-    public static final Audio ITEM_POP = registerSound("pop", "item/pop.ogg");
+    public static final Audio ITEM_CLICK = registerSoundAsMusic("item_click", "item/click.ogg");
+    public static final Audio ITEM_PUT = registerSoundAsMusic("item_put", "item/put.ogg");
+    public static final Audio ITEM_POP = registerSoundAsMusic("item_pop", "item/pop.ogg");
+    public static final Audio ITEM_BREAK = registerSoundAsMusic("item_break", "item/break.ogg");
 
     ///装备物品
     public static final Audio EQUIP = registerSound("equip", "item/equipment/equip.ogg");
