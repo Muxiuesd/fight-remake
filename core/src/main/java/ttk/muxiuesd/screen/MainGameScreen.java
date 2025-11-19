@@ -1,12 +1,7 @@
 package ttk.muxiuesd.screen;
 
-import com.aliasifkhan.hackLights.HackLight;
-import com.aliasifkhan.hackLights.HackLightEngine;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ScreenUtils;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.lang.FI18N;
@@ -37,19 +32,9 @@ public class MainGameScreen implements Screen {
 
     //游戏目前加载的世界，后续可能有多个世界
     private World world;
-    HackLightEngine lightEngine;
 
     @Override
     public void show() {
-        ShaderProgram.pedantic = false;
-        lightEngine = new HackLightEngine();
-        TextureRegion lightRegion = new TextureRegion(new Texture("texture/light/light.png"));
-        HackLight light = new HackLight(lightRegion, 1, 1, 1, 1f);
-        light.setScale(0.04f);
-        light.setOriginBasedPosition(0, 0);
-        lightEngine.addLight(light);
-        lightEngine.update(640, 480);
-
         Fonts.init();
         FI18N.init();
         //初始化游戏底层系统
@@ -141,8 +126,8 @@ public class MainGameScreen implements Screen {
 
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
-        /*LightSystem lightSystem = this.world.getSystem(LightSystem.class);
-        lightSystem.afterProcess();*/
+
+        //System.out.println("FPS：" + Gdx.graphics.getFramesPerSecond());
     }
 
     @Override
