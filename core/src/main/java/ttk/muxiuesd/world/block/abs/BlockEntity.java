@@ -20,7 +20,6 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.Slot;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -83,22 +82,25 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     /**
      * 方块实体被放置
      * */
-    public void bePlaced (World world, Player player) {
-
+    public void bePlaced (World world, LivingEntity<?> placer) {
     }
 
     /**
      * 方块实体被破坏
      * */
-    public void beDestroyed (World world, Player destroyer) {
-        EntitySystem es = world.getSystemManager().getSystem(EntitySystem.class);
+    public void beDestroyed (World world, LivingEntity<?> destroyer) {
+        EntitySystem es = world.getSystem(EntitySystem.class);
+        int size = this.getInventory().getSize();
+        boolean[] shouldBeCleared = new boolean[size];
         //掉落物品
-        for (int i = 0; i < this.getInventory().getSize(); i++) {
+        for (int i = 0; i < size; i++) {
             ItemStack itemStack = this.getInventory().getItemStack(i);
-            if (itemStack == null) continue;
+            if (itemStack == null) {
+                shouldBeCleared[i] = false;
+                continue;
+            }
 
             itemStack.getItem().beDropped(itemStack, world, destroyer);
-            //ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), es);
             ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
             itemEntity.setEntitySystem(es);
             itemEntity.setItemStack(itemStack);
@@ -106,13 +108,17 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
             itemEntity.setSize(ItemEntity.DEFAULT_SIZE);
             itemEntity.setOnGround(false);
             itemEntity.setOnAirTimer(new TaskTimer(0.2f, 0, () -> itemEntity.setOnAirTimer(null)));
-            float speed = MathUtils.random(2f, 3.5f);
+            float speed = MathUtils.random(1f, 1.56f);
             double radian = Util.randomRadian();
             itemEntity.setSpeed(speed);
             itemEntity.setVelocity(new Vector2((float) Math.cos(radian), (float) Math.sin(radian)));
             itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-
-            this.getInventory().clear(i);
+            es.add(itemEntity);
+            shouldBeCleared[i] = true;
+        }
+        //清除物品
+        for (int i = 0; i < shouldBeCleared.length; i++) {
+            if (shouldBeCleared[i]) this.getInventory().clear(i);
         }
     }
 
