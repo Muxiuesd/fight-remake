@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
@@ -14,6 +15,25 @@ import ttk.muxiuesd.world.cat.CAT;
  * 熔炉方块
  * */
 public class BlockFurnace extends BlockWithEntity {
+    public static final BlockRenderer<BlockFurnace> RENDERER = (batch, block, context) -> {
+        if (!block.isWorking) {
+            batch.draw(block.getTextureRegion(),
+                context.x, context.y,
+                context.originX, context.originY,
+                context.width, context.height,
+                context.scaleX, context.scaleY,
+                context.rotation);
+        }else{
+            batch.draw(block.workingTexture,
+                context.x, context.y,
+                context.originX, context.originY,
+                context.width, context.height,
+                context.scaleX, context.scaleY,
+                context.rotation);
+        }
+    };
+
+
     private TextureRegion workingTexture;
     private boolean isWorking = false;
 

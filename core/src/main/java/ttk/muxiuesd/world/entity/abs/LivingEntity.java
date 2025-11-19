@@ -12,6 +12,7 @@ import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
@@ -226,7 +227,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
 
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
-        AudioPlayer.getInstance().playSound(Fight.ID("pop"));
+        AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
 
         return this.spawnItemEntity(itemStack);
     }

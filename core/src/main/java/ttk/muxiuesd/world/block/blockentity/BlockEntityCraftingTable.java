@@ -1,11 +1,11 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.math.GridPoint2;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.BlockEntities;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
@@ -47,7 +47,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         user.setHandItemStack(outStack);
         inventory.clear();
 
-        AudioPlayer.getInstance().playSound(Fight.ID("pop"));
+        AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
         return InteractResult.SUCCESS;
     }
 
@@ -77,7 +77,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         //记得清理
         user.backpack.clear();
 
-        AudioPlayer.getInstance().playSound(Fight.ID("put"), 2.5f);
+        AudioPlayer.getInstance().playSound(Sounds.ITEM_PUT, 2.5f);
         return InteractResult.SUCCESS;
     }
 

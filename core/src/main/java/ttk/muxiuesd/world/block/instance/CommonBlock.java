@@ -5,6 +5,7 @@ import ttk.muxiuesd.world.block.abs.Block;
 
 /**
  * 普通方块的模板
+ *
  * */
 public class CommonBlock extends Block {
     public CommonBlock (String name, Property property) {

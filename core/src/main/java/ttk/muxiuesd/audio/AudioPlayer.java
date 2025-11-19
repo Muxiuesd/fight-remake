@@ -25,6 +25,9 @@ public class AudioPlayer {
     public Sound playSound (Audio audio) {
         return playSound(audio.getId());
     }
+    public Sound playSound (Audio audio, float volume) {
+        return playSound(audio.getId(), volume);
+    }
 
     public Sound playSound(String id) {
         return this.playSound(id, 1f);

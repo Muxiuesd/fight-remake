@@ -108,6 +108,15 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         return this.textureRegion != null;
     }
 
+    public TextureRegion getTextureRegion () {
+        return textureRegion;
+    }
+
+    public Block setTextureRegion (TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
+        return this;
+    }
+
     @Override
     public String getID () {
         return this.id;
