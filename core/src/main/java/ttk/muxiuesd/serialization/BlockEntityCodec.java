@@ -20,7 +20,7 @@ import java.util.Optional;
 public class BlockEntityCodec extends JsonCodec<BlockEntity> {
     @Override
     public void encode (BlockEntity blockEntity, JsonDataWriter dataWriter) {
-        String id = blockEntity.getProvider().getId();
+        String id = blockEntity.getProvider().getID();
         dataWriter
             .writeString("id", id)
             .writeString("codec_id", Fight.ID("block_entity"));

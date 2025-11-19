@@ -1,10 +1,10 @@
 package ttk.muxiuesd.world.block.instance;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
@@ -39,7 +39,7 @@ public class BlockFurnace extends BlockWithEntity {
 
     public BlockFurnace () {
         super(createProperty().setFriction(0.5f), Fight.ID("furnace"), Fight.BlockTexturePath("furnace.png"));
-        this.workingTexture = loadTextureRegion(Fight.ID("furnace_on"), Fight.BlockTexturePath("furnace_on.png"));
+        this.workingTexture = Util.loadTextureRegion(Fight.ID("furnace_on"), Fight.BlockTexturePath("furnace_on.png"));
     }
 
     @Override
@@ -52,25 +52,6 @@ public class BlockFurnace extends BlockWithEntity {
     public void readCAT (JsonValue values) {
         super.readCAT(values);
         this.isWorking = values.getBoolean("is_working");
-    }
-
-    @Override
-    public void draw (Batch batch, float x, float y) {
-        if (this.textureIsValid() && !this.isWorking) {
-            batch.draw(this.textureRegion,
-                x, y,
-                this.originX, this.originY,
-                this.width, this.height,
-                this.scaleX, this.scaleY,
-                this.rotation);
-        }else if (this.workingTexture != null && this.isWorking) {
-            batch.draw(this.workingTexture,
-                x, y,
-                this.originX, this.originY,
-                this.width, this.height,
-                this.scaleX, this.scaleY,
-                this.rotation);
-        }
     }
 
     @Override

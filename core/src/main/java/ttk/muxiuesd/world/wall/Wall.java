@@ -7,7 +7,7 @@ import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.world.block.abs.Block;
 
 /**
- * 墙体，即有碰撞箱的特殊方块
+ * 墙体，即有碰撞箱的特殊方块，目前也是一个墙体一个实例
  * */
 public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRenderable {
     public float x, y;

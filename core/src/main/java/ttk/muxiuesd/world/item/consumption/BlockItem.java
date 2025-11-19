@@ -45,7 +45,7 @@ public class BlockItem extends ConsumptionItem {
             ItemEntity itemEntity = ItemEntityGetter.get(user.getEntitySystem(), stack)
                 .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
                 .setPosition(worldPosition.x, worldPosition.y)
-                .setSize(replacedBlock.width / 2, replacedBlock.height / 2);
+                .setSize(0.5f, 0.5f);
         }
         return true;
     }

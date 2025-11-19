@@ -2,10 +2,14 @@ package ttk.muxiuesd.registry;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
+import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.instance.*;
 
 import java.util.function.Supplier;
@@ -57,11 +61,18 @@ public final class Blocks {
         T block = factory.get();
         block.setID(id);
         Registries.BLOCK.register(identifier, block);
-        registerRenderer(block, renderer);
+        registerBlockRenderer(block, renderer);
+        if (block instanceof BlockWithEntity blockWithEntity) {
+            BlockEntityRendererRegistry.register(blockWithEntity, blockWithEntity.getBlockEntityRenderer());
+        }
         return block;
     }
 
-    public static <T extends Block> void registerRenderer (T block, BlockRenderer<T> renderer) {
+    public static <T extends Block> void registerBlockRenderer (T block, BlockRenderer<T> renderer) {
         BlockRendererRegistry.register(block, renderer);
+    }
+
+    public static <T extends BlockWithEntity, E extends BlockEntity> void registerBlockEntityRenderer (T block, BlockEntityRenderer<E> renderer) {
+
     }
 }

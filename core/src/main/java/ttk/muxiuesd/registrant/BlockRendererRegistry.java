@@ -18,7 +18,7 @@ public class BlockRendererRegistry {
     }
 
     public static <T extends Block> BlockRenderer<T> getRenderer (T block) {
-        BlockRenderer<? extends Block> renderer = getInstance().getIdToRenderersMap().get(block.getID());
+        BlockRenderer<? extends Block> renderer = getInstance().getRenderersMap().get(block.getID());
         if (renderer == null) {
             Log.error(BlockRendererRegistry.class.getName(), "方块：" + block.getID() + " 的渲染器不存在！！！");
         }
@@ -33,8 +33,7 @@ public class BlockRendererRegistry {
         return INSTANCE;
     }
 
-    private final HashMap<Block, BlockRenderer<? extends Block>> blockRenderersMap = new HashMap<>();
-    private final HashMap<String, BlockRenderer<? extends Block>> idToRenderersMap = new HashMap<>();
+    private final HashMap<String, BlockRenderer<? extends Block>> renderersMap = new HashMap<>();
 
     /**
      * 基础注册方法
@@ -42,12 +41,11 @@ public class BlockRendererRegistry {
      * */
     public <T extends Block> BlockRenderer<T> registerRenderer (T block, BlockRenderer<T> blockRenderer) {
         if (block != null && blockRenderer != null) {
-            if (this.getBlockRenderersMap().containsKey(block) || this.getIdToRenderersMap().containsKey(block.getID())) {
+            if (this.getRenderersMap().containsKey(block.getID())) {
                 Log.print(this.getClass().getName(),
                     "已存在过方块：" + block.getClass().getName() + " 的渲染器，执行覆盖！");
             }
-            this.getBlockRenderersMap().put(block, blockRenderer);
-            this.getIdToRenderersMap().put(block.getID(), blockRenderer);
+            this.getRenderersMap().put(block.getID(), blockRenderer);
             return blockRenderer;
         }else {
             Log.error(this.getClass().getName(), "方块参数或者渲染器参数为null！！！");
@@ -55,12 +53,7 @@ public class BlockRendererRegistry {
         return null;
     }
 
-
-    public HashMap<Block, BlockRenderer<? extends Block>> getBlockRenderersMap () {
-        return this.blockRenderersMap;
-    }
-
-    public HashMap<String, BlockRenderer<? extends Block>> getIdToRenderersMap () {
-        return this.idToRenderersMap;
+    public HashMap<String, BlockRenderer<? extends Block>> getRenderersMap () {
+        return this.renderersMap;
     }
 }

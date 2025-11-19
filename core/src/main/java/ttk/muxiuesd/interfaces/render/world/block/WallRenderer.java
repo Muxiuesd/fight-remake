@@ -4,19 +4,20 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Pool;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.wall.Wall;
 
 /**
- * 方块的渲染器接口
+ * 墙体的渲染器
  * */
-public interface BlockRenderer<T extends Block> {
-    void render(Batch batch, T block, Context context);
+public interface WallRenderer<T extends Wall<?>> {
+    void render(Batch batch, T wall, WallRenderer.Context context);
 
-    default Context getContext () {
-        return Context.POOL.obtain();
+    default WallRenderer.Context getContext () {
+        return WallRenderer.Context.POOL.obtain();
     }
 
-    default void freeContext (Context context) {
-        Context.POOL.free(context);
+    default void freeContext (WallRenderer.Context context) {
+        WallRenderer.Context.POOL.free(context);
     }
 
     /**
@@ -24,10 +25,10 @@ public interface BlockRenderer<T extends Block> {
      * */
     class Context implements Pool.Poolable {
         //池化
-        public static FightPool<Context> POOL = new FightPool<>(Context.class, new Pool<Context>() {
+        public static FightPool<WallRenderer.Context> POOL = new FightPool<>(WallRenderer.Context.class, new Pool<WallRenderer.Context>() {
             @Override
-            protected Context newObject () {
-                return new Context();
+            protected WallRenderer.Context newObject () {
+                return new WallRenderer.Context();
             }
         });
 
@@ -59,13 +60,13 @@ public interface BlockRenderer<T extends Block> {
     }
 
     /**
-     * 普通标准的方块渲染器
+     * 普通标准的墙体渲染器
      * */
-    class StandardRenderer<T extends Block> implements BlockRenderer<T>{
+    class StandardRenderer<T extends Wall<?>> implements WallRenderer<T>{
         @Override
-        public void render (Batch batch, T block, Context context) {
-            if (block.textureIsValid()) {
-                batch.draw(block.getTextureRegion(),
+        public void render (Batch batch, T wall, Context context) {
+            if (wall.textureIsValid()) {
+                batch.draw(wall.getTextureRegion(),
                     context.x, context.y,
                     context.originX, context.originY,
                     context.width, context.height,

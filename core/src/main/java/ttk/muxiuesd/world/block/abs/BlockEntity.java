@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -10,7 +9,6 @@ import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.TaskTimer;
@@ -33,7 +31,7 @@ import java.util.List;
 /**
  * 方块实体
  * */
-public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable, ICAT {
+public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     private BlockEntityProvider<? extends BlockEntity> provider;
     private World world;                    //方块实体所属的世界
     private BlockWithEntity block;          //方块
@@ -166,38 +164,6 @@ public abstract class BlockEntity implements Updateable, Tickable, BlockDrawable
      * */
     @Override
     public void tick (World world, float delta) {
-    }
-
-    @Override
-    public void draw (Batch batch, float x, float y) {
-        //槽位不为空就渲染
-        if (!this.slots.isEmpty()) this.drawAllSlots(batch, x, y);
-    }
-
-    /**
-     * 绘制所有槽位
-     * */
-    public void drawAllSlots (Batch batch, float x, float y) {
-        for (Slot slot: getSlots()) {
-            if (slot.getItemStack() != null) {
-                drawSlot(batch, slot, x, y);
-            }
-        }
-    }
-
-    /**
-     * 绘制指定的槽位
-     * */
-    public void drawSlot (Batch batch, Slot slot, float x, float y) {
-        GridPoint2 interactGridSize = getInteractGridSize();
-        GridPoint2 startPos = slot.getStartPos();
-        GridPoint2 size = slot.getSize();
-
-        float slotX = x + (float) startPos.x / interactGridSize.x;
-        float slotY = y + (float) startPos.y / interactGridSize.y;
-        float slotWidth  = (float) size.x / interactGridSize.x;
-        float slotHeight = (float) size.y / interactGridSize.y;
-        batch.draw(slot.getItemStack().getItem().texture, slotX, slotY, slotWidth, slotHeight);
     }
 
     public BlockEntityProvider<? extends BlockEntity> getProvider () {
