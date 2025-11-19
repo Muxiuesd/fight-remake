@@ -18,7 +18,11 @@ public class BlockRendererRegistry {
     }
 
     public static <T extends Block> BlockRenderer<T> getRenderer (T block) {
-        return (BlockRenderer<T>) getInstance().getBlockRenderersMap().get(block);
+        BlockRenderer<? extends Block> renderer = getInstance().getIdToRenderersMap().get(block.getID());
+        if (renderer == null) {
+            Log.error(BlockRendererRegistry.class.getName(), "方块：" + block.getID() + " 的渲染器不存在！！！");
+        }
+        return (BlockRenderer<T>) renderer;
     }
 
     private static BlockRendererRegistry INSTANCE;
@@ -30,15 +34,20 @@ public class BlockRendererRegistry {
     }
 
     private final HashMap<Block, BlockRenderer<? extends Block>> blockRenderersMap = new HashMap<>();
+    private final HashMap<String, BlockRenderer<? extends Block>> idToRenderersMap = new HashMap<>();
 
-
+    /**
+     * 基础注册方法
+     * @param block 传入的方块必须持有id
+     * */
     public <T extends Block> BlockRenderer<T> registerRenderer (T block, BlockRenderer<T> blockRenderer) {
         if (block != null && blockRenderer != null) {
-            if (this.getBlockRenderersMap().containsKey(block)) {
+            if (this.getBlockRenderersMap().containsKey(block) || this.getIdToRenderersMap().containsKey(block.getID())) {
                 Log.print(this.getClass().getName(),
                     "已存在过方块：" + block.getClass().getName() + " 的渲染器，执行覆盖！");
             }
             this.getBlockRenderersMap().put(block, blockRenderer);
+            this.getIdToRenderersMap().put(block.getID(), blockRenderer);
             return blockRenderer;
         }else {
             Log.error(this.getClass().getName(), "方块参数或者渲染器参数为null！！！");
@@ -49,5 +58,9 @@ public class BlockRendererRegistry {
 
     public HashMap<Block, BlockRenderer<? extends Block>> getBlockRenderersMap () {
         return this.blockRenderersMap;
+    }
+
+    public HashMap<String, BlockRenderer<? extends Block>> getIdToRenderersMap () {
+        return this.idToRenderersMap;
     }
 }
