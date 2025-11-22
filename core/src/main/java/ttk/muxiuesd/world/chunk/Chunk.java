@@ -82,7 +82,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         this.traversal((x, y) -> {
             Block block = this.blocks[y][x];
             if (block != null) {
-                BlockRenderer<Block> renderer = BlockRendererRegistry.getRenderer(block);
+                BlockRenderer<Block> renderer = BlockRendererRegistry.get(block);
                 if (renderer != null) {
                     BlockRenderer.Context context = renderer.getContext();
                     context.x = x + cp.x * ChunkWidth;

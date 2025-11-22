@@ -1,6 +1,5 @@
 package ttk.muxiuesd.registrant;
 
-import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
@@ -30,7 +29,7 @@ import java.util.LinkedHashMap;
  * 游戏内的所有注册表
  * */
 public class Registries {
-    public static final Array<Registry<?>> ALL_REGISTRY = new Array<>();
+    public static final HashMap<RegistryKey<?>, Registry<?>> ALL_REGISTRY = new HashMap<>();
 
     public static final Registry<Codec<?, ?, ?>> CODEC = create(RegistryKeys.CODEC);
 
@@ -51,22 +50,33 @@ public class Registries {
     public static final Registry<BlockSoundsID> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
+    public static final BlockRendererRegistry BLOCK_RENDERER = create(RegistryKeys.BLOCK_RENDERER, BlockRendererRegistry.getInstance());
+    public static final BlockEntityRendererRegistry BLOCK_ENTITY_RENDERER = create(RegistryKeys.BLOCK_ENTITY_RENDERER, BlockEntityRendererRegistry.getInstance());
+
     public static final Registry<FightPool<?>> POOL = create(RegistryKeys.POOL);
     public static final Registry<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = create(RegistryKeys.WORLD_INFO_HASH_MAP);
     public static final Registry<LangPack> LANG_HOLDER = create(RegistryKeys.LANG_HOLDER);
 
 
     /**
-     * 创建一个注册表
+     * 创建一个默认的注册表
      * */
     public static <T> DefaultRegistry<T> create (RegistryKey<T> registryKey) {
         DefaultRegistry<T> registry = new DefaultRegistry<>();
-        ALL_REGISTRY.add(registry);
+        ALL_REGISTRY.put(registryKey, registry);
         return registry;
     }
 
     /**
-     * 默认的注册表
+     * 创建一个自定义的注册表
+     * */
+    public static <T, R extends Registry<T>> R create (RegistryKey<T> registryKey, R registry) {
+        ALL_REGISTRY.put(registryKey, registry);
+        return registry;
+    }
+
+    /**
+     * 默认的注册表实现类
      * */
     public static class DefaultRegistry<T> implements Registry<T> {
         private final LinkedHashMap<String, Identifier> idMap = new LinkedHashMap<>();
@@ -107,11 +117,6 @@ public class Registries {
         }
 
         @Override
-        public HashMap<Identifier, T> getMap () {
-            return this.regedit;
-        }
-
-        @Override
         public boolean contains (String id) {
             return this.idMap.containsKey(id);
         }
@@ -119,6 +124,15 @@ public class Registries {
         @Override
         public boolean contains (Identifier identifier) {
             return this.regedit.containsKey(identifier);
+        }
+
+        @Override
+        public HashMap<Identifier, T> getMap () {
+            return this.regedit;
+        }
+
+        public HashMap<String, Identifier> getIDCast () {
+            return this.idMap;
         }
     }
 }

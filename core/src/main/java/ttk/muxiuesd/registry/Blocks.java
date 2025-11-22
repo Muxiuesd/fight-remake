@@ -61,10 +61,12 @@ public final class Blocks {
         T block = factory.get();
         block.setID(id);
         Registries.BLOCK.register(identifier, block);
+
         registerBlockRenderer(block, renderer);
         if (block instanceof BlockWithEntity blockWithEntity) {
-            BlockEntityRendererRegistry.register(blockWithEntity, blockWithEntity.getBlockEntityRenderer());
+            registerBlockEntityRenderer(blockWithEntity, blockWithEntity.getBlockEntityRenderer());
         }
+
         return block;
     }
 
@@ -72,7 +74,8 @@ public final class Blocks {
         BlockRendererRegistry.register(block, renderer);
     }
 
-    public static <T extends BlockWithEntity, E extends BlockEntity> void registerBlockEntityRenderer (T block, BlockEntityRenderer<E> renderer) {
-
+    public static <T extends BlockWithEntity, E extends BlockEntity>
+    void registerBlockEntityRenderer (T blockWithEntity, BlockEntityRenderer<E> renderer) {
+        BlockEntityRendererRegistry.register(blockWithEntity, renderer);
     }
 }

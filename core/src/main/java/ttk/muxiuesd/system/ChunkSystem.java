@@ -184,7 +184,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         this.getBlockEntities().forEach((block, blockEntity) -> {
             BlockPos pos = blockEntity.getBlockPos();
             //找对应的渲染器来执行渲染
-            BlockEntityRenderer<BlockEntity> renderer = BlockEntityRendererRegistry.getRenderer(blockEntity);
+            BlockEntityRenderer<BlockEntity> renderer = BlockEntityRendererRegistry.get(blockEntity);
             BlockEntityRenderer.Context context = renderer.getContext();
             context.x = pos.x;
             context.y = pos.y;

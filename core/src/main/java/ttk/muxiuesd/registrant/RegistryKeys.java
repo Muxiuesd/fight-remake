@@ -1,6 +1,8 @@
 package ttk.muxiuesd.registrant;
 
 import ttk.muxiuesd.audio.Audio;
+import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
+import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
@@ -12,6 +14,7 @@ import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.DamageType;
@@ -43,7 +46,11 @@ public class RegistryKeys {
     public static final RegistryKey<BlockSoundsID> BLOCK_SOUNDS = new RegistryKey<>();
     public static final RegistryKey<RenderLayer> RENDER_LAYER = new RegistryKey<>();
 
+    public static final RegistryKey<BlockRenderer<? extends Block>> BLOCK_RENDERER = new RegistryKey<>();
+    public static final RegistryKey<BlockEntityRenderer<? extends BlockEntity>> BLOCK_ENTITY_RENDERER = new RegistryKey<>();
+
     public static final RegistryKey<FightPool<?>> POOL = new RegistryKey<>();
     public static final RegistryKey<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = new RegistryKey<>();
     public static final RegistryKey<LangPack> LANG_HOLDER = new RegistryKey<>();
+
 }
