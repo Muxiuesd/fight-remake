@@ -50,8 +50,19 @@ public class Registries {
     public static final Registry<BlockSoundsID> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
-    public static final BlockRendererRegistry BLOCK_RENDERER = create(RegistryKeys.BLOCK_RENDERER, BlockRendererRegistry.getInstance());
-    public static final BlockEntityRendererRegistry BLOCK_ENTITY_RENDERER = create(RegistryKeys.BLOCK_ENTITY_RENDERER, BlockEntityRendererRegistry.getInstance());
+    public static final BlockRendererRegistry BLOCK_RENDERER = create(
+        RegistryKeys.BLOCK_RENDERER,
+        BlockRendererRegistry.getInstance()
+    );
+    public static final BlockEntityRendererRegistry BLOCK_ENTITY_RENDERER = create(
+        RegistryKeys.BLOCK_ENTITY_RENDERER,
+        BlockEntityRendererRegistry.getInstance()
+    );
+
+    public static final EntityRendererRegistry ENTITY_RENDERER = create(
+        RegistryKeys.ENTITY_RENDERER,
+        EntityRendererRegistry.getInstance()
+    );
 
     public static final Registry<FightPool<?>> POOL = create(RegistryKeys.POOL);
     public static final Registry<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = create(RegistryKeys.WORLD_INFO_HASH_MAP);

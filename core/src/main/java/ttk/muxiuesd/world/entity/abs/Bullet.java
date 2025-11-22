@@ -50,7 +50,7 @@ public abstract class Bullet extends Entity<Bullet> {
         this.speed = speed;
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        bodyTexture = getTextureRegion(textureId, texturePath);
+        textureRegion = getTextureRegion(textureId, texturePath);
         //默认大小
         setSize(0.5f, 0.5f);
     }

@@ -41,7 +41,7 @@ public class Player extends LivingEntity<Player> {
         renderHandItem = true;
         speed = 3.3f;
         curSpeed = speed;
-        bodyTexture = getTextureRegion(Fight.ID("player"), "player/player.png");
+        textureRegion = getTextureRegion(Fight.ID("player"), "player/player.png");
         this.shield = getTextureRegion(Fight.ID("player_shield"), "player/shield.png");
 
         this.defendCDTimer = Pools.TASK_TIMER.obtain().setMaxSpan(2f).setCurSpan(0f)

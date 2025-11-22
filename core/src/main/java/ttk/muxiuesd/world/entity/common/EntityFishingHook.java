@@ -40,7 +40,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
-        bodyTexture = Util.loadTextureRegion(
+        textureRegion = Util.loadTextureRegion(
             Fight.ID("fishing_hook"),
             Fight.EntityTexturePath("fish/fishing_hook.png")
         );
@@ -104,8 +104,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
 
     @Override
     public void draw (Batch batch) {
-        if (bodyTexture != null) {
-            batch.draw(bodyTexture,
+        if (textureRegion != null) {
+            batch.draw(textureRegion,
                 x, y + this.positionOffset.y,
                 originX, originY,
                 width, height,

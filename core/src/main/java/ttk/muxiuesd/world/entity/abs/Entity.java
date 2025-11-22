@@ -44,7 +44,7 @@ public abstract class Entity<T extends Entity<?>>
     public float rotation;
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
-    public TextureRegion bodyTexture;
+    public TextureRegion textureRegion;
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     private EntitySystem es;    //此实体所属的实体系统
@@ -110,8 +110,8 @@ public abstract class Entity<T extends Entity<?>>
     @Override
     public void draw(Batch batch) {
         //最基础的绘制
-        if (this.bodyTexture != null) {
-            batch.draw(this.bodyTexture, this.x, this.y,
+        if (this.textureRegion != null) {
+            batch.draw(this.textureRegion, this.x, this.y,
                 this.originX, this.originY,
                 this.width, this.height,
                 this.scaleX, this.scaleY, this.rotation);
@@ -133,8 +133,8 @@ public abstract class Entity<T extends Entity<?>>
 
     @Override
     public void dispose() {
-        if (this.bodyTexture != null) {
-            this.bodyTexture = null;
+        if (this.textureRegion != null) {
+            this.textureRegion = null;
         }
     }
 
@@ -314,7 +314,7 @@ public abstract class Entity<T extends Entity<?>>
      * 加载身体材质
      * */
     public void loadBodyTextureRegion (String textureId, String texturePath) {
-        bodyTexture = this.getTextureRegion(textureId, texturePath);
+        textureRegion = this.getTextureRegion(textureId, texturePath);
     }
 
     /**
