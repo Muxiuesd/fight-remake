@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.item.food;
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.SoundEffectSystem;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -31,9 +30,9 @@ public class FoodItem extends ConsumptionItem {
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        Log.print(this.toString(), user.getID() + " 在吃鱼");
-        //随机吃鱼音效
-        String useSoundId = this.property.getUseSoundId() + MathUtils.random(1, 3);
+        //Log.print(this.toString(), user.getID() + " 在吃食物");
+        //随机吃食物音效
+        String useSoundId = itemStack.getProperty().getUseSoundId() + MathUtils.random(1, 3);
         SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
         ses.newSpatialSound(useSoundId, user);
         return true;
