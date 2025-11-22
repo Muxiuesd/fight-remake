@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.IWorldUndergroundEntityRender;
+import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
+import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.system.abs.EntityRenderSystem;
 import ttk.muxiuesd.util.Util;
@@ -39,7 +41,12 @@ public class UndergroundEntityRenderSystem extends EntityRenderSystem implements
 
         for (Entity<?> entity : this.getUndergroundEntities()) {
             if (Util.getDistance(entity, player) > Fight.ENTITY_RENDER_RANGE.getValue()) continue;
-            entity.draw(batch);
+            //获取实体的渲染器进行渲染
+            EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(entity.getID());
+            //直接使用实体的参数渲染
+            EntityRenderer.Context context = renderer.getContext(entity);
+            renderer.draw(batch, entity, context);
+            renderer.freeContext(context);
         }
     }
 
@@ -50,7 +57,12 @@ public class UndergroundEntityRenderSystem extends EntityRenderSystem implements
 
         for (Entity<?> entity : this.getUndergroundEntities()) {
             if (Util.getDistance(entity, player) > Fight.ENTITY_RENDER_RANGE.getValue()) continue;
-            entity.renderShape(batch);
+            //获取实体的渲染器进行渲染
+            EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(entity.getID());
+            EntityRenderer.Context context = renderer.getContext(entity);
+            //直接使用实体的参数渲染
+            renderer.drawShape(batch, entity, context);
+            renderer.freeContext(context);
         }
     }
 

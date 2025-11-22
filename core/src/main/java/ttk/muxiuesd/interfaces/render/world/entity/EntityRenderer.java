@@ -2,6 +2,7 @@ package ttk.muxiuesd.interfaces.render.world.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -20,6 +21,63 @@ public interface EntityRenderer<T extends Entity<?>> {
      * */
     void drawShape (ShapeRenderer batch, T entity, Context context);
 
+
+    default EntityRenderer.Context getContext () {
+        return EntityRenderer.Context.POOL.obtain();
+    }
+
+    /**
+     * 直接使用实体当前的状态来作为渲染上下文参数
+     * */
+    default EntityRenderer.Context getContext (T entity) {
+        Vector2 position = entity.getPosition();
+        Vector2 origin = entity.getOrigin();
+        Vector2 scale = entity.getScale();
+        return getContext(
+            position.x, position.y,
+            entity.getWidth(), entity.getHeight(),
+            origin.x, origin.y,
+            scale.x, scale.y,
+            entity.getRotation()
+        );
+    }
+
+    default EntityRenderer.Context getContext (float x, float y, float width, float height) {
+        Context context = Context.POOL.obtain();
+        context.x = x;
+        context.y = y;
+        context.width = width;
+        context.height = height;
+        return context;
+    }
+
+    /**
+     * 单独设置每一项渲染上下文参数
+     * */
+    default EntityRenderer.Context getContext (float x, float y,
+                                               float width, float height,
+                                               float originX, float originY,
+                                               float scaleX, float scaleY,
+                                               float rotation) {
+        Context context = Context.POOL.obtain();
+        context.x = x;
+        context.y = y;
+        context.width = width;
+        context.height = height;
+        context.originX = originX;
+        context.originY = originY;
+        context.scaleX = scaleX;
+        context.scaleY = scaleY;
+        context.rotation = rotation;
+        return context;
+    }
+
+    /**
+     * 回收上下文参数类
+     * */
+    default void freeContext (EntityRenderer.Context context) {
+        EntityRenderer.Context.POOL.free(context);
+    }
 
     /**
      * 渲染上下文，用于传递渲染信息

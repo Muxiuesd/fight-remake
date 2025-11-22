@@ -3,7 +3,9 @@ package ttk.muxiuesd.registry;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
+import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.render.world.entity.*;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -17,13 +19,13 @@ import ttk.muxiuesd.world.entity.enemy.Slime;
  * 所有实体的注册
  * */
 public final class Entities {
-    public static void init () {
-    }
+    public static void init () {}
 
     public static final EntityProvider<ItemEntity> ITEM_ENTITY = register(
         "item_entity",
         EntityProvider.Builder.<ItemEntity>create(ItemEntity::new)
             .setDefaultType(EntityTypes.ITEM_ENTITY)
+            .setRenderer(ItemEntityRenderer::new)
             .setCodec(Codecs.ITEM_ENTITY)
             .build()
     );
@@ -32,6 +34,7 @@ public final class Entities {
         "player",
         EntityProvider.Builder.<Player>create(Player::new)
             .setDefaultType(EntityTypes.PLAYER)
+            .setRenderer(PlayerRenderer::new)
             .setCodec(Codecs.PLAYER)
             .build()
     );
@@ -41,6 +44,7 @@ public final class Entities {
         "slime",
         EntityProvider.Builder.<Slime>create(Slime::new)
             .setDefaultType(EntityTypes.ENEMY)
+            .setRenderer(EnemyRenderer::new)
             .setCodec(Codecs.LIVING_ENTITY)
             .build()
     );
@@ -49,6 +53,7 @@ public final class Entities {
         "target",
         EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
             .setDefaultType(EntityTypes.ENEMY)
+            .setRenderer(EnemyRenderer::new)
             .setCodec(Codecs.LIVING_ENTITY)
             .build()
     );
@@ -58,6 +63,7 @@ public final class Entities {
         "puffer_fish",
         EntityProvider.Builder.<PufferFish>create(PufferFish::new)
             .setDefaultType(EntityTypes.CREATURE)
+            .setRenderer(LivingEntityRenderer::new)
             .setCodec(Codecs.LIVING_ENTITY)
             .build()
     );
@@ -67,6 +73,7 @@ public final class Entities {
         "bullet_fire",
         EntityProvider.Builder.<BulletFire>create(BulletFire::new)
             .setDefaultType(EntityTypes.ENEMY_BULLET)
+            .setRenderer(BulletRenderer::new)
             .setCodec(Codecs.ENTITY)
             .build()
     );
@@ -76,14 +83,19 @@ public final class Entities {
         "fishing_hook",
         EntityProvider.Builder.<EntityFishingHook>create(EntityFishingHook::new)
             .setDefaultType(EntityTypes.PLAYER_FIASHING_HOOK)
+            .setRenderer(StandardEntityRenderer::new)
             .setCodec(Codecs.ENTITY)
             .setCanBeSaved(false)
             .build()
     );
 
-
+    /**
+     * 最基础的实体注册
+     * */
     public static <T extends Entity<?>> EntityProvider<T> register (String name, EntityProvider<T> provider) {
         Identifier identifier = new Identifier(Fight.NAMESPACE, name);
-        return (EntityProvider<T>) Registries.ENTITY.register(identifier, provider.setId(identifier.getId()));
+        Registries.ENTITY.register(identifier, provider.setID(identifier.getId()));
+        EntityRendererRegistry.register(provider, provider.renderer);
+        return provider;
     }
 }
