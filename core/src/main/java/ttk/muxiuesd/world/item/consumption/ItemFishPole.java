@@ -182,17 +182,17 @@ public class ItemFishPole extends Item {
     @Override
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
         if (! this.onUsing(itemStack)) {
-            if (this.texture == null) return;
+            if (this.textureRegion == null) return;
             //没抛竿渲染
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                batch.draw(textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                     0, 0,
                     holder.width, holder.height,
                     - holder.scaleX, holder.scaleY, rotation + 180);
             } else {
-                batch.draw(texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                batch.draw(textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                     0, 0,
                     holder.width, holder.height,
                     holder.scaleX, holder.scaleY, rotation);
@@ -218,8 +218,8 @@ public class ItemFishPole extends Item {
 
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
-        if (this.texture != null) {
-            batch.draw(this.texture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
+        if (this.textureRegion != null) {
+            batch.draw(this.textureRegion, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
                 itemEntity.originX, itemEntity.originY,
                 itemEntity.width, itemEntity.height,
                 itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);

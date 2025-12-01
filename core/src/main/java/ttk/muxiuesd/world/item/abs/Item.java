@@ -40,7 +40,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public Type type;
     //物品最原始的属性，原则上不直接对这个原始数据进行操作
     public Property property;
-    public TextureRegion texture;
+    public TextureRegion textureRegion;
 
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
@@ -62,12 +62,12 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
         float rotationOffset = holder.getSwingHandDegreeOffset();
         if (rotation > 90f && rotation <= 270f) {
-            batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
                 - holder.scaleX, holder.scaleY, rotation + 225f + rotationOffset);
         } else {
-            batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
                 holder.scaleX, holder.scaleY, rotation - 45f + rotationOffset);
@@ -80,8 +80,8 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
-        if (this.texture != null) {
-            batch.draw(this.texture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
+        if (this.textureRegion != null) {
+            batch.draw(this.textureRegion, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
                 itemEntity.originX, itemEntity.originY,
                 itemEntity.width, itemEntity.height,
                 itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
@@ -149,7 +149,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * 直接把物品的texture加载并赋值
      * */
     public void loadTextureRegion (String id, String texturePath) {
-        this.texture = this.getTextureRegion(id, texturePath);
+        this.textureRegion = this.getTextureRegion(id, texturePath);
     }
 
     public Property getProperty () {

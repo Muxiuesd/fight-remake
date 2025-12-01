@@ -95,7 +95,7 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
             float slotY = y + (float) startPos.y / interactGridSize.y;
             float slotWidth  = (float) size.x / interactGridSize.x;
             float slotHeight = (float) size.y / interactGridSize.y;
-            batch.draw(slot.getItemStack().getItem().texture, slotX, slotY, slotWidth, slotHeight);
+            batch.draw(slot.getItemStack().getItem().textureRegion, slotX, slotY, slotWidth, slotHeight);
         }
     }
 }
