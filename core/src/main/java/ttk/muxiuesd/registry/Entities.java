@@ -83,7 +83,7 @@ public final class Entities {
         "fishing_hook",
         EntityProvider.Builder.<EntityFishingHook>create(EntityFishingHook::new)
             .setDefaultType(EntityTypes.PLAYER_FIASHING_HOOK)
-            .setRenderer(StandardEntityRenderer::new)
+            .setRenderer(FishingHookRenderer::new)
             .setCodec(Codecs.ENTITY)
             .setCanBeSaved(false)
             .build()
