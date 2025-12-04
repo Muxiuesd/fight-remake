@@ -31,12 +31,4 @@ public class Identifier {
     public String getId () {
         return this.id;
     }
-
-    /*public Identifier setId (String id) {
-        if (!check(id)) {
-            throw new IllegalArgumentException("输入的ID：" + id + " 不合法！！！");
-        }
-        this.id = id;
-        return this;
-    }*/
 }

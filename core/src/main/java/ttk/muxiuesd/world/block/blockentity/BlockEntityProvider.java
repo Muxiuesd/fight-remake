@@ -12,7 +12,7 @@ public class BlockEntityProvider<T extends BlockEntity> {
         this.factory = factory;
     }
 
-    public String getId () {
+    public String getID () {
         return this.id;
     }
 

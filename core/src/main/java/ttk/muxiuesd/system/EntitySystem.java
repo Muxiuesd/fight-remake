@@ -18,6 +18,7 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.RenderLayers;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -160,6 +161,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (entity instanceof PoolableEntity poolableEntity) {
             poolableEntity.freeSelf();
         }
+        //释放实体自己的资源
+        entity.dispose();
     }
 
     @Override
@@ -238,7 +241,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    AudioPlayer.getInstance().playSound(Fight.ID("pop"));
+                    AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
                     //整个捡起来就没必要执行下面的代码了
                     return;
                 }else if (state == ItemPickUpState.PARTIAL) {

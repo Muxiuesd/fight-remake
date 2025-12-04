@@ -25,6 +25,9 @@ public class AudioPlayer {
     public Sound playSound (Audio audio) {
         return playSound(audio.getId());
     }
+    public Sound playSound (Audio audio, float volume) {
+        return playSound(audio.getId(), volume);
+    }
 
     public Sound playSound(String id) {
         return this.playSound(id, 1f);
@@ -37,13 +40,21 @@ public class AudioPlayer {
     }
     public Sound playSound(String id, float volume, float pitch, float pan) {
         LinkedHashMap<String, Sound> soundCache = AudioLoader.getInstance().getSoundCache();
-        if (!soundCache.containsKey(id)) {
-            Log.error(TAG, "Id为：" + id + " 的音效不存在，无法播放！！！");
+        LinkedHashMap<String, Music> musicCache = AudioLoader.getInstance().getMusicCache();
+        if (!soundCache.containsKey(id) && !musicCache.containsKey(id)) {
+            Log.error(TAG, "Id为：" + id + " 的音效或者音乐不存在，无法播放！！！");
             return null;
         }
-        Sound sound = soundCache.get(id);
-        sound.play(volume, pitch, pan);
-        return sound;
+        if (soundCache.containsKey(id)) {
+            Sound sound = soundCache.get(id);
+            sound.play(volume, pitch, pan);
+            return sound;
+        }
+
+        Music music = musicCache.get(id);
+        music.setPan(pan, volume);
+        music.play();
+        return null;
     }
 
     public void playMusic (Audio audio) {

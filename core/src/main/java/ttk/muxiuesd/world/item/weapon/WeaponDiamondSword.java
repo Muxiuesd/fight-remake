@@ -30,7 +30,7 @@ public class WeaponDiamondSword extends RangedWeapon {
                 }
                 @Override
                 public String getBulletId () {
-                    return Entities.BULLET_FIRE.getId();
+                    return Entities.BULLET_FIRE.getID();
                 }
             }
         );

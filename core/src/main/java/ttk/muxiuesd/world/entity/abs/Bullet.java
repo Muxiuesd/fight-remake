@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 
@@ -49,7 +50,7 @@ public abstract class Bullet extends Entity<Bullet> {
         this.speed = speed;
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        bodyTexture = getTextureRegion(textureId, texturePath);
+        textureRegion = getTextureRegion(textureId, texturePath);
         //默认大小
         setSize(0.5f, 0.5f);
     }
@@ -118,5 +119,10 @@ public abstract class Bullet extends Entity<Bullet> {
         // 计算旋转角度
         Vector2 velocity = getVelocity();
         setRotation(MathUtils.atan2Deg(velY, velX));
+    }
+
+    @Override
+    public Codec getCodec () {
+        return super.getCodec();
     }
 }

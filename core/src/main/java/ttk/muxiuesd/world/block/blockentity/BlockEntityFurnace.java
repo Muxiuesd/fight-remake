@@ -5,13 +5,13 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.world.World;
@@ -108,7 +108,7 @@ public class BlockEntityFurnace extends BlockEntity {
             handItemStack.setAmount(handItemStack.getAmount() - addAmount - bePutStack.getAmount());
         }
 
-        AudioPlayer.getInstance().playSound(Fight.ID("put"), 2.5f);
+        AudioPlayer.getInstance().playSound(Sounds.ITEM_PUT, 2.5f);
         return InteractResult.SUCCESS;
     }
 
@@ -170,7 +170,7 @@ public class BlockEntityFurnace extends BlockEntity {
                     return;
                 }
                 //消耗物品增加能量值
-                fuelStack.fastDecrease();
+                fuelStack.amountFastDecrease();
                 this.curEnergy += energy;
             }
             //到这里就是可以开始工作了
@@ -184,7 +184,7 @@ public class BlockEntityFurnace extends BlockEntity {
                 //到这里就是一次烧炼完成
                 //产出
                 this.curTick = 0;
-                inputStack.fastDecrease();
+                inputStack.amountFastDecrease();
 
                 if (outputStack == null) {
                     //输出槽位位空时

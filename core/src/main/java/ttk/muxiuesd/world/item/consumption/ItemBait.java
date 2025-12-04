@@ -22,10 +22,10 @@ public class ItemBait extends ConsumptionItem {
 
     @Override
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
-        if (texture != null) {
+        if (textureRegion != null) {
             Direction direction = Util.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
-            batch.draw(texture, holder.x, holder.y,
+            batch.draw(textureRegion, holder.x, holder.y,
                 holder.width / 2, holder.height / 2,
                 holder.width, holder.height,
                 -holder.scaleX, -holder.scaleY, rotation);

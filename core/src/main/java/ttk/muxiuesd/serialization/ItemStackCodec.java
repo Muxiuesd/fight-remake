@@ -1,5 +1,6 @@
 package ttk.muxiuesd.serialization;
 
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
@@ -16,8 +17,11 @@ import java.util.Optional;
 public class ItemStackCodec extends JsonCodec<ItemStack> {
     @Override
     public void encode (ItemStack itemStack, JsonDataWriter dataWriter) {
-        dataWriter.writeString("id", itemStack.getItem().getID());
-        dataWriter.writeInt("amount", itemStack.getAmount());
+        dataWriter
+            .writeString("id", itemStack.getItem().getID())
+            .writeString("codec_id", Fight.ID("item_stack"))
+            .writeInt("amount", itemStack.getAmount());
+
         Item.Property property = itemStack.getProperty();
         Codecs.ITEM_PROPERTY.encode(property, dataWriter);
     }

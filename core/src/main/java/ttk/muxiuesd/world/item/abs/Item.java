@@ -38,8 +38,9 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
 
     private String id;
     public Type type;
+    //物品最原始的属性，原则上不直接对这个原始数据进行操作
     public Property property;
-    public TextureRegion texture;
+    public TextureRegion textureRegion;
 
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
@@ -61,12 +62,12 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
         float rotationOffset = holder.getSwingHandDegreeOffset();
         if (rotation > 90f && rotation <= 270f) {
-            batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
                 - holder.scaleX, holder.scaleY, rotation + 225f + rotationOffset);
         } else {
-            batch.draw(this.texture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                 0, 0,
                 holder.width, holder.height,
                 holder.scaleX, holder.scaleY, rotation - 45f + rotationOffset);
@@ -79,8 +80,8 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
-        if (this.texture != null) {
-            batch.draw(this.texture, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
+        if (this.textureRegion != null) {
+            batch.draw(this.textureRegion, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
                 itemEntity.originX, itemEntity.originY,
                 itemEntity.width, itemEntity.height,
                 itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
@@ -148,7 +149,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * 直接把物品的texture加载并赋值
      * */
     public void loadTextureRegion (String id, String texturePath) {
-        this.texture = this.getTextureRegion(id, texturePath);
+        this.textureRegion = this.getTextureRegion(id, texturePath);
     }
 
     public Property getProperty () {
@@ -199,6 +200,16 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
         }
 
+        /**
+         * 获取一个属性，如果不存在这个属性就返回指定的默认值
+         * */
+        public <T> T get (PropertyType<T> propertyType, T defaultValue) {
+            return this.contain(propertyType) ? this.get(propertyType) : defaultValue;
+        }
+
+        /**
+         * 获取一个属性
+         * */
         public <T> T get (PropertyType<T> propertyType) {
             return getPropertiesMap().get(propertyType);
         }
@@ -238,22 +249,29 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             return this;
         }
 
+        /**
+         * 获取物品耐久
+         * */
         public int getDuration () {
-            return get(PropertyTypes.WEAPON_DURATION);
+            return this.get(PropertyTypes.ITEM_DURATION);
         }
 
         public Property setDuration (int duration) {
-            add(PropertyTypes.WEAPON_DURATION, duration);
+            this.add(PropertyTypes.ITEM_DURATION, duration);
             return this;
         }
 
         public float getUseSpan () {
-            return get(PropertyTypes.WEAPON_USE_SAPN);
+            return this.get(PropertyTypes.WEAPON_USE_SAPN);
         }
 
         public Property setUseSpan (float useSpan) {
-            add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
+            this.add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
             return this;
+        }
+
+        public boolean contain (PropertyType<?> type) {
+            return this.getPropertiesMap().contain(type);
         }
 
         public PropertiesDataMap<?, ?, ?> getPropertiesMap () {

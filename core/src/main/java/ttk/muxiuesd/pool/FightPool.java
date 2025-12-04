@@ -24,6 +24,7 @@ public class FightPool<T> {
     }
 
     public void free (T object) {
+        if (object == null) return;
         Pools.free(object);
     }
 

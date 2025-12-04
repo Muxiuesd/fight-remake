@@ -30,19 +30,24 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     }
 
     @Override
+    public void update (float delta) {
+        this.getComponents().forEach(component -> component.update(delta));
+    }
+
+    @Override
     public void draw (Batch batch, UIPanel parent) {
-        getComponents().forEach(component -> component.draw(batch, this));
+        this.getComponents().forEach(component -> component.draw(batch, this));
     }
 
     @Override
     public boolean click (GridPoint2 interactPos) {
-        if (! getComponents().isEmpty()) {
+        if (! this.getComponents().isEmpty()) {
             //面板内部坐标
             Vector2 internalPos = new Vector2(interactPos.x, interactPos.y);
             PoolableRectangle rectangle = Pools.RECT.obtain();
 
             //遍历面板里面的组件，用内部坐标来检测
-            for (UIComponent component : getComponents()) {
+            for (UIComponent component : this.getComponents()) {
                 //如果是不可交互状态的组件就直接跳过
                 if (!component.isEnabled()) continue;
 

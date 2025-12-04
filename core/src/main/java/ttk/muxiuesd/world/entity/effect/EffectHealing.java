@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.entity.effect;
 
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -11,11 +12,15 @@ import ttk.muxiuesd.world.entity.abs.StatusEffect;
  * */
 public class EffectHealing extends StatusEffect{
     public EffectHealing (String id) {
-        super(id);
+        super(id, Fight.UITexturePath("effect/healing.png"));
     }
 
     @Override
     public void applyEffectTick (LivingEntity<?> entity, int level) {
+    }
+
+    @Override
+    public void applyEffectPreSecond (LivingEntity<?> entity, int level) {
         float value = 2 * level;
         if (entity instanceof Player) {
             entity.increaseHealth(value);

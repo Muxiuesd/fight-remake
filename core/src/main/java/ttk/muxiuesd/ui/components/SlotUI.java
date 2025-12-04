@@ -64,7 +64,7 @@ public class SlotUI extends UIComponent {
         //空物品不绘制
         if (isVisible() && !this.isNullSlot()){
             ItemStack itemStack = this.getItemStack();
-            batch.draw(itemStack.getItem().texture, renderX, renderY, getWidth(), getHeight());
+            batch.draw(itemStack.getItem().textureRegion, renderX, renderY, getWidth(), getHeight());
 
             int amount = itemStack.getAmount();
             this.drawAmount(batch, parent, renderX, renderY, amount);

@@ -10,6 +10,8 @@ import ttk.muxiuesd.ui.components.HotbarSlotUI;
 
 /**
  * 玩家的HUD屏幕
+ * <p>
+ * 显示玩家的快捷栏、血条等UI组件
  * */
 public class PlayerHUDScreen extends UIScreen {
     private PlayerSystem playerSystem;

@@ -1,26 +1,23 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.interfaces.world.block.BlockDrawable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.cat.CAT;
 
 /**
  * 方块
  * */
-public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICAT {
+public abstract class Block implements ID<Block>, Disposable, ICAT {
     private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.BLOCK_FRICTON, 1f)
         .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
@@ -35,14 +32,8 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         return new Property().setCAT(new CAT());
     }
 
-
     private String id;
     public TextureRegion textureRegion;
-
-    public float width = BlockWidth, height = BlockHeight;
-    public float originX = 0, originY = 0;
-    public float scaleX = 1, scaleY = 1;
-    public float rotation = 0;
 
     private Property property;
 
@@ -50,24 +41,11 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         this.setProperty(property);
     }
     public Block (Property property, String textureId) {
-        this.setProperty(property);
-        this.textureRegion = this.loadTextureRegion(textureId);
+        this(property, textureId, null);
     }
     public Block(Property property, String textureId, String texturePath) {
         this.setProperty(property);
-        this.textureRegion = this.loadTextureRegion(textureId, texturePath);
-    }
-
-    @Override
-    public void draw(Batch batch, float x, float y) {
-        if (this.textureIsValid()) {
-            batch.draw(this.textureRegion,
-                x, y,
-                this.originX, this.originY,
-                this.width, this.height,
-                this.scaleX, this.scaleY,
-                this.rotation);
-        }
+        this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
     }
 
     @Override
@@ -85,27 +63,17 @@ public abstract class Block implements ID<Block>, BlockDrawable, Disposable, ICA
         this.property = property;
     }
 
-    public TextureRegion loadTextureRegion (String id) {
-        return this.loadTextureRegion(id, null);
-    }
-
-    /**
-     * 获取材质
-     * <p>
-     * 有返回值，以便于有多个材质的物品使用
-     * @param texturePath 当此为null时默认之前加载过
-     * */
-    public TextureRegion loadTextureRegion (String id, String texturePath) {
-        if (texturePath == null) {
-            texturePath = AssetsLoader.getInstance().getPath(id);
-        }
-
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
-        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
-    }
-
     public boolean textureIsValid() {
         return this.textureRegion != null;
+    }
+
+    public TextureRegion getTextureRegion () {
+        return textureRegion;
+    }
+
+    public Block setTextureRegion (TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
+        return this;
     }
 
     @Override

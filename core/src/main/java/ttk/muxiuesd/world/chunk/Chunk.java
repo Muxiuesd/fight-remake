@@ -10,6 +10,10 @@ import ttk.muxiuesd.interfaces.ChunkTraversalJob;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
+import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
+import ttk.muxiuesd.registrant.BlockRendererRegistry;
+import ttk.muxiuesd.registrant.WallRendererRegistry;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Log;
@@ -60,7 +64,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void draw(Batch batch) {
-        ChunkPosition cp = this.chunkPosition;
+        /*ChunkPosition cp = this.chunkPosition;
         this.traversal((x, y) -> {
             Block block = this.blocks[y][x];
             if (block != null) {
@@ -72,7 +76,37 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             if (wall != null) {
                 wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
+        });*/
+
+        ChunkPosition cp = this.chunkPosition;
+        this.traversal((x, y) -> {
+            Block block = this.blocks[y][x];
+            if (block != null) {
+                BlockRenderer<Block> renderer = BlockRendererRegistry.get(block);
+                if (renderer != null) {
+                    BlockRenderer.Context context = renderer.getContext();
+                    context.x = x + cp.x * ChunkWidth;
+                    context.y = y + cp.y * ChunkHeight;
+                    renderer.render(batch, block, context);
+                    renderer.freeContext(context);
+                }
+            }
         });
+        this.traversal((x, y) -> {
+            Wall<?> wall = this.walls[y][x];
+            if (wall != null) {
+                WallRenderer<Wall<?>> renderer = WallRendererRegistry.getRenderer(wall);
+                if (renderer != null) {
+                    WallRenderer.Context context = renderer.getContext();
+                    context.x = x + cp.x * ChunkWidth;
+                    context.y = y + cp.y * ChunkHeight;
+                    renderer.render(batch, wall, context);
+                    renderer.freeContext(context);
+                }
+                //wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
+            }
+        });
+
     }
 
     @Override

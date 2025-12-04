@@ -20,17 +20,19 @@ public class BlockCodec extends JsonCodec<Block> {
     @Override
     public void encode (Block block, JsonDataWriter dataWriter) {
         //基础属性（所有类型的方块必须写入）
-        dataWriter.writeString("id", block.getID());
+        dataWriter
+            .writeString("id", block.getID())
+            .writeString("codec_id", Fight.ID("block"));
 
         //带有方块实体的方块是一个方块一个实例，所以需要写入自定义的各种属性
         if (block instanceof BlockWithEntity blockWithEntity) {
-            dataWriter.writeFloat("width", block.width)
+            /*dataWriter.writeFloat("width", block.width)
             .writeFloat("height", block.height)
             .writeFloat("originX", block.originX)
             .writeFloat("originY", block.originY)
             .writeFloat("scaleX", block.scaleX)
             .writeFloat("scaleY", block.scaleY)
-            .writeFloat("rotation", block.rotation);
+            .writeFloat("rotation", block.rotation);*/
 
             //记得调用一次cat写入
             blockWithEntity.writeCAT(block.getProperty().getCAT());
@@ -55,13 +57,13 @@ public class BlockCodec extends JsonCodec<Block> {
         if (block instanceof BlockWithEntity blockWithEntity) {
             BlockWithEntity self = blockWithEntity.createSelf();
             //读取基础属性
-            self.width = dataReader.readFloat("width");
+            /*self.width = dataReader.readFloat("width");
             self.height = dataReader.readFloat("height");
             self.originX = dataReader.readFloat("originX");
             self.originY = dataReader.readFloat("originY");
             self.scaleX = dataReader.readFloat("scaleX");
             self.scaleY = dataReader.readFloat("scaleY");
-            self.rotation = dataReader.readFloat("rotation");
+            self.rotation = dataReader.readFloat("rotation");*/
 
             /*for (JsonValue prop : propertyValue) {
                 //读取每一个属性id，获取对应的属性，通过属性自己的读取来获取值

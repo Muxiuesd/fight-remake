@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.abs;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -15,7 +16,7 @@ public abstract class Weapon extends Item {
     public static final PropertiesDataMap<?, ?, ?> DEFAULT_WEAPON_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
         .add(PropertyTypes.ITEM_MAX_COUNT, 1)
         .add(PropertyTypes.WEAPON_DAMAGE, 1f)
-        .add(PropertyTypes.WEAPON_DURATION, 100)
+        .add(PropertyTypes.ITEM_DURATION, 100)
         .add(PropertyTypes.WEAPON_USE_SAPN, 1f);
 
     /**
@@ -31,9 +32,8 @@ public abstract class Weapon extends Item {
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.ofText("fight:weapon_use_span").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
-        array.add(Text.ofText("fight:weapon_duration").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DURATION)));
-        array.add(Text.ofText("fight:weapon_damage").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
+        array.add(Text.ofText(Fight.ID("weapon_use_span")).set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_USE_SAPN)));
+        array.add(Text.ofText(Fight.ID("weapon_damage")).set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_DAMAGE)));
         return super.getTooltips(array, itemStack);
     }
 }

@@ -26,6 +26,9 @@ public class BlockItem extends ConsumptionItem {
     public BlockItem(Block block, Property property, String textureId) {
         super(property, textureId);
         this.block = block;
+
+        //根据方块的id来设置方块物品的id
+        setID(block.getID());
     }
 
     @Override
@@ -45,7 +48,7 @@ public class BlockItem extends ConsumptionItem {
             ItemEntity itemEntity = ItemEntityGetter.get(user.getEntitySystem(), stack)
                 .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
                 .setPosition(worldPosition.x, worldPosition.y)
-                .setSize(replacedBlock.width / 2, replacedBlock.height / 2);
+                .setSize(0.5f, 0.5f);
         }
         return true;
     }

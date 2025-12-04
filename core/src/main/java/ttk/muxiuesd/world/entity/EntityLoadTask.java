@@ -4,14 +4,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.registry.Codecs;
+import ttk.muxiuesd.interfaces.serialization.Codec;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.EntityTask;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -32,13 +33,13 @@ public class EntityLoadTask extends EntityTask {
         for (JsonValue entityValue : entitiesValue) {
             JsonDataReader dataReader = new JsonDataReader(entityValue);
             String id = dataReader.readString("id");
-            if (Objects.equals(id, Fight.ID("item_entity"))) {
-                Optional<ItemEntity> optionalItemEntity = Codecs.ITEM_ENTITY.decode(dataReader);
-                optionalItemEntity.ifPresent(entities::add);
-            }else {
-                Optional<Entity<?>> optionalEntity = Codecs.ENTITY.decode(dataReader);
-                optionalEntity.ifPresent(entities::add);
-            }
+            EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
+
+            //获取实体的编解码器来解码数据变成类
+            Codec codec = entityProvider.codec;
+            Optional<Entity<?>> optionalEntity = codec.decode(dataReader);
+            optionalEntity.ifPresent(entities::add);
+
         }
         //读取完成后删除文件
         FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, chunkPosName + ".json");

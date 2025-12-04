@@ -10,7 +10,9 @@ import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.StatusEffect;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -19,25 +21,8 @@ import java.util.Optional;
 public class PlayerCodec extends JsonCodec<Player> {
     @Override
     public void encode (Player player, JsonDataWriter dataWriter) {
-        dataWriter
-            .writeString("id", player.getID())
-            .writeString("type", player.getType().getId());
-
-        dataWriter.objStart("property");
-        //记得调用一次cat写入
-        player.writeCAT(player.getProperty().getCAT());
-        Codecs.ENTITY_PROPERTY.encode(player.getProperty(), dataWriter);
-        dataWriter.objEnd();
-
-        //编码背包数据
-        dataWriter.objStart("backpack");
-        Codecs.BACKPACK.encode(player.getBackpack(), dataWriter);
-        dataWriter.objEnd();
-
-        //编码装备背包数据
-        dataWriter.objStart("equipment");
-        Codecs.BACKPACK.encode(player.getEquipmentBackpack(), dataWriter);
-        dataWriter.objEnd();
+        //基础的活物实体编码
+        Codecs.LIVING_ENTITY.encode(player, dataWriter);
     }
 
     @Override
@@ -61,6 +46,13 @@ public class PlayerCodec extends JsonCodec<Player> {
         JsonValue equipmentValue = dataReader.readObj("equipment");
         Optional<Backpack> optionalEquipment = Codecs.BACKPACK.decode(new JsonDataReader(equipmentValue));
         optionalEquipment.ifPresent(player::setEquipmentBackpack);
+
+        //读取状态效果
+        JsonValue buffs = dataReader.readObj("status_effect");
+        Optional<LinkedHashMap<StatusEffect, StatusEffect.Data>> optionalEffectsMap = Codecs.STATUS_EFFECTS.decode(
+            new JsonDataReader(buffs)
+        );
+        optionalEffectsMap.ifPresent(player::setEffects);
 
         return Optional.of(player);
     }

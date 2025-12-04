@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.data.EntityDataOutput;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -30,11 +29,15 @@ public class EntityUnloadTask extends EntityTask {
         dataWriter.arrayStart();
         for (Entity<?> entity: this.getEntities()) {
             dataWriter.objStart();
-            if (entity instanceof ItemEntity itemEntity) {
+            /*if (entity instanceof ItemEntity itemEntity) {
                 Codecs.ITEM_ENTITY.encode(itemEntity, dataWriter);
             }else {
                 Codecs.ENTITY.encode(entity, dataWriter);
-            }
+            }*/
+
+            //获取实体的编解码器来编码自己
+            entity.getCodec().encode(entity, dataWriter);
+
             dataWriter.objEnd();
         }
         dataWriter.arrayEnd();
@@ -42,20 +45,12 @@ public class EntityUnloadTask extends EntityTask {
         EntityDataOutput entityDataOutput = new EntityDataOutput(chunkPosName);
         entityDataOutput.output(dataWriter);
 
-        /*for (Entity<?> entity: getEntities()) {
-            JsonDataWriter dataWriter = new JsonDataWriter();
-            dataWriter.objStart();
-            Codecs.ENTITY.encode(entity, dataWriter);
-            dataWriter.objEnd();
-            EntityDataOutput entityDataOutput = new EntityDataOutput(
-                chunkPosName + "/" + entity.getClass().getSimpleName() + "@" + entity.hashCode()
-            );
-            entityDataOutput.output(dataWriter);
-        }*/
-
         return this.getEntities();
     }
 
+    /**
+     * 获取需要被卸载的实体数组
+     * */
     public Array<Entity<?>> getEntities () {
         return this.entities;
     }

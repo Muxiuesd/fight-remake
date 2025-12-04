@@ -44,6 +44,7 @@ import java.util.Optional;
 public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
 
+    //玩家相关的GUIScreen
     public static PlayerHUDScreen PLAYER_HUD_SCREEN;
     public static PlayerInventoryScreen PLAYER_INVENTORY_SCREEN;
 
@@ -76,16 +77,6 @@ public class PlayerSystem extends WorldSystem {
         }
 
         this.playerLastPosition = this.player.getPosition();
-
-        /*if (FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, "player_backpack.json")) {
-            //测试用玩家背包解码
-            String file = FileUtil.readFileAsString(Fight.PATH_SAVE_ENTITIES, "player_backpack.json");
-            JsonDataReader dataReader = new JsonDataReader(file);
-            Optional<Backpack> optional = Codecs.BACKPACK.decode(dataReader);
-            if (optional.isPresent()) {
-                this.player.setBackpack(optional.get());
-            }
-        }*/
 
         GUISystem.getInstance().setCurScreen(PLAYER_HUD_SCREEN);
 
@@ -120,6 +111,37 @@ public class PlayerSystem extends WorldSystem {
                 player.getScale(), MathUtils.random(0, 360), 2f);
         }
 
+        this.handleInput(delta);
+    }
+
+    /**
+     * 键鼠输入处理
+     * */
+    private void handleInput (float delta) {
+        Player curPlayer = this.getPlayer();
+
+        //需要玩家当前的GUIScreen是HUD界面，并且鼠标不在UI组件上，防止同时操作两者
+        if (GUISystem.getInstance().getCurScreen() == PLAYER_HUD_SCREEN
+            && !GUISystem.getInstance().mouseOverUI()) {
+            //玩家右键防御
+            if (KeyBindings.PlayerShield.wasJustPressed()) {
+                curPlayer.defendCDTimer.isReady();
+                //TODO 护盾使用成功的相关操作
+            }
+            //左键使用物品
+            if (KeyBindings.PlayerUseItem.wasJustPressed()) {
+                curPlayer.useItem(getWorld());
+            }
+            //头两个物品槽（0号和1号）快捷循环
+            if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
+                if (curPlayer.getHandIndex() == 0) curPlayer.setHandIndex(1);
+                else if (curPlayer.getHandIndex() == 1) curPlayer.setHandIndex(0);
+            }
+            if (KeyBindings.PlayerDropItem.wasJustPressed()) {
+                curPlayer.dropItem(curPlayer.getHandIndex(), 1);
+            }
+        }
+
         //移动方向
         int inputX = 0;
         int inputY = 0;
@@ -141,11 +163,11 @@ public class PlayerSystem extends WorldSystem {
         if (inputX != 0 || inputY != 0) {
             // 计算方向向量的长度
             float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
-            // 归一化并乘以速度
-            float playerSpeed = player.getSpeed();
+            // 归一化并乘以当前速度
+            float playerSpeed = curPlayer.getCurSpeed();
             float velX = (inputX / length) * playerSpeed;
             float velY = (inputY / length) * playerSpeed;
-            player.setVelocity(velX, velY);
+            curPlayer.setVelocity(velX, velY);
         }
     }
 

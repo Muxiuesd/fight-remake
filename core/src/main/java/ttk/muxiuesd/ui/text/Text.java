@@ -20,6 +20,13 @@ public class Text {
     }
 
     /**
+     * 状态效果
+     * */
+    public static Text ofEffect (String effectId) {
+        return new Text().add("effect.").add(effectId).build();
+    }
+
+    /**
      * 最基础的
      * */
     public static Text of (String textKey) {

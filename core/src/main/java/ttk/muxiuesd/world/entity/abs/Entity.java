@@ -1,9 +1,7 @@
 package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -12,8 +10,14 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.*;
+import ttk.muxiuesd.interfaces.ICAT;
+import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.serialization.Codec;
+import ttk.muxiuesd.interfaces.serialization.Codecable;
 import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
@@ -28,7 +32,7 @@ import ttk.muxiuesd.world.entity.EntityType;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<?>>
-    implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable, Tickable {
+    implements ID<T>, ICAT, Disposable, Updateable, Tickable, Codecable {
 
     private String id;
 
@@ -41,7 +45,7 @@ public abstract class Entity<T extends Entity<?>>
     public float rotation;
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
-    public TextureRegion bodyTexture;
+    public TextureRegion textureRegion;
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     private EntitySystem es;    //此实体所属的实体系统
@@ -105,17 +109,6 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     @Override
-    public void draw(Batch batch) {
-        //最基础的绘制
-        if (this.bodyTexture != null) {
-            batch.draw(this.bodyTexture, this.x, this.y,
-                this.originX, this.originY,
-                this.width, this.height,
-                this.scaleX, this.scaleY, this.rotation);
-        }
-    }
-
-    @Override
     public void update(float delta) {
         this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
     }
@@ -125,16 +118,11 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     @Override
-    public void renderShape (ShapeRenderer batch) {
-    }
-
-    @Override
     public void dispose() {
-        if (this.bodyTexture != null) {
-            this.bodyTexture = null;
+        if (this.textureRegion != null) {
+            this.textureRegion = null;
         }
     }
-
 
 
     public T setCullingArea(float x, float y, float width, float height) {
@@ -311,7 +299,7 @@ public abstract class Entity<T extends Entity<?>>
      * 加载身体材质
      * */
     public void loadBodyTextureRegion (String textureId, String texturePath) {
-        bodyTexture = this.getTextureRegion(textureId, texturePath);
+        textureRegion = this.getTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -352,10 +340,16 @@ public abstract class Entity<T extends Entity<?>>
     public String getID () {
         return this.id;
     }
+
     @Override
     public T setID (String id) {
         this.id = id;
         return (T) this;
+    }
+
+    @Override
+    public Codec getCodec () {
+        return Codecs.ENTITY;
     }
 
     /**

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
@@ -19,6 +20,9 @@ import java.util.Optional;
 public class ChunkCodec extends JsonCodec<Chunk> {
     @Override
     public void encode (Chunk chunk, JsonDataWriter dataWriter) {
+
+        dataWriter.writeString("codec_id", Fight.ID("chunk"));
+
         //方块
         this.encodeTraversal("blocks", dataWriter, chunk, (x, y) -> {
             Block block = chunk.getBlock(x, y);

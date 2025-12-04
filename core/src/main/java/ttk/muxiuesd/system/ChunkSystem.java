@@ -10,6 +10,8 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
+import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
+import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.WorldInformationType;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -174,15 +176,22 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void draw(Batch batch) {
+        //区块绘制
         for (Chunk chunk : this.activeChunks) {
             chunk.draw(batch);
         }
         //绘制方块实体
         this.getBlockEntities().forEach((block, blockEntity) -> {
             BlockPos pos = blockEntity.getBlockPos();
-            blockEntity.draw(batch, pos.x, pos.y);
-        });
+            //找对应的渲染器来执行渲染
+            BlockEntityRenderer<BlockEntity> renderer = BlockEntityRendererRegistry.get(blockEntity);
+            BlockEntityRenderer.Context context = renderer.getContext();
+            context.x = pos.x;
+            context.y = pos.y;
+            renderer.render(batch, blockEntity, context);
 
+            //blockEntity.draw(batch, pos.x, pos.y);
+        });
     }
 
     @Override

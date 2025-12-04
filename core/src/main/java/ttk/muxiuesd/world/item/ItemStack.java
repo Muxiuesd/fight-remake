@@ -3,10 +3,12 @@ package ttk.muxiuesd.world.item;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.ui.text.Text;
@@ -21,7 +23,7 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * <p>
  * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
-public class ItemStack implements Updateable, ShapeRenderable {
+public class ItemStack implements Updateable {
     //所持有的物品
     private final Item item;
     //物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
@@ -46,7 +48,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?, ?, ?> propertiesMap) {
         this.item = item;
         this.amount = amount;
-
+        //传入的属性是原始的属性
         if (behaviour != null) this.behaviour = behaviour;
         else this.behaviour = ItemStackBehaviours.COMMON;   //防止null
 
@@ -80,15 +82,25 @@ public class ItemStack implements Updateable, ShapeRenderable {
     }
 
     /**
-     * 物品在手上的绘制
+     * 物品在持有实体手上的贴图绘制
      * */
     public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
-        this.getItem().drawOnHand(batch, holder, this);
+        //获取物品的渲染器来渲染
+        ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
+        if (renderer == null) return;
+        ItemRenderer.Context context = renderer.getContextByEntity(holder);
+        renderer.drawOnHand(batch, context, holder, this);
+        renderer.freeContext(context);
     }
 
-    @Override
-    public void renderShape (ShapeRenderer batch) {
-        this.getItem().renderShape(batch, this);
+    /**
+     * 物品在持有实体手上的形状绘制
+     * */
+    public void renderShapeOnHand (ShapeRenderer batch, LivingEntity<?> holder) {
+        //获取物品的渲染器来渲染
+        ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
+        if (renderer == null) return;
+        renderer.renderShapeOnHand(batch, holder, this);
     }
 
     /**
@@ -97,13 +109,20 @@ public class ItemStack implements Updateable, ShapeRenderable {
     public Array<Text> getTooltips () {
         Array<Text> array = new Array<>();
         //基础词条
-        array.add(Text.ofItem(getItem().getID()));
+        array.add(Text.ofItem(this.getItem().getID()));  //物品名称
 
         //物品自定义词条
-        getItem().getTooltips(array, this);
+        this.getItem().getTooltips(array, this);
 
         //基础词条
-        //array.add(Text.of(" "));
+        //持有耐久属性就添加词条
+        if (this.getItem().getProperty().contain(PropertyTypes.ITEM_DURATION)) {
+            array.add(
+                Text.ofText(Fight.ID("item_duration"))
+                    .set(0, this.getProperty().getDuration())
+                    .set(1, this.getItem().getProperty().getDuration())
+            );
+        }
         return array;
     }
 
@@ -134,7 +153,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
         }
         //没达到最大数量
         ItemStack newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
-        this.decrease(amount);
+        this.amountDecrease(amount);
         return newStack;
     }
 
@@ -153,7 +172,7 @@ public class ItemStack implements Updateable, ShapeRenderable {
      * 物品是否在使用中
      * */
     public boolean onUsing () {
-        return this.getProperty().get(PropertyTypes.ITEM_ON_USING);
+        return this.getProperty().get(PropertyTypes.ITEM_ON_USING, false);
     }
 
 
@@ -181,31 +200,58 @@ public class ItemStack implements Updateable, ShapeRenderable {
     }
 
     /**
-     * 减少指定数量
-     * */
-    public void decrease (int amount) {
-        this.setAmount(this.getAmount() - amount);
-    }
-
-    /**
-     * 增加指定数量
-     * */
-    public void increase (int amount) {
-        this.setAmount(this.getAmount() + amount);
-    }
-
-    /**
      * 快速减少一个数量
      * */
-    public void fastDecrease () {
-        this.decrease(1);
+    public ItemStack amountFastDecrease () {
+        return this.amountDecrease(1);
     }
 
     /**
      * 快速增加一个数量
      * */
-    public void fastIncrease () {
-        this.increase(1);
+    public ItemStack amountFastIncrease () {
+        return this.amountIncrease(1);
+    }
+
+    /**
+     * 减少指定数量
+     * */
+    public ItemStack amountDecrease (int amount) {
+        this.setAmount(this.getAmount() - amount);
+        return this;
+    }
+
+    /**
+     * 增加指定数量
+     * */
+    public ItemStack amountIncrease (int amount) {
+        this.setAmount(this.getAmount() + amount);
+        return this;
+    }
+
+    /**
+     * 减少指定的耐久值
+     * */
+    public ItemStack durationDecrease (int value) {
+        if (this.getProperty().contain(PropertyTypes.ITEM_DURATION)
+            && this.getProperty().getDuration() > 0) {
+            int d = this.getProperty().getDuration() - value;
+            this.getProperty().setDuration(Math.max(d, 0));
+        }
+        return this;
+    }
+
+    /**
+     * 增加指定的耐久值
+     * */
+    public ItemStack durationIncrease (int value) {
+        if (this.getProperty().contain(PropertyTypes.ITEM_DURATION)) {
+            int maxDuration = this.getItem().getProperty().getDuration();
+            //确保不会超过耐久上限
+            int d = this.getProperty().getDuration() + value;
+            this.getProperty().setDuration(Math.min(d, maxDuration));
+        }
+        return this;
     }
 
     /**
