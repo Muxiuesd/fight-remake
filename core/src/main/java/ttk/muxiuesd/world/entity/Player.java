@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.entity;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
@@ -119,16 +118,6 @@ public class Player extends LivingEntity<Player> {
         //setCullingArea(x, y, width, height);
     }
 
-    @Override
-    public void draw(Batch batch) {
-        super.draw(batch);
-        if (this.isDefend && this.shield != null) {
-            batch.draw(this.shield, x, y,
-                originX, originY,
-                width, height,
-                scaleX, scaleY, rotation);
-        }
-    }
 
     @Override
     public ItemEntity dropItem (int index, int amount) {

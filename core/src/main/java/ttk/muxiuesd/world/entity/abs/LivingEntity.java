@@ -1,7 +1,5 @@
 package ttk.muxiuesd.world.entity.abs;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -158,32 +156,6 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             this.effects.remove(effect);
         }
     }
-
-    @Override
-    public void tick (World world, float delta) {
-        //this.applyEffectTick();
-    }
-
-    @Override
-    public void draw (Batch batch) {
-        //身体渲染
-        if (!this.isAttacked()) {
-            super.draw(batch);
-        }else {
-            // 受到攻击变红
-            batch.setColor(255, 0, 0, 255);
-            super.draw(batch);
-            // 还原batch
-            batch.setColor(255, 255, 255, 255);
-        }
-    }
-
-
-    @Override
-    public void renderShape (ShapeRenderer batch) {
-    }
-
-
 
     /**
      * 实体使用手上的物品

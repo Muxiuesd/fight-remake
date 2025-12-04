@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.entity.common;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
@@ -101,19 +100,6 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
 
         super.update(delta);
     }
-
-    @Override
-    public void draw (Batch batch) {
-        if (textureRegion != null) {
-            batch.draw(textureRegion,
-                x, y + this.positionOffset.y,
-                originX, originY,
-                width, height,
-                scaleX, scaleY,
-                rotation);
-        }
-    }
-
 
     /**
      * 抛钩移动

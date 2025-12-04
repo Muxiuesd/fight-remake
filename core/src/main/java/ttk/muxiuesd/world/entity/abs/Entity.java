@@ -1,9 +1,7 @@
 package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -12,7 +10,10 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.*;
+import ttk.muxiuesd.interfaces.ICAT;
+import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.serialization.Codecable;
 import ttk.muxiuesd.property.PropertyType;
@@ -31,7 +32,7 @@ import ttk.muxiuesd.world.entity.EntityType;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<?>>
-    implements ID<T>, ICAT, Disposable, Drawable, Updateable, ShapeRenderable, Tickable, Codecable {
+    implements ID<T>, ICAT, Disposable, Updateable, Tickable, Codecable {
 
     private String id;
 
@@ -108,17 +109,6 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     @Override
-    public void draw(Batch batch) {
-        //最基础的绘制
-        if (this.textureRegion != null) {
-            batch.draw(this.textureRegion, this.x, this.y,
-                this.originX, this.originY,
-                this.width, this.height,
-                this.scaleX, this.scaleY, this.rotation);
-        }
-    }
-
-    @Override
     public void update(float delta) {
         this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
     }
@@ -128,16 +118,11 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     @Override
-    public void renderShape (ShapeRenderer batch) {
-    }
-
-    @Override
     public void dispose() {
         if (this.textureRegion != null) {
             this.textureRegion = null;
         }
     }
-
 
 
     public T setCullingArea(float x, float y, float width, float height) {

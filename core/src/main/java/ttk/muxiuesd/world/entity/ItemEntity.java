@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.entity;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
@@ -87,11 +86,6 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         y += delta * getCurSpeed() * velY;
 
         super.update(delta);
-    }
-
-    @Override
-    public void draw (Batch batch) {
-        if (this.itemStack != null) this.itemStack.getItem().drawOnWorld(batch, this);
     }
 
     @Override
