@@ -176,34 +176,14 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             // 还原batch
             batch.setColor(255, 255, 255, 255);
         }
-        if (this.renderHandItem) this.drawHandItem(batch);
     }
 
-    /**
-     * 手上持有的物品绘制
-     * */
-    public void drawHandItem (Batch batch) {
-        //如果手上有物品，则绘制手上的物品
-        ItemStack itemStack = this.getHandItemStack();
-        if (itemStack != null) {
-            itemStack.drawItemOnHand(batch, this);
-        }
-    }
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-        if (this.renderHandItem) this.renderShapeHandItem(batch);
     }
 
-    /**
-     * 持有物品的形状渲染
-     * */
-    public void renderShapeHandItem (ShapeRenderer batch) {
-        ItemStack itemStack = this.getHandItemStack();
-        if (itemStack != null) {
-            itemStack.renderShape(batch);
-        }
-    }
+
 
     /**
      * 实体使用手上的物品

@@ -53,7 +53,7 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
     public void renderShapeHandItem (ShapeRenderer batch, T entity, Context context) {
         ItemStack itemStack = entity.getHandItemStack();
         if (itemStack != null) {
-            itemStack.renderShape(batch);
+            itemStack.renderShapeOnHand(batch, entity);
         }
     }
 }

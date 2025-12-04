@@ -5,9 +5,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.ui.text.Text;
@@ -22,7 +23,7 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * <p>
  * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
-public class ItemStack implements Updateable, ShapeRenderable {
+public class ItemStack implements Updateable {
     //所持有的物品
     private final Item item;
     //物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
@@ -81,15 +82,25 @@ public class ItemStack implements Updateable, ShapeRenderable {
     }
 
     /**
-     * 物品在手上的绘制
+     * 物品在持有实体手上的贴图绘制
      * */
     public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
-        this.getItem().drawOnHand(batch, holder, this);
+        //获取物品的渲染器来渲染
+        ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
+        if (renderer == null) return;
+        ItemRenderer.Context context = renderer.getContextByEntity(holder);
+        renderer.drawOnHand(batch, context, holder, this);
+        renderer.freeContext(context);
     }
 
-    @Override
-    public void renderShape (ShapeRenderer batch) {
-        this.getItem().renderShape(batch, this);
+    /**
+     * 物品在持有实体手上的形状绘制
+     * */
+    public void renderShapeOnHand (ShapeRenderer batch, LivingEntity<?> holder) {
+        //获取物品的渲染器来渲染
+        ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
+        if (renderer == null) return;
+        renderer.renderShapeOnHand(batch, holder, this);
     }
 
     /**

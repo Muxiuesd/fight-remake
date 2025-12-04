@@ -30,7 +30,7 @@ public interface ItemRenderer<T extends Item> {
     void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity);
 
     /**
-     * 在掉落物形式下的形状绘制
+     * 在实体手持形式下的形状绘制
      * @param holder 所属的实体
      * @param itemStack 物品堆叠
      * */
