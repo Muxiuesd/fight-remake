@@ -26,6 +26,9 @@ public class BlockItem extends ConsumptionItem {
     public BlockItem(Block block, Property property, String textureId) {
         super(property, textureId);
         this.block = block;
+
+        //根据方块的id来设置方块物品的id
+        setID(block.getID());
     }
 
     @Override

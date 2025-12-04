@@ -78,12 +78,10 @@ public final class Items {
     }
 
     /**
-     * 物品注册的基本方法
+     * 根据名字来创建id
      * */
-    public static Item register (String name, Supplier<Item> factory) {
-        String id = Fight.ID(name);
-        Identifier identifier = new Identifier(id);
-        return Registries.ITEM.register(identifier, factory.get()).setID(id);
+    public static <T extends Item> T register (String name, Supplier<T> factory) {
+        return register(factory, Fight.ID(name));
     }
 
     /**
@@ -91,9 +89,7 @@ public final class Items {
      * */
     public static Item register (Block block) {
         String id = block.getID();
-        BlockItem blockItem = new BlockItem(block, id);
-        blockItem.setID(id);
-        return Registries.ITEM.register(new Identifier(id), blockItem);
+        return register(() -> new BlockItem(block, id), id);
     }
 
     /**
@@ -101,8 +97,17 @@ public final class Items {
      * */
     public static <T extends Wall<T>> Item register (Wall<T> wall) {
         String id = wall.getID();
-        WallItem wallItem = new WallItem(wall, id);
-        wallItem.setID(id);
-        return Registries.ITEM.register(new Identifier(id), wallItem);
+        return register(() -> new WallItem(wall, id), id);
+    }
+
+    /**
+     * 物品注册的基本方法
+     * */
+    public static <T extends Item> T register (Supplier<T> factory, String id) {
+        Identifier identifier = new Identifier(id);
+        T item = factory.get();
+        item.setID(id);
+        Registries.ITEM.register(identifier, item);
+        return item;
     }
 }

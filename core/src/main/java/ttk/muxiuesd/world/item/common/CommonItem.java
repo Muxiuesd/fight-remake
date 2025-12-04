@@ -10,7 +10,10 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class CommonItem extends Item {
     public CommonItem (String name) {
-        super(Type.COMMON, new Property(), Fight.ID(name), Fight.ItemTexturePath(name + ".png"));
+        super(
+            Type.COMMON, new Property(),
+            Fight.ID(name), Fight.ItemTexturePath(name + ".png")
+        );
     }
 
     @Override
