@@ -1,7 +1,6 @@
 package ttk.muxiuesd.render.shader;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import ttk.muxiuesd.Fight;
 
@@ -82,7 +81,7 @@ public class ShadersReg {
 
     private static String registerDefault() {
         String id = Fight.ID("default_shader");
-        ShaderScheduler.getInstance().registry(id, SpriteBatch.createDefaultShader());
+        ShaderScheduler.getInstance().registry(id, DefaultShader);
         return id;
     }
 }
