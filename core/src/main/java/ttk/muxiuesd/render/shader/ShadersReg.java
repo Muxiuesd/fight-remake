@@ -9,9 +9,37 @@ import ttk.muxiuesd.Fight;
  * 着色器注册
  * */
 public class ShadersReg {
+
+    // 符合 GLSL 330 core 语法的顶点着色器
+    private static final String VERTEX_SHADER_330 =
+        "#version 330 core\n" +
+            "layout(location = 0) in vec2 a_position;\n" +
+            "layout(location = 1) in vec4 a_color;\n" +
+            "layout(location = 2) in vec2 a_texCoord0;\n" +
+            "uniform mat4 u_projTrans;\n" +
+            "out vec4 v_color;\n" +
+            "out vec2 v_texCoords;\n" +
+            "void main() {\n" +
+            "    v_color = a_color;\n" +
+            "    v_texCoords = a_texCoord0;\n" +
+            "    gl_Position = u_projTrans * vec4(a_position, 0.0, 1.0);\n" +
+            "}";
+
+    // 符合 GLSL 330 core 语法的片段着色器
+    private static final String FRAGMENT_SHADER_330 =
+        "#version 330 core\n" +
+            "in vec4 v_color;\n" +
+            "in vec2 v_texCoords;\n" +
+            "out vec4 f_color;\n" +
+            "uniform sampler2D u_texture;\n" +
+            "void main() {\n" +
+            "    f_color = v_color * texture(u_texture, v_texCoords);\n" +
+            "}";
+
+
     public static final ShaderProgram DefaultShader = new ShaderProgram(
-        Gdx.files.internal("shaders/daynight/daynight.vert").readString(),
-        Gdx.files.internal("shaders/daynight/daynight.frag").readString()
+        VERTEX_SHADER_330,
+        FRAGMENT_SHADER_330
     );
 
     //gdx默认的着色器

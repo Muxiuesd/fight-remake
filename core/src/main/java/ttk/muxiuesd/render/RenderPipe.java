@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.render.camera.CameraController;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
+import ttk.muxiuesd.render.shader.ShadersReg;
 import ttk.muxiuesd.util.Log;
 
 import java.util.HashSet;
@@ -27,7 +28,7 @@ public class RenderPipe {
     //所有的相机控制器，管理着需要被自动更新的相机
     private final Set<CameraController> cameraControllers = new HashSet<>();
 
-    private final Batch batch = new SpriteBatch();
+    private final Batch batch = new SpriteBatch(1000, ShadersReg.DefaultShader);
     private final ShapeRenderer shapeRenderer = new ShapeRenderer() {{
         setAutoShapeType(true);
     }};
