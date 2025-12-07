@@ -9,6 +9,11 @@ import ttk.muxiuesd.Fight;
  * 着色器注册
  * */
 public class ShadersReg {
+    public static final ShaderProgram DefaultShader = new ShaderProgram(
+        Gdx.files.internal("shaders/daynight/daynight.vert").readString(),
+        Gdx.files.internal("shaders/daynight/daynight.frag").readString()
+    );
+
     //gdx默认的着色器
     public static final String DEFAULT_SHADER = registerDefault();
 
@@ -49,8 +54,7 @@ public class ShadersReg {
 
     private static String registerDefault() {
         String id = Fight.ID("default_shader");
-        ShaderProgram shader = SpriteBatch.createDefaultShader();
-        ShaderScheduler.getInstance().registry(id, shader);
+        ShaderScheduler.getInstance().registry(id, SpriteBatch.createDefaultShader());
         return id;
     }
 }
