@@ -36,6 +36,12 @@ public class ShadersReg {
     public static String register (String id, String vertPath, String fragPath) {
         String vert = Gdx.files.internal(vertPath).readString();
         String frag = Gdx.files.internal(fragPath).readString();
+
+        System.out.println("vert代码:");
+        System.out.println(vert);
+        System.out.println("frag代码:");
+        System.out.println(frag);
+
         ShaderProgram shader = new ShaderProgram(vert, frag);
         ShaderScheduler.getInstance().registry(id, shader);
         return id;
