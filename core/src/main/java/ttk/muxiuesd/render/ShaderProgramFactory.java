@@ -1,4 +1,4 @@
-package ttk.muxiuesd.util;
+package ttk.muxiuesd.render;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;

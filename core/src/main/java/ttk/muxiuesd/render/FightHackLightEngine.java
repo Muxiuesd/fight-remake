@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.util.GL32CMacIssueHandler;
 
 /**
  * 魔改的{@link com.aliasifkhan.hackLights.HackLightEngine}，因为要适配macos
