@@ -1,12 +1,11 @@
 package ttk.muxiuesd.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.render.camera.CameraController;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
-import ttk.muxiuesd.render.shader.ShadersReg;
+import ttk.muxiuesd.util.GL32CMacIssueHandler;
 import ttk.muxiuesd.util.Log;
 
 import java.util.HashSet;
@@ -28,16 +27,15 @@ public class RenderPipe {
 
     private RenderPipe() {
         this(
-            new SpriteBatch(1000, ShadersReg.BatchDefaultShader),
-            new ShapeRenderer(){{
-                setAutoShapeType(true);
-            }}
+            GL32CMacIssueHandler.createSpriteBatch(),
+            GL32CMacIssueHandler.createShapeRenderer()
         );
     }
     /// 支持注入
     private RenderPipe(Batch batch, ShapeRenderer shapeRenderer) {
         this.batch = batch;
         this.shapeRenderer = shapeRenderer;
+        this.shapeRenderer.setAutoShapeType(true);
 
         this.addCameraController(PlayerCamera.INSTANCE);
         this.addCameraController(GUICamera.INSTANCE);

@@ -1,0 +1,99 @@
+package ttk.muxiuesd.util;
+
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
+
+public class ShaderCompatibilityHelper {
+    private ShaderCompatibilityHelper() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Converts the given GLSL shader code from version 120 to version 150, if
+     * the application is run on macOS and uses OpenGL 3. Ignores any
+     * {@linkplain ShaderProgram#prependVertexCode prepends}.
+     * <p>
+     * This is useful for libraries that – other than real applications – have
+     * to support multiple use cases and therefore have to provide shaders for
+     * versions 120 and 150.
+     *
+     * @param vert
+     *            the vertex shader code; should not contain a version statement
+     * @param frag
+     *            the fragment shader code; should not contain a version
+     *            statement
+     * @return the compiled shader
+     * @see #toVert150(String)
+     * @see #toFrag150(String)
+     * @see ShaderProgramFactory
+     */
+    public static ShaderProgram fromString(String vert, String frag) {
+        if (ShaderCompatibilityHelper.mustUse32CShader()) {
+            vert = toVert150(vert);
+            frag = toFrag150(frag);
+        }
+
+        return ShaderProgramFactory.fromString(
+            getDefaultShaderVersionStatement() + vert,
+            getDefaultShaderVersionStatement() + frag, true, true);
+    }
+
+    public static String toVert150(String vert120) {
+        vert120 = vert120.replace("\nattribute ", "\nin ");
+        vert120 = vert120.replace(" attribute ", " in ");
+
+        vert120 = vert120.replace("\nvarying ", "\nout ");
+        vert120 = vert120.replace(" varying ", " out ");
+
+        vert120 = vert120.replace("texture2D(", "texture(");
+
+        return vert120;
+    }
+
+    public static String toFrag150(String frag120) {
+        frag120 = frag120.replace("\nattribute ", "\nout ");
+        frag120 = frag120.replace(" attribute ", " out ");
+
+        frag120 = frag120.replace("\nvarying ", "\nin ");
+        frag120 = frag120.replace(" varying ", " in ");
+
+        if (frag120.contains("gl_FragColor")) {
+            frag120 = frag120.replace("void main()",
+                "out vec4 fragColor; \nvoid main()");
+            frag120 = frag120.replace("gl_FragColor", "fragColor");
+        }
+
+        frag120 = frag120.replace("texture2D(", "texture(");
+        frag120 = frag120.replace("textureCube(", "texture(");
+
+        return frag120;
+    }
+
+    public static boolean mustUse32CShader() {
+        // Since gl30 != null, we can be sure that we aren't running on ANGLE
+        // TODO: use PlatformUtils.isMac (see
+        // https://github.com/libgdx/libgdx/pull/5960)
+        return (Gdx.app.getType() == Application.ApplicationType.Desktop
+            || Gdx.app.getType() == Application.ApplicationType.HeadlessDesktop)
+            && Gdx.gl30 != null && UIUtils.isMac;
+    }
+
+    public static String getDefaultShaderVersionStatement() {
+        if (mustUse32CShader())
+            return "#version 150\n"; // macOS 3.2 core profile
+
+        if (Gdx.app.getType() != Application.ApplicationType.Desktop
+            && Gdx.app.getType() != Application.ApplicationType.HeadlessDesktop)
+            return "#version 100\n"; // GLSL ES (Android, iOS, WebGL); use a
+        // sensible default version because
+        // sometimes this can cause problems?
+
+        return ""; // don't use a version statement on desktop; this should make
+        // the compiler more forgiving and saves us from having to
+        // determine whether we are running on ANGLE (see
+        // https://github.com/google/angle/blob/0ed0de4f0b7f5a81fbe35b28e6a68a739f365556/src/compiler/translator/DirectiveHandler.cpp#L285
+    }
+
+}
