@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * 魔改的{@link com.aliasifkhan.hackLights.HackLightEngine}，因为要适配macos
+ * 魔改的 {@link com.aliasifkhan.hackLights.HackLightEngine}，因为要适配macos
  * */
 public class FightHackLightEngine {
     private final Array<HackLight> lights = new Array<>();
@@ -34,6 +34,7 @@ public class FightHackLightEngine {
 
         this.lightsBufferRegion = new TextureRegion();
 
+        //这里改成macos也能运行的方法
         this.batch = GL32CMacIssueHandler.createSpriteBatch();
     }
 

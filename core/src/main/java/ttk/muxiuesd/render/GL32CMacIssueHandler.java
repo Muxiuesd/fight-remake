@@ -4,6 +4,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+/**
+ * 针对Macos的着色器编译解决方案
+ * <p>
+ * 以后只要是涉及着色器编译的地方全部使用此类
+ * */
 public class GL32CMacIssueHandler {
     // TODO https://github.com/libgdx/libgdx/pull/5960
 
