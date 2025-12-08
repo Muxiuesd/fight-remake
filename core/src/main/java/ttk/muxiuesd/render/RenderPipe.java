@@ -18,20 +18,30 @@ import java.util.Set;
 public class RenderPipe {
     public static String TAG = RenderPipe.class.getName();
 
-    private RenderPipe() {
-        this.addCameraController(PlayerCamera.INSTANCE);
-        this.addCameraController(GUICamera.INSTANCE);
-    }
     //必须单例模式
     private static RenderPipe INSTANCE;
 
     //所有的相机控制器，管理着需要被自动更新的相机
     private final Set<CameraController> cameraControllers = new HashSet<>();
+    private final Batch batch ;
+    private final ShapeRenderer shapeRenderer;
 
-    private final Batch batch = new SpriteBatch(1000, ShadersReg.DefaultShader);
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer() {{
-        setAutoShapeType(true);
-    }};
+    private RenderPipe() {
+        this(
+            new SpriteBatch(1000, ShadersReg.BatchDefaultShader),
+            new ShapeRenderer(){{
+                setAutoShapeType(true);
+            }}
+        );
+    }
+    /// 支持注入
+    private RenderPipe(Batch batch, ShapeRenderer shapeRenderer) {
+        this.batch = batch;
+        this.shapeRenderer = shapeRenderer;
+
+        this.addCameraController(PlayerCamera.INSTANCE);
+        this.addCameraController(GUICamera.INSTANCE);
+    }
 
     /**
      * 初始化渲染管线
