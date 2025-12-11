@@ -1,4 +1,4 @@
-package ttk.muxiuesd.render;
+package ttk.muxiuesd.render.fix;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;

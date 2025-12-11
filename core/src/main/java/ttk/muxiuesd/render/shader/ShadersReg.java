@@ -3,7 +3,7 @@ package ttk.muxiuesd.render.shader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.render.GL32CMacIssueHandler;
+import ttk.muxiuesd.render.fix.GL32CMacIssueHandler;
 
 /**
  * 游戏内用到的着色器的注册

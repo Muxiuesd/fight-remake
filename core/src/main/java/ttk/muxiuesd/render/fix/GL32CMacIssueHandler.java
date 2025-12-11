@@ -1,4 +1,4 @@
-package ttk.muxiuesd.render;
+package ttk.muxiuesd.render.fix;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
