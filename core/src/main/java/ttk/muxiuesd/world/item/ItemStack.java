@@ -158,6 +158,28 @@ public class ItemStack implements Updateable {
     }
 
     /**
+     * 物品堆叠的合并
+     * @param stack 需要被合并的物品堆叠
+     * */
+    public void merge (ItemStack stack) {
+        //物品相同就执行合并
+        if (this.equals(stack)) {
+            int stackAmount = stack.getAmount();
+            int maxCount = stack.getProperty().getMaxCount();
+            int newAmount = this.getAmount() + stackAmount;
+            if (newAmount > maxCount) {
+                //要是超出堆叠上限，传入的物品堆叠的数量变为超出的部分
+                this.amount = maxCount;
+                stack.setAmount(newAmount - maxCount);
+            }else {
+                //合并后没超出堆叠上限
+                this.amount = newAmount;
+                stack.setAmount(0);
+            }
+        }
+    }
+
+    /**
      * 检测两个物品堆叠是否相同，需要所持有的物品以及属性（数量，种类，值）相同
      * */
     public boolean equals (ItemStack stack) {

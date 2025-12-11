@@ -112,7 +112,7 @@ public class SlotUI extends UIComponent {
                 ItemStack mouseStack = mouseSlotUI.getItemStack();
                 int mouseAmount = mouseStack.getAmount();
                 //检查鼠标物品槽的物品类型是否符合槽位，并且检查物品槽位与鼠标的物品是否是同类
-                if (this.checkItemType(mouseStack) && stack.equals(mouseStack)) {
+                /*if (this.checkItemType(mouseStack) && stack.equals(mouseStack)) {
                     //物品相同就执行合并
                     int maxCount = stack.getProperty().getMaxCount();
                     int newAmount = amount + mouseAmount;
@@ -125,6 +125,12 @@ public class SlotUI extends UIComponent {
                         stack.setAmount(newAmount);
                         MouseSlotUI.deactivate().clearItem();
                     }
+                }*/
+                //检查鼠标物品槽的物品类型是否符合槽位
+                if (this.checkItemType(mouseStack)){
+                    stack.merge(mouseStack);
+                    //合并物品后鼠标物品数量归零就清除
+                    if (mouseStack.getAmount() == 0) MouseSlotUI.deactivate().clearItem();
                 }
             }
         }else if (! mouseSlotUI.isNullSlot()) {
