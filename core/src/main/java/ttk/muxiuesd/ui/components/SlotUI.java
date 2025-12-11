@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.Inventory;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.text.TextUI;
@@ -94,9 +95,19 @@ public class SlotUI extends UIComponent {
         if (!this.isNullSlot()) {
             //点击这个有物品的槽位就把物品转移到鼠标物品槽里面，如果鼠标物品槽有东西就交换两者
             if (mouseSlotUI.isNullSlot()) {
-                //激活鼠标物品槽
-                MouseSlotUI.activate().setItemStack(this.getItemStack());
-                this.clearItem();
+                ItemStack stack = this.getItemStack();
+                int amount = stack.getAmount();
+                //按下shift是半数拿取
+                if (KeyBindings.PlayerShift.wasPressed() && amount >= 2) {
+                    //如果为奇数，就鼠标拿取一半且多一个
+                    MouseSlotUI.activate().setItemStack(stack.split((amount / 2) + amount % 2));
+                }else {
+                    //全部拿走
+                    //激活鼠标物品槽
+                    MouseSlotUI.activate().setItemStack(stack);
+                    this.clearItem();
+                }
+
             }else {
                 //如果鼠标物品槽的物品通过类型检测，就交换物品
                 if (this.checkItemType(mouseSlotUI.getItemStack())) {
