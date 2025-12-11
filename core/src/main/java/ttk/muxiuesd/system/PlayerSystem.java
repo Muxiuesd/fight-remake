@@ -140,6 +140,15 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerDropItem.wasJustPressed()) {
                 curPlayer.dropItem(curPlayer.getHandIndex(), 1);
             }
+            if (KeyBindings.PlayerShortcutKey_1.wasJustPressed()) curPlayer.setHandIndex(0);
+            if (KeyBindings.PlayerShortcutKey_2.wasJustPressed()) curPlayer.setHandIndex(1);
+            if (KeyBindings.PlayerShortcutKey_3.wasJustPressed()) curPlayer.setHandIndex(2);
+            if (KeyBindings.PlayerShortcutKey_4.wasJustPressed()) curPlayer.setHandIndex(3);
+            if (KeyBindings.PlayerShortcutKey_5.wasJustPressed()) curPlayer.setHandIndex(4);
+            if (KeyBindings.PlayerShortcutKey_6.wasJustPressed()) curPlayer.setHandIndex(5);
+            if (KeyBindings.PlayerShortcutKey_7.wasJustPressed()) curPlayer.setHandIndex(6);
+            if (KeyBindings.PlayerShortcutKey_8.wasJustPressed()) curPlayer.setHandIndex(7);
+            if (KeyBindings.PlayerShortcutKey_9.wasJustPressed()) curPlayer.setHandIndex(8);
         }
 
         //移动方向
