@@ -93,10 +93,10 @@ public class SlotUI extends UIComponent {
     public boolean click (GridPoint2 interactPos) {
         MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
         if (!this.isNullSlot()) {
-            //点击这个有物品的槽位就把物品转移到鼠标物品槽里面，如果鼠标物品槽有东西就交换两者
+            ItemStack stack = this.getItemStack();
+            int amount = stack.getAmount();
+            //点击这个有物品的槽位就把物品转移到鼠标物品槽里面，如果鼠标物品槽有东西，不同类就交换两者，同类就合并
             if (mouseSlotUI.isNullSlot()) {
-                ItemStack stack = this.getItemStack();
-                int amount = stack.getAmount();
                 //按下shift是半数拿取
                 if (KeyBindings.PlayerShift.wasPressed() && amount >= 2) {
                     //如果为奇数，就鼠标拿取一半且多一个
@@ -107,24 +107,34 @@ public class SlotUI extends UIComponent {
                     MouseSlotUI.activate().setItemStack(stack);
                     this.clearItem();
                 }
-
             }else {
-                //如果鼠标物品槽的物品通过类型检测，就交换物品
-                if (this.checkItemType(mouseSlotUI.getItemStack())) {
-                    ItemStack mouseItem = mouseSlotUI.getItemStack();
-                    ItemStack slotItem = this.getItemStack();
-                    mouseSlotUI.setItemStack(slotItem);
-                    this.setItemStack(mouseItem);
+                //到这里鼠标物品槽位是有东西的
+                ItemStack mouseStack = mouseSlotUI.getItemStack();
+                int mouseAmount = mouseStack.getAmount();
+                //检查鼠标物品槽的物品类型是否符合槽位，并且检查物品槽位与鼠标的物品是否是同类
+                if (this.checkItemType(mouseStack) && stack.equals(mouseStack)) {
+                    //物品相同就执行合并
+                    int maxCount = stack.getProperty().getMaxCount();
+                    int newAmount = amount + mouseAmount;
+                    if (newAmount > maxCount) {
+                        //要是超出堆叠上限，鼠标物品数量变为超出的部分
+                        stack.setAmount(maxCount);
+                        mouseStack.setAmount(newAmount - maxCount);
+                    }else {
+                        //合并后没超出堆叠上限
+                        stack.setAmount(newAmount);
+                        MouseSlotUI.deactivate().clearItem();
+                    }
                 }
             }
         }else if (! mouseSlotUI.isNullSlot()) {
             //物品槽是空的，同时鼠标物品槽有物品，且物品类型检查通过，就把物品放进来
             if (this.checkItemType(mouseSlotUI.getItemStack())) {
                 this.setItemStack(mouseSlotUI.getItemStack());
-                MouseSlotUI.deactivate();
-                mouseSlotUI.clearItem();
+                MouseSlotUI.deactivate().clearItem();
             }
         }
+        this.getPlayerSystem().getPlayer().getBackpack().clear();
         return super.click(interactPos);
     }
 
