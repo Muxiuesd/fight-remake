@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.render.camera.CameraController;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
+import ttk.muxiuesd.render.fix.GL32CMacIssueHandler;
 import ttk.muxiuesd.util.Log;
 
 import java.util.HashSet;
