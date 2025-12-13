@@ -23,19 +23,29 @@ public abstract class SystemManager implements Updateable, Disposable {
         this.systems = new LinkedHashMap<>();
     }
 
+    /**
+     * 添加系统，如果系统实现了渲染处理任务，会自动添加（需要对应的渲染处理器已经注册完毕）
+     * */
     public SystemManager addSystem(String name, GameSystem system) {
         if (!this.systems.containsKey(name)) {
             this.systemsClazzToName.put(system.getClass(), name);
             this.systems.put(name, system);
-
-            return this;
+        }else {
+            //存在同名系统，就执行覆盖
+            GameSystem oldSystem = this.systems.get(name);
+            this.systemsClazzToName.remove(oldSystem.getClass());
+            //如果旧的系统实现了渲染接口，就移除它的渲染任务
+            if (system instanceof IRenderTask task) {
+                this.removeSystemRenderTask(task);
+            }
+            this.systemsClazzToName.put(system.getClass(), name);
+            this.systems.put(name, system);
+            Log.print(TAG, "旧系统：" + oldSystem + " 已被新系统：" + system + " 覆盖！");
         }
-        //存在同名系统，就执行覆盖
-        GameSystem oldSystem = this.systems.get(name);
-        this.systemsClazzToName.remove(oldSystem.getClass());
-        this.systemsClazzToName.put(system.getClass(), name);
-        this.systems.put(name, system);
-        Log.print(TAG, "旧系统：" + oldSystem + " 已被新系统：" + system + " 覆盖！");
+        //如果系统实现了渲染接口
+        if (system instanceof IRenderTask task) {
+            this.addSystemRenderTask(task);
+        }
 
         return this;
     }
@@ -60,17 +70,26 @@ public abstract class SystemManager implements Updateable, Disposable {
     }
 
     /**
-     * 延迟初始化
+     * 延迟初始化，当所有系统添加完毕后的初始化
      * */
     public void initAllSystems() {
         for (GameSystem system : this.systems.values()) {
             system.initialize();
-            ///如果这个系统有渲染任务接口，就识别接口并且加进渲染任务里
-            if (system instanceof IRenderTask task) {
-                RenderProcessorManager.addRenderTask(task);
-            }
         }
         Log.print(TAG, "所有系统初始化完毕");
+    }
+
+    /**
+     * 将实现了渲染任务接口的系统加入渲染任务管理里面
+     * */
+    public void addSystemRenderTask (IRenderTask systemRenderTask) {
+        RenderProcessorManager.addRenderTask(systemRenderTask);
+    }
+    /**
+     * 将实现了渲染任务接口的系统加入渲染任务管理里面
+     * */
+    public void removeSystemRenderTask (IRenderTask systemRenderTask) {
+        RenderProcessorManager.removeRenderTask(systemRenderTask);
     }
 
     @Override

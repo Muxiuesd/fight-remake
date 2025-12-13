@@ -13,6 +13,7 @@ public class InputHandleSystem extends GameSystem {
 
     private InputHandleSystem() {
         this.inputMultiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(this.inputMultiplexer);
     }
     private static InputHandleSystem INSTANCE;
     public static InputHandleSystem getInstance() {
@@ -20,11 +21,6 @@ public class InputHandleSystem extends GameSystem {
             INSTANCE = new InputHandleSystem();
         }
         return INSTANCE;
-    }
-
-    @Override
-    public void initialize () {
-        Gdx.input.setInputProcessor(this.inputMultiplexer);
     }
 
     public void addProcessor (InputProcessor processor) {

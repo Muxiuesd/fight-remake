@@ -27,7 +27,7 @@ public class RenderProcessorManager {
     /**
      * 获取指定名称的渲染处理器
      * */
-    public static RenderProcessor get(String name) {
+    public static RenderProcessor get (String name) {
         if (!processors.containsKey(name)) {
             throw new RuntimeException("没有名为：" + name + " 的渲染处理器！！！");
         }
@@ -37,7 +37,7 @@ public class RenderProcessorManager {
     /**
      * 注册一个渲染处理器
      */
-    public static String register(String name, RenderProcessor processor) {
+    public static String register (String name, RenderProcessor processor) {
         // 检查是否已存在并移除旧条目
         if (processors.containsKey(name)) {
             Log.error(TAG, "名为：" + name + " 的渲染处理器已存在，执行覆盖！！！");
@@ -110,6 +110,26 @@ public class RenderProcessorManager {
             if (processor.recognize(task)) {
                 break;
             }
+        }
+    }
+
+    /**
+     * 根据渲染任务的接口类型从相应的渲染处理器中移除
+     * */
+    public static void removeRenderTask(IRenderTask task) {
+        boolean removed = false;
+        for (RenderProcessor processor : processors.values()) {
+            if (processor.getRenderTasks().contains(task)) {
+                if (processor.getRenderTasks().remove(task)) {
+                    removed = true;
+                    break;
+                }
+            }
+        }
+        if (removed) {
+            Log.print(TAG, "渲染任务：" + task + " 已被移除！");
+        }else {
+            Log.error(TAG, "渲染任务：" + task + " 没有被移除成功！！！或许并未被添加过！！！");
         }
     }
 

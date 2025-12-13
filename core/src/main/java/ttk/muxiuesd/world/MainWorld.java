@@ -12,6 +12,12 @@ public class MainWorld extends World {
         super(screen);
         //一定要最先初始化世界系统管理器
         setWorldSystemsManager(new WorldSystemsManager(this));
+    }
+
+    /**
+     * 添加世界的系统
+     * */
+    public void addAllSystems () {
         addSystem("TimeSystem", new TimeSystem(this));
         addSystem("EventSystem", new EventSystem(this));
         addSystem("PlayerSystem", new PlayerSystem(this));
@@ -29,7 +35,6 @@ public class MainWorld extends World {
         addSystem("MonsterGenerationSystem", new MonsterGenerationSystem(this));
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
-
     }
 
     @Override

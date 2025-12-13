@@ -2,6 +2,8 @@
 package ttk.muxiuesd.render;
 
 public class RenderProcessorsReg {
+    public static String START_MENU_GUI = "StartMenuGUI";
+
     public static String WORLD_CHUNK = "WorldChunk";
     public static String ENTITY_GROUND = "EntityGround";
     public static String ENTITY_UNDERGROUND = "EntityUnderground";
