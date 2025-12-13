@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
-import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
+import ttk.muxiuesd.ui.screen.PlayerInventoryUIScreen;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -38,7 +38,7 @@ public class MouseSlotUI extends SlotUI {
      * 激活鼠标物品槽
      * */
     public static MouseSlotUI activate () {
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
         MouseSlotUI instance = getInstance();
         instance.setPosition(Util.getMouseUIPosition());
         inventoryUIPanel.addComponent(instance);
@@ -51,7 +51,7 @@ public class MouseSlotUI extends SlotUI {
      * */
     public static MouseSlotUI deactivate () {
         MouseSlotUI instance = getInstance();
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
         inventoryUIPanel.removeComponent(instance);
 
         return instance;

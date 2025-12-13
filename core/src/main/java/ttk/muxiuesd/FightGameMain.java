@@ -2,6 +2,7 @@ package ttk.muxiuesd;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 import ttk.muxiuesd.event.EventTypes;
@@ -20,8 +21,21 @@ import ttk.muxiuesd.system.manager.GameSystemManager;
  *  游戏核心启动入口
  * */
 public class FightGameMain extends Game {
-    private StartMenuScreen startMenuScreen;
-    private MainGameScreen mainGameScreen;
+    /**
+     * 游戏核心，单例模式，全局只有一个实例
+     * */
+    private static FightGameMain gameInstance;
+    public static FightGameMain getInstance() {
+        if (gameInstance == null) {
+            gameInstance = new FightGameMain();
+        }
+        return gameInstance;
+    }
+    private FightGameMain() {}
+
+    private Screen nextScreen;
+    public StartMenuScreen startMenuScreen;
+    public MainGameScreen mainGameScreen;
 
     @Override
     public void create() {
@@ -47,11 +61,18 @@ public class FightGameMain extends Game {
         //初始化游戏底层系统
         GameSystemManager.getInstance().initAllSystems();
 
-        setScreen(this.mainGameScreen);
+        //setScreen(this.mainGameScreen);
+        setScreen(this.startMenuScreen);
     }
 
     @Override
     public void render () {
+        //延迟交换Screen，防止冲突
+        if (this.nextScreen != null) {
+            setScreen(this.nextScreen);
+            this.nextScreen = null;
+        }
+
         //游戏系统的更新
         float deltaTime = Gdx.graphics.getDeltaTime();
         GameSystemManager.getInstance().update(deltaTime);
@@ -64,6 +85,15 @@ public class FightGameMain extends Game {
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
     }
+
+    /**
+     * 延迟交换Screen，防止冲突
+     * */
+    public void changeScreen (Screen screen) {
+        this.nextScreen = screen;
+    }
+
+
 
     @Override
     public void resize (int width, int height) {

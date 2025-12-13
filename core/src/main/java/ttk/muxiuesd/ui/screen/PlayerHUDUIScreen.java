@@ -13,10 +13,10 @@ import ttk.muxiuesd.ui.components.HotbarSlotUI;
  * <p>
  * 显示玩家的快捷栏、血条等UI组件
  * */
-public class PlayerHUDScreen extends UIScreen {
+public class PlayerHUDUIScreen extends UIScreen {
     private PlayerSystem playerSystem;
 
-    public PlayerHUDScreen (PlayerSystem playerSystem) {
+    public PlayerHUDUIScreen (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
 
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
@@ -29,12 +29,5 @@ public class PlayerHUDScreen extends UIScreen {
             new GridPoint2((int) width, (int) HotbarSlotUI.HOTBAR_HEIGHT));
 
         addComponent(hotbarUIPanel);
-    }
-
-    @Override
-    public void show () {
-        //调整
-        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
-        resize(camera.viewportWidth, camera.viewportHeight);
     }
 }

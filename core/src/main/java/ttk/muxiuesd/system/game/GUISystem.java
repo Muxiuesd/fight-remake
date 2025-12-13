@@ -4,13 +4,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.interfaces.render.IGUIRender;
+import ttk.muxiuesd.interfaces.render.IMenuGUIRender;
 import ttk.muxiuesd.system.abs.GameSystem;
 import ttk.muxiuesd.ui.abs.UIScreen;
 
 /**
  * 游戏的GUI系统
  * */
-public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
+public class GUISystem extends GameSystem implements IGUIRender, IMenuGUIRender, GUIResize {
     //也是单例模式
     private GUISystem() {}
     private static GUISystem INSTANCE;
@@ -72,7 +73,9 @@ public class GUISystem extends GameSystem implements IGUIRender, GUIResize {
             this.getCurScreen().hide();
         }
         this.curScreen = curScreen;
-        curScreen.show();
+        if (this.curScreen != null) {
+            this.curScreen.show();
+        }
     }
 
     public UIScreen getCurScreen () {

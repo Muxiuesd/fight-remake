@@ -2,6 +2,7 @@ package ttk.muxiuesd.ui.abs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -12,6 +13,7 @@ import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 
@@ -31,7 +33,11 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
     /**
      * 被展示出来时调用
      * */
-    public void show () {}
+    public void show () {
+        //调整
+        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
+        resize(camera.viewportWidth, camera.viewportHeight);
+    }
 
     /**
      * 被隐藏时调用

@@ -11,7 +11,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
 import ttk.muxiuesd.ui.abs.UIComponent;
-import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
+import ttk.muxiuesd.ui.screen.PlayerInventoryUIScreen;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -45,7 +45,7 @@ public class TooltipUI extends UIComponent {
      * 激活词条UI
      * */
     public static TooltipUI activate () {
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
         TooltipUI instance = getInstance();
         //由鼠标坐标来给出基础坐标
         instance.setPosition(Util.getMouseUIPosition().add(1, 1));
@@ -59,7 +59,7 @@ public class TooltipUI extends UIComponent {
      * */
     public static TooltipUI deactivate () {
         TooltipUI instance = getInstance();
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
         inventoryUIPanel.removeComponent(instance);
 
         return instance;

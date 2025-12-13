@@ -26,53 +26,7 @@ public class MainGameScreen implements Screen {
     private World world;
 
     public MainGameScreen () {
-        MainWorld mainWorld = new MainWorld(this);
-        //游戏世界的渲染处理器注册
-        RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
-            new EntityUndergroundRenderProcessor(
-                PlayerCamera.INSTANCE.getCamera(),
-                ShadersReg.DAYNIGHT_SHADER,
-                100,
-                mainWorld
-            )
-        );
-        RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
-            new WorldChunkRenderProcessor(
-                PlayerCamera.INSTANCE.getCamera(),
-                ShadersReg.DAYNIGHT_SHADER,
-                200,
-                mainWorld
-            )
-        );
-        RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
-            new EntityGroundRenderProcessor(
-                PlayerCamera.INSTANCE.getCamera(),
-                ShadersReg.DAYNIGHT_SHADER,
-                300,
-                mainWorld
-            )
-        );
-        RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
-            new ParticleRenderProcessor(
-                PlayerCamera.INSTANCE.getCamera(),
-                ShadersReg.PARTICLE_SHADER,
-                400,
-                mainWorld
-            )
-        );
-        RenderProcessorManager.register(RenderProcessorsReg.GUI,
-            new GUIRenderProcessor(
-                GUICamera.INSTANCE.getCamera(),
-                ShadersReg.DEFAULT_SHADER,
-                10000,
-                this
-            )
-        );
 
-        mainWorld.addAllSystems();
-
-        this.setWorld(mainWorld);
-        this.world.getSystemManager().initAllSystems();
     }
 
     @Override
@@ -91,13 +45,64 @@ public class MainGameScreen implements Screen {
         WorldInformationType.init();
 
 
+        MainWorld mainWorld = new MainWorld(this);
+        //游戏世界的渲染处理器注册
+        this.initWorldRenderProcessors(mainWorld);
+        mainWorld.addAllSystems();
+        this.setWorld(mainWorld);
+
         //执行mod代码
         ModLibManager.getInstance().loadCoreLib();
         ModLoader.getInstance().loadAllMods();
         ModLoader.getInstance().runAllMods();
 
+        //初始化世界系统
+        this.getWorld().getSystemManager().initAllSystems();
 
         Log.print(TAG, "------游戏正式开始运行------");
+    }
+
+    private void initWorldRenderProcessors (World world) {
+        RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
+            new EntityUndergroundRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.DAYNIGHT_SHADER,
+                100,
+                world
+            )
+        );
+        RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
+            new WorldChunkRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.DAYNIGHT_SHADER,
+                200,
+                world
+            )
+        );
+        RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
+            new EntityGroundRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.DAYNIGHT_SHADER,
+                300,
+                world
+            )
+        );
+        RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
+            new ParticleRenderProcessor(
+                PlayerCamera.INSTANCE.getCamera(),
+                ShadersReg.PARTICLE_SHADER,
+                400,
+                world
+            )
+        );
+        RenderProcessorManager.register(RenderProcessorsReg.GUI,
+            new GUIRenderProcessor(
+                GUICamera.INSTANCE.getCamera(),
+                ShadersReg.DEFAULT_SHADER,
+                10000,
+                this
+            )
+        );
     }
 
     @Override

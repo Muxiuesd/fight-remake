@@ -81,8 +81,30 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     public Vector2 getPosition () {
         return new Vector2(this.getX(), this.getY());
     }
-    public float getX() { return this.x; }
-    public float getY() { return this.y; }
+
+    /**
+     * 获取原始的x
+     * */
+    public float getX () { return this.x; }
+
+    /**
+     * 获取原始的y
+     * */
+    public float getY () { return this.y; }
+
+    /**
+     * 根据父组件来获取x
+     * */
+    public float getX (UIComponent component) {
+        return component != null ? this.getX() + component.getX() : this.getX();
+    }
+
+    /**
+     * 根据父组件来获取y
+     * */
+    public float getY (UIComponent component) {
+        return component != null ? this.getY() + component.getY() : this.getY();
+    }
 
     public Vector2 getSize() {
         return new Vector2(this.width, this.height);

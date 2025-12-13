@@ -16,7 +16,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 由背景面板、各种槽位组成
  * */
-public class PlayerInventoryScreen extends UIScreen {
+public class PlayerInventoryUIScreen extends UIScreen {
     private static PlayerInventoryUIPanel INVENTORY_UI_PANEL_INSTANCE;
 
     public static PlayerInventoryUIPanel getInventoryUIPanel() {
@@ -31,7 +31,7 @@ public class PlayerInventoryScreen extends UIScreen {
     private PlayerEffectUIPanel effectUIPanel;
 
 
-    public PlayerInventoryScreen(PlayerSystem playerSystem) {
+    public PlayerInventoryUIScreen (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
 
         TextureRegion background = Util.loadTextureRegion(
