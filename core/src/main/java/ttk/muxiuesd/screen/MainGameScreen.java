@@ -1,6 +1,7 @@
 package ttk.muxiuesd.screen;
 
 import com.badlogic.gdx.Screen;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
 import ttk.muxiuesd.mod.ModLoader;
@@ -8,9 +9,11 @@ import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
-import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
-import ttk.muxiuesd.render.instance.*;
+import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
+import ttk.muxiuesd.render.instance.EntityUndergroundRenderProcessor;
+import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
+import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.render.shader.ShadersReg;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
@@ -59,6 +62,8 @@ public class MainGameScreen implements Screen {
         //初始化世界系统
         this.getWorld().getSystemManager().initAllSystems();
 
+        FightCore.getInstance().guiRenderProcessor.setMainGameScreen(this);
+
         Log.print(TAG, "------游戏正式开始运行------");
     }
 
@@ -93,14 +98,6 @@ public class MainGameScreen implements Screen {
                 ShadersReg.PARTICLE_SHADER,
                 400,
                 world
-            )
-        );
-        RenderProcessorManager.register(RenderProcessorsReg.GUI,
-            new GUIRenderProcessor(
-                GUICamera.INSTANCE.getCamera(),
-                ShadersReg.DEFAULT_SHADER,
-                10000,
-                this
             )
         );
     }

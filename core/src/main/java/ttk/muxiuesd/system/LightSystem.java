@@ -90,7 +90,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
     }
 
     /**
-     * 处理光照
+     * 处理光照，必须在GUI渲染之前调用
      * */
     public void afterProcess() {
         float time = this.timeSystem.getGameTime() / 24f;

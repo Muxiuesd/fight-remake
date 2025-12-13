@@ -20,7 +20,7 @@ public class StartMenuUIScreen extends UIScreen {
             new GridPoint2((int) UIButton.DEFAULT_WIDTH, 100)
         );
 
-        this.buttonsPanel.addComponent(new UIButton((button, interactPos) -> {
+        this.buttonsPanel.addComponent(new UIButton("开始游戏", (button, interactPos) -> {
             FightCore.getInstance().changeScreen(FightCore.getInstance().mainGameScreen);
             return false;
         }));

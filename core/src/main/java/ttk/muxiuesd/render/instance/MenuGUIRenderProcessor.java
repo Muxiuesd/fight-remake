@@ -29,7 +29,7 @@ public class MenuGUIRenderProcessor extends RenderProcessor {
     public boolean recognize (IRenderTask task) {
         if (task instanceof IMenuGUIRender) {
             addRenderTask(task);
-            return true;
+            //return true;
         }
         return false;
     }

@@ -70,6 +70,47 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     }
 
     @Override
+    public void mouseOver (GridPoint2 interactPos) {
+        if (! this.getComponents().isEmpty()) {
+            //面板内部坐标
+            Vector2 internalPos = new Vector2(interactPos.x, interactPos.y);
+            PoolableRectangle rectangle = Pools.RECT.obtain();
+
+            //遍历面板里面的组件，用内部坐标来检测
+            for (UIComponent component : this.getComponents()) {
+                component.setMouseOver(false);
+                //如果是不可交互状态的组件就直接跳过
+                if (!component.isEnabled()) continue;
+
+                rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
+                if (rectangle.contains(internalPos)) {
+                    //计算交互区域坐标
+                    GridPoint2 interactGridPos = Util.getInteractGridPos(
+                        component.getPosition(),
+                        internalPos,
+                        component.getSize(),
+                        component.getInteractGridSize()
+                    );
+                    component.setMouseOver(true);
+                    component.mouseOver(interactGridPos);
+                }
+            }
+
+            Pools.RECT.free(rectangle);
+        }
+        super.mouseOver(interactPos);
+    }
+
+    @Override
+    public void setMouseOver (boolean mouseOver) {
+        super.setMouseOver(mouseOver);
+        //当这个面板都没有被鼠标覆盖，就让里面的所有ui组件的覆盖状态都为false
+        if (!mouseOver) {
+            this.getComponents().forEach(component -> component.setMouseOver(false));
+        }
+    }
+
+    @Override
     public void addComponent (UIComponent component) {
         UIComponentsHolder.super.addComponent(component);
         //当加入的组件是面板时，把子面板的父节点设置为此面板

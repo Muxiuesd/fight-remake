@@ -1,11 +1,6 @@
 package ttk.muxiuesd.screen;
 
 import com.badlogic.gdx.Screen;
-import ttk.muxiuesd.render.RenderProcessorManager;
-import ttk.muxiuesd.render.RenderProcessorsReg;
-import ttk.muxiuesd.render.camera.GUICamera;
-import ttk.muxiuesd.render.instance.MenuGUIRenderProcessor;
-import ttk.muxiuesd.render.shader.ShadersReg;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.ui.screen.StartMenuUIScreen;
 
@@ -18,13 +13,13 @@ public class StartMenuScreen implements Screen {
 
     public StartMenuScreen () {
         //注册主菜单界面的GUI渲染处理器
-        RenderProcessorManager.register(RenderProcessorsReg.START_MENU_GUI,
+        /*RenderProcessorManager.register(RenderProcessorsReg.START_MENU_GUI,
             new MenuGUIRenderProcessor(
                 GUICamera.INSTANCE.getCamera(),
                 ShadersReg.DEFAULT_SHADER,
                 9999
             )
-        );
+        );*/
 
         this.uiScreen = new StartMenuUIScreen();
     }

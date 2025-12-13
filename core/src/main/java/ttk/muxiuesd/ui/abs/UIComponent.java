@@ -22,6 +22,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     private int zIndex = 0; // 渲染顺序
     ///交互区域网格
     private GridPoint2 interactGridSize;
+    private boolean mouseIsOver;
 
     public UIComponent() {}
 
@@ -157,5 +158,13 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     public UIComponent setInteractGridSize (GridPoint2 interactGridSize) {
         this.interactGridSize = interactGridSize;
         return this;
+    }
+
+    public void setMouseOver (boolean mouseOver) {
+        this.mouseIsOver = mouseOver;
+    }
+
+    public boolean isMouseOver () {
+        return this.mouseIsOver;
     }
 }

@@ -10,7 +10,12 @@ import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.render.RenderPipe;
+import ttk.muxiuesd.render.RenderProcessorManager;
+import ttk.muxiuesd.render.RenderProcessorsReg;
+import ttk.muxiuesd.render.camera.GUICamera;
+import ttk.muxiuesd.render.instance.GUIRenderProcessor;
 import ttk.muxiuesd.render.shader.ShaderScheduler;
+import ttk.muxiuesd.render.shader.ShadersReg;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.screen.StartMenuScreen;
 import ttk.muxiuesd.system.game.GUISystem;
@@ -37,6 +42,8 @@ public class FightCore extends Game {
     public StartMenuScreen startMenuScreen;
     public MainGameScreen mainGameScreen;
 
+    public GUIRenderProcessor guiRenderProcessor;
+
     @Override
     public void create() {
         //先行加载
@@ -51,6 +58,14 @@ public class FightCore extends Game {
         RenderPipe.init();
         //添加底层游戏系统
         GameSystemManager.init();
+
+        this.guiRenderProcessor = new GUIRenderProcessor(
+            GUICamera.INSTANCE.getCamera(),
+            ShadersReg.DEFAULT_SHADER,
+            10000
+        );
+        //GUI渲染处理器是最先注册的渲染处理器
+        RenderProcessorManager.register(RenderProcessorsReg.GUI, this.guiRenderProcessor);
 
         //游戏界面初始化，在各自的screen里面注册各自需要的渲染处理器
         this.startMenuScreen = new StartMenuScreen();
