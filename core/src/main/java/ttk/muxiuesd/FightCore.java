@@ -18,20 +18,20 @@ import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
 
 /**
- *  游戏核心启动入口
+ *  游戏的核心类
  * */
-public class FightGameMain extends Game {
+public class FightCore extends Game {
     /**
      * 游戏核心，单例模式，全局只有一个实例
      * */
-    private static FightGameMain gameInstance;
-    public static FightGameMain getInstance() {
+    private static FightCore gameInstance;
+    public static FightCore getInstance() {
         if (gameInstance == null) {
-            gameInstance = new FightGameMain();
+            gameInstance = new FightCore();
         }
         return gameInstance;
     }
-    private FightGameMain() {}
+    private FightCore () {}
 
     private Screen nextScreen;
     public StartMenuScreen startMenuScreen;

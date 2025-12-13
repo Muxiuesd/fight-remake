@@ -1,7 +1,7 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.math.GridPoint2;
-import ttk.muxiuesd.FightGameMain;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.ui.components.UIButton;
 import ttk.muxiuesd.ui.components.UIPanel;
@@ -21,7 +21,7 @@ public class StartMenuUIScreen extends UIScreen {
         );
 
         this.buttonsPanel.addComponent(new UIButton((button, interactPos) -> {
-            FightGameMain.getInstance().changeScreen(FightGameMain.getInstance().mainGameScreen);
+            FightCore.getInstance().changeScreen(FightCore.getInstance().mainGameScreen);
             return false;
         }));
         addComponent(buttonsPanel);
