@@ -82,7 +82,8 @@ public class UIButton extends UIComponent {
         if (this.text != null) {
             BitmapFont font = this.getFontHolder().getFont(FontHolder.FONT_SIZE);
             font.getData().setScale(FontHolder.FONT_SCALE);
-            int renderSize = this.getFontRenderSize();
+            //让文本在按钮中央渲染
+            int renderSize = this.getFontRenderSize(FontHolder.FONT_SIZE, FontHolder.FONT_SCALE);
             float renderX = x + (getWidth() - renderSize * this.getText().length()) / 2;
             font.draw(batch, this.getText(), renderX, y + renderSize + DEFAULT_EDGE);
         }
@@ -121,8 +122,8 @@ public class UIButton extends UIComponent {
         return this;
     }
 
-    public int getFontRenderSize () {
-        return (int) (FontHolder.FONT_SIZE * FontHolder.FONT_SCALE);
+    public int getFontRenderSize (int fontSize, float fontScale) {
+        return (int) (fontSize * fontScale);
     }
 
     /**
