@@ -21,48 +21,58 @@ public class UIButton extends UIComponent {
     public static final float DEFAULT_WIDTH = 80f;
     public static final float DEFAULT_HEIGHT = 14f;
 
-    private Click click;
-    private MouseOver mouseOver;
+    private String text;
+    private FontHolder fontHolder;
     private NinePatch backgroundPatch;
     private NinePatch clickBackgroundPatch;
-
-    private FontHolder fontHolder;
-    private String text;
+    private NinePatch mouseOverBackgroundPatch;
+    private Click click;
+    private MouseOver mouseOver;
 
     public UIButton(String text, Click click) {
         this(
-            text,
+            text, Fonts.MC,
             Util.loadTextureRegion(
                 Fight.ID("button"),
-                Fight.UITexturePath("tooltip_background.png")
+                Fight.UITexturePath("button.png")
             ),
             Util.loadTextureRegion(
-                Fight.ID("button_click"),
-                Fight.UITexturePath("tooltip_frame.png")
+                Fight.ID("button_clicked"),
+                Fight.UITexturePath("button_clicked.png")
+            ),
+            Util.loadTextureRegion(
+                Fight.ID("button_mouse_over"),
+                Fight.UITexturePath("button_mouse_over.png")
             ),
             click,
             (button, interactPos) -> {}
         );
     }
-    public UIButton(String text, TextureRegion background, TextureRegion clickBackground, Click click, MouseOver mouseOver) {
+    public UIButton(String text, FontHolder fontHolder,
+                    TextureRegion background, TextureRegion clickBackground, TextureRegion mouseOverBackground,
+                    Click click, MouseOver mouseOver) {
         this(
-            text,
+            text, fontHolder,
             new NinePatch(background, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             new NinePatch(clickBackground, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
+            new NinePatch(mouseOverBackground, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             DEFAULT_WIDTH, DEFAULT_HEIGHT, new GridPoint2(DEFAULT_EDGE, DEFAULT_EDGE),
             click, mouseOver
         );
     }
 
-    public UIButton (String text, NinePatch backgroundPatch, NinePatch clickBackground,
+    public UIButton (String text, FontHolder fontHolder,
+                     NinePatch backgroundPatch, NinePatch clickBackground, NinePatch mouseOverBackground,
                      float width, float height, GridPoint2 interactSize,
                      Click click, MouseOver mouseOver) {
         this.text = text;
-        this.fontHolder = Fonts.MC;
+        this.fontHolder = fontHolder;
         this.backgroundPatch = backgroundPatch;
         this.clickBackgroundPatch = clickBackground;
+        this.mouseOverBackgroundPatch = mouseOverBackground;
         this.click = click;
         this.mouseOver = mouseOver;
+
         setSize(width, height);
         setInteractGridSize(interactSize);
     }
@@ -71,11 +81,12 @@ public class UIButton extends UIComponent {
     public void draw (Batch batch, UIPanel parent) {
         float x = getX(parent);
         float y = getY(parent);
-        if (this.backgroundPatch != null) {
-            this.backgroundPatch.draw(batch, x, y, getWidth(), getHeight());
-        }
-        if (isMouseOver()) {
+        if (isClicked() && this.clickBackgroundPatch != null) {
             this.clickBackgroundPatch.draw(batch, x, y, getWidth(), getHeight());
+        }else if (isMouseOver() && this.mouseOverBackgroundPatch != null) {
+            this.mouseOverBackgroundPatch.draw(batch, x, y, getWidth(), getHeight());
+        }else if (this.backgroundPatch != null) {
+            this.backgroundPatch.draw(batch, x, y, getWidth(), getHeight());
         }
 
         //渲染字体
