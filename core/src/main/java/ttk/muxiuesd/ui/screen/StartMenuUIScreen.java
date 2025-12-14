@@ -26,4 +26,12 @@ public class StartMenuUIScreen extends UIScreen {
         }));
         addComponent(buttonsPanel);
     }
+
+    @Override
+    public void hide () {
+        this.getComponents().forEach(uiComponent -> {
+            uiComponent.setMouseOver(false);
+            uiComponent.setClicked(false);
+        });
+    }
 }

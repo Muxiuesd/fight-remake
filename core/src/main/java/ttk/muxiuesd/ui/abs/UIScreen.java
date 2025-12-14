@@ -56,8 +56,10 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
         for (UIComponent uiComponent : getComponents()) {
             //更新组件
-            uiComponent.update(delta);
-            uiComponent.setMouseOver(false);
+            uiComponent
+                .setMouseOver(false)
+                .setClicked(false)
+                .update(delta);
             //不可交互状态的组件就直接跳过交互计算
             if (!uiComponent.isEnabled()) continue;
 
@@ -76,7 +78,9 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
                 //如果鼠标在组件的交互区域上并且点击了鼠标左键，就是点击了组件
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    uiComponent.click(grid);
+                    uiComponent
+                        .setClicked(true)
+                        .click(grid);
                 }
 
                 this.setMouseOver(true);

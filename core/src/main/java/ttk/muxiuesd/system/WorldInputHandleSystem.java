@@ -1,6 +1,5 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -8,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
@@ -68,10 +68,11 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
         if (KeyBindings.ExitGame.wasJustPressed()) {
-            //如果是玩家HUD屏幕就是退出游戏
+            //如果是玩家HUD屏幕就是退出游戏世界，回到主菜单
             if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN) {
                 Log.print(TAG(), "游戏退出！");
-                Gdx.app.exit();
+                FightCore.getInstance().changeScreen(FightCore.getInstance().startMenuScreen);
+                FightCore.getInstance().mainGameScreen.dispose();
             }else {
                 //否则就把当前的屏幕调整回玩家HUD屏幕
                 GUISystem.getInstance().setCurScreen(PlayerSystem.PLAYER_HUD_SCREEN);

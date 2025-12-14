@@ -48,11 +48,13 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
 
             //遍历面板里面的组件，用内部坐标来检测
             for (UIComponent component : this.getComponents()) {
+                component.setClicked(false);
                 //如果是不可交互状态的组件就直接跳过
                 if (!component.isEnabled()) continue;
 
                 rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
                 if (rectangle.contains(internalPos)) {
+
                     //计算交互区域坐标
                     GridPoint2 interactGridPos = Util.getInteractGridPos(
                         component.getPosition(),
@@ -60,6 +62,8 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
                         component.getSize(),
                         component.getInteractGridSize()
                     );
+                    //设置被点击
+                    component.setClicked(true);
                     if (! component.click(interactGridPos)) break;
                 }
             }
@@ -102,12 +106,13 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     }
 
     @Override
-    public void setMouseOver (boolean mouseOver) {
+    public UIPanel setMouseOver (boolean mouseOver) {
         super.setMouseOver(mouseOver);
         //当这个面板都没有被鼠标覆盖，就让里面的所有ui组件的覆盖状态都为false
         if (!mouseOver) {
             this.getComponents().forEach(component -> component.setMouseOver(false));
         }
+        return this;
     }
 
     @Override
@@ -152,5 +157,14 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     public float getY () {
         float y = super.getY();
         return this.getParent() == null ? y : y + this.getParent().getY();
+    }
+
+    @Override
+    public UIComponent setClicked (boolean clicked) {
+        //如果面板被设置为没有被点击，那么里面的所有组件都应该是没有被点击的状态
+        if (!clicked && !this.getComponents().isEmpty()) {
+            this.getComponents().forEach(component -> component.setClicked(false));
+        }
+        return super.setClicked(clicked);
     }
 }

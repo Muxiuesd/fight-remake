@@ -50,7 +50,7 @@ public class MainGameScreen implements Screen {
 
         MainWorld mainWorld = new MainWorld(this);
         //游戏世界的渲染处理器注册
-        this.initWorldRenderProcessors(mainWorld);
+        this.registerWorldRenderProcessors(mainWorld);
         mainWorld.addAllSystems();
         this.setWorld(mainWorld);
 
@@ -67,7 +67,7 @@ public class MainGameScreen implements Screen {
         Log.print(TAG, "------游戏正式开始运行------");
     }
 
-    private void initWorldRenderProcessors (World world) {
+    private void registerWorldRenderProcessors (World world) {
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
             new EntityUndergroundRenderProcessor(
                 PlayerCamera.INSTANCE.getCamera(),
@@ -102,6 +102,16 @@ public class MainGameScreen implements Screen {
         );
     }
 
+    /**
+     * 把世界里注册的渲染器全部取消掉
+     * */
+    public void unregisterWorldRenderProcessors () {
+        RenderProcessorManager.unregister(RenderProcessorsReg.ENTITY_UNDERGROUND);
+        RenderProcessorManager.unregister(RenderProcessorsReg.WORLD_CHUNK);
+        RenderProcessorManager.unregister(RenderProcessorsReg.ENTITY_GROUND);
+        RenderProcessorManager.unregister(RenderProcessorsReg.PARTICLE);
+    }
+
     @Override
     public void render(float delta) {
         this.world.update(delta);
@@ -130,6 +140,7 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void dispose() {
+        this.unregisterWorldRenderProcessors();
         this.world.dispose();
     }
 

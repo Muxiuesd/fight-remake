@@ -1,6 +1,8 @@
 package ttk.muxiuesd.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.ui.screen.StartMenuUIScreen;
 
@@ -12,15 +14,6 @@ public class StartMenuScreen implements Screen {
     private StartMenuUIScreen uiScreen;
 
     public StartMenuScreen () {
-        //注册主菜单界面的GUI渲染处理器
-        /*RenderProcessorManager.register(RenderProcessorsReg.START_MENU_GUI,
-            new MenuGUIRenderProcessor(
-                GUICamera.INSTANCE.getCamera(),
-                ShadersReg.DEFAULT_SHADER,
-                9999
-            )
-        );*/
-
         this.uiScreen = new StartMenuUIScreen();
     }
 
@@ -32,7 +25,7 @@ public class StartMenuScreen implements Screen {
 
     @Override
     public void render (float delta) {
-
+        if (KeyBindings.ExitGame.wasJustPressed()) Gdx.app.exit();
     }
 
     @Override
@@ -52,6 +45,7 @@ public class StartMenuScreen implements Screen {
 
     @Override
     public void hide () {
+        this.uiScreen.hide();
         GUISystem.getInstance().setCurScreen(null);
     }
 
@@ -61,7 +55,7 @@ public class StartMenuScreen implements Screen {
     }
 
     public StartMenuUIScreen getUiScreen () {
-        return uiScreen;
+        return this.uiScreen;
     }
 
     public StartMenuScreen setUiScreen (StartMenuUIScreen uiScreen) {

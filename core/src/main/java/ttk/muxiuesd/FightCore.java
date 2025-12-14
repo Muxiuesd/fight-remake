@@ -46,18 +46,7 @@ public class FightCore extends Game {
 
     @Override
     public void create() {
-        //先行加载
-        Fonts.init();
-        FI18N.init();
-
-        EventTypes.init();
-        RegistrantGroup.init();
-
-        //初始化着色器调度器
-        ShaderScheduler.init();
-        RenderPipe.init();
-        //添加底层游戏系统
-        GameSystemManager.init();
+        this.coreInit();
 
         this.guiRenderProcessor = new GUIRenderProcessor(
             GUICamera.INSTANCE.getCamera(),
@@ -78,6 +67,20 @@ public class FightCore extends Game {
 
         //setScreen(this.mainGameScreen);
         setScreen(this.startMenuScreen);
+    }
+
+    public void coreInit () {
+        //先行加载
+        Fonts.init();
+        FI18N.init();
+        EventTypes.init();
+        RegistrantGroup.init();
+
+        //初始化着色器调度器
+        ShaderScheduler.init();
+        RenderPipe.init();
+        //初始化底层游戏系统
+        GameSystemManager.init();
     }
 
     @Override
@@ -107,8 +110,6 @@ public class FightCore extends Game {
     public void changeScreen (Screen screen) {
         this.nextScreen = screen;
     }
-
-
 
     @Override
     public void resize (int width, int height) {

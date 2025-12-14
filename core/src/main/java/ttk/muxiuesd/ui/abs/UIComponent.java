@@ -22,7 +22,8 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     private int zIndex = 0; // 渲染顺序
     ///交互区域网格
     private GridPoint2 interactGridSize;
-    private boolean mouseIsOver;
+    private boolean mouseIsOver = false;
+    private boolean isClicked = false;
 
     public UIComponent() {}
 
@@ -160,11 +161,21 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
         return this;
     }
 
-    public void setMouseOver (boolean mouseOver) {
+    public UIComponent setMouseOver (boolean mouseOver) {
         this.mouseIsOver = mouseOver;
+        return this;
     }
 
     public boolean isMouseOver () {
         return this.mouseIsOver;
+    }
+
+    public boolean isClicked () {
+        return this.isClicked;
+    }
+
+    public UIComponent setClicked (boolean clicked) {
+        this.isClicked = clicked;
+        return this;
     }
 }
