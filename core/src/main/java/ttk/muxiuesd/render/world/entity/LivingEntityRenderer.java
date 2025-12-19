@@ -3,8 +3,11 @@ package ttk.muxiuesd.render.world.entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 活物实体的渲染器
@@ -27,7 +30,9 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
         }
 
         //手持物品渲染
-        if (entity.renderHandItem) this.drawHandItem(batch, entity, context);
+        if (entity.renderHandItem) {
+            this.drawHandItem(batch, entity, context);
+        }
     }
 
     /**
@@ -37,7 +42,16 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
         //如果手上有物品，则绘制手上的物品
         ItemStack itemStack = entity.getHandItemStack();
         if (itemStack != null) {
-            itemStack.drawItemOnHand(batch, entity);
+            //获取物品的渲染器来渲染
+            ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack.getItem());
+            if (renderer == null) return;
+
+            ItemRenderer.Context itemContext = renderer.getContextByEntityContext(context);
+            //物品渲染起点基于实体中心
+            itemContext.x += context.width / 2;
+            itemContext.y += context.height / 2;
+            renderer.drawOnHand(batch, itemContext, entity, itemStack);
+            renderer.freeContext(itemContext);
         }
     }
 

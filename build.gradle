@@ -9,7 +9,7 @@ buildscript {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-
+    //implementation "com.badlogicgames.packr:3.0.3"
   }
 }
 

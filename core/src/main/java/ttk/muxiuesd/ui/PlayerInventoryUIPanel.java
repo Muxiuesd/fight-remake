@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
+import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.UIComponent;
@@ -12,6 +14,8 @@ import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.ui.components.TooltipUI;
 import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
+import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 玩家背包容器UI面板
@@ -57,7 +61,20 @@ public class PlayerInventoryUIPanel extends UIPanel {
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
+        //绘制背景贴图
         batch.draw(this.background, getX(), getY(), getWidth(), getHeight());
+
+        //绘制玩家布娃娃
+        Player player = this.playerSystem.getPlayer();
+        EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(player.getID());
+        EntityRenderer.Context context = renderer.getContext();
+        context.x = getX() + 45f;
+        context.y = getY() + 100f;
+        context.width = 32f;
+        context.height = 32f;
+        renderer.draw(batch, player, context);
+        renderer.freeContext(context);
+
         super.draw(batch, parent);
     }
 

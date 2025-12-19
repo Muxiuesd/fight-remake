@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -65,6 +66,19 @@ public interface ItemRenderer<T extends Item> {
         );
     }
 
+    /**
+     * 直接使用实体当前的渲染上下文参数来作为物品渲染上下文参数
+     * */
+    default <E extends Entity<?>> ItemRenderer.Context getContextByEntityContext (EntityRenderer.Context holderContext) {
+        return getContext(
+            holderContext.x, holderContext.y,
+            holderContext.width, holderContext.height,
+            holderContext.originX, holderContext.originY,
+            holderContext.scaleX, holderContext.scaleY,
+            holderContext.rotation
+        );
+    }
+
     default ItemRenderer.Context getContext (float x, float y, float width, float height) {
         ItemRenderer.Context context = getContext();
         context.x = x;
@@ -100,7 +114,7 @@ public interface ItemRenderer<T extends Item> {
     }
 
     /**
-     * 回收上下文参数类
+     * 回收上下文参数类，每次渲染完后记得调用此类回收
      * */
     default void freeContext (ItemRenderer.Context context) {
         ItemRenderer.Context.POOL.free(context);
@@ -161,18 +175,17 @@ public interface ItemRenderer<T extends Item> {
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             float rotationOffset = holder.getSwingHandDegreeOffset();
 
-            //直接利用持有者的各种参数来渲染
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(item.textureRegion,
-                    context.x + holder.getWidth() / 2, context.y + holder.getHeight() / 2,
-                    0, 0,
+                    context.x /*+ holder.getWidth() / 2*/, context.y /*+ holder.getHeight() / 2*/,
+                    context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     rotation + 225f + rotationOffset);
             } else {
                 batch.draw(item.textureRegion,
-                    context.x + holder.getWidth() / 2, context.y + holder.getHeight() / 2,
-                    0, 0,
+                    context.x /*+ holder.getWidth() / 2*/, context.y /*+ holder.getHeight() / 2*/,
+                    context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,
                     rotation - 45f + rotationOffset);
