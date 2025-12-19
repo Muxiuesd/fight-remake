@@ -1,7 +1,7 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
@@ -24,17 +24,20 @@ public class Util {
      * 获取鼠标指向的游戏世界坐标
      * */
     public static Vector2 getMouseWorldPosition() {
-        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
+        return getMousePosForCamera(PlayerCamera.INSTANCE.getCamera());
     }
 
     /**
      * 获取鼠标指向的游戏GUI坐标
      * */
     public static Vector2 getMouseUIPosition() {
-        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
+        return getMousePosForCamera(GUICamera.INSTANCE.getCamera());
+    }
+
+    /**
+     * 从相机获取鼠标的坐标
+     * */
+    public static Vector2 getMousePosForCamera(Camera camera) {
         Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
         Vector3 up = camera.unproject(mp);
         return new Vector2(up.x, up.y);
@@ -44,7 +47,7 @@ public class Util {
     /**
      * 获取鼠标的位置,相对于游戏窗口的中心
      */
-    public static Vector2 getMousePosition() {
+    public static Vector2 getMouseWindowPos () {
         return axeTransfer(Gdx.input.getX(), Gdx.input.getY());
     }
 

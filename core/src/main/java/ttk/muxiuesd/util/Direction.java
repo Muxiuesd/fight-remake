@@ -11,7 +11,7 @@ public class Direction extends Vector2 {
      * 默认方向：当前游戏窗口中心到鼠标的方向
      */
     public Direction () {
-        Vector2 mouse = Util.getMousePosition();
+        Vector2 mouse = Util.getMouseWindowPos();
         float mouseX = mouse.x;
         float mouseY = mouse.y;
         float length = (float) Math.sqrt(Math.pow((mouseX), 2) + Math.pow((mouseY), 2));

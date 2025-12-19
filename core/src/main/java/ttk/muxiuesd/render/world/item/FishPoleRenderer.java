@@ -31,16 +31,18 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(fishPole.textureRegion,
-                    holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
-                    0, 0,
-                    holder.width, holder.height,
-                    - holder.scaleX, holder.scaleY, rotation + 180);
+                    context.x , context.y ,
+                    context.originX, context.originY,
+                    context.width, context.height,
+                    - context.scaleX, context.scaleY,
+                    rotation + 180);
             } else {
                 batch.draw(fishPole.textureRegion,
-                    holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
-                    0, 0,
-                    holder.width, holder.height,
-                    holder.scaleX, holder.scaleY, rotation);
+                    context.x , context.y ,
+                    context.originX, context.originY,
+                    context.width, context.height,
+                    context.scaleX, context.scaleY,
+                    rotation);
             }
         }else {
             //if (fishPole.castTexture == null) return;
@@ -49,16 +51,18 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(fishPole.castTexture,
-                    holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
-                    0, 0,
-                    holder.width, holder.height,
-                    - holder.scaleX, holder.scaleY, rotation + 225f);
+                    context.x , context.y ,
+                    context.originX, context.originY,
+                    context.width, context.height,
+                    - context.scaleX, context.scaleY,
+                    rotation + 225f);
             } else {
                 batch.draw(fishPole.castTexture,
-                    holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
-                    0, 0,
-                    holder.width, holder.height,
-                    holder.scaleX, holder.scaleY, rotation - 45f);
+                    context.x , context.y ,
+                    context.originX, context.originY,
+                    context.width, context.height,
+                    context.scaleX, context.scaleY,
+                    rotation - 45f);
             }
         }
     }

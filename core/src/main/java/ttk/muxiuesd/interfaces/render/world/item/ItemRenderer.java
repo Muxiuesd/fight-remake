@@ -177,18 +177,18 @@ public interface ItemRenderer<T extends Item> {
 
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(item.textureRegion,
-                    context.x /*+ holder.getWidth() / 2*/, context.y /*+ holder.getHeight() / 2*/,
+                    context.x, context.y,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
-                    rotation + 225f + rotationOffset);
+                    context.rotation + 225f + rotationOffset);
             } else {
                 batch.draw(item.textureRegion,
-                    context.x /*+ holder.getWidth() / 2*/, context.y /*+ holder.getHeight() / 2*/,
+                    context.x, context.y,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,
-                    rotation - 45f + rotationOffset);
+                    context.rotation - 45f + rotationOffset);
             }
         }
 
@@ -200,7 +200,8 @@ public interface ItemRenderer<T extends Item> {
                     context.x, context.y + itemEntity.getPositionOffset().y,
                     context.originX, context.originY,
                     context.width, context.height,
-                    context.scaleX, context.scaleY, context.rotation);
+                    context.scaleX, context.scaleY,
+                    context.rotation);
             }
         }
 

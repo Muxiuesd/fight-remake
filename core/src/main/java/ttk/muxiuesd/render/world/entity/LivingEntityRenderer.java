@@ -3,8 +3,11 @@ package ttk.muxiuesd.render.world.entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -50,6 +53,8 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
             //物品渲染起点基于实体中心
             itemContext.x += context.width / 2;
             itemContext.y += context.height / 2;
+            Vector2 mousePos = Util.getMouseWindowPos();
+            itemContext.rotation = MathUtils.atan2Deg360(mousePos.y - itemContext.y, mousePos.x - itemContext.x);
             renderer.drawOnHand(batch, itemContext, entity, itemStack);
             renderer.freeContext(itemContext);
         }
@@ -58,16 +63,19 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
 
     @Override
     public void drawShape (ShapeRenderer batch, T entity, Context context) {
-        if (entity.renderHandItem) this.renderShapeHandItem(batch, entity, context);
+        if (entity.renderHandItem) this.renderShapeHandItem(batch, entity);
     }
 
     /**
      * 持有物品的形状渲染
      * */
-    public void renderShapeHandItem (ShapeRenderer batch, T entity, Context context) {
+    public void renderShapeHandItem (ShapeRenderer batch, T entity) {
         ItemStack itemStack = entity.getHandItemStack();
         if (itemStack != null) {
-            itemStack.renderShapeOnHand(batch, entity);
+            //获取物品的渲染器来渲染
+            ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack.getItem());
+            if (renderer == null) return;
+            renderer.renderShapeOnHand(batch, entity, itemStack);
         }
     }
 }

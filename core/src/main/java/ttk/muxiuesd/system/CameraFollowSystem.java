@@ -47,7 +47,7 @@ public class CameraFollowSystem extends WorldSystem {
 
         // 使相机跟随鼠标移动
         Direction direction = Util.getDirection();
-        Vector2 vector2 = Util.getMousePosition();
+        Vector2 vector2 = Util.getMouseWindowPos();
         float xOffset = Math.abs(vector2.x) * direction.getxDirection() / 300;
         float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
         PlayerCamera.INSTANCE.setPosition(follower.x + follower.width / 2 + xOffset,
