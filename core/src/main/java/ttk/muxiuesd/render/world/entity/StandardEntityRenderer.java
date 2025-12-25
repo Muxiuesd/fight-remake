@@ -17,7 +17,9 @@ public class StandardEntityRenderer<T extends Entity<?>> implements EntityRender
                 context.x, context.y,
                 context.originX, context.originY,
                 context.width, context.height,
-                context.scaleX, context.scaleY, context.rotation);
+                context.scaleX, context.scaleY,
+                context.rotation
+            );
         }
     }
 
