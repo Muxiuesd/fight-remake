@@ -33,6 +33,10 @@ public class KeyBindings {
         Fight.ID("key_player_backpack_screen"), "key_player_backpack_screen",
         KeyBinding.Type.Keyboard, Input.Keys.E
     ));
+    public static KeyBinding PlayerBackpackScreenChange = InputBinding.registerBinding(new KeyBinding(
+        Fight.ID("key_player_backpack_screen_change"), "key_player_backpack_screen_change",
+        KeyBinding.Type.Keyboard, Input.Keys.F
+    ));
     public static KeyBinding PlayerShoot = InputBinding.registerBinding(new KeyBinding(
         Fight.ID("key_player_shoot"), "key_player_shoot",
         KeyBinding.Type.Mouse, Input.Buttons.LEFT

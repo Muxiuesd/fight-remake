@@ -25,6 +25,7 @@ public class PlayerEffectUIPanel extends UIPanel {
                                 GridPoint2 interactGridSize,
                                 PlayerSystem playerSystem) {
         super(x, y, width, height, interactGridSize);
+
         this.playerSystem = playerSystem;
         this.effectUIs = new LinkedHashMap<>();
     }

@@ -27,8 +27,6 @@ public class SlotUI extends UIComponent {
     private int index;  ///指向的玩家的某个容器的索引
 
     private TextUI textUI;
-    private boolean mouseIsOver;
-
 
 
     public SlotUI (PlayerSystem playerSystem, int index, float x, float y) {
@@ -71,7 +69,7 @@ public class SlotUI extends UIComponent {
             this.drawAmount(batch, parent, renderX, renderY, amount);
         }
         //绘制鼠标放在槽位上的高光
-        if (this.slotHighlight != null && this.mouseIsOver()) {
+        if (this.slotHighlight != null && isMouseOver()) {
             batch.draw(this.slotHighlight, renderX - 1, renderY - 1);
         }
     }
@@ -198,14 +196,5 @@ public class SlotUI extends UIComponent {
 
     public int getIndex() {
         return this.index;
-    }
-
-    public boolean mouseIsOver () {
-        return this.mouseIsOver;
-    }
-
-    public SlotUI setMouseIsOver (boolean mouseIsOver) {
-        this.mouseIsOver = mouseIsOver;
-        return this;
     }
 }

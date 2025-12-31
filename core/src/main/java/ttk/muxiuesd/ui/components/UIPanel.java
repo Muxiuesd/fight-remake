@@ -23,7 +23,7 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     //父节点面板
     private UIPanel parent;
 
-
+    public UIPanel() {}
     public UIPanel (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
         this.components = new LinkedHashSet<>();

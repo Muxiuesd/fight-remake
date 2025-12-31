@@ -19,6 +19,7 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
+import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -34,6 +35,7 @@ public class Registries {
     public static final Registry<Codec<?, ?, ?>> CODEC = create(RegistryKeys.CODEC);
 
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
+    public static final Registry<ItemGroup> ITEM_GROUP = create(RegistryKeys.ITEM_GROUP);
     public static final Registry<Block> BLOCK = create(RegistryKeys.BLOCK);
     public static final Registry<BlockEntityProvider<?>> BLOCK_ENTITY = create(RegistryKeys.BLOCK_ENTITY);
     public static final Registry<Wall<?>> WALL = create(RegistryKeys.WALL);

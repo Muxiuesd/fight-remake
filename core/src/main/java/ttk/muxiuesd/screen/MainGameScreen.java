@@ -46,7 +46,7 @@ public class MainGameScreen implements Screen {
         Entities.init();
         StatusEffects.init();
         WorldInformationType.init();
-
+        ItemGroups.init();
 
         MainWorld mainWorld = new MainWorld(this);
         //游戏世界的渲染处理器注册

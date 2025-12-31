@@ -9,9 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
 import ttk.muxiuesd.ui.abs.UIComponent;
-import ttk.muxiuesd.ui.screen.PlayerInventoryUIScreen;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -41,15 +39,21 @@ public class TooltipUI extends UIComponent {
         if (instance != null) INSTANCE = instance;
     }
 
+    //当前
+    public UIPanel curUIPanel;
+
+
     /**
      * 激活词条UI
+     * @param panel 需要基于哪个UI面板来激活，坐标会相对于那个面板
      * */
-    public static TooltipUI activate () {
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
+    public static TooltipUI activate (UIPanel panel) {
+        //PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
         TooltipUI instance = getInstance();
         //由鼠标坐标来给出基础坐标
         instance.setPosition(Util.getMouseUIPosition().add(1, 1));
-        inventoryUIPanel.addComponent(instance);
+        instance.curUIPanel = panel;
+        panel.addComponent(instance);
 
         return INSTANCE;
     }
@@ -59,8 +63,12 @@ public class TooltipUI extends UIComponent {
      * */
     public static TooltipUI deactivate () {
         TooltipUI instance = getInstance();
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
-        inventoryUIPanel.removeComponent(instance);
+        //PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
+        //在当前显示的面板上移除词条组件
+        if (instance.curUIPanel != null) {
+            instance.curUIPanel.removeComponent(instance);
+            instance.curUIPanel = null;
+        }
 
         return instance;
     }
