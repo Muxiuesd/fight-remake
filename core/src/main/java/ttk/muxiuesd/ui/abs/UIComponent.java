@@ -14,6 +14,7 @@ import ttk.muxiuesd.ui.components.UIPanel;
  * 基础 UI 组件
  * */
 public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRenderable, GUIResize {
+    private UIScreen screen;  //隶属于哪一个screen
 
     private float x, y;
     private float width, height;
@@ -80,6 +81,15 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     }
 
 
+    public UIScreen getScreen () {
+        return this.screen;
+    }
+
+    public UIComponent setScreen (UIScreen screen) {
+        this.screen = screen;
+        return this;
+    }
+
     public Vector2 getPosition () {
         return new Vector2(this.getX(), this.getY());
     }
@@ -118,7 +128,9 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     public boolean isEnabled() { return this.enabled; }
 
-    public int getZIndex() { return this.zIndex; }
+    public int getZIndex() {
+        return this.zIndex;
+    }
 
     public void setPosition (Vector2 pos) {
         this.x = pos.x;

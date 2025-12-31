@@ -21,7 +21,7 @@ import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.ui.screen.PlayerHUDUIScreen;
-import ttk.muxiuesd.ui.screen.PlayerInventoryUIScreen;
+import ttk.muxiuesd.ui.screen.PlayerUIScreen;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Log;
@@ -46,7 +46,7 @@ public class PlayerSystem extends WorldSystem {
 
     //玩家相关的GUIScreen
     public static PlayerHUDUIScreen PLAYER_HUD_SCREEN;
-    public static PlayerInventoryUIScreen PLAYER_INVENTORY_SCREEN;
+    public static PlayerUIScreen PLAYER_INVENTORY_SCREEN;
 
     private Player player;
     private Vector2 playerLastPosition;
@@ -62,7 +62,7 @@ public class PlayerSystem extends WorldSystem {
         WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
 
         PLAYER_HUD_SCREEN = new PlayerHUDUIScreen(this);
-        PLAYER_INVENTORY_SCREEN = new PlayerInventoryUIScreen(this);
+        PLAYER_INVENTORY_SCREEN = new PlayerUIScreen(this);
     }
 
     @Override

@@ -3,8 +3,7 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
-import ttk.muxiuesd.ui.screen.PlayerInventoryUIScreen;
+import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -28,20 +27,24 @@ public class MouseSlotUI extends SlotUI {
     }
 
     private ItemStack itemStack;
+    //public UIPanel curPanel;
+    public UIScreen curScreen; //当前鼠标物品槽UI所属的UIScreen
 
     private MouseSlotUI() {
         super(10000f, 10000f, SLOT_WIDTH, SLOT_HEIGHT, new GridPoint2(16, 16));
         setEnabled(false);
+        setZIndex(10000);
     }
 
     /**
      * 激活鼠标物品槽
+     * @param screen 在哪个UIScreen上激活物品槽
      * */
-    public static MouseSlotUI activate () {
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
+    public static MouseSlotUI activate (UIScreen screen) {
         MouseSlotUI instance = getInstance();
         instance.setPosition(Util.getMouseUIPosition());
-        inventoryUIPanel.addComponent(instance);
+        instance.curScreen = screen;
+        screen.addComponent(instance);
 
         return INSTANCE;
     }
@@ -51,9 +54,10 @@ public class MouseSlotUI extends SlotUI {
      * */
     public static MouseSlotUI deactivate () {
         MouseSlotUI instance = getInstance();
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
-        inventoryUIPanel.removeComponent(instance);
-
+        if (instance.curScreen != null) {
+            instance.curScreen.removeComponent(instance);
+            instance.curScreen = null;
+        }
         return instance;
     }
 

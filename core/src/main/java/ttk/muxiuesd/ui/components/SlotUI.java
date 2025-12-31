@@ -98,17 +98,16 @@ public class SlotUI extends UIComponent {
                 //按下shift是半数拿取
                 if (KeyBindings.PlayerShift.wasPressed() && amount >= 2) {
                     //如果为奇数，就鼠标拿取一半且多一个
-                    MouseSlotUI.activate().setItemStack(stack.split((amount / 2) + amount % 2));
+                    MouseSlotUI.activate(getScreen()).setItemStack(stack.split((amount / 2) + amount % 2));
                 }else {
                     //全部拿走
                     //激活鼠标物品槽
-                    MouseSlotUI.activate().setItemStack(stack);
+                    MouseSlotUI.activate(getScreen()).setItemStack(stack);
                     this.clearItem();
                 }
             }else {
                 //到这里鼠标物品槽位是有东西的
                 ItemStack mouseStack = mouseSlotUI.getItemStack();
-                int mouseAmount = mouseStack.getAmount();
                 //检查鼠标物品槽的物品类型是否符合槽位，并且检查物品槽位与鼠标的物品是否是同类
                 /*if (this.checkItemType(mouseStack) && stack.equals(mouseStack)) {
                     //物品相同就执行合并
@@ -126,9 +125,17 @@ public class SlotUI extends UIComponent {
                 }*/
                 //检查鼠标物品槽的物品类型是否符合槽位
                 if (this.checkItemType(mouseStack)){
-                    stack.merge(mouseStack);
-                    //合并物品后鼠标物品数量归零就清除
-                    if (mouseStack.getAmount() == 0) MouseSlotUI.deactivate().clearItem();
+                    //检查是否为同类物品
+                    if (mouseStack.equals(stack)) {
+                        //是同类物品就合并
+                        stack.merge(mouseStack);
+                        //合并物品后鼠标物品数量归零就清除
+                        if (mouseStack.getAmount() == 0) MouseSlotUI.deactivate().clearItem();
+                    }else {
+                        //不是同类物品就交换两者
+                        this.setItemStack(mouseStack);
+                        mouseSlotUI.setItemStack(stack);
+                    }
                 }
             }
         }else if (! mouseSlotUI.isNullSlot()) {

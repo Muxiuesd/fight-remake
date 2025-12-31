@@ -15,11 +15,11 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 玩家背包界面屏幕
+ * 玩家相关的界面屏幕，持有各种玩家相关的UI面板
  * <p>
  * 由背景面板、各种槽位组成
  * */
-public class PlayerInventoryUIScreen extends UIScreen {
+public class PlayerUIScreen extends UIScreen {
     private static PlayerInventoryUIPanel INVENTORY_UI_PANEL_INSTANCE;
     private static PlayerCreateTabUIPanel CREATE_TAB_UI_PANEL_INSTANCE;
 
@@ -45,7 +45,7 @@ public class PlayerInventoryUIScreen extends UIScreen {
     private UIPanel currentTopPanel;   //当前顶层显示的面板
 
 
-    public PlayerInventoryUIScreen (PlayerSystem playerSystem) {
+    public PlayerUIScreen (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
 
         /// 玩家背包
@@ -119,7 +119,7 @@ public class PlayerInventoryUIScreen extends UIScreen {
     public void hide () {
         //如果鼠标上还有物品的时候关闭玩家背包界面，就自动把鼠标上的物品丢出来
         MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
-        if (getInventoryUIPanel().hasComponent(mouseSlotUI) && !mouseSlotUI.isNullSlot()) {
+        if (this.currentTopPanel.hasComponent(mouseSlotUI) && !mouseSlotUI.isNullSlot()) {
             ItemStack itemStack = mouseSlotUI.getItemStack();
             mouseSlotUI.clearItem();
             this.playerSystem.getPlayer().dropItem(itemStack);

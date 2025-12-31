@@ -23,11 +23,23 @@ import java.util.LinkedHashSet;
  * UI屏幕，UI组件都绘制在这个Screen里面
  * */
 public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder {
-    private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();;
+    private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();
+    private final LinkedHashSet<UIComponent> delayAddComponents = new LinkedHashSet<>();
+    private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
 
     private boolean mouseOver = false;  ///当鼠标指针在任意的可交互的组件上就标记为true，否则为false
 
     public UIScreen () {
+    }
+
+    @Override
+    public void addComponent (UIComponent component) {
+        this.delayAddComponents.add(component);
+    }
+
+    @Override
+    public void removeComponent (UIComponent component) {
+        this.delayRemoveComponents.add(component);
     }
 
     /**
@@ -46,6 +58,24 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
     @Override
     public void update (float delta) {
+        //检查延迟添加和延迟删除
+        if (!this.delayAddComponents.isEmpty()) {
+            this.delayAddComponents.forEach(delayAddComponent -> {
+                delayAddComponent.setScreen(this);
+                this.components.add(delayAddComponent);
+            });
+            this.delayAddComponents.clear();
+            //添加完新的组件后调用一次排序
+            sortComponents();
+        }
+        if (!this.delayRemoveComponents.isEmpty()) {
+            this.delayRemoveComponents.forEach(delayRemoveComponent -> {
+                delayRemoveComponent.setScreen(null);
+                this.components.remove(delayRemoveComponent);
+            });
+            this.delayRemoveComponents.clear();
+        }
+
         setMouseOver(false);    //清理标记
         //没东西就直接返回
         if (getComponents().isEmpty()) return;

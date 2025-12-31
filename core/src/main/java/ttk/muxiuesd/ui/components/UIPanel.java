@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.ui.abs.UIComponent;
+import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 
@@ -28,6 +29,8 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
         super(x, y, width, height, interactGridSize);
         this.components = new LinkedHashSet<>();
     }
+
+
 
     @Override
     public void update (float delta) {
@@ -118,6 +121,7 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     @Override
     public void addComponent (UIComponent component) {
         UIComponentsHolder.super.addComponent(component);
+        component.setScreen(getScreen());
         //当加入的组件是面板时，把子面板的父节点设置为此面板
         if (component instanceof UIPanel childPanel) {
             childPanel.setParent(this);
@@ -127,6 +131,7 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     @Override
     public void removeComponent (UIComponent component) {
         UIComponentsHolder.super.removeComponent(component);
+        component.setScreen(null);
         //当被移除的组件是面板时，把子面板的父节点设置为空
         if (component instanceof UIPanel childPanel) {
             childPanel.setParent(null);
@@ -148,6 +153,14 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     }
 
     @Override
+    public UIPanel setScreen (UIScreen screen) {
+        super.setScreen(screen);
+        //将所有子节点的UI组件的screen都设置成指定的screen
+        getComponents().forEach(component -> component.setScreen(screen));
+        return this;
+    }
+
+    @Override
     public float getX () {
         float x = super.getX();
         return this.getParent() == null ? x : x + this.getParent().getX();
@@ -160,11 +173,12 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     }
 
     @Override
-    public UIComponent setClicked (boolean clicked) {
+    public UIPanel setClicked (boolean clicked) {
         //如果面板被设置为没有被点击，那么里面的所有组件都应该是没有被点击的状态
         if (!clicked && !this.getComponents().isEmpty()) {
             this.getComponents().forEach(component -> component.setClicked(false));
         }
-        return super.setClicked(clicked);
+        super.setClicked(clicked);
+        return this;
     }
 }

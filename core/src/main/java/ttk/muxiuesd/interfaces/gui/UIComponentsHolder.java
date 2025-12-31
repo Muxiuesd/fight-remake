@@ -2,12 +2,15 @@ package ttk.muxiuesd.interfaces.gui;
 
 import ttk.muxiuesd.ui.abs.UIComponent;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 
 /**
  * UI组件持有者接口
  * */
 public interface UIComponentsHolder {
+    Comparator<UIComponent> ByZIndex = Comparator.comparingInt(UIComponent::getZIndex);
 
     default void addComponent (UIComponent component) {
         this.getComponents().add(component);
@@ -24,6 +27,15 @@ public interface UIComponentsHolder {
     default void setComponents (LinkedHashSet<UIComponent> components) {
         this.getComponents().clear();
         this.getComponents().addAll(components);
+    }
+
+    /**
+     * 对组件进行排序
+     * */
+    default void sortComponents () {
+        ArrayList<UIComponent> list = new ArrayList<>(this.getComponents());
+        list.sort(ByZIndex);
+        setComponents(new LinkedHashSet<>(list));
     }
 
     /**
