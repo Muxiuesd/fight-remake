@@ -6,7 +6,7 @@ import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.HotbarUIPanel;
 import ttk.muxiuesd.ui.abs.UIScreen;
-import ttk.muxiuesd.ui.components.HotbarSlotUI;
+import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
 
 /**
  * 玩家的HUD屏幕
@@ -22,11 +22,11 @@ public class PlayerHUDUIScreen extends UIScreen {
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
         float viewportWidth = camera.viewportWidth;
         float viewportHeight = camera.viewportHeight;
-        float width = HotbarSlotUI.HOTBAR_WIDTH * 9;
+        float width = HotbarPlayerSlotUI.HOTBAR_WIDTH * 9;
         HotbarUIPanel hotbarUIPanel = new HotbarUIPanel(playerSystem,
             - width / 2, - viewportHeight / 2,
-            width, HotbarSlotUI.HOTBAR_HEIGHT,
-            new GridPoint2((int) width, (int) HotbarSlotUI.HOTBAR_HEIGHT));
+            width, HotbarPlayerSlotUI.HOTBAR_HEIGHT,
+            new GridPoint2((int) width, (int) HotbarPlayerSlotUI.HOTBAR_HEIGHT));
 
         addComponent(hotbarUIPanel);
     }

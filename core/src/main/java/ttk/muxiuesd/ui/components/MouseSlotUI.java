@@ -1,7 +1,6 @@
 package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.util.Util;
@@ -11,7 +10,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 /**
  * 鼠标物品槽UI
  * */
-public class MouseSlotUI extends SlotUI {
+public class MouseSlotUI extends PlayerSlotUI {
     //单例模式
     private static MouseSlotUI INSTANCE;
 
@@ -30,8 +29,8 @@ public class MouseSlotUI extends SlotUI {
     //public UIPanel curPanel;
     public UIScreen curScreen; //当前鼠标物品槽UI所属的UIScreen
 
-    private MouseSlotUI() {
-        super(10000f, 10000f, SLOT_WIDTH, SLOT_HEIGHT, new GridPoint2(16, 16));
+    private MouseSlotUI () {
+        super(10000f, 10000f, SLOT_WIDTH, SLOT_HEIGHT);
         setEnabled(false);
         setZIndex(10000);
     }
@@ -58,6 +57,7 @@ public class MouseSlotUI extends SlotUI {
             instance.curScreen.removeComponent(instance);
             instance.curScreen = null;
         }
+        instance.clearItem();
         return instance;
     }
 
@@ -93,6 +93,13 @@ public class MouseSlotUI extends SlotUI {
         batch.draw(item.textureRegion, renderX, renderY, getWidth(), getHeight());
 
         int amount = stack.getAmount();
-        drawAmount(batch, parent, renderX, renderY, amount);
+        if (amount > 1) drawAmount(batch, parent, renderX, renderY, amount);
+    }
+
+    /**
+     * 检查这个鼠标物品槽位UI是否活跃，也就是检查它是否有在uiScreen上
+     * */
+    public boolean isActive () {
+        return this.curScreen != null;
     }
 }

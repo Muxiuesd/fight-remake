@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 快捷栏槽位UI组件
  * */
-public class HotbarSlotUI extends SlotUI {
+public class HotbarPlayerSlotUI extends PlayerSlotUI {
     public static final float HOTBAR_WIDTH = 20f;
     public static final float HOTBAR_HEIGHT = 22f;
     public static final float SELECTED_HOTBAR_WIDTH  = 24f;
@@ -23,10 +23,8 @@ public class HotbarSlotUI extends SlotUI {
     private TextureRegion textureRegion;
 
 
-    public HotbarSlotUI (PlayerSystem playerSystem, int index, float x, float y) {
-        super(playerSystem, index,
-            x, y, HOTBAR_WIDTH, HOTBAR_HEIGHT,
-            new GridPoint2((int) HOTBAR_WIDTH, (int) HOTBAR_HEIGHT));
+    public HotbarPlayerSlotUI (PlayerSystem playerSystem, int index, float x, float y) {
+        super(playerSystem, index, x, y, HOTBAR_WIDTH, HOTBAR_HEIGHT);
         this.textureRegion = Util.loadTextureRegion(
             Fight.ID("hotbar"),
             Fight.UITexturePath("hotbar.png")
@@ -60,7 +58,7 @@ public class HotbarSlotUI extends SlotUI {
             if (itemStack != null) {
                 batch.draw(itemStack.getItem().textureRegion, renderX + 2, renderY + 3, 16f, 16f);
                 int amount = itemStack.getAmount();
-                drawAmount(batch, parent, renderX, renderY, amount);
+                if (amount > 1) drawAmount(batch, parent, renderX, renderY, amount);
             }
         }
     }

@@ -31,7 +31,6 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     }
 
 
-
     @Override
     public void update (float delta) {
         this.getComponents().forEach(component -> component.update(delta));
@@ -85,6 +84,8 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
 
             //遍历面板里面的组件，用内部坐标来检测
             for (UIComponent component : this.getComponents()) {
+                //记录这个ui上一个状态是否被鼠标覆盖
+                boolean uiComponentMouseOver = component.isMouseOver();
                 component.setMouseOver(false);
                 //如果是不可交互状态的组件就直接跳过
                 if (!component.isEnabled()) continue;
@@ -100,6 +101,11 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
                     );
                     component.setMouseOver(true);
                     component.mouseOver(interactGridPos);
+                }
+
+                //鼠标上一个状态是被鼠标覆盖的，但是此时的状态不是，就调用方法
+                if (uiComponentMouseOver && !component.isMouseOver()) {
+                    component.mouseDown();
                 }
             }
 

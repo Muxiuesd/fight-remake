@@ -10,12 +10,15 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.abs.UIComponent;
+import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 物品词条UI组件
+ * <p>
+ * 显示物品的名称、各种属性、耐久等等信息
  * */
 public class TooltipUI extends UIComponent {
     public static final int FONT_SIZE = 16; //字体大小，最好是8的整数倍，不然中文字体会糊
@@ -39,21 +42,24 @@ public class TooltipUI extends UIComponent {
         if (instance != null) INSTANCE = instance;
     }
 
-    //当前
-    public UIPanel curUIPanel;
-
+    //当前uiScreen
+    public UIScreen curScreen;
+    public SlotUI curSlotUI;
 
     /**
      * 激活词条UI
-     * @param panel 需要基于哪个UI面板来激活，坐标会相对于那个面板
+     * @param screen 需要基于哪个UI屏幕来激活，坐标会相对于那个面板
      * */
-    public static TooltipUI activate (UIPanel panel) {
-        //PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
+    public static TooltipUI activate (UIScreen screen, SlotUI slotUI) {
+
         TooltipUI instance = getInstance();
         //由鼠标坐标来给出基础坐标
         instance.setPosition(Util.getMouseUIPosition().add(1, 1));
-        instance.curUIPanel = panel;
-        panel.addComponent(instance);
+        instance.curScreen = screen;
+        screen.addComponent(instance);
+
+        instance.curSlotUI = slotUI;
+        instance.setCurItemStack(slotUI.getItemStack());
 
         return INSTANCE;
     }
@@ -62,12 +68,22 @@ public class TooltipUI extends UIComponent {
      * 使词条UI失活
      * */
     public static TooltipUI deactivate () {
+        return deactivate(getInstance().curSlotUI);
+    }
+
+    /**
+     * 使词条UI失活，需要检查是不是对应物品槽位
+     * */
+    public static TooltipUI deactivate (SlotUI slotUI) {
         TooltipUI instance = getInstance();
-        //PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryUIScreen.getInventoryUIPanel();
-        //在当前显示的面板上移除词条组件
-        if (instance.curUIPanel != null) {
-            instance.curUIPanel.removeComponent(instance);
-            instance.curUIPanel = null;
+        //在当前显示的UI屏幕上移除词条组件
+        if (instance.curScreen != null) {
+            instance.curScreen.removeComponent(instance);
+            instance.curScreen = null;
+        }
+        if (instance.curSlotUI == slotUI) {
+            instance.curSlotUI = null;
+            instance.setCurItemStack(null);
         }
 
         return instance;
@@ -93,13 +109,15 @@ public class TooltipUI extends UIComponent {
         );
 
         setEnabled(false);
+        setZIndex(1000000);
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        int trueSize = (int) (FONT_SIZE * FONT_SCALE);
-
         ItemStack itemStack = this.getCurItemStack();
+        if (itemStack == null) return;
+
+        int trueSize = (int) (FONT_SIZE * FONT_SCALE);
         //基础坐标由激活时给出
         int renderX = (int) getX();
         int renderY = (int) getY();

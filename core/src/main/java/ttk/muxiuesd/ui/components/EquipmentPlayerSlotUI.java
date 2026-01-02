@@ -9,10 +9,10 @@ import ttk.muxiuesd.world.item.equipment.EquipmentItem;
 /**
  * 装备物品槽位的UI组件
  * */
-public class EquipmentSlotUI extends SlotUI {
+public class EquipmentPlayerSlotUI extends PlayerSlotUI {
     public final EquipmentItem.Type type;
 
-    public EquipmentSlotUI (PlayerSystem playerSystem, int index, float x, float y) {
+    public EquipmentPlayerSlotUI (PlayerSystem playerSystem, int index, float x, float y) {
         super(playerSystem, index, x, y);
         this.type = EquipmentItem.Type.values()[index];
     }

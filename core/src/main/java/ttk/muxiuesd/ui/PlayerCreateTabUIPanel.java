@@ -8,6 +8,7 @@ import ttk.muxiuesd.registry.ItemGroups;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
 import ttk.muxiuesd.ui.components.CreateSlotUI;
+import ttk.muxiuesd.ui.components.PlayerSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.world.item.ItemGroup;
@@ -35,7 +36,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         float trueWidth = SlotUI.SLOT_WIDTH + 2;
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {
-            addComponent(new SlotUI(getPlayerSystem(), index, 9 + (index * trueWidth), 8));
+            addComponent(new PlayerSlotUI(getPlayerSystem(), index, 9 + (index * trueWidth), 8));
         }
 
         //创造槽位

@@ -7,7 +7,8 @@ import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
-import ttk.muxiuesd.ui.components.EquipmentSlotUI;
+import ttk.muxiuesd.ui.components.EquipmentPlayerSlotUI;
+import ttk.muxiuesd.ui.components.PlayerSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.world.entity.Player;
@@ -36,20 +37,20 @@ public class PlayerInventoryUIPanel extends PlayerItemSlotsUIPanel {
         float trueWidth = SlotUI.SLOT_WIDTH + 2;
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {
-            addComponent(new SlotUI(getPlayerSystem(), index, 8 + (index * trueWidth), 8));
+            addComponent(new PlayerSlotUI(getPlayerSystem(), index, 8 + (index * trueWidth), 8));
         }
 
         //背包内部槽位
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
-                addComponent(new SlotUI(getPlayerSystem(), x + (y * 9) + 9,
+                addComponent(new PlayerSlotUI(getPlayerSystem(), x + (y * 9) + 9,
                     8 + (x * trueWidth), 30 + y * trueHeight));
             }
         }
 
         //装备槽位
         for (int y = 0; y < 4; y++) {
-            addComponent(new EquipmentSlotUI(getPlayerSystem(), y, 8, 142 - (y * trueHeight)));
+            addComponent(new EquipmentPlayerSlotUI(getPlayerSystem(), y, 8, 142 - (y * trueHeight)));
         }
     }
 

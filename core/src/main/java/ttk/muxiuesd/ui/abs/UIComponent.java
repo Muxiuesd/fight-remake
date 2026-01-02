@@ -62,6 +62,12 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     }
 
     /**
+     * 鼠标离开这个UI组件上面
+     * */
+    public void mouseDown () {
+    }
+
+    /**
      * 鼠标点击这个UI组件调用
      * @param interactPos 鼠标点击这个UI组件的交互区域的坐标位置
      * @return 是否具有传递性，比如这个组件位于另一个组件之上，有传递性则执行完这个组件的方法后继续下一个组件的方法

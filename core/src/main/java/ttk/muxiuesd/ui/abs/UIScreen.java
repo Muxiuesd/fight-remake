@@ -86,13 +86,12 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
         for (UIComponent uiComponent : getComponents()) {
             //更新组件
-            uiComponent
-                .setMouseOver(false)
-                .setClicked(false)
-                .update(delta);
+            uiComponent.update(delta);
             //不可交互状态的组件就直接跳过交互计算
             if (!uiComponent.isEnabled()) continue;
 
+            //记录这个ui上一个状态是否被鼠标覆盖
+            boolean uiComponentMouseOver = uiComponent.isMouseOver();
             rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
             //鼠标坐标在ui的区域上
             if (rectangle.contains(mouseUIPosition)) {
@@ -103,8 +102,8 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                 int xn = (int) ((mouseUIPosition.x - position.x) / size.x * interactGrid.x);
                 int yn = (int) ((mouseUIPosition.y - position.y) / size.y * interactGrid.y);
                 GridPoint2 grid = new GridPoint2(xn, yn);
-                uiComponent.mouseOver(grid);
                 uiComponent.setMouseOver(true);
+                uiComponent.mouseOver(grid);
 
                 //如果鼠标在组件的交互区域上并且点击了鼠标左键，就是点击了组件
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
@@ -112,8 +111,16 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                         .setClicked(true)
                         .click(grid);
                 }
-
+                //这个ui屏幕的状态变成被鼠标覆盖
                 this.setMouseOver(true);
+            }else {
+                uiComponent
+                    .setClicked(false)
+                    .setMouseOver(false);
+            }
+            //鼠标上一个状态是被鼠标覆盖的，但是此时的状态不是，就调用方法
+            if (uiComponentMouseOver && !uiComponent.isMouseOver()) {
+                uiComponent.mouseDown();
             }
         }
         Pools.RECT.free(rectangle);
