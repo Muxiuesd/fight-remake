@@ -9,12 +9,12 @@ import java.util.LinkedHashMap;
 public class HitboxHolder<T> {
     private T holder; //这个类的持有者
     private HashMap<String, Hitbox> boxes;
-    private HashMap<String, CollidedAction> actions;
+    private HashMap<String, CollidedAction<T>> actions;
 
     public HitboxHolder () {
         this(new LinkedHashMap<>(), new LinkedHashMap<>());
     }
-    public HitboxHolder(HashMap<String, Hitbox> boxesMap, HashMap<String, CollidedAction> actionsMap) {
+    public HitboxHolder(HashMap<String, Hitbox> boxesMap, HashMap<String, CollidedAction<T>> actionsMap) {
         this.boxes = boxesMap;
         this.actions = actionsMap;
     }
@@ -35,7 +35,7 @@ public class HitboxHolder<T> {
     /**
      * 添加一个碰撞箱
      * */
-    public HitboxHolder add (String id ,Hitbox box, CollidedAction action) {
+    public HitboxHolder<T> add (String id ,Hitbox box, CollidedAction<T> action) {
         if (!this.boxes.containsKey(id) && !this.boxes.containsValue(box)) {
             this.boxes.put(id, box);
             this.setAction(id, action);
@@ -46,19 +46,19 @@ public class HitboxHolder<T> {
     /**
      * 移除一个碰撞箱
      * */
-    public HitboxHolder remove (String id) {
+    public HitboxHolder<T> remove (String id) {
         this.boxes.remove(id);
         return this;
     }
 
-    public HitboxHolder setAction (String id, CollidedAction action) {
+    public HitboxHolder<T> setAction (String id, CollidedAction<T> action) {
         if (!this.actions.containsKey(id) && !this.actions.containsValue(action)) {
             this.actions.put(id, action);
         }
         return this;
     }
 
-    public CollidedAction getAction (String id) {
+    public CollidedAction<T> getAction (String id) {
         return this.actions.get(id);
     }
 
@@ -70,7 +70,7 @@ public class HitboxHolder<T> {
         return this.boxes;
     }
 
-    public HashMap<String, CollidedAction> getActions () {
+    public HashMap<String, CollidedAction<T>> getActions () {
         return this.actions;
     }
 
