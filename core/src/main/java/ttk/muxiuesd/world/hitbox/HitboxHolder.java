@@ -26,6 +26,7 @@ public class HitboxHolder<T> {
         this.getBoxes().forEach((thisBoxID, thisBox) -> {
             otherHolder.getBoxes().forEach((otherBoxID, otherBox) -> {
                 if (thisBox.checkCollision(otherBox)) {
+                    //目前只处理当前这个持有者的碰撞事件，两个碰撞持有者会相互检测共两次（需要修改）
                     this.getAction(thisBoxID).handle(this.getHolder(), thisBoxID, thisBox, otherBox);
                 }
             });
@@ -35,7 +36,7 @@ public class HitboxHolder<T> {
     /**
      * 添加一个碰撞箱
      * */
-    public HitboxHolder<T> add (String id ,Hitbox box, CollidedAction<T> action) {
+    public HitboxHolder<T> addHitbox (String id ,Hitbox box, CollidedAction<T> action) {
         if (!this.boxes.containsKey(id) && !this.boxes.containsValue(box)) {
             this.boxes.put(id, box);
             this.setAction(id, action);
@@ -46,7 +47,7 @@ public class HitboxHolder<T> {
     /**
      * 移除一个碰撞箱
      * */
-    public HitboxHolder<T> remove (String id) {
+    public HitboxHolder<T> removeHitbox (String id) {
         this.boxes.remove(id);
         return this;
     }
