@@ -20,7 +20,7 @@ public class HitboxHolder<T> {
     }
 
     /**
-     * 处理每一个碰撞事件
+     * 核心方法：对每一个碰撞箱都检测一次碰撞事件
      * */
     public void handleCollision (HitboxHolder<?> otherHolder) {
         this.getBoxes().forEach((thisBoxID, thisBox) -> {
@@ -36,9 +36,9 @@ public class HitboxHolder<T> {
     /**
      * 添加一个碰撞箱
      * */
-    public HitboxHolder<T> addHitbox (String id ,Hitbox box, CollidedAction<T> action) {
-        if (!this.boxes.containsKey(id) && !this.boxes.containsValue(box)) {
-            this.boxes.put(id, box);
+    public HitboxHolder<T> addBox (String id ,Hitbox box, CollidedAction<T> action) {
+        if (!this.getBoxes().containsKey(id) && !this.getBoxes().containsValue(box)) {
+            this.getBoxes().put(id, box);
             this.setAction(id, action);
         }
         return this;
@@ -47,9 +47,16 @@ public class HitboxHolder<T> {
     /**
      * 移除一个碰撞箱
      * */
-    public HitboxHolder<T> removeHitbox (String id) {
-        this.boxes.remove(id);
+    public HitboxHolder<T> removeBox (String id) {
+        this.getBoxes().remove(id);
         return this;
+    }
+
+    /**
+     * 根据id来获取碰撞箱
+     * */
+    public Hitbox getBox (String id) {
+        return this.getBoxes().get(id);
     }
 
     public HitboxHolder<T> setAction (String id, CollidedAction<T> action) {
