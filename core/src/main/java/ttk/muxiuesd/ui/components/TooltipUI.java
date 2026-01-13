@@ -12,7 +12,7 @@ import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.ui.text.FontHolder;
 import ttk.muxiuesd.ui.text.Text;
-import ttk.muxiuesd.ui.text.TextUI;
+import ttk.muxiuesd.util.TextUtil;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -137,9 +137,10 @@ public class TooltipUI extends UIComponent {
             for (Text text : textArray) {
                 maxLength = Math.max(
                     maxLength,
-                    TextUI.getTextRenderWidth(this.getFontHolder(), FONT_SIZE, text.getText())
+                    TextUtil.getTextRenderWidth(this.getFontHolder(), FONT_SIZE, TextUtil.getPlainText(text.getText()))
                 );
             }
+            //确定背景要渲染的最大宽度
             renderWidth += maxLength + 4;
         }
 
@@ -149,7 +150,7 @@ public class TooltipUI extends UIComponent {
 
         BitmapFont font = this.getFontHolder().getFont(FONT_SIZE);
         font.getData().setScale(FONT_SCALE);
-        //绘制词条
+        //绘制词条文本
         this.drawTooltips(batch,
             new Vector2(renderX, renderY + renderHeight),
             textArray,
@@ -171,7 +172,8 @@ public class TooltipUI extends UIComponent {
             float renderY = position.y - topEdge - index * (fontSize + 2);
 
             Text text = textArray.get(index);
-            bitmapFont.draw(batch, text.getText(), renderX, renderY);
+            //bitmapFont.draw(batch, text.getText(), renderX, renderY);
+            TextUtil.draw(batch, this.getFontHolder().getFont(FONT_SIZE), text.getText(), renderX, renderY);
         }
     }
 

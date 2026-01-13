@@ -11,11 +11,7 @@ import ttk.muxiuesd.ui.components.UIPanel;
  * 文本UI组件
  * */
 public class TextUI extends UIComponent {
-    public static final GlyphLayout staticGlyphLayout = new GlyphLayout();
-    public static float getTextRenderWidth (FontHolder fontHolder, int fontSize, String text) {
-        TextUI.staticGlyphLayout.setText(fontHolder.getFont(fontSize), text);
-        return staticGlyphLayout.width;
-    }
+
 
 
     private GlyphLayout glyphLayout;

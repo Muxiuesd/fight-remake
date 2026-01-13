@@ -3,7 +3,6 @@ package ttk.muxiuesd.ui.text;
 import com.badlogic.gdx.graphics.Color;
 import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.lang.LangPack;
-import ttk.muxiuesd.util.Util;
 
 import java.util.HashMap;
 
@@ -13,8 +12,8 @@ import java.util.HashMap;
  * 可以在文本里面插入格式化参数，使用格式：{<这里填入参数序号数字>}，例如："武器伤害： {0}"
  * */
 public class Text {
+    public static final String COLOR_MARK = "&&";   //颜色标记
     public static HashMap<Character, Color> COLOR_MAP = new HashMap<>();
-    public static final String COLOR_MARK = "&&";
     public static final int DEFAULT_ARGS = 10;
     static {
         COLOR_MAP.put('r', Color.RED);
@@ -100,11 +99,10 @@ public class Text {
 
     /**
      * 基础核心方法：获取指定语言包的格式化过后的文本
+     * @return 返回格式化过后的文本，依然带有颜色标记
      * */
     public String getText (LangPack langPack, Object[] args) {
         String result = langPack.getText(this.getKey());
-        //去掉颜色文本标记
-        result = Util.getPlainText(result);
 
         if (args.length > 0) {
             for (int i = 0; i < args.length; i++) {
