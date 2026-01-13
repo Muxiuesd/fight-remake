@@ -38,7 +38,7 @@ public class EffectUI extends UIComponent {
     private Text effectDurationText = Text.ofText(Fight.ID("effect_duration"));
 
     public EffectUI () {
-        this.background = new NinePatch(
+        this.background = createNinePatch(
             Util.loadTextureRegion(
                 Fight.ID("effect_background"),
                 Fight.UITexturePath("effect_background.png")

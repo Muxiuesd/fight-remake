@@ -1,6 +1,8 @@
 package ttk.muxiuesd.ui.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
@@ -14,6 +16,14 @@ import ttk.muxiuesd.ui.components.UIPanel;
  * 基础 UI 组件
  * */
 public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRenderable, GUIResize {
+    /**
+     * 创建点九
+     * */
+    public static NinePatch createNinePatch(TextureRegion textureRegion, int left, int right, int top, int bottom) {
+        return new NinePatch(textureRegion, left, right, top, bottom);
+    }
+
+
     private UIScreen screen;  //隶属于哪一个screen
 
     private float x, y;
@@ -196,4 +206,6 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
         this.isClicked = clicked;
         return this;
     }
+
+
 }

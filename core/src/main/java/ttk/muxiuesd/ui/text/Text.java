@@ -4,42 +4,52 @@ import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.lang.LangPack;
 
 /**
- * 文本
+ * 游戏的文本类
+ * <p>
+ * 可以在文本里面插入格式化参数，使用格式：{<这里填入参数序号数字>}，例如："武器伤害： {0}"
  * */
 public class Text {
+    public static final int DEFAULT_ARGS = 10;
 
     /**
-     * 物品
+     * 物品相关的文本
      * */
     public static Text ofItem (String itemId) {
         return new Text().add("item.").add(itemId).build();
     }
 
+    /**
+     * 纯文本
+     * */
     public static Text ofText (String textId) {
         return new Text().add("text.").add(textId).build();
     }
 
     /**
-     * 状态效果
+     * 状态效果的文本
      * */
     public static Text ofEffect (String effectId) {
         return new Text().add("effect.").add(effectId).build();
     }
 
     /**
-     * 最基础的
+     * 最基础的文本
      * */
     public static Text of (String textKey) {
         return new Text().setKey(textKey);
     }
 
-    private StringBuilder stringBuilder = new StringBuilder();
     private String textKey = "text.null_text";
-    private Object[] args = new Object[20];
+    private StringBuilder stringBuilder;
+    private Object[] args;   //文本的格式化参数
 
+    public Text () {
+        this.stringBuilder = new StringBuilder();
+        this.args = new Object[DEFAULT_ARGS];
+    }
 
     /**
-     * 获取文本长度
+     * 获取文本长度（文本字符数）
      * */
     public int getLength() {
         return this.getText(this.getArgs()).length();
@@ -54,7 +64,7 @@ public class Text {
     }
 
     /**
-     * 获取翻译后的文本
+     * 使用当前游戏的语言包来获取翻译后的文本
      * */
     public String getText () {
         return this.getText(FI18N.curLang());
@@ -68,7 +78,7 @@ public class Text {
     }
 
     /**
-     * 基础：获取指定语言包的格式化过后的文本
+     * 基础核心方法：获取指定语言包的格式化过后的文本
      * */
     public String getText (LangPack langPack, Object[] args) {
         String result = langPack.getText(this.getKey());
@@ -76,7 +86,7 @@ public class Text {
         if (args.length > 0) {
             for (int i = 0; i < args.length; i++) {
                 String placeholder = "{" + i + "}";
-                String value = args[i] != null ? args[i].toString() : "null";
+                String value = args[i] != null ? args[i].toString() : "NULL";
                 result = result.replace(placeholder, value);
             }
         }

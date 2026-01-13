@@ -3,7 +3,6 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -11,7 +10,9 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.abs.UIScreen;
+import ttk.muxiuesd.ui.text.FontHolder;
 import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.ui.text.TextUI;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -92,6 +93,8 @@ public class TooltipUI extends UIComponent {
     private NinePatch backgroundNinePatch;
     private NinePatch frameNinePatch;
     private ItemStack curItemStack;
+    private FontHolder fontHolder;
+
 
     public TooltipUI () {
         super(1145f, 1145f, 100, 100, new GridPoint2(10, 10));
@@ -107,7 +110,7 @@ public class TooltipUI extends UIComponent {
             ),
             LEFT, RIGHT, TOP, BOTTOM
         );
-
+        this.fontHolder = Fonts.MC;
         setEnabled(false);
         setZIndex(1000000);
     }
@@ -123,27 +126,30 @@ public class TooltipUI extends UIComponent {
         int renderY = (int) getY();
 
         //计算词条总的宽度和高度
-        int renderWidth = LEFT + RIGHT;
-        int renderHeight = TOP + BOTTOM;
+        float renderWidth = LEFT + RIGHT;
+        float renderHeight = TOP + BOTTOM;
         Array<Text> textArray = itemStack.getTooltips();
         if (textArray.size > 0) {
             renderHeight += (trueSize + 3) * textArray.size;
 
-            int maxLength = 0;
+            float maxLength = 0;
             //查找最大
             for (Text text : textArray) {
-                maxLength = Math.max(maxLength, text.getLength());
+                maxLength = Math.max(
+                    maxLength,
+                    TextUI.getTextRenderWidth(this.getFontHolder(), FONT_SIZE, text.getText())
+                );
             }
-            renderWidth += maxLength * trueSize + 4;
+            renderWidth += maxLength + 4;
         }
 
         //绘制背景和框架
         this.backgroundNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
         this.frameNinePatch.draw(batch, renderX + 1, renderY + 1, renderWidth - 2, renderHeight - 2);
 
-        BitmapFont font = Fonts.MC.getFont(FONT_SIZE);
+        BitmapFont font = this.getFontHolder().getFont(FONT_SIZE);
         font.getData().setScale(FONT_SCALE);
-        //词条
+        //绘制词条
         this.drawTooltips(batch,
             new Vector2(renderX, renderY + renderHeight),
             textArray,
@@ -178,10 +184,12 @@ public class TooltipUI extends UIComponent {
         return this;
     }
 
-    /**
-     * 创建点九
-     * */
-    private NinePatch createNinePatch(TextureRegion textureRegion, int left, int right, int top, int bottom) {
-        return new NinePatch(textureRegion, left, right, top, bottom);
+    public FontHolder getFontHolder () {
+        return this.fontHolder;
+    }
+
+    public TooltipUI setFontHolder (FontHolder fontHolder) {
+        this.fontHolder = fontHolder;
+        return this;
     }
 }
