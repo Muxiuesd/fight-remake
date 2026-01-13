@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.text;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -28,7 +29,7 @@ public class FontHolder {
      * 获取字体
      * @param size 字体大小
      * */
-    public BitmapFont getFont(int size) {
+    public BitmapFont getFont (int size) {
         //查找缓存，有的这个字号的缓存就直接获取
         if (this.fontsCache.containsKey(size)) {
             return this.fontsCache.get(size);
@@ -46,7 +47,11 @@ public class FontHolder {
         parameter.minFilter = Texture.TextureFilter.Nearest;
         parameter.incremental = true;
         parameter.size = size;
-        // 可以设置其他参数，如颜色、边框等
+
+        // 设置阴影
+        parameter.shadowOffsetX = 1; // 阴影横向偏移
+        parameter.shadowOffsetY = 1; // 阴影纵向偏移
+        parameter.shadowColor = new Color(0, 0, 0, 0.50f); // 阴影颜色（黑色，75%不透明度）
 
         //根据字号生成
         BitmapFont font = this.generator.generateFont(parameter);
@@ -54,11 +59,4 @@ public class FontHolder {
         return font;
     }
 
-    private String fullCharacters () {
-        return "abcdefghijklmnopqrstuvwxyz" +
-        "0123456789" +
-        ",./;'[]-=<>?:\"\\|_+!@#$%^&*(){}" +
-        "，。/；‘【】、！￥……《》？：“”、（）" +
-        ChineseCharacters.CHARACTERS;
-    }
 }
