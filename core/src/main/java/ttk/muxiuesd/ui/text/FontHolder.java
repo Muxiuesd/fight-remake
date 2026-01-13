@@ -41,7 +41,6 @@ public class FontHolder {
         }
 
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        //parameter.characters = this.fullCharacters();
         parameter.genMipMaps = false;
         parameter.magFilter = Texture.TextureFilter.Nearest;
         parameter.minFilter = Texture.TextureFilter.Nearest;
@@ -58,5 +57,4 @@ public class FontHolder {
         this.fontsCache.put(size, font);
         return font;
     }
-
 }

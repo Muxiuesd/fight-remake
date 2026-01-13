@@ -1,7 +1,11 @@
 package ttk.muxiuesd.ui.text;
 
+import com.badlogic.gdx.graphics.Color;
 import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.lang.LangPack;
+import ttk.muxiuesd.util.Util;
+
+import java.util.HashMap;
 
 /**
  * 游戏的文本类
@@ -9,7 +13,24 @@ import ttk.muxiuesd.lang.LangPack;
  * 可以在文本里面插入格式化参数，使用格式：{<这里填入参数序号数字>}，例如："武器伤害： {0}"
  * */
 public class Text {
+    public static HashMap<Character, Color> COLOR_MAP = new HashMap<>();
+    public static final String COLOR_MARK = "&&";
     public static final int DEFAULT_ARGS = 10;
+    static {
+        COLOR_MAP.put('r', Color.RED);
+        COLOR_MAP.put('g', Color.GREEN);
+        COLOR_MAP.put('b', Color.BLUE);
+        COLOR_MAP.put('y', Color.YELLOW);
+        COLOR_MAP.put('c', Color.CYAN);
+        COLOR_MAP.put('m', Color.MAGENTA);
+        COLOR_MAP.put('o', Color.ORANGE);
+        COLOR_MAP.put('p', Color.PINK);
+        COLOR_MAP.put('w', Color.WHITE);
+        COLOR_MAP.put('k', Color.BLACK);
+        COLOR_MAP.put('l', Color.LIGHT_GRAY);
+        COLOR_MAP.put('d', Color.DARK_GRAY);
+        COLOR_MAP.put('a', Color.GRAY);
+    }
 
     /**
      * 物品相关的文本
@@ -49,7 +70,7 @@ public class Text {
     }
 
     /**
-     * 获取文本长度（文本字符数）
+     * 获取文本长度，返回文本参数格式化后的字符总数
      * */
     public int getLength() {
         return this.getText(this.getArgs()).length();
@@ -82,6 +103,8 @@ public class Text {
      * */
     public String getText (LangPack langPack, Object[] args) {
         String result = langPack.getText(this.getKey());
+        //去掉颜色文本标记
+        result = Util.getPlainText(result);
 
         if (args.length > 0) {
             for (int i = 0; i < args.length; i++) {

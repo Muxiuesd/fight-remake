@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -236,5 +237,42 @@ public class Util {
 
         AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    }
+
+    /**
+     * 获取去掉颜色标记的纯文本
+     * @param text 包含颜色标记的文本，如 "&&g绿色文本&&b红色文本"
+     * @return 去掉所有颜色标记后的纯文本，如 "绿色文本红色文本"
+     */
+    public static String getPlainText(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        int length = text.length();
+        int i = 0;
+
+        while (i < length) {
+            // 检查是否是颜色标记 "&&x"
+            if (i + 2 < length &&
+                text.charAt(i) == '&' &&
+                text.charAt(i + 1) == '&') {
+
+                char colorChar = text.charAt(i + 2);
+                // 检查是否是有效的颜色字符（在colorMap中）
+                if (Text.COLOR_MAP.containsKey(colorChar)) {
+                    // 跳过颜色标记 "&&x"（3个字符）
+                    i += 3;
+                    continue;
+                }
+            }
+
+            // 普通字符，添加到结果中
+            result.append(text.charAt(i));
+            i++;
+        }
+
+        return result.toString();
     }
 }
