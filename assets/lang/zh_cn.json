@@ -1,5 +1,7 @@
 {
   "text.null_text": "空文本！",
+  "text.fight:button_start_game": "开始游戏",
+
   "text.fight:weapon_use_span":     "&&a攻击间隔：{0}",
   "text.fight:weapon_damage":       "&&a武器伤害：{0}",
   "text.fight:weapon_attack_range": "&&a攻击范围：{0}",

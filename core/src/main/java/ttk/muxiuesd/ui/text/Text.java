@@ -72,36 +72,36 @@ public class Text {
      * 获取文本长度，返回文本参数格式化后的字符总数
      * */
     public int getLength() {
-        return this.getText(this.getArgs()).length();
+        return this.getString(this.getArgs()).length();
     }
 
 
     /**
      * 获取当前语言包的格式化过后的文本
      * */
-    public String getText (Object[] args) {
-        return this.getText(FI18N.curLang(), args);
+    public String getString (Object[] args) {
+        return this.getString(FI18N.curLang(), args);
     }
 
     /**
      * 使用当前游戏的语言包来获取翻译后的文本
      * */
-    public String getText () {
-        return this.getText(FI18N.curLang());
+    public String getString () {
+        return this.getString(FI18N.curLang());
     }
 
     /**
      * 指定语言包来获取翻译文本
      * */
-    public String getText (LangPack langPack) {
-        return this.getText(langPack, this.getArgs());
+    public String getString (LangPack langPack) {
+        return this.getString(langPack, this.getArgs());
     }
 
     /**
      * 基础核心方法：获取指定语言包的格式化过后的文本
      * @return 返回格式化过后的文本，依然带有颜色标记
      * */
-    public String getText (LangPack langPack, Object[] args) {
+    public String getString (LangPack langPack, Object[] args) {
         String result = langPack.getText(this.getKey());
 
         if (args.length > 0) {

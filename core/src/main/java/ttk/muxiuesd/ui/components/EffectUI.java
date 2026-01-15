@@ -96,13 +96,13 @@ public class EffectUI extends UIComponent {
         float textRenderY = iconRenderY + 2;
 
         //绘制状态效果名称
-        font.draw(batch, this.getEffectText().getText(),
+        font.draw(batch, this.getEffectText().getString(),
             textRenderX + ICON_WIDTH,
             textRenderY + TRUE_FONT_SIZE * 2
         );
 
         //绘制剩余时间
-        font.draw(batch, this.getEffectDurationText().getText(),
+        font.draw(batch, this.getEffectDurationText().getString(),
             textRenderX + ICON_WIDTH,
             textRenderY + TRUE_FONT_SIZE - 2
         );

@@ -137,7 +137,7 @@ public class TooltipUI extends UIComponent {
             for (Text text : textArray) {
                 maxLength = Math.max(
                     maxLength,
-                    TextUtil.getTextRenderWidth(this.getFontHolder(), FONT_SIZE, TextUtil.getPlainText(text.getText()))
+                    TextUtil.getTextRenderWidth(this.getFontHolder(), FONT_SIZE, TextUtil.getPlainText(text.getString()))
                 );
             }
             //确定背景要渲染的最大宽度
@@ -172,7 +172,7 @@ public class TooltipUI extends UIComponent {
             float renderY = position.y - topEdge - index * (fontSize + 2);
 
             Text text = textArray.get(index);
-            TextUtil.draw(batch, bitmapFont, text.getText(), renderX, renderY);
+            TextUtil.draw(batch, bitmapFont, text.getString(), renderX, renderY);
         }
     }
 
