@@ -3,17 +3,16 @@ package ttk.muxiuesd.ui.text;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.components.UIPanel;
+import ttk.muxiuesd.util.TextUtil;
 
 /**
  * 文本UI组件
  * */
 public class TextUI extends UIComponent {
-
-
-
     private GlyphLayout glyphLayout;
     private String text;
     private FontHolder fontHolder;
@@ -35,8 +34,7 @@ public class TextUI extends UIComponent {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         BitmapFont font = this.getFontHolder().getFont(this.getFontSize());
-        //font.draw(batch, this.getText(), getX(), getY() + this.getFontSize());
-        font.draw(batch, this.getGlyphLayout(), getX(), getY() + this.getFontSize());
+        TextUtil.draw(batch, font, this.getText(), getX(), getY() + this.getFontSize());
     }
 
     /**
@@ -48,7 +46,7 @@ public class TextUI extends UIComponent {
     }
 
     public GlyphLayout getGlyphLayout () {
-        return glyphLayout;
+        return this.glyphLayout;
     }
 
     public TextUI setGlyphLayout (GlyphLayout glyphLayout) {
@@ -80,6 +78,18 @@ public class TextUI extends UIComponent {
 
     public TextUI setFontSize (int fontSize) {
         this.fontSize = fontSize;
+        return this;
+    }
+
+    @Override
+    public TextUI setPosition (float x, float y) {
+        super.setPosition(x, y);
+        return this;
+    }
+
+    @Override
+    public TextUI setPosition (Vector2 pos) {
+        super.setPosition(pos);
         return this;
     }
 }

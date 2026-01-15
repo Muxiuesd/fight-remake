@@ -167,13 +167,12 @@ public class TooltipUI extends UIComponent {
         int leftEdge = LEFT * 2;
         int topEdge = TOP * 2;
 
+        float renderX = position.x + leftEdge;
         for (int index = 0; index < textArray.size; index++) {
-            float renderX = position.x + leftEdge;
             float renderY = position.y - topEdge - index * (fontSize + 2);
 
             Text text = textArray.get(index);
-            //bitmapFont.draw(batch, text.getText(), renderX, renderY);
-            TextUtil.draw(batch, this.getFontHolder().getFont(FONT_SIZE), text.getText(), renderX, renderY);
+            TextUtil.draw(batch, bitmapFont, text.getText(), renderX, renderY);
         }
     }
 

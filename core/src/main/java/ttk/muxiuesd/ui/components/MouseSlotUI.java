@@ -90,10 +90,10 @@ public class MouseSlotUI extends PlayerSlotUI {
         Item item = stack.getItem();
         float renderX = mouseUIPosition.x - getWidth() / 2;
         float renderY = mouseUIPosition.y - getHeight() / 2;
-        batch.draw(item.textureRegion, renderX, renderY, getWidth(), getHeight());
+        batch.draw(item.textureRegion, (int) renderX, (int) renderY, getWidth(), getHeight());
 
         int amount = stack.getAmount();
-        if (amount > 1) drawAmount(batch, parent, renderX, renderY, amount);
+        if (amount > 1) drawAmount(batch, parent, (int) renderX, (int) renderY, amount);
     }
 
     /**

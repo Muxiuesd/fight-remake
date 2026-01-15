@@ -70,7 +70,7 @@ public class FightCore extends Game {
     }
 
     public void coreInit () {
-        //先行加载
+        /// 以下是整个游戏核心加载初始化的东西
         Fonts.init();
         FI18N.init();
         EventTypes.init();

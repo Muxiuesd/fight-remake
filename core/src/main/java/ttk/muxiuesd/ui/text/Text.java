@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * 游戏的文本类
  * <p>
- * 可以在文本里面插入格式化参数，使用格式：{<这里填入参数序号数字>}，例如："武器伤害： {0}"
+ * 可以在文本里面插入格式化参数，使用格式：{<这里填入参数索引 int>}，例如："武器伤害： {0}"，之后调用{@link #set(int, Object)}来设置对应索引的值。
  * */
 public class Text {
     public static final String COLOR_MARK = "&&";   //颜色标记

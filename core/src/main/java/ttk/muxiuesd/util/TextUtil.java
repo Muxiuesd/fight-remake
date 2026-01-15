@@ -27,7 +27,7 @@ public class TextUtil {
      * @param x 起始x坐标
      * @param y 起始y坐标
      */
-    public static void draw(Batch batch, BitmapFont font, String text, float x, float y) {
+    public static void draw (Batch batch, BitmapFont font, String text, float x, float y) {
         draw(batch, font, text, x, y, Color.WHITE);
     }
 
@@ -40,7 +40,7 @@ public class TextUtil {
      * @param y 起始y坐标
      * @param defaultColor 默认颜色（当没有颜色标记时使用）
      */
-    public static void draw(Batch batch, BitmapFont font, String text, float x, float y, Color defaultColor) {
+    public static void draw (Batch batch, BitmapFont font, String text, float x, float y, Color defaultColor) {
         if (text == null || text.isEmpty()) return;
 
         Color currentColor = defaultColor;

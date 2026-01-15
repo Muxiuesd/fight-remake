@@ -3,6 +3,7 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.text.TextUI;
@@ -61,7 +62,9 @@ public class SlotUI extends UIComponent {
 
             //数量大于1才绘制
             int amount = itemStack.getAmount();
-            if (amount > 1) this.drawAmount(batch, parent, renderX, renderY, amount);
+            if (amount > 1) {
+                this.drawAmount(batch, parent, renderX, renderY, amount);
+            }
         }
         //绘制鼠标放在槽位上的高光
         if (this.slotHighlight != null && isMouseOver()) {
@@ -70,14 +73,14 @@ public class SlotUI extends UIComponent {
     }
 
     /**
-     * 绘制数量字体
+     * 绘制数量字体，会绘制在槽位UI的右下角
      * */
     public void drawAmount (Batch batch, UIPanel parent, float renderX, float renderY, int amount) {
-        this.textUI.setPosition(renderX, renderY);
-        this.textUI.setText(String.valueOf(amount)).draw(batch, parent);
+        this.textUI
+            .setPosition(renderX + getWidth() - this.textUI.getRenderWidth(), renderY + 1f)
+            .setText(String.valueOf(amount))
+            .draw(batch, parent);
     }
-
-
 
     /**
      * 物品类型检测：检查要放进来的物品是否符合可放进来的类型
@@ -99,5 +102,17 @@ public class SlotUI extends UIComponent {
      * */
     public ItemStack getItemStack () {
         return null;
+    }
+
+    @Override
+    public SlotUI setPosition (float x, float y) {
+        super.setPosition(x, y);
+        return this;
+    }
+
+    @Override
+    public SlotUI setPosition (Vector2 pos) {
+        super.setPosition(pos);
+        return this;
     }
 }
