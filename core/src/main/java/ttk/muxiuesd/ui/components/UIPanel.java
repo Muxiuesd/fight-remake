@@ -205,6 +205,11 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     }
 
     @Override
+    public void mouseDown() {
+        this.getComponents().forEach(UIComponent::mouseDown);
+    }
+
+    @Override
     public void addComponent (UIComponent component) {
         UIComponentsHolder.super.addComponent(component);
         component.setScreen(getScreen());

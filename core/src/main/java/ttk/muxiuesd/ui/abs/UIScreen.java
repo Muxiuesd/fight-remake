@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.Drawable;
 import ttk.muxiuesd.interfaces.ShapeRenderable;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -134,7 +135,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-        if (getComponents().isEmpty()) return;
+        if (!Fight.UI_DEBUG_BOX_RENDER.getValue() || getComponents().isEmpty()) return;
         getComponents().forEach(uiComponent -> uiComponent.renderShape(batch));
     }
 
