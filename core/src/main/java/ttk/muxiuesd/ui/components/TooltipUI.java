@@ -143,7 +143,7 @@ public class TooltipUI extends UIComponent {
             //确定背景要渲染的最大宽度
             renderWidth += maxLength + 4;
         }
-
+        setSize(renderWidth, renderHeight);
         //绘制背景和框架
         this.backgroundNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
         this.frameNinePatch.draw(batch, renderX + 1, renderY + 1, renderWidth - 2, renderHeight - 2);

@@ -61,7 +61,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-        batch.rect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        batch.rect(this.getAbsX(), this.getAbsY(), this.getWidth(), this.getHeight());
     }
 
     /**
@@ -129,42 +129,42 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     }
 
     /**
-     * 获取原始的x
+     * 获取原始的x（相对于它的父组件）
      * */
     public float getX () {
         return this.x;
     }
 
     /**
-     * 获取原始的y
+     * 获取原始的y（相对于它的父组件）
      * */
     public float getY () {
         return this.y;
     }
 
     /**
-     * 获取绝对的X坐标
+     * 获取绝对的X坐标（相对于相机）
      * */
     public float getAbsX () {
         return this.x + this.parentPanel.getX();
     }
 
     /**
-     * 获取绝对的X坐标
+     * 获取绝对的X坐标（相对于相机）
      * */
     public float getAbsY () {
         return this.y + this.parentPanel.getY();
     }
 
     /**
-     * 根据父组件来获取x
+     * 根据指定的父组件来获取x
      * */
     public float getX (UIComponent component) {
         return component != null ? this.getX() + component.getX() : this.getX();
     }
 
     /**
-     * 根据父组件来获取y
+     * 根据指定的父组件来获取y
      * */
     public float getY (UIComponent component) {
         return component != null ? this.getY() + component.getY() : this.getY();
