@@ -30,6 +30,29 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
         this.components = new LinkedHashSet<>();
     }
 
+    /**
+     * 根据持有的UI组件大小来自动计算大小面板的尺寸大小，在添加完UI组件后调用
+     * */
+    public UIPanel autoSize () {
+        float maxWidth = getWidth();
+        float maxHeight = getHeight();
+
+        float up, down;
+
+
+        for (UIComponent component : this.getComponents()) {
+            Vector2 componentSize = component.getSize();
+            //找到宽度最大值
+            if (componentSize.x > maxWidth) {
+                maxWidth = componentSize.x;
+            }
+
+        }
+
+        setSize(maxWidth, maxHeight);
+
+        return this;
+    }
 
     @Override
     public void update (float delta) {

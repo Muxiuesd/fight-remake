@@ -22,15 +22,21 @@ public class StartMenuUIScreen extends UIScreen {
             UIButton.DEFAULT_WIDTH, 100,
             new GridPoint2((int) UIButton.DEFAULT_WIDTH, 100)
         );
+        addComponent(this.buttonsPanel);
 
         this.buttonsPanel.addComponent(new UITextButton(
             Text.ofText(Fight.ID("button_start_game")),
             (button, interactPos) -> {
                 FightCore.getInstance().changeScreen(FightCore.getInstance().mainGameScreen);
                 return false;
-            })
+            }).setPosition(0, 10)
         );
-        addComponent(buttonsPanel);
+        this.buttonsPanel.addComponent(new UITextButton(
+            Text.ofText(Fight.ID("button_game_settings")),
+            (button, interactPos) -> {
+                return false;
+            }).setPosition(0, -10)
+        );
     }
 
     @Override
