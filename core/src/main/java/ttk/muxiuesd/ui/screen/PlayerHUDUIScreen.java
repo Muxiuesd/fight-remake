@@ -1,7 +1,6 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.HotbarUIPanel;
@@ -20,14 +19,9 @@ public class PlayerHUDUIScreen extends UIScreen {
         this.playerSystem = playerSystem;
 
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
-        float viewportWidth = camera.viewportWidth;
         float viewportHeight = camera.viewportHeight;
         float width = HotbarPlayerSlotUI.HOTBAR_WIDTH * 9;
-        HotbarUIPanel hotbarUIPanel = new HotbarUIPanel(playerSystem,
-            - width / 2, - viewportHeight / 2,
-            width, HotbarPlayerSlotUI.HOTBAR_HEIGHT,
-            new GridPoint2((int) width, (int) HotbarPlayerSlotUI.HOTBAR_HEIGHT));
 
-        addComponent(hotbarUIPanel);
+        addComponent(new HotbarUIPanel(playerSystem, - width / 2, - viewportHeight / 2).auto());
     }
 }

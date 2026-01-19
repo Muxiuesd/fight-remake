@@ -1,9 +1,11 @@
 package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
+import ttk.muxiuesd.interfaces.util.Voidable;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.abs.UIScreen;
@@ -19,38 +21,87 @@ import java.util.LinkedHashSet;
  * <p>
  * 面板可以互相嵌套
  * */
-public class UIPanel extends UIComponent implements UIComponentsHolder {
+public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable {
+    public static final UIPanel VOID_INSTANCE = new UIPanel();
+    static {
+        VOID_INSTANCE.setPosition(0, 0).setSize(0, 0);
+    }
+
     private LinkedHashSet<UIComponent> components;
-    //父节点面板
-    private UIPanel parent;
 
     public UIPanel() {}
+    public UIPanel (float x, float y) {
+        this(x, y, 0, 0, new GridPoint2());
+    }
+    public UIPanel (float x, float y, GridPoint2 interactGridSize) {
+        this(x, y, 0, 0, interactGridSize);
+    }
     public UIPanel (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
         this.components = new LinkedHashSet<>();
     }
 
     /**
+     * 面板的自动设置方法
+     * */
+    public UIPanel auto () {
+        this.autoSize();
+        this.autoInteractGridSize();
+        return this;
+    }
+
+    /**
      * 根据持有的UI组件大小来自动计算大小面板的尺寸大小，在添加完UI组件后调用
      * */
     public UIPanel autoSize () {
+        LinkedHashSet<UIComponent> uiComponents = this.getComponents();
+        if (uiComponents.isEmpty()) return this;
+
         float maxWidth = getWidth();
         float maxHeight = getHeight();
+        float left = 0f, right = 0f;
+        float up = 0f, down = 0f;
 
-        float up, down;
-
-
-        for (UIComponent component : this.getComponents()) {
-            Vector2 componentSize = component.getSize();
-            //找到宽度最大值
-            if (componentSize.x > maxWidth) {
-                maxWidth = componentSize.x;
+        for (UIComponent component : uiComponents) {
+            //找到组件的最左边
+            if (component.getX() < left) {
+                left = component.getX();
+            }
+            //找最右边
+            float r = component.getX() + component.getWidth();
+            if (r > right) {
+                right = r;
             }
 
+            /*//找组件的最大高度
+            if (componentSize.y > maxHeight) {
+                maxHeight = componentSize.y;
+            }*/
+
+            //找最低点
+            if (component.getY() < down) {
+                down = component.getY();
+            }
+            //找最高点
+            float u = component.getY() + component.getHeight();
+            if (u > up) {
+                up = u;
+            }
         }
 
+        //取所有组件最高点和最低点的高度差和所有组件当中最大高度的最大值
+        maxHeight = Math.max(Math.abs(up - down), maxHeight);
+        maxWidth = Math.max(Math.abs(right - left), maxWidth);
         setSize(maxWidth, maxHeight);
 
+        return this;
+    }
+
+    /**
+     * 根据宽高自动设置交互网格尺寸
+     * */
+    public UIPanel autoInteractGridSize () {
+        this.setInteractGridSize(new GridPoint2((int) getWidth(), (int) getHeight()));
         return this;
     }
 
@@ -62,6 +113,12 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         this.getComponents().forEach(component -> component.draw(batch, this));
+    }
+
+    @Override
+    public void renderShape (ShapeRenderer batch) {
+        super.renderShape(batch);
+        this.getComponents().forEach(component -> component.renderShape(batch));
     }
 
     @Override
@@ -151,34 +208,20 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
     public void addComponent (UIComponent component) {
         UIComponentsHolder.super.addComponent(component);
         component.setScreen(getScreen());
-        //当加入的组件是面板时，把子面板的父节点设置为此面板
-        if (component instanceof UIPanel childPanel) {
-            childPanel.setParent(this);
-        }
+        component.setParentPanel(this);
     }
 
     @Override
     public void removeComponent (UIComponent component) {
         UIComponentsHolder.super.removeComponent(component);
         component.setScreen(null);
-        //当被移除的组件是面板时，把子面板的父节点设置为空
-        if (component instanceof UIPanel childPanel) {
-            childPanel.setParent(null);
-        }
+        component.setParentPanel(VOID_INSTANCE);
+
     }
 
     @Override
     public LinkedHashSet<UIComponent> getComponents () {
         return this.components;
-    }
-
-    public UIPanel getParent () {
-        return this.parent;
-    }
-
-    public UIPanel setParent (UIPanel parent) {
-        this.parent = parent;
-        return this;
     }
 
     @Override
@@ -187,18 +230,6 @@ public class UIPanel extends UIComponent implements UIComponentsHolder {
         //将所有子节点的UI组件的screen都设置成指定的screen
         getComponents().forEach(component -> component.setScreen(screen));
         return this;
-    }
-
-    @Override
-    public float getX () {
-        float x = super.getX();
-        return this.getParent() == null ? x : x + this.getParent().getX();
-    }
-
-    @Override
-    public float getY () {
-        float y = super.getY();
-        return this.getParent() == null ? y : y + this.getParent().getY();
     }
 
     @Override

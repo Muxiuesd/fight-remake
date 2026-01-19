@@ -20,6 +20,9 @@ public class HotbarUIPanel extends UIPanel {
     private final Array<HotbarPlayerSlotUI> hotbarUIComponents = new Array<>();
     private TextureRegion selectedHotbarTextureRegion;  //快捷栏选中框贴图
 
+    public HotbarUIPanel (PlayerSystem playerSystem, float x, float y) {
+        this(playerSystem, x, y, 0, 0, new GridPoint2(0, 0));
+    }
     public HotbarUIPanel (PlayerSystem playerSystem,
                           float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);

@@ -25,7 +25,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
 
     private UIScreen screen;  //隶属于哪一个screen
-
+    private UIPanel parentPanel = UIPanel.VOID_INSTANCE;  //隶属于哪一个UI面板，无论如何不能为null
     private float x, y;
     private float width, height;
     private boolean visible = true;
@@ -61,7 +61,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     @Override
     public void renderShape (ShapeRenderer batch) {
-        //batch.rect(this.getX(), this.getY(), this.getWidth(), this.getWidth());
+        batch.rect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     /**
@@ -106,6 +106,24 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
         return this;
     }
 
+    public UIPanel getParentPanel () {
+        return this.parentPanel;
+    }
+
+    public UIComponent setParentPanel (UIPanel parentPanel) {
+        if (parentPanel == null){
+            this.parentPanel = UIPanel.VOID_INSTANCE;
+        }else {
+            this.parentPanel = parentPanel;
+        }
+        return this;
+    }
+
+    public UIComponent resetParentPanel () {
+        this.parentPanel = UIPanel.VOID_INSTANCE;
+        return this;
+    }
+
     public Vector2 getPosition () {
         return new Vector2(this.getX(), this.getY());
     }
@@ -113,12 +131,30 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     /**
      * 获取原始的x
      * */
-    public float getX () { return this.x; }
+    public float getX () {
+        return this.x;
+    }
 
     /**
      * 获取原始的y
      * */
-    public float getY () { return this.y; }
+    public float getY () {
+        return this.y;
+    }
+
+    /**
+     * 获取绝对的X坐标
+     * */
+    public float getAbsX () {
+        return this.x + this.parentPanel.getX();
+    }
+
+    /**
+     * 获取绝对的X坐标
+     * */
+    public float getAbsY () {
+        return this.y + this.parentPanel.getY();
+    }
 
     /**
      * 根据父组件来获取x
