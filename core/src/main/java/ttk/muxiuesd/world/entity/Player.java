@@ -72,8 +72,8 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(33, new ItemStack(Items.DIAMOND_BOOTS));
         backpack.setItemStack(35, new ItemStack(Items.TORCH));
 
-        setEffect(StatusEffects.HEALING, 10f, 2);
-        setEffect(StatusEffects.POISON, 5f, 1);
+        setEffect(StatusEffects.HEALING, 500f, 2);
+        setEffect(StatusEffects.POISON, 500f, 1);
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }

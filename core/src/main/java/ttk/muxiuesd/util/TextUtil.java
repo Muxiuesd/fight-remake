@@ -15,8 +15,12 @@ public class TextUtil {
     public static float getTextRenderWidth (FontHolder fontHolder, int fontSize, String text) {
         return getTextRenderWidth(fontHolder.getFont(fontSize), text);
     }
+    /**
+     * 获取文本字体渲染的总宽度
+     * @param text 传入的文本Sting，会自动转换成去掉颜色标记的纯文本
+     * */
     public static float getTextRenderWidth (BitmapFont bitmapFont, String text) {
-        TextUtil.staticGlyphLayout.setText(bitmapFont, text);
+        TextUtil.staticGlyphLayout.setText(bitmapFont, getPlainText(text));
         return staticGlyphLayout.width;
     }
     /**
