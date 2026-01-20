@@ -27,8 +27,27 @@ public final class Blocks {
     public static final BlockStone STONE = register("stone", BlockStone::new);
     public static final BlockSand SAND = register("sand", BlockSand::new);
     public static final BlockWater WATER = register("water", BlockWater::new, BlockWater.RENDERER);
+
     public static final Block GLASS = register("glass");
+    //矿
     public static final Block COAL_ORE = register("coal_ore");
+    //颜色方块
+    public static final Block WOOL_BLACK = register("wool_colored_black", "wool/wool_colored_black");
+    public static final Block WOOL_BLUE = register("wool_colored_blue", "wool/wool_colored_blue");
+    public static final Block WOOL_BROWN = register("wool_colored_brown", "wool/wool_colored_brown");
+    public static final Block WOOL_CYAN = register("wool_colored_cyan", "wool/wool_colored_cyan");
+    public static final Block WOOL_GRAY = register("wool_colored_gray", "wool/wool_colored_gray");
+    public static final Block WOOL_GREEN = register("wool_colored_green", "wool/wool_colored_green");
+    public static final Block WOOL_LIGHT_BLUE = register("wool_colored_light_blue", "wool/wool_colored_light_blue");
+    public static final Block WOOL_LIME = register("wool_colored_lime", "wool/wool_colored_lime");
+    public static final Block WOOL_MAGENTA = register("wool_colored_magenta", "wool/wool_colored_magenta");
+    public static final Block WOOL_ORANGE = register("wool_colored_orange", "wool/wool_colored_orange");
+    public static final Block WOOL_PINK = register("wool_colored_pink", "wool/wool_colored_pink");
+    public static final Block WOOL_PURPLE = register("wool_colored_purple", "wool/wool_colored_purple");
+    public static final Block WOOL_RED = register("wool_colored_red", "wool/wool_colored_red");
+    public static final Block WOOL_SILVER = register("wool_colored_silver", "wool/wool_colored_silver");
+    public static final Block WOOL_WHITE = register("wool_colored_white", "wool/wool_colored_white");
+    public static final Block WOOL_YELLOW = register("wool_colored_yellow", "wool/wool_colored_yellow");
 
     /// 带有方块实体的方块
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
@@ -39,6 +58,14 @@ public final class Blocks {
      * */
     public static Block register (String name) {
         return register(name, Block.createProperty());
+    }
+
+    /**
+     * 注册一个名称与贴图路径不完全相同的方块
+     * @param pathName 在{@link Fight#BLOCK_TEXTURE_ROOT}下的路径
+     * */
+    public static Block register (String name, String pathName) {
+        return register(name, () -> new CommonBlock(name, pathName, Block.createProperty()));
     }
 
     public static Block register (String name, Block.Property property) {

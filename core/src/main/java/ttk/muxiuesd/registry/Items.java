@@ -63,6 +63,23 @@ public final class Items {
     public static final Item WATER = register(Blocks.WATER);
     public static final Item GLASS = register(Blocks.GLASS);
     public static final Item COAL_ORE = register(Blocks.COAL_ORE);
+    //颜色方块物品
+    public static final Item WOOL_BLACK = register(Blocks.WOOL_BLACK);
+    public static final Item WOOL_BLUE = register(Blocks.WOOL_BLUE);
+    public static final Item WOOL_BROWN = register(Blocks.WOOL_BROWN);
+    public static final Item WOOL_CYAN = register(Blocks.WOOL_CYAN);
+    public static final Item WOOL_GRAY = register(Blocks.WOOL_GRAY);
+    public static final Item WOOL_GREEN = register(Blocks.WOOL_GREEN);
+    public static final Item WOOL_LIGHT_BLUE = register(Blocks.WOOL_LIGHT_BLUE);
+    public static final Item WOOL_LIME = register(Blocks.WOOL_LIME);
+    public static final Item WOOL_MAGENTA = register(Blocks.WOOL_MAGENTA);
+    public static final Item WOOL_ORANGE = register(Blocks.WOOL_ORANGE);
+    public static final Item WOOL_PINK = register(Blocks.WOOL_PINK);
+    public static final Item WOOL_PURPLE = register(Blocks.WOOL_PURPLE);
+    public static final Item WOOL_RED = register(Blocks.WOOL_RED);
+    public static final Item WOOL_SILVER = register(Blocks.WOOL_SILVER);
+    public static final Item WOOL_WHITE = register(Blocks.WOOL_WHITE);
+    public static final Item WOOL_YELLOW = register(Blocks.WOOL_YELLOW);
 
     /// 带有方块实体的方块物品
     public static final Item CRAFTING_TABLE = register(Blocks.CRAFTING_TABLE);

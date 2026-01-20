@@ -12,9 +12,18 @@ public class ItemGroup {
     private final ArrayList<ItemStack> itemsList;
 
     public ItemGroup (String groupID) {
-        this.groupID = groupID;
-        this.itemsList = new ArrayList<>();
+        this(groupID, new ArrayList<>());
     }
+    public ItemGroup(String groupID, ArrayList<ItemStack> itemsList) {
+        this.groupID = groupID;
+        this.itemsList = itemsList;
+    }
+
+    public ItemGroup selfAction (Self self) {
+        self.action(this);
+        return this;
+    }
+
 
     /**
      * 添加一个物品
@@ -42,5 +51,10 @@ public class ItemGroup {
 
     public ArrayList<ItemStack> getItemsList() {
         return this.itemsList;
+    }
+
+    @FunctionalInterface
+    public interface Self {
+        void action (ItemGroup group);
     }
 }
