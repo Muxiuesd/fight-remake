@@ -31,7 +31,7 @@ public final class Pools {
     public static final FightPool<PoolableVec2> VEC2 = register("vec2", PoolableVec2.class);
     public static final FightPool<PoolableRectangle> RECT = register("rectangle", PoolableRectangle.class);
     public static final FightPool<Timer> TIMER = register("timer", Timer.class);
-    public static final FightPool<TaskTimer> TASK_TIMER = register("timer", TaskTimer.class);
+    public static final FightPool<TaskTimer> TASK_TIMER = register("task_timer", TaskTimer.class);
 
     /// 粒子池
     public static final FightPool<ParticleSpell> SPELL = register("spell", ParticleSpell.class, EmitterEnemyShootParticle.POOL);
