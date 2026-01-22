@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
 import ttk.muxiuesd.interfaces.Drawable;
@@ -34,11 +35,13 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public static final int HighestHeight = 7;
 
     //区块分区
+    public static final Vector2 ZONE_RECTANGLE_OFFSET = new Vector2(- Block.WIDTH / 2, - Block.HEIGHT / 2);
     public static final int NotInChunk = -1;
     public static final int LeftUp   = 6, Up     = 7, RightUp   = 8;
     public static final int Left     = 3, Center = 4, Right     = 5;
     public static final int LeftDown = 0, Down   = 1, RightDown = 2;
     public Rectangle[] chunkZone;
+
 
     private ChunkSystem chunkSystem;
 
@@ -64,20 +67,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void draw(Batch batch) {
-        /*ChunkPosition cp = this.chunkPosition;
-        this.traversal((x, y) -> {
-            Block block = this.blocks[y][x];
-            if (block != null) {
-                block.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
-            }
-        });
-        this.traversal((x, y) -> {
-            Wall<?> wall = this.walls[y][x];
-            if (wall != null) {
-                wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
-            }
-        });*/
-
         ChunkPosition cp = this.chunkPosition;
         this.traversal((x, y) -> {
             Block block = this.blocks[y][x];
@@ -116,17 +105,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void dispose() {
-        /*this.traversal((x, y) -> {
-            Block block = blocks[y][x];
-            if (block != null) {
-                blocks[y][x] = null;
-            }
-
-            Wall<?> wall = walls[y][x];
-            if (wall != null) {
-                walls[y][x] = null;
-            }
-        });*/
     }
 
     /**
@@ -236,15 +214,18 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         //绘制区块边界
         if (this.chunkSystem.chunkEdgeRender) {
             batch.setColor(Color.PURPLE);
+            //内部区域边界
             for (int i = 0; i < chunkZone.length; i++) {
                 Rectangle zone = chunkZone[i];
                 batch.rect(zone.x, zone.y, zone.width, zone.height);
             }
+            //区块整个边界
             batch.setColor(new Color(255, 0, 0, 255));
             batch.rect(
-                this.chunkPosition.x * ChunkWidth,
-                this.chunkPosition.y * ChunkHeight,
-                ChunkWidth, ChunkHeight);
+                this.chunkPosition.x * ChunkWidth + ZONE_RECTANGLE_OFFSET.x,
+                this.chunkPosition.y * ChunkHeight+ ZONE_RECTANGLE_OFFSET.y,
+                ChunkWidth, ChunkHeight
+            );
             //还原颜色
             batch.setColor(Color.WHITE);
         }
@@ -322,8 +303,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private void updateChunkZone () {
         this.chunkZone = new Rectangle[9];
         chunkZone[LeftDown] = new Rectangle(
-            chunkPosition.getX() * ChunkWidth,
-            chunkPosition.getY() * ChunkHeight,
+            chunkPosition.getX() * ChunkWidth + ZONE_RECTANGLE_OFFSET.x,
+            chunkPosition.getY() * ChunkHeight + ZONE_RECTANGLE_OFFSET.y,
             5f, 5f);
         chunkZone[Down] = new Rectangle(
             chunkZone[LeftDown].getX() + chunkZone[LeftDown].getWidth(),
