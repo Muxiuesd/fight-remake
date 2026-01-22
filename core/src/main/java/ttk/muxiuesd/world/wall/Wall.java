@@ -17,15 +17,19 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
     public static final String DEFAULT_HITBOX_ID = Fight.ID("wall");
 
     public float x, y;
+    private RectHitbox rectHitbox;  //普通墙体只有一个矩形碰撞箱，最好也只有一个
     private HitboxHolder<T> hitboxHolder;
 
-
-    private Rectangle hitbox;
+    //private Rectangle hitbox;
 
     public Wall(Property property, String textureId, String texturePath) {
         super(property, textureId, texturePath);
+
+        this.rectHitbox = new RectHitbox()
+            .setStartPos(HITBOX_START_X_OFFSET, HITBOX_START_Y_OFFSET)
+            .setEndPos(HITBOX_END_X_OFFSET, HITBOX_END_Y_OFFSET);
         this.hitboxHolder = new HitboxHolder<>();
-        this.hitboxHolder.addBox(DEFAULT_HITBOX_ID, new RectHitbox());
+        this.hitboxHolder.addBox(DEFAULT_HITBOX_ID, this.rectHitbox);
     }
 
     /**
@@ -35,44 +39,57 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
 
     @Override
     public void renderShape(ShapeRenderer batch) {
-        if (this.getHitbox() != null) {
-            batch.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
-        }
+        Rectangle hitboxRectangle = this.getHitboxRectangle();
+        batch.rect(hitboxRectangle.x, hitboxRectangle.y, hitboxRectangle.width, hitboxRectangle.height);
     }
 
-    public Rectangle getHitbox() {
-        return this.hitbox;
+    public Rectangle getHitboxRectangle () {
+        return this.getRectHitbox().getRectangle();
     }
 
     /**
-     * 设置默认的hitbox，以墙的坐标来设置
+     * 设置默认的hitbox，以墙体的中心点的世界坐标
      * */
-    public Wall<T> setHitbox() {
+    public Wall<T> setHitbox () {
         return this.setHitbox(x, y);
     }
 
-    public Wall<T> setHitbox(float startX, float startY) {
-
+    public Wall<T> setHitbox (float cx, float cy) {
         Hitbox box = this.getHitboxHolder().getBox(DEFAULT_HITBOX_ID);
-        box.setCenterPos(startX, startY);
-
-
-        return this.setHitbox(new Rectangle().set(startX, startY, BlockWidth, BlockHeight));
-    }
-
-    public Wall<T> setHitbox(Rectangle hitbox) {
-        this.hitbox = hitbox;
+        box.setCenterPos(cx, cy);
+        //return this.setHitbox(new Rectangle().set(startX, startY, WIDTH, HEIGHT));
         return this;
     }
 
-    public void setPosition (Vector2 position) {
-        this.setPosition(position.x, position.y);
+    /*public Wall<T> setHitbox(Rectangle hitbox) {
+        this.hitbox = hitbox;
+        return this;
+    }*/
+
+    /**
+     * 设置墙体的坐标
+     * @param position 传入世界坐标
+     * */
+    public void setPos (Vector2 position) {
+        this.setPos(position.x, position.y);
     }
 
-    public void setPosition(float x, float y) {
+    /**
+     * 传入世界坐标，墙体的中心会置于这个坐标上，默认渲染也会基于这个坐标为中心渲染贴图
+     * */
+    public void setPos (float x, float y) {
         this.x = x;
         this.y = y;
         this.setHitbox();
+    }
+
+    public RectHitbox getRectHitbox () {
+        return this.rectHitbox;
+    }
+
+    public Wall<T> setRectHitbox (RectHitbox rectHitbox) {
+        this.rectHitbox = rectHitbox;
+        return this;
     }
 
     public HitboxHolder<T> getHitboxHolder () {

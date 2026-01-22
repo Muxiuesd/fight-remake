@@ -33,7 +33,7 @@ public interface BlockRenderer<T extends Block> {
 
         public float
             x , y,
-            width = Block.BlockWidth, height = Block.BlockHeight,
+            width = Block.WIDTH, height = Block.HEIGHT,
             originX = 0f, originY = 0f,
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
@@ -48,8 +48,8 @@ public interface BlockRenderer<T extends Block> {
         public void reset () {
             this.x = 0f;
             this.y = 0f;
-            this.width = Block.BlockWidth;
-            this.height = Block.BlockHeight;
+            this.width = Block.WIDTH;
+            this.height = Block.HEIGHT;
             this.originX = 0f;
             this.originY = 0f;
             this.scaleX = 1f;

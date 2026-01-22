@@ -253,7 +253,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             batch.setColor(Color.BLUE);
             this.traversal(((x, y) -> {
                 Wall wall = walls[y][x];
-                if (wall != null && wall.getHitbox() != null) {
+                if (wall != null && wall.getHitboxRectangle() != null) {
                     /*Rectangle hitbox = wall.getHitbox();
                     batch.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());*/
                     wall.renderShape(batch);

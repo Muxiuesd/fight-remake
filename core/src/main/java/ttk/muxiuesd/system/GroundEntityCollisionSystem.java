@@ -108,7 +108,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         while (!collidingWalls.isEmpty() && fixes < MAX_FIXES) {
             float totalSeparation = 0;
             for (Wall<?> wall : collidingWalls) {
-                Rectangle wallBox = wall.getHitbox();
+                Rectangle wallBox = wall.getHitboxRectangle();
                 if (hitbox.overlaps(wallBox)) {
                     float overlap = calculateOverlap(hitbox, wallBox, axisX, axisY, move);
                     totalSeparation += overlap;
@@ -202,8 +202,8 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
                     chunk.traversal((x, y) -> {
                         Wall<?> wall = chunk.getWall(x, y);
-                        if (wall != null && wall.getHitbox() != null &&
-                            hitbox.overlaps(wall.getHitbox())) {
+                        if (wall != null && wall.getHitboxRectangle() != null &&
+                            hitbox.overlaps(wall.getHitboxRectangle())) {
                             result.add(wall);
                         }
                     });

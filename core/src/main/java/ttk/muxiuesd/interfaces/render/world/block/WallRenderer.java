@@ -34,7 +34,7 @@ public interface WallRenderer<T extends Wall<?>> {
 
         public float
             x , y,
-            width = Block.BlockWidth, height = Block.BlockHeight,
+            width = Block.WIDTH, height = Block.HEIGHT,
             originX = 0f, originY = 0f,
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
@@ -49,8 +49,8 @@ public interface WallRenderer<T extends Wall<?>> {
         public void reset () {
             this.x = 0f;
             this.y = 0f;
-            this.width = Block.BlockWidth;
-            this.height = Block.BlockHeight;
+            this.width = Block.WIDTH;
+            this.height = Block.HEIGHT;
             this.originX = 0f;
             this.originY = 0f;
             this.scaleX = 1f;
@@ -64,8 +64,8 @@ public interface WallRenderer<T extends Wall<?>> {
      * */
     class StandardRenderer<T extends Wall<?>> implements WallRenderer<T>{
         /// 渲染向左下角偏移半个方块距离
-        final float offsetX = - Wall.BlockWidth / 2;
-        final float offsetY = - Wall.BlockHeight / 2;
+        final float offsetX = - Wall.WIDTH / 2;
+        final float offsetY = - Wall.HEIGHT / 2;
 
         @Override
         public void render (Batch batch, T wall, Context context) {

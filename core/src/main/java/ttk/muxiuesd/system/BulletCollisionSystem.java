@@ -84,8 +84,8 @@ public class BulletCollisionSystem extends WorldSystem {
 
                 chunk.traversal((wx, wy) -> {
                     Wall wall = chunk.getWall(wx, wy);
-                    if (wall != null && wall.getHitbox() != null &&
-                        pathBounds.overlaps(wall.getHitbox())) {
+                    if (wall != null && wall.getHitboxRectangle() != null &&
+                        pathBounds.overlaps(wall.getHitboxRectangle())) {
                         relevantWalls.add(wall);
                     }
                 });
@@ -183,7 +183,7 @@ public class BulletCollisionSystem extends WorldSystem {
     private boolean checkWallCollision(Bullet bullet, Array<Wall> walls, float prevX, float prevY) {
         Rectangle bulletHitbox = bullet.getHitbox();
         for (Wall wall : walls) {
-            Rectangle wallHitbox = wall.getHitbox();
+            Rectangle wallHitbox = wall.getHitboxRectangle();
             if (bulletHitbox.overlaps(wallHitbox)) {
                 // 回退到碰撞前位置
                 bullet.x = prevX;

@@ -80,14 +80,15 @@ public class RectHitbox extends Hitbox {
         return this;
     }
 
-
-
+    /**
+     * 获取这个碰撞箱的矩形
+     * */
     public Rectangle getRectangle () {
         float startX = this.getStartX();
         float startY = this.getStartY();
         return Pools.RECT.obtain().set(
-            this.getCenterX() - startX,
-            this.getCenterY() - startY,
+            this.getCenterX() + startX,
+            this.getCenterY() + startY,
             this.getEndX() - startX,
             this.getEndY() - startY
         );

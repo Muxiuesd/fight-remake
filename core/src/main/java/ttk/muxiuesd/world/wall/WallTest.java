@@ -16,7 +16,7 @@ public class WallTest extends Wall<WallTest>{
     @Override
     public WallTest createSelf (Vector2 position) {
         WallTest wallTest = new WallTest();
-        wallTest.setPosition(position.x, position.y);
+        wallTest.setPos(position.x, position.y);
         return wallTest;
     }
 }
