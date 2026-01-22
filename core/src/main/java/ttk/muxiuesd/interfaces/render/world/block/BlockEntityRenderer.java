@@ -66,10 +66,16 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
      * 普通标准的方块实体渲染器
      * */
     class StandardRenderer<T extends BlockEntity> implements BlockEntityRenderer<T>{
+        /// 渲染向左下角偏移半个方块距离
+        public static final float OFFSET_X = - Block.WIDTH / 2;
+        public static final float OFFSET_Y = - Block.HEIGHT / 2;
+
         @Override
         public void render (Batch batch, T blockEntity, Context context) {
             //槽位不为空就渲染
-            if (!blockEntity.getSlots().isEmpty()) this.drawAllSlots(batch, blockEntity, context.x, context.y);
+            if (!blockEntity.getSlots().isEmpty()) {
+                this.drawAllSlots(batch, blockEntity, context.x + OFFSET_X, context.y + OFFSET_Y);
+            }
         }
 
         /**

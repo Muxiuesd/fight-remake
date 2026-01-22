@@ -26,6 +26,7 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
     /// 方块碰撞箱坐标偏移，自带正负号
     public static final float HITBOX_START_X_OFFSET = - WIDTH / 2, HITBOX_START_Y_OFFSET = - HEIGHT / 2;
     public static final float HITBOX_END_X_OFFSET = WIDTH / 2, HITBOX_END_Y_OFFSET = HEIGHT / 2;
+
     /**
      * 生成默认的属性
      * 有些需要实例化的东西就放里面防止浅拷贝

@@ -141,19 +141,31 @@ public class Util {
     }
 
     /**
-     * 取整工具
+     * 快速对坐标值四舍五入
+     * */
+    public static Vector2 fastRound (float x, float y) {
+        return new Vector2(fastRound(x), fastRound(y));
+    }
+    /**
+     * 四舍五入取整工具
      * */
     public static float fastRound (float value) {
-        if (value < 0) {
+        /*if (value < 0) {
             return (float) Math.floor(value);
             //return Math.round(value);
         }
         if (value > 0) {
             return (float) Math.floor(value);
-        }
-        return value;
+        }*/
+        return Math.round(value);
     }
 
+    /**
+     * 快速向下取整
+     * */
+    public static Vector2 fastFloor (Vector2 value) {
+        return fastFloor(value.x, value.y);
+    }
     /**
      * 快速向下取整
      * */

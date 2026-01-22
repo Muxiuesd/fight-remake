@@ -45,8 +45,8 @@ public class WallItem extends ConsumptionItem {
             Rectangle hitbox = entity.getHitbox();
             if (hitbox == null) continue;
 
-            Vector2 floor = Util.fastFloor(worldPosition.x, worldPosition.y);
-            Rectangle wallHitbox = Pools.RECT.obtain().set(floor.x, floor.y, hitbox.width, hitbox.height);
+            Vector2 round = Util.fastRound(worldPosition.x, worldPosition.y);
+            Rectangle wallHitbox = Pools.RECT.obtain().set(round.x, round.y, hitbox.width, hitbox.height);
             if (wallHitbox.overlaps(hitbox)) {
                 flag = true;
                 break;

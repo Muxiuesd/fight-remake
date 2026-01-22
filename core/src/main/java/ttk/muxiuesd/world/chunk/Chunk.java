@@ -267,9 +267,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 获取坐标在这个区块内的区域，首先要确保传入的坐标在这个区块内
-     * @param wx
-     * @param wy
-     * @return
      */
     public int getChunkZone (float wx, float wy) {
         ChunkPosition cp = getChunkPosition();
@@ -375,22 +372,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 将传入的世界坐标转换为这个区块里的方块数组坐标
-     * @param fwx 向下取整过的世界横坐标
-     * @param fwy 向下取整过的世界纵坐标
+     * @param rwx 四舍五入过的世界横坐标
+     * @param rwy 四舍五入过的世界纵坐标
      * */
-    public GridPoint2 worldToChunk (float fwx, float fwy) {
+    public GridPoint2 worldToChunk (float rwx, float rwy) {
         GridPoint2 cp = new GridPoint2();
-        if (fwx < 0) {
-            cp.x = ChunkWidth + (int)(fwx % ChunkWidth);
+        if (rwx < 0) {
+            cp.x = ChunkWidth + (int)(rwx % ChunkWidth);
             cp.x %= ChunkWidth;
         }else {
-            cp.x = (int) (fwx % ChunkWidth);
+            cp.x = (int) (rwx % ChunkWidth);
         }
-        if (fwy < 0) {
-            cp.y = ChunkHeight + (int)(fwy % ChunkHeight);
+        if (rwy < 0) {
+            cp.y = ChunkHeight + (int)(rwy % ChunkHeight);
             cp.y %= ChunkHeight;
         }else {
-            cp.y = (int) (fwy % ChunkHeight);
+            cp.y = (int) (rwy % ChunkHeight);
         }
         return cp;
     }

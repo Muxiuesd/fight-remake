@@ -265,13 +265,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 添加方块，确切地说，是把这个方块的实例放进区块系统里确保可以被查询到
      * */
     public void addBlock (Block block, float wx, float wy) {
-        Vector2 floor = Util.fastFloor(wx, wy);
+        Vector2 round = Util.fastRound(wx, wy);
         //如果新的方块是带有方块实体的方块
         if (block instanceof BlockWithEntity blockWithEntity) {
             //添加方块实体
             BlockEntity blockEntity = blockWithEntity.getBlockEntity();
             if (blockEntity == null) {
-                blockEntity = blockWithEntity.createBlockEntity(new BlockPos(floor), getWorld());
+                blockEntity = blockWithEntity.createBlockEntity(new BlockPos(round), getWorld());
             }
             blockWithEntity.setBlockEntity(blockEntity);
             blockEntity.setBlock(blockWithEntity);
@@ -290,10 +290,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     public Block removeBlock (float wx, float wy) {
         Block removed = this.getBlock(wx, wy);
-        Vector2 floor = Util.fastFloor(wx, wy);
+        Vector2 round = Util.fastRound(wx, wy);
 
-        Chunk chunk = this.getChunk(this.getChunkPosition(floor.x, floor.y));
-        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
+        Chunk chunk = this.getChunk(this.getChunkPosition(round.x, round.y));
+        GridPoint2 chunkBlockPos = chunk.worldToChunk(round.x, round.y);
         chunk.setBlock(null, chunkBlockPos.x, chunkBlockPos.y);
 
         return removed;
@@ -370,11 +370,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             throw new NullPointerException("newBlock 不能为null！！！");
         }
         Block oldBlock = this.getBlock(wx, wy);
-        Vector2 floor = Util.fastFloor(wx, wy);
+        Vector2 round = Util.fastRound(wx, wy);
 
-        ChunkPosition chunkPosition = this.getChunkPosition(floor);
+        ChunkPosition chunkPosition = this.getChunkPosition(round);
         Chunk chunk = this.getChunk(chunkPosition);
-        GridPoint2 chunkBlockPos = chunk.worldToChunk(floor.x, floor.y);
+        GridPoint2 chunkBlockPos = chunk.worldToChunk(round.x, round.y);
 
         //如果旧的方块是带有方块实体的方块
         if (oldBlock instanceof BlockWithEntity blockWithEntity) {
@@ -413,11 +413,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //在空气方块或者水方块上不得放置墙体
         if (block instanceof BlockAir || block instanceof BlockWater) return false;
 
-        Vector2 floor = Util.fastFloor(wx, wy);
+        Vector2 round = Util.fastRound(wx, wy);
         //每一个墙体都是一个单独的实例
-        Wall<?> instance = wall.createSelf(floor);
-        Chunk chunk = this.getChunk(this.getChunkPosition(floor));
-        GridPoint2 chunkWallPos = chunk.worldToChunk(floor.x, floor.y);
+        Wall<?> instance = wall.createSelf(round);
+        Chunk chunk = this.getChunk(this.getChunkPosition(round));
+        GridPoint2 chunkWallPos = chunk.worldToChunk(round.x, round.y);
         chunk.setWall(instance, chunkWallPos.x, chunkWallPos.y);
         System.out.println("在区块：" + chunk.getChunkPosition().toString()
             + " 的" + chunkWallPos.toString() + "上放置墙体");
@@ -434,9 +434,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     public Wall<?> destroyWall (float wx, float wy) {
         //没有墙体
         if (this.getWall(wx, wy) == null) return null;
-        Vector2 floor = Util.fastFloor(wx, wy);
-        Chunk chunk = this.getChunk(this.getChunkPosition(floor));
-        GridPoint2 cp = chunk.worldToChunk(floor.x, floor.y);
+        Vector2 round = Util.fastRound(wx, wy);
+        Chunk chunk = this.getChunk(this.getChunkPosition(round));
+        GridPoint2 cp = chunk.worldToChunk(round.x, round.y);
         Wall<?> wall = chunk.getWall(cp.x, cp.y);
         chunk.setWall(null, cp.x, cp.y);
         return wall;
@@ -646,15 +646,15 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * @return
      */
     public Block getBlock(float wx, float wy) {
-        Vector2 floor = Util.fastFloor(wx, wy);
-        ChunkPosition chunkPosition = this.getChunkPosition(floor.x, floor.y);
+        Vector2 round = Util.fastRound(wx, wy);
+        ChunkPosition chunkPosition = this.getChunkPosition(round.x, round.y);
 
         Chunk chunk = this.getChunk(chunkPosition);
         if (chunk == null) {
             return Blocks.ARI;
         }
 
-        Block block = chunk.seekBlock(floor.x, floor.y);
+        Block block = chunk.seekBlock(round.x, round.y);
         // 如果在当前区块找不到的话
         if (block == null) {
             Log.print(TAG, "没尽力");
@@ -672,11 +672,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         return this.getWall(position.x, position.y);
     }
     public Wall<?> getWall(float wx, float wy) {
-        Vector2 floor = Util.fastFloor(wx, wy);
-        Chunk chunk = this.getChunk(this.getChunkPosition(floor.x, floor.y));
+        Vector2 round = Util.fastRound(wx, wy);
+        Chunk chunk = this.getChunk(this.getChunkPosition(round.x, round.y));
         if (chunk == null) return null;
 
-        return chunk.seekWall(floor.x, floor.y);
+        return chunk.seekWall(round.x, round.y);
     }
 
     /**
@@ -724,8 +724,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * @return
      */
     public ChunkPosition getChunkPosition(float wx, float wy) {
-        Vector2 floor = Util.fastFloor(wx, wy);
-        Vector2 chunkPos = Util.fastFloor(floor.x / Chunk.ChunkWidth, floor.y / Chunk.ChunkHeight);
+        Vector2 round = Util.fastRound(wx, wy);
+        //这里就该这么写，最好别动
+        Vector2 chunkPos = Util.fastFloor(round.x / Chunk.ChunkWidth, round.y / Chunk.ChunkHeight);
         return new ChunkPosition((int) chunkPos.x, (int) chunkPos.y);
     }
 

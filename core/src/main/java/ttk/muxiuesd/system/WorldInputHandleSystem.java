@@ -260,7 +260,8 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
      * */
     public BlockPosition getMouseBlockPosition() {
         Vector2 wp = Util.getMouseWorldPosition();
-        return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
+        //return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
+        return new BlockPosition((int) Util.fastRound(wp.x), (int) Util.fastRound(wp.y));
     }
 
     /**
@@ -270,14 +271,11 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         if (this.mouseBlockPosition != null) {
             batch.setColor(Color.BLACK);
             batch.rect(
-                this.mouseBlockPosition.getX() + 0.1f,
-                this.mouseBlockPosition.getY() + 0.1f,
+                this.mouseBlockPosition.getX() + Block.HITBOX_START_X_OFFSET + 0.1f,
+                this.mouseBlockPosition.getY() + Block.HITBOX_START_Y_OFFSET + 0.1f,
                 0.8f,
                 0.8f);
             batch.setColor(Color.WHITE);
-            //没有这个flush()就会渲染线条后渲染其他贴图而发生错误
-            //已在渲染管线flush
-            //batch.flush();
         }
     }
 

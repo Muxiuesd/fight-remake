@@ -62,11 +62,15 @@ public interface BlockRenderer<T extends Block> {
      * 普通标准的方块渲染器
      * */
     class StandardRenderer<T extends Block> implements BlockRenderer<T>{
+        /// 渲染向左下角偏移半个方块距离
+        public static final float OFFSET_X = - Block.WIDTH / 2;
+        public static final float OFFSET_Y = - Block.HEIGHT / 2;
+
         @Override
         public void render (Batch batch, T block, Context context) {
             if (block.textureIsValid()) {
                 batch.draw(block.getTextureRegion(),
-                    context.x, context.y,
+                    context.x + OFFSET_X, context.y + OFFSET_Y,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,
