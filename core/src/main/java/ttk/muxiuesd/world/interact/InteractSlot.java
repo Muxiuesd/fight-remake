@@ -8,18 +8,18 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 物品交互槽位
  * */
-public class Slot {
+public class InteractSlot {
     private GridPoint2 startPos;
     private GridPoint2 size;
     private Rectangle rect; //交互区域
     private int index;
     private Inventory inventory;
 
-    public Slot (int sx, int sy, int ex, int ey, int index) {
+    public InteractSlot (int sx, int sy, int ex, int ey, int index) {
         this(new GridPoint2(sx, sy), new GridPoint2(ex, ey), index);
     }
 
-    public Slot (GridPoint2 startPos, GridPoint2 size, int index) {
+    public InteractSlot (GridPoint2 startPos, GridPoint2 size, int index) {
         this.startPos = startPos;
         this.size = size;
         this.index = index;

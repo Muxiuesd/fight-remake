@@ -128,9 +128,9 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                 //计算交互区域网格坐标
                 BlockPos blockPos = blockEntity.getBlockPos();
                 GridPoint2 gridSize = blockEntity.getInteractGridSize();
-                int xn = (int) ((mouseWorldPosition.x - blockPos.x) * gridSize.x);
-                int yn = (int) ((mouseWorldPosition.y - blockPos.y) * gridSize.y);
-                GridPoint2 interactGrid = new GridPoint2(xn, yn);
+                float xn = ((mouseWorldPosition.x - blockPos.x - Block.HITBOX_START_X_OFFSET) * gridSize.x);
+                float yn = ((mouseWorldPosition.y - blockPos.y - Block.HITBOX_START_Y_OFFSET) * gridSize.y);
+                GridPoint2 interactGrid = new GridPoint2((int) Util.fastRound(xn), (int) Util.fastRound(yn));
 
                 System.out.println(interactGrid);
 

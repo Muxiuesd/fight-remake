@@ -21,7 +21,7 @@ import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.interact.Slot;
+import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     private BlockPos blockPos;              //方块实体的位置
     private GridPoint2 interactGridSize;    //方块实体的交互网格大小
     private Inventory inventory;            //方块实体所拥有的容器
-    private List<Slot> slots;               //交互槽位
+    private List<InteractSlot> interactSlots;               //交互槽位
 
 
     public BlockEntity (BlockEntityProvider<?> blockEntityProvider, BlockPos blockPos) {
@@ -48,7 +48,7 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
         this.blockPos = blockPos;
 
         this.setInteractGridSize(new GridPoint2(16, 16));
-        this.slots = new ArrayList<>();
+        this.interactSlots = new ArrayList<>();
     }
 
     /**
@@ -125,35 +125,35 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     /**
      * 添加slot
      * */
-    public Slot addSlot (int index, int x, int y, int width, int height) {
-        return this.addSlot(new Slot(new GridPoint2(x, y), new GridPoint2(width, height), index));
+    public InteractSlot addSlot (int index, int x, int y, int width, int height) {
+        return this.addSlot(new InteractSlot(new GridPoint2(x, y), new GridPoint2(width, height), index));
     }
 
     /**
      * 添加一个slot
      * */
-    public Slot addSlot (Slot slot) {
-        if (!this.slots.contains(slot)) {
-            this.slots.add(slot);
-            slot.setInventory(this.inventory);
+    public InteractSlot addSlot (InteractSlot interactSlot) {
+        if (!this.interactSlots.contains(interactSlot)) {
+            this.interactSlots.add(interactSlot);
+            interactSlot.setInventory(this.inventory);
         }
-        return slot;
+        return interactSlot;
     }
 
     /**
      * 移除slot
      * */
-    public BlockEntity removeSlot (Slot slot) {
-        this.slots.remove(slot);
+    public BlockEntity removeSlot (InteractSlot interactSlot) {
+        this.interactSlots.remove(interactSlot);
         return this;
     }
 
     /**
      * 获取slot
      * */
-    public Slot getSlot (GridPoint2 interactGridPos) {
-        for (Slot slot : this.slots) {
-            if (slot.touch(interactGridPos)) return slot;
+    public InteractSlot getSlot (GridPoint2 interactGridPos) {
+        for (InteractSlot interactSlot : this.interactSlots) {
+            if (interactSlot.touch(interactGridPos)) return interactSlot;
         }
         return null;
     }
@@ -231,12 +231,12 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
         return this;
     }
 
-    public List<Slot> getSlots () {
-        return this.slots;
+    public List<InteractSlot> getSlots () {
+        return this.interactSlots;
     }
 
-    public BlockEntity setSlots (List<Slot> slots) {
-        this.slots = slots;
+    public BlockEntity setSlots (List<InteractSlot> interactSlots) {
+        this.interactSlots = interactSlots;
         return this;
     }
 }

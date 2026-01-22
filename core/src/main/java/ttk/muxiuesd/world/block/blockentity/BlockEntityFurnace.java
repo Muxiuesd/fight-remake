@@ -22,7 +22,7 @@ import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.interact.Slot;
+import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.light.PointLight;
 import ttk.muxiuesd.world.particle.ParticleEmittersReg;
@@ -33,18 +33,18 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 public class BlockEntityFurnace extends BlockEntity {
     private int curEnergy = 0;  //能量，每tick减1
     private int curTick = 0;
-    private Slot inputSlot;
-    private Slot outputSlot;
-    private Slot fuelSlot;
+    private InteractSlot inputInteractSlot;
+    private InteractSlot outputInteractSlot;
+    private InteractSlot fuelInteractSlot;
     private PointLight light;
 
     public BlockEntityFurnace (BlockPos blockPos) {
         super(BlockEntities.FURNACE, blockPos);
         setInventory(new Backpack(3));
 
-        this.inputSlot = addSlot(this.getInputSlotIndex(), 1, 8, 6, 6);
-        this.outputSlot = addSlot(this.getOutputSlotIndex(), 9, 8, 6, 6);
-        this.fuelSlot = addSlot(this.getFuelSlotIndex(), 5, 0, 6, 6);
+        this.inputInteractSlot = addSlot(this.getInputSlotIndex(), 1, 8, 6, 6);
+        this.outputInteractSlot = addSlot(this.getOutputSlotIndex(), 9, 8, 6, 6);
+        this.fuelInteractSlot = addSlot(this.getFuelSlotIndex(), 5, 0, 6, 6);
 
         this.light = new PointLight(new Color(0.8f, 0.1f, 0.1f, 0.1f), 2.5f);
         this.light.setPosition(new Vector2(blockPos).add(0.5f, 0.2f));
@@ -66,12 +66,12 @@ public class BlockEntityFurnace extends BlockEntity {
     public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //TODO 根据物品类型或者配方来判断是否可以把东西放进来当原料或者燃料
 
-        Slot interactSlot = getSlot(interactGridPos);
+        InteractSlot interactSlot = getSlot(interactGridPos);
         //没碰到任何槽位
         if (interactSlot == null) return InteractResult.FAILURE;
         System.out.println("交互槽位：" + interactSlot.getIndex());
         //输出槽位不能放物品进来
-        if (interactSlot == this.outputSlot) return InteractResult.FAILURE;
+        if (interactSlot == this.outputInteractSlot) return InteractResult.FAILURE;
 
         Inventory inventory = getInventory();
         ItemStack interactStack = inventory.getItemStack(interactSlot.getIndex());
@@ -117,7 +117,7 @@ public class BlockEntityFurnace extends BlockEntity {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
         //获取交互槽位
-        Slot interactSlot = getSlot(interactGridPos);
+        InteractSlot interactSlot = getSlot(interactGridPos);
         //没有交互到槽位
         if (interactSlot == null) return InteractResult.FAILURE;
         //到这里说明交互到了槽位

@@ -12,7 +12,7 @@ import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.interact.Slot;
+import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -37,10 +37,11 @@ public class BlockEntityCraftingTable extends BlockEntity {
         Inventory inventory = getInventory();
         if (inventory.isEmpty()) return InteractResult.FAILURE;
 
-        Slot slot = this.getSlot(interactGridPos);
+        InteractSlot interactSlot = this.getSlot(interactGridPos);
         //没有物品就跳过
-        if (slot.getItemStack() == null) return InteractResult.FAILURE;
-        ItemStack slotItemStack = slot.getItemStack();
+        if (interactSlot.getItemStack() == null) return InteractResult.FAILURE;
+
+        ItemStack slotItemStack = interactSlot.getItemStack();
         //按住左Shift就是把这个物品全数取出
         int outAmount = KeyBindings.PlayerShift.wasPressed() ? slotItemStack.getAmount() : 1;
         ItemStack outStack = slotItemStack.split(outAmount);
@@ -54,12 +55,12 @@ public class BlockEntityCraftingTable extends BlockEntity {
     @Override
     public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //手持物品放入
-        Slot slot = this.getSlot(interactGridPos);
-        ItemStack slotItemStack = slot.getItemStack();
+        InteractSlot interactSlot = this.getSlot(interactGridPos);
+        ItemStack slotItemStack = interactSlot.getItemStack();
         if (slotItemStack == null) {
             //交互的槽位上本来没有物品
             int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
-            slot.setItemStack(handItemStack.split(addAmount));
+            interactSlot.setItemStack(handItemStack.split(addAmount));
         }else {
             //到这里就是槽位上本来有物品
             //检测交互槽位的物品是否与手持物品一致
@@ -75,7 +76,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
             slotItemStack.amountIncrease(addAmount);
         }
         //记得清理
-        user.backpack.clear();
+        user.getBackpack().clear();
 
         AudioPlayer.getInstance().playSound(Sounds.ITEM_PUT, 2.5f);
         return InteractResult.SUCCESS;

@@ -63,15 +63,12 @@ public interface WallRenderer<T extends Wall<?>> {
      * 普通标准的墙体渲染器
      * */
     class StandardRenderer<T extends Wall<?>> implements WallRenderer<T>{
-        /// 渲染向左下角偏移半个方块距离
-        final float offsetX = - Wall.WIDTH / 2;
-        final float offsetY = - Wall.HEIGHT / 2;
-
         @Override
         public void render (Batch batch, T wall, Context context) {
             if (wall.textureIsValid()) {
                 batch.draw(wall.getTextureRegion(),
-                    context.x + offsetX, context.y + offsetY,
+                    context.x + BlockRenderer.StandardRenderer.OFFSET_X,
+                    context.y + BlockRenderer.StandardRenderer.OFFSET_Y,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,

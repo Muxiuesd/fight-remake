@@ -18,14 +18,15 @@ import ttk.muxiuesd.world.cat.CAT;
  * 方块
  * */
 public abstract class Block implements ID<Block>, Disposable, ICAT {
-    private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-        .add(PropertyTypes.BLOCK_FRICTON, 1f)
-        .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
-
+    /// 方块的大小（最基础的属性）
     public static final float WIDTH = 1f, HEIGHT = 1f;
     /// 方块碰撞箱坐标偏移，自带正负号
     public static final float HITBOX_START_X_OFFSET = - WIDTH / 2, HITBOX_START_Y_OFFSET = - HEIGHT / 2;
     public static final float HITBOX_END_X_OFFSET = WIDTH / 2, HITBOX_END_Y_OFFSET = HEIGHT / 2;
+
+    private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+        .add(PropertyTypes.BLOCK_FRICTON, 1f)
+        .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
 
     /**
      * 生成默认的属性

@@ -142,14 +142,16 @@ public class ItemStack implements Updateable {
      * */
     public ItemStack split (int amount) {
         if (amount <= 0) return null;
-        //超过或者等于最大数量
+        ItemStack newStack;
+        //超过或者等于最大数量，直接返回目前的数量
         if (amount >= this.getAmount()) {
+            newStack = new ItemStack(this.getItem(), this.getAmount(), this.behaviour, this.property.getPropertiesMap());
             this.setAmount(0);
-            return new ItemStack(this.getItem(), this.getAmount(), this.behaviour, this.property.getPropertiesMap());
+        }else {
+            //没达到最大数量
+            newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
+            this.amountDecrease(amount);
         }
-        //没达到最大数量
-        ItemStack newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
-        this.amountDecrease(amount);
         return newStack;
     }
 
