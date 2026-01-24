@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.world.item.ItemGroup;
@@ -38,6 +39,14 @@ public class CreateSlotUI extends SlotUI {
             }
         }
         return false;
+    }
+
+    /**
+     *  不绘制数量字体
+     * */
+    @Override
+    public void drawAmount(Batch batch, UIPanel parent, float renderX, float renderY, int amount) {
+        //super.drawAmount(batch, parent, renderX, renderY, amount);
     }
 
     @Override
