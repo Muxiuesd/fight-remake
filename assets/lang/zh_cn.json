@@ -8,6 +8,8 @@
   "text.fight:weapon_attack_range": "&&a攻击范围：{0}",
   "text.fight:effect_duration":     "&&a持续时间：{0}",
   "text.fight:item_duration":       "&&a剩余耐久：{0} / {1}",
+  "text.fight:shoot_bullet":        "&&a发射子弹：{0}",
+
 
   "item.fight:diamond_sword":       "&&m钻石剑",
   "item.fight:diamond_helmet":      "&&m钻石头盔",

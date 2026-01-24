@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBulletShoot;
@@ -59,7 +60,7 @@ public class RangedWeapon extends Weapon {
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.of("发射子弹：" + this.getFactory().getBulletId()));
+        array.add(Text.ofText(Fight.ID("shoot_bullet")).set(0, this.getFactory().getBulletId()));
         return super.getTooltips(array, itemStack);
     }
 
