@@ -26,7 +26,7 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     private UIScreen screen;  //隶属于哪一个screen
     private UIPanel parentPanel = UIPanel.VOID_INSTANCE;  //隶属于哪一个UI面板，无论如何不能为null
-    private float x, y;
+    private float x, y; //这里的坐标是相对于父组件的（如果有的话）
     private float width, height;
     private boolean visible = true;
     private boolean enabled = true;
@@ -88,6 +88,15 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     }
 
     /**
+     * 鼠标对这个UI组件进行拖拽
+     * @param dx 横坐标上的移动量
+     * @param dy 纵坐标上的移动量
+     * */
+    public void mouseDrag (float dx, float dy) {
+    }
+
+
+    /**
      * 当相机视口大小更改时调用，传入的参数是改变大小后相机视口所能看到的宽高大小，单位：米
      * @param viewportWidth  视口宽度
      * @param viewportHeight 视口高度
@@ -140,6 +149,16 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
      * */
     public float getY () {
         return this.y;
+    }
+
+    public UIComponent setX (float x) {
+        this.x = x;
+        return this;
+    }
+
+    public UIComponent setY (float y) {
+        this.y = y;
+        return this;
     }
 
     /**
