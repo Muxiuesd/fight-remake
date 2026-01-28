@@ -7,10 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.registry.ItemGroups;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
-import ttk.muxiuesd.ui.components.CreateSlotUI;
-import ttk.muxiuesd.ui.components.PlayerSlotUI;
-import ttk.muxiuesd.ui.components.SlotUI;
-import ttk.muxiuesd.ui.components.UIPanel;
+import ttk.muxiuesd.ui.components.*;
 import ttk.muxiuesd.world.item.ItemGroup;
 
 /**
@@ -19,7 +16,7 @@ import ttk.muxiuesd.world.item.ItemGroup;
 public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     private TextureRegion background;
     private Array<CreateSlotUI> createSlots;
-
+    private UIScrollBar scrollBar;
 
     public PlayerCreateTabUIPanel (PlayerSystem playerSystem, TextureRegion background, float width, float height) {
         super(playerSystem, - width / 2, - height / 2, width, height,
@@ -29,6 +26,13 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         this.createSlots = new Array<>();
 
         this.initSlots();
+
+        this.scrollBar = new UIScrollBar();
+        this.scrollBar
+            .setSliderWidth(12f)
+            .setSliderHeight(15f)
+            .setPosition(175f, 8f);
+        addComponent(this.scrollBar);
     }
 
     private void initSlots () {

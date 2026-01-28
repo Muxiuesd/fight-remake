@@ -2,6 +2,7 @@ package ttk.muxiuesd.ui.abs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,6 +16,7 @@ import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.render.camera.GUICamera;
+import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 
@@ -23,7 +25,7 @@ import java.util.LinkedHashSet;
 /**
  * UI屏幕，UI组件都绘制在这个Screen里面
  * */
-public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder {
+public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder, InputProcessor {
     private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayAddComponents = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
@@ -43,6 +45,51 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
         this.delayRemoveComponents.add(component);
     }
 
+    @Override
+    public boolean keyDown (int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp (int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped (char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged (int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled (float amountX, float amountY) {
+        return false;
+    }
+
     /**
      * 被展示出来时调用
      * */
@@ -50,12 +97,18 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
         //调整
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
         resize(camera.viewportWidth, camera.viewportHeight);
+
+        //加入系统底层的输入处理器
+        InputHandleSystem.getInstance().addProcessor(this);
     }
 
     /**
      * 被隐藏时调用
      * */
-    public void hide () {}
+    public void hide () {
+        //加入系统底层的输入处理器
+        InputHandleSystem.getInstance().removeProcessor(this);
+    }
 
     @Override
     public void update (float delta) {
@@ -99,9 +152,11 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                 //计算交互区域坐标
                 GridPoint2 interactGrid = uiComponent.getInteractGridSize();
                 Vector2 position = uiComponent.getPosition();
+                //鼠标相对于UI组件的坐标
+                Vector2 relativePos = new Vector2((mouseUIPosition.x - position.x), (mouseUIPosition.y - position.y));
                 Vector2 size = uiComponent.getSize();
-                int xn = (int) ((mouseUIPosition.x - position.x) / size.x * interactGrid.x);
-                int yn = (int) ((mouseUIPosition.y - position.y) / size.y * interactGrid.y);
+                int xn = (int) (relativePos.x / size.x * interactGrid.x);
+                int yn = (int) (relativePos.y / size.y * interactGrid.y);
                 GridPoint2 grid = new GridPoint2(xn, yn);
                 uiComponent.setMouseOver(true);
                 uiComponent.mouseOver(grid);
@@ -111,6 +166,13 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                     uiComponent
                         .setClicked(true)
                         .click(grid);
+                }else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                    //如果是按住鼠标左键，就是拖拽
+                    Vector2 uiPosDelta = Util.getMouseUIPosDelta();
+                    if (uiPosDelta.len() > 0f) {
+                        System.out.println(uiPosDelta);
+                        uiComponent.mouseDrag(uiPosDelta.x, uiPosDelta.y, relativePos.x, relativePos.y);
+                    }
                 }
                 //这个ui屏幕的状态变成被鼠标覆盖
                 this.setMouseOver(true);

@@ -91,8 +91,10 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
      * 鼠标对这个UI组件进行拖拽
      * @param dx 横坐标上的移动量
      * @param dy 纵坐标上的移动量
+     * @param mouseX 鼠标的横坐标（相对于UI组件自身）
+     * @param mouseY 鼠标的纵坐标（相对于UI组件自身）
      * */
-    public void mouseDrag (float dx, float dy) {
+    public void mouseDrag (float dx, float dy, float mouseX, float mouseY) {
     }
 
 

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.ui.abs.UIComponent;
+import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 
 /**
@@ -19,11 +20,15 @@ public class UIScrollBar extends UIComponent {
     }
 
     private Type type;
+    private NinePatch backgroundPatch;
     private NinePatch sliderPatch;
-    private float sliderX, sliderY, sliderWidth, sliderHeight;
+    private float sliderX, sliderY, sliderWidth, sliderHeight;  //滑块的坐标（相当对于滚动条的坐标）和宽高
 
     public UIScrollBar() {
-        this(Fight.ID("slider"), Fight.UITexturePath("slider.png"), 12f, 100f, Type.VERTICAL);
+        this(
+            Fight.ID("slider"), Fight.UITexturePath("slider.png"),
+            12f, 110f, Type.VERTICAL
+        );
     }
     public UIScrollBar(String sliderPatchId, String sliderTexturePath, float width, float height, Type type) {
         this(
@@ -43,32 +48,70 @@ public class UIScrollBar extends UIComponent {
                        NinePatch sliderPatch, Type type) {
         super(x, y, width, height, interactGridSize);
         this.sliderPatch = sliderPatch;
+
+        switch (type) {
+            case VERTICAL: {
+                setSliderWidth(width);
+                break;
+            }
+            case HORIZONTAL: {
+                setSliderHeight(height);
+                break;
+            }
+            default: {
+                //TODO 错误处理
+                Log.error(this.getClass().getName(), "滚动条UI种类：" + type + " 错误！！！");
+            }
+        }
+        this.type = type;
     }
 
+    /**
+     * 滑块拖拽的核心算法
+     * */
     @Override
-    public void mouseDrag (float dx, float dy) {
-         if (this.getType() == Type.VERTICAL) {
-             float nextY = getSliderY() + dy;
-             //计算滑块底部坐标，确保不能超过滚动条的底部
-             if (nextY < getY()) {
-                 setSliderY(getY());
-             }
-             //计算滑块顶部坐标，确保不能超过滚动条的顶部
-             float sliderTopY = nextY + this.getSliderHeight();
-             float scrollTopY = getY() + getHeight();
-             if (sliderTopY > scrollTopY) {
-                 setSliderY(scrollTopY - this.getSliderHeight());
-             }
-             setSliderY(nextY);
-         }else {
-             //TODO 横向的逻辑
-             setX(getX() + dx);
-         }
+    public void mouseDrag (float dx, float dy, float mouseX, float mouseY) {
+        /*if (this.getType() == Type.VERTICAL) {
+            float nextY = getSliderY() + dy;
+            //计算滑块顶部坐标，确保不能超过滚动条的顶部
+            float sliderTopY = nextY + this.getSliderHeight();
+            if (sliderTopY > getHeight()) {
+                setSliderY(getHeight() - this.getSliderHeight());
+            }else if (nextY < 0) {
+                //计算滑块底部坐标，确保不能超过滚动条的底部
+                setSliderY(0);
+            }else {
+                setSliderY(nextY);
+            }
+        }else if (this.getType() == Type.HORIZONTAL) {
+            setX(getX() + dx);
+        }*/
+
+        if (this.getType() == Type.VERTICAL) {
+            float nextY = mouseY - getSliderHeight() / 2;
+            if (nextY < 0f) {
+                setSliderY(0f);
+            }else if (nextY + getSliderHeight() > getHeight()) {
+                setSliderY(getHeight() - getSliderHeight());
+            }else {
+                setSliderY(nextY);
+            }
+        }else if (this.getType() == Type.HORIZONTAL) {
+            //TODO 横向的逻辑
+        }
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
+        //TODO 绘制滚动条的背景（假如有的话）
 
+        //绘制滑块
+        NinePatch patch = this.getSliderPatch();
+        if (patch != null) {
+            float renderX = getSliderX() + getAbsX();
+            float renderY = getSliderY() + getAbsY();
+            patch.draw(batch, renderX, renderY, getSliderWidth(), getSliderHeight());
+        }
     }
 
     public Type getType () {
@@ -77,6 +120,15 @@ public class UIScrollBar extends UIComponent {
 
     public UIScrollBar setType (Type type) {
         this.type = type;
+        return this;
+    }
+
+    public NinePatch getBackgroundPatch () {
+        return this.backgroundPatch;
+    }
+
+    public UIScrollBar setBackgroundPatch (NinePatch backgroundPatch) {
+        this.backgroundPatch = backgroundPatch;
         return this;
     }
 

@@ -210,6 +210,16 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     }
 
     @Override
+    public void mouseDrag (float dx, float dy, float mouseX, float mouseY) {
+        this.getComponents().forEach(component -> {
+            if (component.isMouseOver()) {
+                Vector2 compPos = component.getPosition();
+                component.mouseDrag(dx, dy, mouseX - compPos.x, mouseY - compPos.y);
+            }
+        });
+    }
+
+    @Override
     public void addComponent (UIComponent component) {
         UIComponentsHolder.super.addComponent(component);
         component.setScreen(getScreen());

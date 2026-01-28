@@ -28,10 +28,26 @@ public class Util {
     }
 
     /**
-     * 获取鼠标指向的游戏GUI坐标
+     * 获取鼠标指向的游戏GUI相机的坐标
      * */
     public static Vector2 getMouseUIPosition() {
         return getMousePosForCamera(GUICamera.INSTANCE.getCamera());
+    }
+
+    static Vector2 lastMouseUIPos = null;
+    /**
+     * 获取鼠标指向的游戏GUI相机的坐标增量
+     * */
+    public static Vector2 getMouseUIPosDelta() {
+        if (lastMouseUIPos != null) {
+            Vector2 curMouseUIPos = getMouseUIPosition();
+            Vector2 sub = new Vector2(curMouseUIPos.x - lastMouseUIPos.x , curMouseUIPos.y - lastMouseUIPos.y);
+            lastMouseUIPos = curMouseUIPos;
+            return sub;
+        }
+        lastMouseUIPos = new Vector2(0, 0);
+        return lastMouseUIPos;
+        //return getMouseDeltaPosForCamera(GUICamera.INSTANCE.getCamera());
     }
 
     /**
@@ -39,6 +55,16 @@ public class Util {
      * */
     public static Vector2 getMousePosForCamera(Camera camera) {
         Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
+        Vector3 up = camera.unproject(mp);
+        return new Vector2(up.x, up.y);
+    }
+
+
+    /**
+     * 从相机获取鼠标的的坐标增量
+     * */
+    public static Vector2 getMouseDeltaPosForCamera(Camera camera) {
+        Vector3 mp = new Vector3(new Vector2(Gdx.input.getDeltaX(), Gdx.input.getDeltaY()), camera.position.z);
         Vector3 up = camera.unproject(mp);
         return new Vector2(up.x, up.y);
     }
