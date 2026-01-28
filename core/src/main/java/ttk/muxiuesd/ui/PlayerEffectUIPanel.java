@@ -45,7 +45,7 @@ public class PlayerEffectUIPanel extends UIPanel {
             if (this.effectUIs.containsKey(effect)) {
                 EffectUI effectUI = this.effectUIs.get(effect);
                 effectUI
-                    .setPosition(getX(), getY() - index * effectUI.getHeight())
+                    .setPosition(getWidth(), getHeight() - index * effectUI.getHeight())
                     .update(delta);
             }else {
                 //如果不存在这个状态的UI，就新建一个并且加入
@@ -53,7 +53,7 @@ public class PlayerEffectUIPanel extends UIPanel {
                     .setStatusEffect(effect)
                     .setEffectData(playerEffects.get(effect));
 
-                effectUI.setPosition(getX(), getY() - index * effectUI.getHeight());
+                effectUI.setPosition(getWidth(), getHeight() - index * effectUI.getHeight());
 
                 this.effectUIs.put(effect, effectUI);
             }

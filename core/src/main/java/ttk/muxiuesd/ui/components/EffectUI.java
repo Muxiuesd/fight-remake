@@ -80,13 +80,13 @@ public class EffectUI extends UIComponent {
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        float renderX = getX();
-        float renderY = getY();
-        if (parent != null) {
+        float renderX = getAbsX();
+        float renderY = getAbsY();
+        /*if (parent != null) {
             //默认渲染在面板的右上角
             renderX += parent.getWidth();
             renderY += parent.getHeight();
-        }
+        }*/
         StatusEffect effect = this.getStatusEffect();
 
         //绘制背景
