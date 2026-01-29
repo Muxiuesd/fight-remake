@@ -24,6 +24,12 @@ public class ItemGroup {
         return this;
     }
 
+    /**
+     * 获取数量
+     * */
+    public int getItemCount () {
+        return this.getItemsList().size();
+    }
 
     /**
      * 添加一个物品

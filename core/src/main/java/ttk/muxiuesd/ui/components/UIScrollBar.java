@@ -103,7 +103,6 @@ public class UIScrollBar extends UIComponent {
                 break;
             }
         }
-
         return this;
     }
 

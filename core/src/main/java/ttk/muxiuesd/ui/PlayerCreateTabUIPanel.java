@@ -16,7 +16,9 @@ import ttk.muxiuesd.world.item.ItemGroup;
 public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     private TextureRegion background;
     private Array<CreateSlotUI> createSlots;
+    private ItemGroup curItemGroup;
     private UIScrollBar scrollBar;
+    private int firstCreateSlotIndex = 0;
 
     public PlayerCreateTabUIPanel (PlayerSystem playerSystem, TextureRegion background, float width, float height) {
         super(playerSystem, - width / 2, - height / 2, width, height,
@@ -33,6 +35,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             .setSliderHeight(15f)
             .sliderGotoStart()
             .setPosition(175f, 8f);
+
         addComponent(this.scrollBar);
     }
 
@@ -73,7 +76,27 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
      * 设置当前面板要显示的物品组
      * */
     public void setTabItemGroup (ItemGroup itemGroup) {
+        if (itemGroup == null) return;
+        this.setCurItemGroup(itemGroup);
         this.createSlots.forEach((createSlotUI -> createSlotUI.setItemGroup(itemGroup)));
+    }
+
+    @Override
+    public void update (float delta) {
+        super.update(delta);
+
+        UIScrollBar scroll = this.getScrollBar();
+        float value = scroll.getSliderPathwayPos();
+        ItemGroup itemGroup = this.getCurItemGroup();
+        int count = itemGroup.getItemCount();
+        int row = (count / 9);
+        this.firstCreateSlotIndex = (int) (value * row) * 9;
+
+        int createSlotIndex = 0;
+        for (int index = this.firstCreateSlotIndex; index < this.createSlots.size; index++) {
+            this.createSlots.get(createSlotIndex).setIndex(index);
+            createSlotIndex++;
+        }
     }
 
     @Override
@@ -82,5 +105,27 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         batch.draw(this.background, getX(), getY(), getWidth(), getHeight());
 
         super.draw(batch, parent);
+    }
+
+    public ItemGroup getCurItemGroup () {
+        return this.curItemGroup;
+    }
+
+    public PlayerCreateTabUIPanel setCurItemGroup (ItemGroup itemGroup) {
+        if (itemGroup != null) this.curItemGroup = itemGroup;
+        return this;
+    }
+
+    public int getFirstCreateSlotIndex () {
+        return this.firstCreateSlotIndex;
+    }
+
+    public PlayerCreateTabUIPanel setFirstCreateSlotIndex (int index) {
+        this.firstCreateSlotIndex = Math.max(index, 0);
+        return this;
+    }
+
+    public UIScrollBar getScrollBar () {
+        return this.scrollBar;
     }
 }
