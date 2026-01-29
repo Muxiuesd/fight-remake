@@ -10,6 +10,9 @@ import ttk.muxiuesd.util.Util;
 
 /**
  * 滚动条UI组件
+ * <p>
+ * （垂直轨道起点在最上面，横向轨道起点在最左边）
+ * （垂直轨道终点在最下面，横向轨道终点在最右边）
  * */
 public class UIScrollBar extends UIComponent {
     public static final int SLIDER_LEFT = 2, SLIDER_RIGHT = 2, SLIDER_TOP = 2, SLIDER_BOTTOM = 3;
@@ -48,14 +51,14 @@ public class UIScrollBar extends UIComponent {
                        NinePatch sliderPatch, Type type) {
         super(x, y, width, height, interactGridSize);
         this.sliderPatch = sliderPatch;
-
-        switch (type) {
+        this.type = type;
+        switch (this.type) {
             case VERTICAL: {
-                setSliderWidth(width);
+                this.setSliderWidth(width);
                 break;
             }
             case HORIZONTAL: {
-                setSliderHeight(height);
+                this.setSliderHeight(height);
                 break;
             }
             default: {
@@ -63,7 +66,61 @@ public class UIScrollBar extends UIComponent {
                 Log.error(this.getClass().getName(), "滚动条UI种类：" + type + " 错误！！！");
             }
         }
-        this.type = type;
+    }
+
+    /**
+     * 获取滑块在轨道上的坐标
+     * <p>
+     * 以起点和终点为长度，返回值的区间在[0, 1]
+     * */
+    public float getSliderPathwayPos () {
+        float value = 0f;
+        switch (this.getType()) {
+            case VERTICAL: {
+                value = 1f - (this.getSliderY()) / (getHeight() - this.getSliderHeight()) ;
+                break;
+            }
+            case HORIZONTAL: {
+                value = (this.getSliderX()) / (getWidth() - this.getSliderWidth()) ;
+                break;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * 滑块回到滚动条的轨道起点
+     * */
+    public UIScrollBar sliderGotoStart () {
+        switch (this.getType()) {
+            case VERTICAL: {
+                this.setSliderY(getHeight() - this.getSliderHeight());
+                break;
+            }
+            case HORIZONTAL: {
+                this.setSliderX(0f);
+                break;
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * 滑块去到滚动条的轨道终点
+     * */
+    public UIScrollBar sliderGotoEnd () {
+        switch (this.getType()) {
+            case VERTICAL: {
+                this.setSliderY(0f);
+                break;
+            }
+            case HORIZONTAL: {
+                this.setSliderX(getWidth() - this.getSliderWidth());
+                break;
+            }
+        }
+        return this;
     }
 
     /**
@@ -88,17 +145,19 @@ public class UIScrollBar extends UIComponent {
         }*/
 
         if (this.getType() == Type.VERTICAL) {
-            float nextY = mouseY - getSliderHeight() / 2;
+            float nextY = mouseY - this.getSliderHeight() / 2;
             if (nextY < 0f) {
-                setSliderY(0f);
-            }else if (nextY + getSliderHeight() > getHeight()) {
-                setSliderY(getHeight() - getSliderHeight());
+                this.setSliderY(0f);
+            }else if (nextY + this.getSliderHeight() > getHeight()) {
+                this.setSliderY(getHeight() - this.getSliderHeight());
             }else {
-                setSliderY(nextY);
+                this.setSliderY(nextY);
             }
         }else if (this.getType() == Type.HORIZONTAL) {
             //TODO 横向的逻辑
         }
+
+        System.out.println(this.getSliderPathwayPos());
     }
 
     @Override
