@@ -3,6 +3,7 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.util.Log;
@@ -143,18 +144,31 @@ public class UIScrollBar extends UIComponent {
         }else if (this.getType() == Type.HORIZONTAL) {
             setX(getX() + dx);
         }*/
-
-        if (this.getType() == Type.VERTICAL) {
-            float nextY = mouseY - this.getSliderHeight() / 2;
-            if (nextY < 0f) {
-                this.setSliderY(0f);
-            }else if (nextY + this.getSliderHeight() > getHeight()) {
-                this.setSliderY(getHeight() - this.getSliderHeight());
-            }else {
-                this.setSliderY(nextY);
+        float sl = this.getSliderWidth();
+        float sh = this.getSliderHeight();
+        switch (this.getType()) {
+            case VERTICAL: {
+                float nextY = mouseY - sh / 2;
+                if (nextY < 0f) {
+                    this.setSliderY(0f);
+                }else if (nextY + sh > getHeight()) {
+                    this.setSliderY(getHeight() - sh);
+                }else {
+                    this.setSliderY(nextY);
+                }
+                break;
             }
-        }else if (this.getType() == Type.HORIZONTAL) {
-            //TODO 横向的逻辑
+            case HORIZONTAL: {
+                float nextX = mouseX - sl / 2;
+                if (nextX < 0f) {
+                    this.setSliderX(0f);
+                }else if (nextX + sl > getWidth()) {
+                    this.setSliderX(getWidth() - sl);
+                }else {
+                    this.setSliderX(nextX);
+                }
+                break;
+            }
         }
 
         System.out.println(this.getSliderPathwayPos());
@@ -209,6 +223,10 @@ public class UIScrollBar extends UIComponent {
         return this;
     }
 
+    public Vector2 getSliderPos () {
+        return new Vector2(this.getSliderX(), this.getSliderY());
+    }
+
     public float getSliderY () {
         return this.sliderY;
     }
@@ -216,6 +234,10 @@ public class UIScrollBar extends UIComponent {
     public UIScrollBar setSliderY (float sliderY) {
         this.sliderY = sliderY;
         return this;
+    }
+
+    public Vector2 getSliderSize () {
+        return new Vector2(this.getSliderWidth(), this.getSliderHeight());
     }
 
     public float getSliderWidth () {
