@@ -89,7 +89,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         float value = scroll.getSliderPathwayPos();
         ItemGroup itemGroup = this.getCurItemGroup();
         int count = itemGroup.getItemCount();
-        int row = (count / 9);
+        float row = (count / 9f);
         this.firstCreateSlotIndex = (int) (value * row) * 9;
 
         int createSlotIndex = 0;
