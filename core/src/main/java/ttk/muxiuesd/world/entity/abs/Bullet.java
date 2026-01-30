@@ -4,6 +4,7 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.serialization.Codec;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 
@@ -51,6 +52,7 @@ public abstract class Bullet extends Entity<Bullet> {
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
         textureRegion = getTextureRegion(textureId, texturePath);
+
         //默认大小
         setSize(0.5f, 0.5f);
     }
@@ -59,7 +61,9 @@ public abstract class Bullet extends Entity<Bullet> {
     @Override
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
-        setPosition(x + getSpeed() * delta * velX, y + getSpeed() * delta * velY);
+        //setPosition(x + getSpeed() * delta * velX, y + getSpeed() * delta * velY);
+        positionChange(delta);
+
         super.update(delta);
     }
 
@@ -104,9 +108,14 @@ public abstract class Bullet extends Entity<Bullet> {
         this.liveTime = liveTime;
     }
 
-    public void setDirection(float xDirection, float yDirection) {
-        this.velX = xDirection;
-        this.velY = yDirection;
+    /**
+     * 设置子弹的速度
+     * @param direction 速度方向
+     * @param speed 速度大小
+     * */
+    public void setVelocity (Direction direction, float speed) {
+        this.velX = direction.getX() * speed;
+        this.velY = direction.getY() * speed;
         this.setDegrees();
     }
 
@@ -114,11 +123,9 @@ public abstract class Bullet extends Entity<Bullet> {
      * 设置旋转角度，需要已知速度方向
      */
     private void setDegrees() {
-        // 调整旋转原点
-        setOrigin(getWidth() / 2, getHeight() / 2);
         // 计算旋转角度
         Vector2 velocity = getVelocity();
-        setRotation(MathUtils.atan2Deg(velY, velX));
+        setRotation(MathUtils.atan2Deg(velocity.y, velocity.x));
     }
 
     @Override

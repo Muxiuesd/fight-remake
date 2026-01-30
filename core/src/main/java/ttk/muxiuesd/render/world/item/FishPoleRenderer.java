@@ -29,7 +29,7 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             //if (fishPole.textureRegion == null) return;
             //没抛竿渲染
             Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(fishPole.textureRegion,
                     renderStartPos.x , renderStartPos.y ,
@@ -49,7 +49,7 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             //if (fishPole.castTexture == null) return;
             //抛竿渲染
             Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(fishPole.castTexture,
                     renderStartPos.x , renderStartPos.y ,
@@ -92,7 +92,7 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
 
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
         Direction direction = Util.getDirection();
-        float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+        float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         //绘制鱼线
         LivingEntity<?> hookOwner = hook.getOwner();
         Vector2 ownerPos = hookOwner.getCenter();

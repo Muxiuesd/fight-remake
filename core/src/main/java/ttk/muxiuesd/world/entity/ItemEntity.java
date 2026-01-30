@@ -36,6 +36,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         super(world, EntityTypes.ITEM_ENTITY);
         this.positionOffset = new Vector2();
         setSize(DEFAULT_SIZE);
+        fastAddBodyHitBox();
     }
 
     @Override

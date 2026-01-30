@@ -74,10 +74,12 @@ public class Slime extends Enemy<Slime> {
         bullet.setOwner(owner);
         bullet.setSize(
             (float) (bullet.width * Math.pow(this.factor, this.generation)),
-            (float) (bullet.height * Math.pow(this.factor, this.generation)));
-        bullet.setPosition(x + (width - bullet.width)/2, y + (height - bullet.height)/2);
-        bullet.setDirection(direction.getxDirection(), direction.getyDirection());
-        bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
+            (float) (bullet.height * Math.pow(this.factor, this.generation))
+        );
+        bullet.setPosition(x - bullet.width / 2f, y - bullet.height / 2f);
+        bullet.setVelocity(direction, bullet.getSpeed());
+
+        bullet.fastAddBodyHitBox();
         return bullet;
     }
 }

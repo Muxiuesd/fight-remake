@@ -70,7 +70,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     public void walkToTarget (float delta) {
         Entity<?> target = this.getCurTarget();
         Direction direction = new Direction(target.x - x, target.y - y);
-        setVelocity(direction.getxDirection() * curSpeed, direction.getyDirection() * curSpeed);
+        setVelocity(direction.getX() * curSpeed, direction.getY() * curSpeed);
         this.x += velX * delta;
         this.y += velY * delta;
     }
@@ -135,7 +135,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
         bullet.setPosition(x + (getWidth() - bullet.getWidth())/2, y + (getHeight() - bullet.getHeight())/2);
-        bullet.setDirection(direction.getxDirection(), direction.getyDirection());
+        bullet.setVelocity(direction, bullet.getSpeed());
         return bullet;
     }
 

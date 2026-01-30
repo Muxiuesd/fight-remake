@@ -69,7 +69,7 @@ public class PlayerSystem extends WorldSystem {
     public void initialize () {
         //有玩家数据就读取
         if (FileUtil.fileExists(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME)) {
-            this.player = readPlayer();
+            this.player = readPlayerData();
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
             this.player = Entities.PLAYER.create(getWorld());
@@ -210,13 +210,13 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void dispose () {
-        this.savePlayer();
+        this.savePlayerData();
     }
 
     /**
      * 保存玩家数据
      * */
-    public void savePlayer () {
+    public void savePlayerData () {
         JsonDataWriter dataWriter = new JsonDataWriter();
         dataWriter.objStart();
         Codecs.PLAYER.encode(this.getPlayer(), dataWriter);
@@ -228,7 +228,7 @@ public class PlayerSystem extends WorldSystem {
     /**
      * 读取玩家数据
      * */
-    public Player readPlayer () {
+    public Player readPlayerData () {
         JsonValue playerValue = FileUtil.readJsonFile(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME);
         Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
         if (optionalPlayer.isPresent()) {
@@ -242,7 +242,7 @@ public class PlayerSystem extends WorldSystem {
     /**
      * 获取玩家的唯一方式，其他地方获取玩家也是通过这个方法
      * */
-    public Player getPlayer() {
+    public Player getPlayer () {
         return this.player;
     }
 
@@ -263,7 +263,7 @@ public class PlayerSystem extends WorldSystem {
             ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, this.getPlayer().getEntitySystem());
             itemEntity.setItemStack(itemStack);
             Direction direction = this.player.getDirection();
-            itemEntity.setVelocity(direction.scl(MathUtils.random(0.7f, 1.2f)));
+            itemEntity.setVelocity(direction.toVector2().scl(MathUtils.random(0.7f, 1.2f)));
             itemEntity.setSpeed(3f);
             itemEntity.setPosition(this.player.getCenter());
         });

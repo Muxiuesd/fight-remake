@@ -172,7 +172,7 @@ public interface ItemRenderer<T extends Item> {
         public void drawOnHand (Batch batch, Context context, LivingEntity<?> holder, ItemStack itemStack) {
             Item item = itemStack.getItem();
             Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             float rotationOffset = holder.getSwingHandDegreeOffset();
 
             if (rotation > 90f && rotation <= 270f) {

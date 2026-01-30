@@ -31,6 +31,8 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.hitbox.Hitbox;
+import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -236,7 +238,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN.getValue()) {
             //当物品实体与玩家的碰撞箱相碰就是捡起
-            if (itemEntity.hitbox.overlaps(player.hitbox)) {
+            if (itemEntity.getBodyHitbox().checkCollision(player.getBodyHitbox())) {
                 ItemStack itemStack = itemEntity.getItemStack();
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
@@ -257,7 +259,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
-                itemEntity.setVelocity(direction);
+                itemEntity.setVelocity(direction.getX(), direction.getY());
                 itemEntity.setSpeed(7.7f);
             }
         }
@@ -503,11 +505,14 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void renderShape (ShapeRenderer batch) {
         if (this.renderHitbox) {
             for (Entity entity : this.entities) {
-                Rectangle hitbox = entity.getHitbox();
-                batch.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+                Hitbox hitbox = entity.getBodyHitbox();
+                if (hitbox instanceof RectHitbox rectHitbox){
+                    Rectangle box = rectHitbox.getRectangle();
+                    batch.rect(box.x, box.y, box.width, box.height);
+                }
                 Vector2 entityCenter = entity.getCenter();
                 if (entity instanceof LivingEntity livingEntity) {
-                    batch.line(entityCenter, new Vector2(entityCenter).add(livingEntity.getDirection().scl(1)));
+                    batch.line(entityCenter, new Vector2(entityCenter).add(livingEntity.getDirection().toVector2()));
                 }else {
                     batch.line(entityCenter, new Vector2(entityCenter).add(entity.getVelocity().scl(1)));
                 }

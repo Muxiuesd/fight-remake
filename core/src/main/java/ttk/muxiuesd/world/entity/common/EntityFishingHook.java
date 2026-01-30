@@ -17,6 +17,7 @@ import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -90,7 +91,9 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         //在收杆返回途中
         if (this.isReturning) {
             this.returningMovement(delta);
-            if (this.hitbox.overlaps(this.getOwner().hitbox)) {
+            Hitbox hookHitbox = getBodyHitbox();
+            Hitbox ownerHitbox = this.getOwner().getBodyHitbox();
+            if (hookHitbox.checkCollision(ownerHitbox)) {
                 this.removeSelf();
                 //this.getPole().isCasting = false;
                 this.getPole().getProperty().add(PropertyTypes.ITEM_ON_USING, false);
@@ -105,8 +108,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 抛钩移动
      * */
     private void throwMovement (float delta) {
-        velX = speed * throwDirection.x;
-        velY = speed * throwDirection.y;
+        velX = speed * throwDirection.getX();
+        velY = speed * throwDirection.getY();
         x += velX * delta;
         y += velY * delta;
     }
@@ -116,8 +119,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * */
     private void returningMovement (float delta) {
         Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
-        velX = speed * dir.x;
-        velY = speed * dir.y;
+        velX = speed * dir.getX();
+        velY = speed * dir.getY();
         x += velX * delta;
         y += velY * delta;
     }

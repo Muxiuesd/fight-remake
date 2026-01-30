@@ -8,6 +8,8 @@ import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.hitbox.Hitbox;
+import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.wall.Wall;
 
 /**
@@ -41,56 +43,59 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         Player player = es.getPlayer();
         if (player == null) return;
 
-        Rectangle hitbox = player.getHitbox();
-        Vector2 vel = player.getVelocity();
+        Hitbox bodyHitbox = player.getBodyHitbox();
+        if (bodyHitbox instanceof RectHitbox rectHitbox) {
+            Rectangle rect = rectHitbox.getRectangle();
+            Vector2 vel = player.getVelocity();
 
-        // 计算总移动距离
-        float totalMoveX = vel.x * delta;
-        float totalMoveY = vel.y * delta;
+            // 计算总移动距离
+            float totalMoveX = vel.x * delta;
+            float totalMoveY = vel.y * delta;
 
-        // 计算需要分解的步数（解决高速移动隧穿问题的核心）
-        float totalDistance = (float) Math.sqrt(totalMoveX * totalMoveX + totalMoveY * totalMoveY);
-        int steps = (int) Math.ceil(totalDistance / MAX_STEP);
-        if (steps == 0) steps = 1; // 至少一步
+            // 计算需要分解的步数（解决高速移动隧穿问题的核心）
+            float totalDistance = (float) Math.sqrt(totalMoveX * totalMoveX + totalMoveY * totalMoveY);
+            int steps = (int) Math.ceil(totalDistance / MAX_STEP);
+            if (steps == 0) steps = 1; // 至少一步
 
-        // 每步的移动量
-        float stepX = totalMoveX / steps;
-        float stepY = totalMoveY / steps;
+            // 每步的移动量
+            float stepX = totalMoveX / steps;
+            float stepY = totalMoveY / steps;
 
-        // 分步移动并检测碰撞
-        for (int i = 0; i < steps; i++) {
-            // X轴分步移动
-            if (Math.abs(stepX) > EPS) {
-                hitbox.x += stepX;
-                if (fixCollisions(hitbox, 1, 0, stepX)) {
-                    // 如果发生碰撞，剩余步数不再移动X轴
-                    stepX = 0;
+            // 分步移动并检测碰撞
+            for (int i = 0; i < steps; i++) {
+                // X轴分步移动
+                if (Math.abs(stepX) > EPS) {
+                    rect.x += stepX;
+                    if (fixCollisions(rect, 1, 0, stepX)) {
+                        // 如果发生碰撞，剩余步数不再移动X轴
+                        stepX = 0;
+                    }
+                }
+
+                // Y轴分步移动
+                if (Math.abs(stepY) > EPS) {
+                    rect.y += stepY;
+                    if (fixCollisions(rect, 0, 1, stepY)) {
+                        // 如果发生碰撞，剩余步数不再移动Y轴
+                        stepY = 0;
+                    }
+                }
+
+                // 如果X和Y轴都发生碰撞，提前退出循环
+                if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
+                    break;
                 }
             }
 
-            // Y轴分步移动
-            if (Math.abs(stepY) > EPS) {
-                hitbox.y += stepY;
-                if (fixCollisions(hitbox, 0, 1, stepY)) {
-                    // 如果发生碰撞，剩余步数不再移动Y轴
-                    stepY = 0;
-                }
-            }
-
-            // 如果X和Y轴都发生碰撞，提前退出循环
-            if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
-                break;
-            }
+            // 更新玩家位置
+            player.setPosition(
+                rect.x + (player.getWidth() / 2f - Player.HITBOX_OFFSET.x),
+                rect.y + (player.getHeight() / 2f - Player.HITBOX_OFFSET.y)
+            );
+            // 重置速度
+            player.velX = 0;
+            player.velY = 0;
         }
-
-        // 更新玩家位置
-        player.setPosition(
-            hitbox.x - Player.HITBOX_OFFSET.x,
-            hitbox.y - Player.HITBOX_OFFSET.y
-        );
-        // 重置速度
-        player.velX = 0;
-        player.velY = 0;
     }
 
     /**

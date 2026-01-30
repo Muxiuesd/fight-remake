@@ -87,7 +87,7 @@ public class ItemFishPole extends Item {
                     itemEntity.setItemStack(genItemStack);
                     itemEntity.setSpeed(this.pullSpeed);
                     itemEntity.setCurSpeed(this.pullSpeed);
-                    itemEntity.setVelocity(new Direction(hook.getCenter(), hook.getOwner().getCenter()));
+                    itemEntity.setVelocity(new Direction(hook.getCenter(), hook.getOwner().getCenter()).toVector2());
                     itemEntity.setOnGround(false);
                     itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
                         itemEntity.setOnAirTimer(null);
@@ -185,7 +185,7 @@ public class ItemFishPole extends Item {
             if (this.textureRegion == null) return;
             //没抛竿渲染
             Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                     0, 0,
@@ -201,7 +201,7 @@ public class ItemFishPole extends Item {
             if (this.castTexture == null) return;
             //抛竿渲染
             Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(this.castTexture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
                     0, 0,
@@ -232,7 +232,7 @@ public class ItemFishPole extends Item {
 
         EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
         Direction direction = Util.getDirection();
-        float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+        float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         //绘制鱼线
         LivingEntity<?> hookOwner = hook.getOwner();
         Vector2 ownerPos = hookOwner.getCenter();

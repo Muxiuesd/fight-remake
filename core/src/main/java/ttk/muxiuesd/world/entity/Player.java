@@ -24,7 +24,7 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
     //碰撞箱起点（前两个值）和终点（后两个值）的偏移
-    public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, 0.2f, 0.2f);
+    public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, -0.1f, -0.1f);
 
 
     public TextureRegion shield;
@@ -51,7 +51,7 @@ public class Player extends LivingEntity<Player> {
                 //到时间了就取消防御状态
                 this.isDefend = false;
             });
-
+        fastAddBodyHitBox();
 
         backpack.setItemStack(0, new ItemStack(Items.IRON_SWORD));
         backpack.setItemStack(1, new ItemStack(Items.TEST_WEAPON));
@@ -84,13 +84,13 @@ public class Player extends LivingEntity<Player> {
         super.readCAT(values);
 
         //更新hitbox
-        Vector2 position = getPosition();
+        /*Vector2 position = getPosition();
         setCullingArea(
             position.x + HITBOX_OFFSET.x,
             position.y + HITBOX_OFFSET.y,
             getWidth() - HITBOX_OFFSET.z,
             getHeight() - HITBOX_OFFSET.w
-        );
+        );*/
     }
 
     @Override
@@ -109,13 +109,6 @@ public class Player extends LivingEntity<Player> {
             }
         }
 
-        Vector2 position = getPosition();
-        setCullingArea(
-            position.x + HITBOX_OFFSET.x,
-            position.y + HITBOX_OFFSET.y,
-            getWidth() - HITBOX_OFFSET.z,
-            getHeight() - HITBOX_OFFSET.w
-        );
         //setCullingArea(x, y, width, height);
     }
 
@@ -129,7 +122,7 @@ public class Player extends LivingEntity<Player> {
             float v = Math.min(distance, 4f);
             itemEntity.setSpeed(v);
             itemEntity.setCurSpeed(v);
-            itemEntity.setVelocity(getDirection());
+            itemEntity.setVelocity(getDirection().toVector2());
         }
 
         return itemEntity;
@@ -147,7 +140,26 @@ public class Player extends LivingEntity<Player> {
         return spawnItemEntity(stack)
             .setSpeed(v)
             .setCurSpeed(v)
-            .setVelocity(getDirection());
+            .setVelocity(getDirection().toVector2());
+    }
+
+    /**
+     * 玩家的快速添加身体碰撞箱方法
+     * */
+    @Override
+    public Player fastAddBodyHitBox () {
+        float halfWidth = this.getWidth() / 2f;
+        float halfHeight = this.getHeight() / 2f;
+        //加上偏移量
+        this.addRectHitBox(
+            HITBOX_BODY,
+            - halfWidth + HITBOX_OFFSET.x,
+            - halfHeight + HITBOX_OFFSET.y,
+            halfWidth + HITBOX_OFFSET.z,
+            halfHeight + HITBOX_OFFSET.w
+        );
+
+        return this;
     }
 
     @Override

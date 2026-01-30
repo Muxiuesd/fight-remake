@@ -59,7 +59,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
 
         Direction direction = holder.getDirection();
-        float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+        float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         float rotationOffset = holder.getSwingHandDegreeOffset();
         if (rotation > 90f && rotation <= 270f) {
             batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,

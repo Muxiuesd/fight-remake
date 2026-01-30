@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
@@ -25,6 +24,7 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.HitboxHolder;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
 
@@ -35,6 +35,9 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  */
 public abstract class Entity<T extends Entity<?>>
     implements ID<T>, ICAT, Disposable, Updateable, Tickable, Codecable {
+
+    //实体的默认碰撞箱ID（默认就一个身体碰撞箱）
+    public static final String HITBOX_BODY = Fight.ID("entity_body");
 
     private String id;
 
@@ -49,7 +52,6 @@ public abstract class Entity<T extends Entity<?>>
 
     public TextureRegion textureRegion;
     private HitboxHolder<T> hitboxHolder;
-    public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     private EntitySystem es;    //此实体所属的实体系统
     private EntityType<?> type;
@@ -79,13 +81,13 @@ public abstract class Entity<T extends Entity<?>>
         this.onGround = values.getBoolean("onGround", true);
 
         //更新hitbox
-        Vector2 position = getPosition();
+        /*Vector2 position = getPosition();
         setCullingArea(
             position.x,
             position.y,
             getWidth(),
             getHeight()
-        );
+        );*/
     }
 
     @Override
@@ -114,7 +116,12 @@ public abstract class Entity<T extends Entity<?>>
 
     @Override
     public void update(float delta) {
-        this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
+        //this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
+
+        //更新持有的hitbox的中心点坐标
+        this.getHitboxHolder().getBoxes().forEach((id, box) -> {
+            box.setCenterPos(this.x, this.y);
+        });
     }
 
     @Override
@@ -129,12 +136,12 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     /**
-     * 快速添加一个矩形碰撞箱，起点和终点相对于中心的偏移值都是实体的宽高的一半
+     * 快速添加一个实体身体的矩形碰撞箱，起点和终点相对于中心的偏移值都是实体的宽高的一半
      * */
-    public T fastAddRectHitBox (String id) {
+    public T fastAddBodyHitBox () {
         float halfWidth = this.getWidth() / 2f;
         float halfHeight = this.getHeight() / 2f;
-        this.addRectHitBox(id, - halfWidth, - halfHeight, halfWidth, halfHeight);
+        this.addRectHitBox(HITBOX_BODY, - halfWidth, - halfHeight, halfWidth, halfHeight);
         return (T) this;
     }
     /**
@@ -145,12 +152,6 @@ public abstract class Entity<T extends Entity<?>>
             id,
             new RectHitbox().setStartPos(startX, startY).setEndPos(endX, endY).setCenterPos(this.x, this.y)
         );
-        return (T) this;
-    }
-
-
-    public T setCullingArea(float x, float y, float width, float height) {
-        this.hitbox.set(x, y, width, height);
         return (T) this;
     }
 
@@ -287,21 +288,19 @@ public abstract class Entity<T extends Entity<?>>
         return (T) this;
     }
 
+    /**
+     * 获取实体的身体碰撞箱
+     * */
+    public Hitbox getBodyHitbox () {
+        return this.getHitboxHolder().getBox(HITBOX_BODY);
+    }
+
     public HitboxHolder<T> getHitboxHolder () {
         return this.hitboxHolder;
     }
 
     public T setHitboxHolder (HitboxHolder<T> hitboxHolder) {
         if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
-        return (T) this;
-    }
-
-    public Rectangle getHitbox() {
-        return this.hitbox;
-    }
-
-    public T setHitbox (Rectangle hitbox) {
-        this.hitbox = hitbox;
         return (T) this;
     }
 
