@@ -81,7 +81,9 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
         if (this.textureRegion != null) {
-            batch.draw(this.textureRegion, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
+            batch.draw(this.textureRegion,
+                itemEntity.x - itemEntity.getWidth() / 2f,
+                itemEntity.y - itemEntity.getHeight() / 2f + itemEntity.getPositionOffset().y,
                 itemEntity.originX, itemEntity.originY,
                 itemEntity.width, itemEntity.height,
                 itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);

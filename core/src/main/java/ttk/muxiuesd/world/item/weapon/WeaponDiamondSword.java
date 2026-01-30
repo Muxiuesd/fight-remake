@@ -25,7 +25,7 @@ public class WeaponDiamondSword extends RangedWeapon {
                     bullet.setType(owner.getType().getChildType("bullet"));
                     bullet.setPosition(owner.x, owner.y);
                     bullet.setVelocity(direction, bullet.getSpeed());
-                    //bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
+
                     bullet.fastAddBodyHitBox();
                     return bullet;
                 }

@@ -67,11 +67,11 @@ public class HitboxHolder<T> {
      * */
     public Hitbox getBox (String id) {
         Hitbox hitbox = this.getBoxes().get(id);
-        if (hitbox == null && this.getHolder() != null) {
-            Log.error(
+        if (hitbox == null) {
+            /*Log.error(
                 this.getClass().getName(),
                 this.getHolder().getClass().getName() + "没有ID为：" + id + " 的碰撞箱！！！已用空对象代替！！！"
-            );
+            );*/
             return VOID_HITBOX;
         }
         return hitbox;

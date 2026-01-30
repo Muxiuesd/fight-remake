@@ -2,6 +2,7 @@ package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
@@ -37,7 +38,7 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         EntityProvider<Entity<?>> entityProvider = (EntityProvider<Entity<?>>) Registries.ENTITY.get(id);
         String typeId = dataReader.readString("type");
         EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.get(typeId);
-        Entity<?> entity = entityProvider.create(null, entityType);
+        Entity<?> entity = entityProvider.create(FightCore.getInstance().mainGameScreen.getWorld(), entityType);
 
         JsonValue propertyValue = dataReader.readObj("property");
         Optional<Entity.Property> propertyOptional = Codecs.ENTITY_PROPERTY.decode(

@@ -45,8 +45,8 @@ public abstract class Entity<T extends Entity<?>>
     public float x, y;
     public float velX, velY;
     public float width, height;
-    public float originX, originY;
-    public float scaleX = 1, scaleY = 1;
+    public float originX = 0f, originY = 0f;
+    public float scaleX = 1f, scaleY = 1f;
     public float rotation;
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
@@ -116,8 +116,6 @@ public abstract class Entity<T extends Entity<?>>
 
     @Override
     public void update(float delta) {
-        //this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
-
         //更新持有的hitbox的中心点坐标
         this.getHitboxHolder().getBoxes().forEach((id, box) -> {
             box.setCenterPos(this.x, this.y);
@@ -136,12 +134,17 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     /**
-     * 快速添加一个实体身体的矩形碰撞箱，起点和终点相对于中心的偏移值都是实体的宽高的一半
+     * 快速添加一个实体身体的碰撞箱，起点和终点相对于中心的偏移值都是实体的宽高的一半
      * */
     public T fastAddBodyHitBox () {
         float halfWidth = this.getWidth() / 2f;
         float halfHeight = this.getHeight() / 2f;
-        this.addRectHitBox(HITBOX_BODY, - halfWidth, - halfHeight, halfWidth, halfHeight);
+        Hitbox bodyHitbox = this.getBodyHitbox();
+        if (bodyHitbox == HitboxHolder.VOID_HITBOX) {
+            this.addRectHitBox(HITBOX_BODY, - halfWidth, - halfHeight, halfWidth, halfHeight);
+        }else if (bodyHitbox instanceof RectHitbox rectBodyHitbox) {
+            rectBodyHitbox.setStartPos(- halfWidth, - halfHeight).setEndPos(halfWidth, halfHeight);
+        }
         return (T) this;
     }
     /**
@@ -175,6 +178,9 @@ public abstract class Entity<T extends Entity<?>>
         return (T) this;
     }
 
+    /**
+     * 设置旋转中心，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
     public T setOrigin(float originX, float originY) {
         this.originX = originX;
         this.originY = originY;

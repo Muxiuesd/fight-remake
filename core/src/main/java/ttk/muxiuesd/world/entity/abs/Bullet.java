@@ -55,8 +55,8 @@ public abstract class Bullet extends Entity<Bullet> {
 
         //默认大小
         setSize(0.5f, 0.5f);
+        fastAddBodyHitBox();
     }
-
 
     @Override
     public void update (float delta) {
@@ -123,6 +123,7 @@ public abstract class Bullet extends Entity<Bullet> {
      * 设置旋转角度，需要已知速度方向
      */
     private void setDegrees() {
+        setOrigin(this.getWidth() / 2f, this.getHeight() / 2f);
         // 计算旋转角度
         Vector2 velocity = getVelocity();
         setRotation(MathUtils.atan2Deg(velocity.y, velocity.x));
