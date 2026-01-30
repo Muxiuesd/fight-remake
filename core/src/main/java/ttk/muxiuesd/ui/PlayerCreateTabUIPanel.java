@@ -85,6 +85,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     public void update (float delta) {
         super.update(delta);
 
+        //滚动条的滑块位置与创造槽位索引的对应
         UIScrollBar scroll = this.getScrollBar();
         float value = scroll.getSliderPathwayPos();
         ItemGroup itemGroup = this.getCurItemGroup();
