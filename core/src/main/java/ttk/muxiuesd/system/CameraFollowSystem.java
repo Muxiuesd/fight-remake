@@ -50,13 +50,10 @@ public class CameraFollowSystem extends WorldSystem {
         Vector2 vector2 = Util.getMouseWindowPos();
         float xOffset = Math.abs(vector2.x) * direction.getxDirection() / 300;
         float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
-        PlayerCamera.INSTANCE.setPosition(follower.x + follower.width / 2 + xOffset,
-            follower.y + follower.height / 2 + yOffset);
-
-        /*GUICamera.INSTANCE.setPosition(
-            follower.x + follower.width / 2,
-            follower.y + follower.height / 2
-        );*/
+        PlayerCamera.INSTANCE.setPosition(
+            follower.x + xOffset,
+            follower.y + yOffset
+        );
 
     }
 

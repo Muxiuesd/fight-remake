@@ -26,16 +26,16 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
 
     @Override
     public void draw (Batch batch, T entity, Context context) {
-        batch.setColor(1, 1, 1, 0.666f);
+        batch.setColor(1f, 1f, 1f, 0.666f);
         //渲染影子
         batch.draw(ENTITY_SHADOW,
-            context.x, context.y - context.height / 5,
+            context.x - context.width / 2f, context.y - (context.height / 5f) - (context.height / 2f),
             context.originX, context.originY,
             context.width, context.height,
-            context.scaleX, context.scaleY / 2,
+            context.scaleX, context.scaleY / 2f,
             context.rotation
         );
-        batch.setColor(1, 1, 1, 1);
+        batch.setColor(1f, 1f, 1f, 1f);
 
         //身体渲染
         if (!entity.isAttacked()) {

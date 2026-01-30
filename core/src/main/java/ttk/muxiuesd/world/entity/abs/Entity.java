@@ -25,6 +25,8 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.hitbox.HitboxHolder;
+import ttk.muxiuesd.world.hitbox.RectHitbox;
 
 /**
  * 游戏的基础实体
@@ -46,6 +48,7 @@ public abstract class Entity<T extends Entity<?>>
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
     public TextureRegion textureRegion;
+    private HitboxHolder<T> hitboxHolder;
     public Rectangle hitbox = new Rectangle();  //碰撞箱
 
     private EntitySystem es;    //此实体所属的实体系统
@@ -55,6 +58,7 @@ public abstract class Entity<T extends Entity<?>>
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
         this.property = new Property();
+        this.hitboxHolder = new HitboxHolder<>();
     }
 
     @Override
@@ -122,6 +126,26 @@ public abstract class Entity<T extends Entity<?>>
         if (this.textureRegion != null) {
             this.textureRegion = null;
         }
+    }
+
+    /**
+     * 快速添加一个矩形碰撞箱，起点和终点相对于中心的偏移值都是实体的宽高的一半
+     * */
+    public T fastAddRectHitBox (String id) {
+        float halfWidth = this.getWidth() / 2f;
+        float halfHeight = this.getHeight() / 2f;
+        this.addRectHitBox(id, - halfWidth, - halfHeight, halfWidth, halfHeight);
+        return (T) this;
+    }
+    /**
+     * 根据起点和终点相对于中心点的偏移来添加一个矩形碰撞箱
+     * */
+    public T addRectHitBox (String id, float startX, float startY, float endX, float endY) {
+        this.getHitboxHolder().addBox(
+            id,
+            new RectHitbox().setStartPos(startX, startY).setEndPos(endX, endY).setCenterPos(this.x, this.y)
+        );
+        return (T) this;
     }
 
 
@@ -242,8 +266,12 @@ public abstract class Entity<T extends Entity<?>>
         return this.height;
     }
 
+    /**
+     * 获取实体的中心点的坐标
+     * */
     public Vector2 getCenter() {
-        return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
+        //return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
+        return new Vector2(this.x, this.y);
     }
 
     public Vector2 getScale () {
@@ -256,6 +284,15 @@ public abstract class Entity<T extends Entity<?>>
 
     public T setRotation (float rotation) {
         this.rotation = rotation;
+        return (T) this;
+    }
+
+    public HitboxHolder<T> getHitboxHolder () {
+        return this.hitboxHolder;
+    }
+
+    public T setHitboxHolder (HitboxHolder<T> hitboxHolder) {
+        if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
         return (T) this;
     }
 

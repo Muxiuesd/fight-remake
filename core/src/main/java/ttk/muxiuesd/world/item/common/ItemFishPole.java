@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.consumption;
+package ttk.muxiuesd.world.item.common;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

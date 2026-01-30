@@ -63,7 +63,7 @@ public class RectHitbox extends Hitbox {
     }
 
     /**
-     * 设置起点相对中心的坐标
+     * 设置相对于中心的起点坐标
      * */
     public RectHitbox setStartPos (float x, float y) {
         this.hitboxData[START_X_OFFSET] = x;
@@ -72,7 +72,7 @@ public class RectHitbox extends Hitbox {
     }
 
     /**
-     * 设置终点相对中心的坐标
+     * 设置相对于中心的终点坐标
      * */
     public RectHitbox setEndPos (float x, float y) {
         this.hitboxData[END_X_OFFSET] = x;
@@ -89,8 +89,8 @@ public class RectHitbox extends Hitbox {
         return Pools.RECT.obtain().set(
             this.getCenterX() + startX,
             this.getCenterY() + startY,
-            this.getEndX() - startX,
-            this.getEndY() - startY
+            Math.abs(this.getEndX() - startX),
+            Math.abs(this.getEndY() - startY)
         );
     }
 

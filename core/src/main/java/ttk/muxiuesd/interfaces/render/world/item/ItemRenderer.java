@@ -177,14 +177,14 @@ public interface ItemRenderer<T extends Item> {
 
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(item.textureRegion,
-                    context.x, context.y,
+                    context.x - context.width / 2, context.y - context.height / 2,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     context.rotation + 225f + rotationOffset);
             } else {
                 batch.draw(item.textureRegion,
-                    context.x, context.y,
+                    context.x - context.width / 2, context.y - context.height / 2,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,

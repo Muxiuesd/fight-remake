@@ -23,6 +23,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  */
 public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
+    //碰撞箱起点（前两个值）和终点（后两个值）的偏移
     public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, 0.2f, 0.2f);
 
 

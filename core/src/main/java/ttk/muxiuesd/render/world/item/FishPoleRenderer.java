@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.consumption.ItemFishPole;
+import ttk.muxiuesd.world.item.common.ItemFishPole;
 
 /**
  * 钓竿的渲染器
@@ -24,6 +24,7 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
     public void drawOnHand (Batch batch, Context context, LivingEntity<?> holder, ItemStack itemStack) {
         ItemFishPole fishPole = (ItemFishPole) itemStack.getItem();
 
+        Vector2 renderStartPos = new Vector2(context.x - context.width / 2f, context.y - context.height / 2f);
         if (! fishPole.onUsing(itemStack)) {
             //if (fishPole.textureRegion == null) return;
             //没抛竿渲染
@@ -31,14 +32,14 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(fishPole.textureRegion,
-                    context.x , context.y ,
+                    renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     rotation + 180);
             } else {
                 batch.draw(fishPole.textureRegion,
-                    context.x , context.y ,
+                    renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,
@@ -51,14 +52,14 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
             if (rotation > 90f && rotation <= 270f) {
                 batch.draw(fishPole.castTexture,
-                    context.x , context.y ,
+                    renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     rotation + 225f);
             } else {
                 batch.draw(fishPole.castTexture,
-                    context.x , context.y ,
+                    renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,
@@ -81,6 +82,9 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
         }
     }
 
+    /**
+     * 钓鱼线的形状绘制
+     * */
     @Override
     public void renderShapeOnHand (ShapeRenderer batch, LivingEntity<?> holder, ItemStack itemStack) {
         ItemFishPole fishPole = (ItemFishPole) itemStack.getItem();
@@ -98,7 +102,7 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
 
         Vector2 hookPos = hook.getCenter();
         //让鱼线绘制在钩子上方
-        hookPos.add(0, hook.getHeight() / 2 - 0.07f + hook.getPositionOffset().y);
+        hookPos.add(0, hook.getHeight() / 2f - 0.07f + hook.getPositionOffset().y);
         //控制鱼线绘制方向
         if (ownerPos.x <= hookPos.x) CurveDrawer.drawCurve(batch, ownerPos, hookPos, -0.5f);
         else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);

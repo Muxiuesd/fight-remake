@@ -8,7 +8,7 @@ import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
- * 实体得渲染器接口
+ * 实体的渲染器接口
  * */
 public interface EntityRenderer<T extends Entity<?>> {
     /**
