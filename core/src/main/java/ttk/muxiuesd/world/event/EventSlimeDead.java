@@ -36,6 +36,7 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
                 float height = mom.getHeight() * 0.8f;
                 child.setBounds(x, y, width, height);
                 child.setEntitySystem(es);
+                child.fastAddBodyHitBox();
                 es.add(child);
             }
             SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);

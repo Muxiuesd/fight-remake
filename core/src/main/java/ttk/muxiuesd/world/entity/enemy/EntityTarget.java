@@ -14,6 +14,7 @@ public class EntityTarget extends Enemy<EntityTarget> {
     public EntityTarget (World world, EntityType<?> entityType) {
         super(world, EntityTypes.ENEMY, 1000, 1000, 1, 1, 1, 0);
         textureRegion = getTextureRegion(Fight.ID("fish"), "fish/fish.png");
+        fastAddBodyHitBox();
     }
 
     @Override

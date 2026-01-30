@@ -44,6 +44,8 @@ public class Slime extends Enemy<Slime> {
         addState(STATE_REST, new SlimeRestState());
         addState(STATE_RANDOM_WALK, new SlimeRandomWalkState());
         addState(STATE_ATTACK_TARGET, new SlimeAttackTargetState());
+
+        fastAddBodyHitBox();
     }
 
     @Override

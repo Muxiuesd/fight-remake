@@ -26,6 +26,7 @@ public class PufferFish extends LivingEntity<PufferFish> {
         super(world, entityType, 5, 5, 1);
         loadBodyTextureRegion(Fight.ID("puffer_fish"), "fish/puffer_fish.png");
         setSize(DEFAULT_SIZE);
+        fastAddBodyHitBox();
         setSpeed(1f);
         getBackpack().addItem(new ItemStack(Items.PUFFER_FISH, 1));
 

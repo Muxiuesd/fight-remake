@@ -18,7 +18,7 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
 
     public float x, y;
     private RectHitbox rectHitbox;  //普通墙体只有一个矩形碰撞箱，最好也只有一个
-    private HitboxHolder<T> hitboxHolder;
+    private HitboxHolder<Wall<T>> hitboxHolder;
 
     public Wall(Property property, String textureId, String texturePath) {
         super(property, textureId, texturePath);
@@ -26,7 +26,7 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
         this.rectHitbox = new RectHitbox()
             .setStartPos(HITBOX_START_X_OFFSET, HITBOX_START_Y_OFFSET)
             .setEndPos(HITBOX_END_X_OFFSET, HITBOX_END_Y_OFFSET);
-        this.hitboxHolder = new HitboxHolder<>();
+        this.hitboxHolder = new HitboxHolder<>(this);
         this.hitboxHolder.addBox(DEFAULT_HITBOX_ID, this.rectHitbox);
     }
 
@@ -84,11 +84,11 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
         return this;
     }
 
-    public HitboxHolder<T> getHitboxHolder () {
+    public HitboxHolder<Wall<T>> getHitboxHolder () {
         return this.hitboxHolder;
     }
 
-    public Wall<T> setHitboxHolder (HitboxHolder<T> hitboxHolder) {
+    public Wall<T> setHitboxHolder (HitboxHolder<Wall<T>> hitboxHolder) {
         if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
         return this;
     }

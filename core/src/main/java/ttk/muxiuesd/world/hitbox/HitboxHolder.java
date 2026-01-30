@@ -17,10 +17,11 @@ public class HitboxHolder<T> {
     private HashMap<String, Hitbox> boxes;
     private HashMap<String, CollidedAction<T>> actions;
 
-    public HitboxHolder () {
-        this(new LinkedHashMap<>(), new LinkedHashMap<>());
+    public HitboxHolder (T holder) {
+        this(holder, new LinkedHashMap<>(), new LinkedHashMap<>());
     }
-    public HitboxHolder(HashMap<String, Hitbox> boxesMap, HashMap<String, CollidedAction<T>> actionsMap) {
+    public HitboxHolder(T holder, HashMap<String, Hitbox> boxesMap, HashMap<String, CollidedAction<T>> actionsMap) {
+        this.holder = holder;
         this.boxes = boxesMap;
         this.actions = actionsMap;
     }
@@ -66,8 +67,11 @@ public class HitboxHolder<T> {
      * */
     public Hitbox getBox (String id) {
         Hitbox hitbox = this.getBoxes().get(id);
-        if (hitbox == null) {
-            Log.error(this.getClass().getName(), "ID为：" + id + " 的碰撞箱不存在！！！已用空对象代替！！！");
+        if (hitbox == null && this.getHolder() != null) {
+            Log.error(
+                this.getClass().getName(),
+                this.getHolder().getClass().getName() + "没有ID为：" + id + " 的碰撞箱！！！已用空对象代替！！！"
+            );
             return VOID_HITBOX;
         }
         return hitbox;

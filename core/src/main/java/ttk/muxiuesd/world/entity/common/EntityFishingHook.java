@@ -44,6 +44,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
             Fight.ID("fishing_hook"),
             Fight.EntityTexturePath("fish/fishing_hook.png")
         );
+        fastAddBodyHitBox();
 
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {

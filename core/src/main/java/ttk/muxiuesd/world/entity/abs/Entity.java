@@ -51,7 +51,7 @@ public abstract class Entity<T extends Entity<?>>
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
     public TextureRegion textureRegion;
-    private HitboxHolder<T> hitboxHolder;
+    private HitboxHolder<Entity<T>> hitboxHolder;
 
     private EntitySystem es;    //此实体所属的实体系统
     private EntityType<?> type;
@@ -60,7 +60,7 @@ public abstract class Entity<T extends Entity<?>>
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
         this.property = new Property();
-        this.hitboxHolder = new HitboxHolder<>();
+        this.hitboxHolder = new HitboxHolder<>(this);
     }
 
     @Override
@@ -295,11 +295,11 @@ public abstract class Entity<T extends Entity<?>>
         return this.getHitboxHolder().getBox(HITBOX_BODY);
     }
 
-    public HitboxHolder<T> getHitboxHolder () {
+    public HitboxHolder<Entity<T>> getHitboxHolder () {
         return this.hitboxHolder;
     }
 
-    public T setHitboxHolder (HitboxHolder<T> hitboxHolder) {
+    public T setHitboxHolder (HitboxHolder<Entity<T>> hitboxHolder) {
         if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
         return (T) this;
     }
