@@ -97,6 +97,9 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         this.maxSwingHandDegree = 60f;
     }
 
+
+
+
     @Override
     public void readCAT (JsonValue values) {
         super.readCAT(values);

@@ -9,10 +9,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ICAT;
-import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.interfaces.Tickable;
-import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.interfaces.*;
 import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.serialization.Codecable;
 import ttk.muxiuesd.property.PropertyType;
@@ -23,6 +20,9 @@ import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatBoolean;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.HitboxHolder;
@@ -34,13 +34,13 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<?>>
-    implements ID<T>, ICAT, Disposable, Updateable, Tickable, Codecable {
+    implements ID<T>, ICAT, ICatData, Disposable, Updateable, Tickable, Codecable {
 
     //实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
-    private String id;
-
+    private String id;  //实体的id
+    /// 以下都是实体的基础数据（物理参数、渲染参数等）
     public float speed, curSpeed;
     public float x, y;
     public float velX, velY;
@@ -64,6 +64,46 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     @Override
+    public void readCatData (JsonValue values) {
+        this.speed = values.getFloat("speed", 1.145f);
+        this.curSpeed = values.getFloat("curSpeed", 1.145f);
+        this.x = values.getFloat("x", 1.145f);
+        this.y = values.getFloat("y", 1.145f);
+        this.velX = values.getFloat("velX", 0);
+        this.velY = values.getFloat("velY", 0);
+        this.width = values.getFloat("width", 1f);
+        this.height = values.getFloat("height", 1f);
+        this.originX = values.getFloat("originX", 0);
+        this.originY = values.getFloat("originY", 0);
+        this.scaleX = values.getFloat("scaleX", 1f);
+        this.scaleY = values.getFloat("scaleY", 1f);
+        this.rotation = values.getFloat("rotation", 0);
+        this.onGround = values.getBoolean("onGround", true);
+    }
+
+    @Override
+    public void writeCatData (CatsHolder holder) {
+        holder
+            .put("speed", new CatFloat(this.speed))
+            .put("curSpeed", new CatFloat(this.curSpeed))
+            .put("x", new CatFloat(this.x))
+            .put("y", new CatFloat(this.y))
+            .put("velX", new CatFloat(this.velX))
+            .put("velY", new CatFloat(this.velY))
+            .put("width", new CatFloat(this.width))
+            .put("height", new CatFloat(this.height))
+            .put("originX", new CatFloat(this.originX))
+            .put("originY", new CatFloat(this.originY))
+            .put("scaleX", new CatFloat(this.scaleX))
+            .put("scaleY", new CatFloat(this.scaleY))
+            .put("rotation", new CatFloat(this.rotation))
+            .put("onGround", new CatBoolean(this.onGround));
+    }
+
+    /**
+     * 写入：实体基础数据
+     * */
+    @Override
     public void readCAT (JsonValue values) {
         this.speed = values.getFloat("speed", 1.145f);
         this.curSpeed = values.getFloat("curSpeed", 1.145f);
@@ -79,17 +119,11 @@ public abstract class Entity<T extends Entity<?>>
         this.scaleY = values.getFloat("scaleY", 1f);
         this.rotation = values.getFloat("rotation", 0);
         this.onGround = values.getBoolean("onGround", true);
-
-        //更新hitbox
-        /*Vector2 position = getPosition();
-        setCullingArea(
-            position.x,
-            position.y,
-            getWidth(),
-            getHeight()
-        );*/
     }
 
+    /**
+     * 读取：实体基础数据
+     * */
     @Override
     public void writeCAT (CAT cat) {
         cat.set("speed", this.speed);
@@ -111,8 +145,7 @@ public abstract class Entity<T extends Entity<?>>
     /**
      * 延迟初始化，在实体添加到实体系统后才会执行
      * */
-    public void initialize() {
-    }
+    public void lazyInitialize () {}
 
     @Override
     public void update(float delta) {
@@ -363,7 +396,7 @@ public abstract class Entity<T extends Entity<?>>
      * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦
      * */
     public boolean isOnGround () {
-        return onGround;
+        return this.onGround;
     }
 
     public T setOnGround (boolean onGround) {
@@ -395,7 +428,7 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     /**
-     * 实体的属性
+     * 实体的属性类
      * */
     public static class Property {
         //属性映射
@@ -404,16 +437,17 @@ public abstract class Entity<T extends Entity<?>>
         public Property () {
             setPropertiesMap(
                 new JsonPropertiesMap()
-                    .add(PropertyTypes.CAT, new CAT())
+                    //.add(PropertyTypes.CAT, new CAT())
+                    .add(PropertyTypes.CATS, new CatsHolder())
             );
         }
 
         public <T> T get (PropertyType<T> propertyType) {
-            return getPropertiesMap().get(propertyType);
+            return this.getPropertiesMap().get(propertyType);
         }
 
         public <T> Entity.Property add (PropertyType<T> propertyType, T value) {
-            getPropertiesMap().add(propertyType, value);
+            this.getPropertiesMap().add(propertyType, value);
             return this;
         }
 
@@ -423,6 +457,10 @@ public abstract class Entity<T extends Entity<?>>
 
         public Entity.Property setCAT (CAT cat) {
             return this.add(PropertyTypes.CAT, cat);
+        }
+
+        public CatsHolder getCatsHolder () {
+            return this.get(PropertyTypes.CATS);
         }
 
         public PropertiesDataMap<?, ?, ?> getPropertiesMap () {

@@ -35,7 +35,7 @@ public class PufferFish extends LivingEntity<PufferFish> {
     }
 
     @Override
-    public void initialize () {
+    public void lazyInitialize () {
         setState(Fight.ID("rest"));
     }
 

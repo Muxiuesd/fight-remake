@@ -49,7 +49,7 @@ public class Slime extends Enemy<Slime> {
     }
 
     @Override
-    public void initialize () {
+    public void lazyInitialize () {
         //最开始是休息状态
         setState(STATE_REST);
     }

@@ -22,7 +22,6 @@ public class PropertyCAT extends PropertyType<CAT>{
     @Override
     public CAT read (DataReader<?> reader, String dataKey) {
         CAT cat = new CAT();
-        //cat.read(new JsonValue(dataKey));
         return cat;
     }
 }

@@ -143,7 +143,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             this.renderableEntities.get(entity.getRenderLayer()).add(entity);
         //防止没有指定实体系统
         entity.setEntitySystem(this);
-        entity.initialize();
+        entity.lazyInitialize();
     }
 
     /**

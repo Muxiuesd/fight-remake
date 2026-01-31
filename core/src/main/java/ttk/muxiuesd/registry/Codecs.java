@@ -42,7 +42,7 @@ public final class Codecs {
     public static final JsonCodec<LivingEntity<?>> LIVING_ENTITY = register("living_entity", new LivingEntityCodec());
     public static final JsonCodec<Player> PLAYER = register("player", new PlayerCodec());
     public static final JsonCodec<ItemEntity> ITEM_ENTITY = register("item_entity", new ItemEntityCodec());
-    public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = register("item_property", new EntityPropertyCodec());
+    public static final JsonCodec<Entity.Property> ENTITY_PROPERTY = register("entity_property", new EntityPropertyCodec());
     public static final JsonCodec<LinkedHashMap<StatusEffect, StatusEffect.Data>> STATUS_EFFECTS = register("status_effect", new BuffCodec());
 
 

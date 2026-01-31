@@ -18,4 +18,5 @@ public abstract class PropertyType<T> implements IWriteData<T>, IReadData<T> {
         this.id = id;
         return this;
     }
+
 }
