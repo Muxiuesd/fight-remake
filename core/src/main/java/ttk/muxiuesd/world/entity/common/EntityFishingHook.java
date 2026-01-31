@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.entity.common;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -13,7 +12,6 @@ import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -59,16 +57,6 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
 
         this.positionOffset = new Vector2(0, 0);
         this.isReturning = false;
-    }
-
-    @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-    }
-
-    @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
     }
 
     @Override

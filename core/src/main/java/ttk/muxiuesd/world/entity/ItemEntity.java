@@ -11,7 +11,9 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatBoolean;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -40,8 +42,8 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
         this.cycle = values.getFloat("cycle", 0f);
         this.livingTime = values.getFloat("living_time", 0f);
 
@@ -58,15 +60,17 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("cycle", this.cycle);
-        cat.set("living_time", this.livingTime);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder
+            .put("cycle", new CatFloat(this.cycle))
+            .put("livingTime", new CatFloat(this.livingTime));
 
         if (this.onAirTimer != null) {
-            cat.set("on_air", true);
-            cat.set("on_air_max_span", this.onAirTimer.getMaxSpan());
-            cat.set("on_air_cur_span", this.onAirTimer.getCurSpan());
+            holder
+                .put("on_air", new CatBoolean(true))
+                .put("on_air_max_span", new CatFloat(this.onAirTimer.getMaxSpan()))
+                .put("on_air_cur_span", new CatFloat(this.onAirTimer.getCurSpan()));
         }
     }
 

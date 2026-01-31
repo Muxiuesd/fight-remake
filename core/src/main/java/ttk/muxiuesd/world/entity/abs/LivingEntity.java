@@ -15,7 +15,9 @@ import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatInt;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -97,23 +99,21 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         this.maxSwingHandDegree = 60f;
     }
 
-
-
-
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-        this.handIndex = values.getInt("hand_index", 0);
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
+        this.handIndex = values.getInt("handIndex", 0);
         this.maxHealth = values.getFloat("maxHealth", 10f);
         this.curHealth = values.getFloat("curHealth", 10f);
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("hand_index", this.handIndex);
-        cat.set("maxHealth", this.maxHealth);
-        cat.set("curHealth", this.curHealth);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder
+            .put("handIndex", new CatInt(this.handIndex))
+            .put("maxHealth", new CatFloat(this.maxHealth))
+            .put("curHealth", new CatFloat(this.curHealth));
     }
 
     @Override

@@ -9,7 +9,10 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.*;
+import ttk.muxiuesd.interfaces.ICatData;
+import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.serialization.Codecable;
 import ttk.muxiuesd.property.PropertyType;
@@ -19,7 +22,6 @@ import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -34,7 +36,7 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<?>>
-    implements ID<T>, ICAT, ICatData, Disposable, Updateable, Tickable, Codecable {
+    implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
 
     //实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
@@ -98,48 +100,6 @@ public abstract class Entity<T extends Entity<?>>
             .put("scaleY", new CatFloat(this.scaleY))
             .put("rotation", new CatFloat(this.rotation))
             .put("onGround", new CatBoolean(this.onGround));
-    }
-
-    /**
-     * 写入：实体基础数据
-     * */
-    @Override
-    public void readCAT (JsonValue values) {
-        this.speed = values.getFloat("speed", 1.145f);
-        this.curSpeed = values.getFloat("curSpeed", 1.145f);
-        this.x = values.getFloat("x", 1.145f);
-        this.y = values.getFloat("y", 1.145f);
-        this.velX = values.getFloat("velX", 0);
-        this.velY = values.getFloat("velY", 0);
-        this.width = values.getFloat("width", 1f);
-        this.height = values.getFloat("height", 1f);
-        this.originX = values.getFloat("originX", 0);
-        this.originY = values.getFloat("originY", 0);
-        this.scaleX = values.getFloat("scaleX", 1f);
-        this.scaleY = values.getFloat("scaleY", 1f);
-        this.rotation = values.getFloat("rotation", 0);
-        this.onGround = values.getBoolean("onGround", true);
-    }
-
-    /**
-     * 读取：实体基础数据
-     * */
-    @Override
-    public void writeCAT (CAT cat) {
-        cat.set("speed", this.speed);
-        cat.set("curSpeed", this.curSpeed);
-        cat.set("x", this.x);
-        cat.set("y", this.y);
-        cat.set("velX", this.velX);
-        cat.set("velY", this.velY);
-        cat.set("width", this.width);
-        cat.set("height", this.height);
-        cat.set("originX", this.originX);
-        cat.set("originY", this.originY);
-        cat.set("scaleX", this.scaleX);
-        cat.set("scaleY", this.scaleY);
-        cat.set("rotation", this.rotation);
-        cat.set("onGround", this.onGround);
     }
 
     /**
@@ -449,14 +409,6 @@ public abstract class Entity<T extends Entity<?>>
         public <T> Entity.Property add (PropertyType<T> propertyType, T value) {
             this.getPropertiesMap().add(propertyType, value);
             return this;
-        }
-
-        public CAT getCAT () {
-            return this.get(PropertyTypes.CAT);
-        }
-
-        public Entity.Property setCAT (CAT cat) {
-            return this.add(PropertyTypes.CAT, cat);
         }
 
         public CatsHolder getCatsHolder () {

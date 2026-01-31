@@ -8,7 +8,8 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatInt;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -55,15 +56,15 @@ public class Slime extends Enemy<Slime> {
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
         this.generation = values.getInt("generation", 1);
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("generation", this.generation);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder.put("generation", new CatInt(this.generation));
     }
 
     /**

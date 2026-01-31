@@ -1,12 +1,12 @@
 package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
@@ -67,7 +67,8 @@ public class LivingEntityCodec extends JsonCodec<LivingEntity<?>> {
         propertyOptional.ifPresent(livingEntity::setProperty);
 
         //读取cat
-        livingEntity.readCAT(propertyValue.get(Fight.ID("cat")));
+        //livingEntity.readCAT(propertyValue.get(Fight.ID("cat")));
+        livingEntity.readCatData(propertyValue.get(PropertyTypes.CATS.getId()));
 
         //读取背包数据
         JsonValue backpackValue = dataReader.readObj("backpack");

@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
-import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.registry.Codecs;
@@ -77,20 +76,6 @@ public class Player extends LivingEntity<Player> {
         setEffect(StatusEffects.POISON, 500f, 1);
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
-    }
-
-    @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-
-        //更新hitbox
-        /*Vector2 position = getPosition();
-        setCullingArea(
-            position.x + HITBOX_OFFSET.x,
-            position.y + HITBOX_OFFSET.y,
-            getWidth() - HITBOX_OFFSET.z,
-            getHeight() - HITBOX_OFFSET.w
-        );*/
     }
 
     @Override
