@@ -25,8 +25,6 @@ public class WallCodec extends JsonCodec<Wall<?>> {
             .writeFloat("x", wall.x)
             .writeFloat("y", wall.y);
 
-        //记得调用一次cat写入
-        wall.writeCAT(wall.getProperty().getCAT());
         //自定义属性
         dataWriter.objStart("property");
         Codecs.BLOCK_PROPERTY.encode (wall.getProperty(), dataWriter);
@@ -46,8 +44,6 @@ public class WallCodec extends JsonCodec<Wall<?>> {
         if (propertyOptional.isPresent()) {
             self.setProperty(propertyOptional.get());
         }
-        //读取cat
-        self.readCAT(propertyValue.get(Fight.ID("cat")));
 
         return Optional.of(self);
     }

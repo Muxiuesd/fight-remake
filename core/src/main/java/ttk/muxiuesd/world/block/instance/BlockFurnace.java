@@ -9,7 +9,8 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatBoolean;
+import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
  * 熔炉方块
@@ -43,15 +44,15 @@ public class BlockFurnace extends BlockWithEntity {
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("is_working", this.isWorking);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder.put("is_working", new CatBoolean(this.isWorking));
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-        this.isWorking = values.getBoolean("is_working");
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
+        this.isWorking = values.getBoolean("is_working", false);
     }
 
     @Override

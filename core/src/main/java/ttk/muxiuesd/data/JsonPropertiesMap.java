@@ -1,7 +1,7 @@
 package ttk.muxiuesd.data;
 
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.Copyable;
+import ttk.muxiuesd.interfaces.ShallowCopyable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
 
@@ -46,19 +46,22 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
         return this.propertiesMap.containsKey(type);
     }
 
+    /**
+     * 复制一份属性
+     * */
     @Override
     public JsonPropertiesMap copy () {
         JsonPropertiesMap map = new JsonPropertiesMap();
         this.propertiesMap.forEach((key, value) -> {
-            if (value instanceof Copyable<?> copyableValue) {
-                map.add(key, copyableValue.copy());
+            //如果是可浅拷贝的值就调用浅拷贝
+            if (value instanceof ShallowCopyable<?> shallowCopyableValue) {
+                map.add(key, shallowCopyableValue.copy());
             }else {
+                //不是浅拷贝的值就直接添加
                 map.add(key, value);
             }
         });
         return map;
-
-        //return new JsonPropertiesMap((LinkedHashMap<PropertyType, Object>) propertiesMap.clone());
     }
 
     /**

@@ -2,22 +2,19 @@ package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.block.BlockSoundsID;
-import ttk.muxiuesd.world.cat.CAT;
 
 /**
  * 方块
  * */
-public abstract class Block implements ID<Block>, Disposable, ICAT {
+public abstract class Block implements ID<Block>, Disposable {
     /// 方块的大小（最基础的属性）
     public static final float WIDTH = 1f, HEIGHT = 1f;
     /// 方块碰撞箱坐标偏移，自带正负号
@@ -33,7 +30,7 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
      * 有些需要实例化的东西就放里面防止浅拷贝
      * */
     public static Property createProperty() {
-        return new Property().setCAT(new CAT());
+        return new Property();
     }
 
     private String id;
@@ -90,20 +87,6 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
         return this;
     }
 
-    /**
-     * 在方块属性写入前一刻调用
-     * */
-    @Override
-    public void writeCAT (CAT cat) {
-    }
-
-    /**
-     * 从json中获取值
-     * */
-    @Override
-    public void readCAT (JsonValue values) {
-    }
-
     /**方块属性
      * 使用构建者模式
      * */
@@ -111,16 +94,8 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
         private PropertiesDataMap<?, ?, ?> propertiesDataMap;
 
         private Property() {
-            ////这里有可能浅拷贝
+            /// 这里有可能浅拷贝
             this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
-        }
-
-        public CAT getCAT () {
-            return this.propertiesDataMap.get(PropertyTypes.CAT);
-        }
-
-        public Property setCAT (CAT cat) {
-            return this.set(PropertyTypes.CAT, cat);
         }
 
         public float getFriction() {

@@ -1,6 +1,6 @@
 package ttk.muxiuesd.world.cat;
 
-import ttk.muxiuesd.interfaces.Copyable;
+import ttk.muxiuesd.interfaces.ShallowCopyable;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
  * <p>
  * 持有管理一些自定义的属性
  * */
-public class CatsHolder implements Copyable<CatsHolder> {
+public class CatsHolder implements ShallowCopyable<CatsHolder> {
     private final HashMap<String, CatValue<?>> entries = new LinkedHashMap<>();
 
     /**

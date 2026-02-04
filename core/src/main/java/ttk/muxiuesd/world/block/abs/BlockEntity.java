@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.ICAT;
+import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.Updateable;
@@ -17,7 +17,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * 方块实体
  * */
-public abstract class BlockEntity implements Updateable, Tickable, ICAT {
+public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     private BlockEntityProvider<? extends BlockEntity> provider;
     private World world;                    //方块实体所属的世界
     private BlockWithEntity block;          //方块
@@ -52,17 +52,17 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     }
 
     /**
-     * 由所属方块调用的写入
+     * 这里面可以写一些要保存的值，由所属方块调用的cat写入
      * */
     @Override
-    public void writeCAT (CAT cat) {
+    public void writeCatData (CatsHolder holder) {
     }
 
     /**
-     * 由所属方块调用的读取
+     * 由所属方块调用的cat读取
      * */
     @Override
-    public void readCAT (JsonValue values) {
+    public void readCatData (JsonValue values) {
     }
 
     /**

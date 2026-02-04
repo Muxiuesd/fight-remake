@@ -19,7 +19,8 @@ import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatInt;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.InteractSlot;
@@ -51,16 +52,17 @@ public class BlockEntityFurnace extends BlockEntity {
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("curEnergy", this.curEnergy);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder.put("curEnergy", new CatInt(this.curEnergy));
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-        this.curEnergy = values.getInt("curEnergy");
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
+        this.curEnergy = values.getInt("curEnergy", 0);
     }
+
 
     @Override
     public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {

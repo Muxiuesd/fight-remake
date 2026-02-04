@@ -5,7 +5,6 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.property.*;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.BlockSoundsID;
-import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -18,7 +17,6 @@ public final class PropertyTypes {
     public static void init () {
     }
 
-    public static final PropertyType<CAT> CAT = register("cat", new PropertyCAT());
     public static final PropertyType<CatsHolder> CATS = register("cats", new PropertyCats());
     /// 物品基础属性
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
