@@ -63,8 +63,8 @@ public class PlayerInventoryUIPanel extends PlayerItemSlotsUIPanel {
         Player player = getPlayerSystem().getPlayer();
         EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(player.getID());
         EntityRenderer.Context context = renderer.getContext();
-        context.x = getX() + 33f;
-        context.y = getY() + 100f;
+        context.x = getX() + 50f;
+        context.y = getY() + 125f;
         context.width = 32f;
         context.height = 32f;
         renderer.draw(batch, player, context);
