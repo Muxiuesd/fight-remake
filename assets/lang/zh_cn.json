@@ -1,7 +1,9 @@
 {
   "text.null_text": "空文本！",
+  "text.fight:null_text": "空的文本组件",
   "text.fight:button_start_game":    "开始游戏",
   "text.fight:button_game_settings": "游戏设置",
+  "text.fight:button_exit_game":     "退出游戏",
 
   "text.fight:weapon_use_span":     "&&a攻击间隔：{0}",
   "text.fight:weapon_damage":       "&&a武器伤害：{0}",

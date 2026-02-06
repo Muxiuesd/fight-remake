@@ -1,6 +1,8 @@
 package ttk.muxiuesd.screen;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.ScreenUtils;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.mod.ModLibManager;
@@ -114,8 +116,8 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        ScreenUtils.clear(Color.BLACK);
         this.world.update(delta);
-        //System.out.println("FPS：" + Gdx.graphics.getFramesPerSecond());
     }
 
     @Override

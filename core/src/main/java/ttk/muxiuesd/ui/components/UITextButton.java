@@ -11,9 +11,18 @@ import ttk.muxiuesd.util.TextUtil;
  * 带有文本字体渲染的按钮，字体默认渲染在按钮的中心位置
  * */
 public class UITextButton extends UIButton {
+
+    public static final Click VOID_CLICK = (button, interactPos) -> {
+        //啥也不做
+        return false;
+    };
+
     private Text text;
     private FontHolder fontHolder;
 
+    public UITextButton () {
+        this(Text.NULL_TEXT, VOID_CLICK);
+    }
     public UITextButton (Text text, Click clickEvent) {
         this(text, Fonts.MC, clickEvent);
     }

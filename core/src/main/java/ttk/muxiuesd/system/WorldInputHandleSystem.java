@@ -67,7 +67,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
-        if (KeyBindings.ExitGame.wasJustPressed()) {
+        if (KeyBindings.Exit.wasJustPressed()) {
             //如果是玩家HUD屏幕就是退出游戏世界，回到主菜单
             if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN) {
                 Log.print(TAG(), "游戏退出！");

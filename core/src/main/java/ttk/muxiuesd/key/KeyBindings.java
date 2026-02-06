@@ -107,9 +107,11 @@ public class KeyBindings {
         KeyBinding.Type.Keyboard, Input.Keys.NUM_9
     ));
 
-
-    public static KeyBinding ExitGame = InputBinding.registerBinding(new KeyBinding(
-        Fight.ID("key_exit_game"), "key_exit_game",
+    /**
+     * 退出按键
+     * */
+    public static KeyBinding Exit = InputBinding.registerBinding(new KeyBinding(
+        Fight.ID("key_exit"), "key_exit",
         KeyBinding.Type.Keyboard, Input.Keys.ESCAPE
     ));
 

@@ -2,6 +2,8 @@ package ttk.muxiuesd.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.ScreenUtils;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.ui.screen.StartMenuUIScreen;
@@ -25,7 +27,9 @@ public class StartMenuScreen implements Screen {
 
     @Override
     public void render (float delta) {
-        if (KeyBindings.ExitGame.wasJustPressed()) Gdx.app.exit();
+        ScreenUtils.clear(Color.BLACK);
+
+        if (KeyBindings.Exit.wasJustPressed()) Gdx.app.exit();
     }
 
     @Override

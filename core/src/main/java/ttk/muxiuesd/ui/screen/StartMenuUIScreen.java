@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.screen;
 
+import com.badlogic.gdx.Gdx;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.ui.abs.UIScreen;
@@ -14,25 +15,47 @@ import ttk.muxiuesd.ui.text.Text;
 public class StartMenuUIScreen extends UIScreen {
 
     private UIPanel buttonsPanel;
+    private UITextButton startButton;
+    private UITextButton settingsButton;
+    private UITextButton exitButton;
+
 
     public StartMenuUIScreen () {
         this.buttonsPanel = new UIPanel(-(UIButton.DEFAULT_WIDTH / 2), 0);
         addComponent(this.buttonsPanel);
 
-        this.buttonsPanel.addComponent(new UITextButton(
+        //开始游戏按钮
+        this.startButton = new UITextButton(
             Text.ofText(Fight.ID("button_start_game")),
             (button, interactPos) -> {
-                FightCore.getInstance().changeScreen(FightCore.getInstance().mainGameScreen);
+                FightCore.getInstance().changeScreen(FightCore.getInstance().worldsMenuScreen);
                 return false;
-            }).setPosition(0, UIButton.DEFAULT_HEIGHT + 10)
+            }
         );
-        this.buttonsPanel.addComponent(new UITextButton(
+        this.startButton.setPosition(0, UIButton.DEFAULT_HEIGHT * 2 + 20);
+
+        //游戏设置按钮
+        this.settingsButton = new UITextButton(
             Text.ofText(Fight.ID("button_game_settings")),
             (button, interactPos) -> {
                 return false;
-            }).setPosition(0, 0)
+            }
         );
+        this.settingsButton.setPosition(0, UIButton.DEFAULT_HEIGHT + 10);
 
+        //退出游戏的按钮
+        this.exitButton = new UITextButton(
+            Text.ofText(Fight.ID("button_exit_game")),
+            (button, interactPos) -> {
+                Gdx.app.exit();
+                return false;
+            }
+        );
+        this.exitButton.setPosition(0, 0);
+
+        this.buttonsPanel.addComponent(this.startButton);
+        this.buttonsPanel.addComponent(this.settingsButton);
+        this.buttonsPanel.addComponent(this.exitButton);
         this.buttonsPanel.auto();
     }
 

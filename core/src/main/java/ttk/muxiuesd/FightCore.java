@@ -3,8 +3,6 @@ package ttk.muxiuesd;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ScreenUtils;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.registrant.RegistrantGroup;
@@ -18,6 +16,7 @@ import ttk.muxiuesd.render.shader.ShaderScheduler;
 import ttk.muxiuesd.render.shader.ShadersReg;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.screen.StartMenuScreen;
+import ttk.muxiuesd.screen.WorldsMenuScreen;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
@@ -40,6 +39,7 @@ public class FightCore extends Game {
 
     private Screen nextScreen;
     public StartMenuScreen startMenuScreen;
+    public WorldsMenuScreen worldsMenuScreen;
     public MainGameScreen mainGameScreen;
 
     public GUIRenderProcessor guiRenderProcessor;
@@ -58,6 +58,7 @@ public class FightCore extends Game {
 
         //游戏界面初始化，在各自的screen里面注册各自需要的渲染处理器
         this.startMenuScreen = new StartMenuScreen();
+        this.worldsMenuScreen = new WorldsMenuScreen();
         this.mainGameScreen = new MainGameScreen();
 
         GameSystemManager.getInstance().addSystem("InputHandleSystem", InputHandleSystem.getInstance());
@@ -99,7 +100,6 @@ public class FightCore extends Game {
         if (getScreen() != null) getScreen().render(deltaTime);
 
         //游戏渲染部分
-        ScreenUtils.clear(Color.BLACK);
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
     }

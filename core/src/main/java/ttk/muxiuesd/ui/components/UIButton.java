@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
+import ttk.muxiuesd.interfaces.util.Voidable;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.util.Util;
@@ -103,12 +104,12 @@ public class UIButton extends UIComponent {
     /**
      * 点击按钮事件处理接口
      * */
-    public interface Click {
+    public interface Click extends Voidable {
         boolean handle (UIButton button, GridPoint2 interactPos);
     }
 
     /**
-     * 点击按钮事件处理接口
+     * 鼠标放在按钮上面的事件处理接口
      * */
     public interface MouseOver {
         void handle (UIButton button, GridPoint2 interactPos);
