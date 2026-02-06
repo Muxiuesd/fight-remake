@@ -1,10 +1,10 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.HotbarUIPanel;
-import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
 
 /**

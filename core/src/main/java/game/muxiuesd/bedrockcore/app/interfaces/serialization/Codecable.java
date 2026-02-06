@@ -1,7 +1,7 @@
-package ttk.muxiuesd.interfaces.serialization;
+package game.muxiuesd.bedrockcore.app.interfaces.serialization;
 
-import ttk.muxiuesd.interfaces.data.DataReader;
-import ttk.muxiuesd.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 
 /**
  * 接口：可编解码

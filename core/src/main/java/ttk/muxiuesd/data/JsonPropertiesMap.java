@@ -1,7 +1,7 @@
 package ttk.muxiuesd.data;
 
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ShallowCopyable;
+import game.muxiuesd.bedrockcore.app.interfaces.ShallowCopyable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
 

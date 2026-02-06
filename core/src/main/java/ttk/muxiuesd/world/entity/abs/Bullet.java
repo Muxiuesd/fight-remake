@@ -4,7 +4,7 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatFloat;

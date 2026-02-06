@@ -1,6 +1,6 @@
 package ttk.muxiuesd.interfaces.gui;
 
-import ttk.muxiuesd.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.ui.abs.UIComponent;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -1,9 +1,9 @@
 package ttk.muxiuesd.world.item;
 
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;

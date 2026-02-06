@@ -1,6 +1,6 @@
 package ttk.muxiuesd.ui.screen;
 
-import ttk.muxiuesd.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
 import ttk.muxiuesd.ui.components.UIPanel;
 
 /**

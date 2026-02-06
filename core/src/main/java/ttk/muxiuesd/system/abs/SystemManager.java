@@ -1,7 +1,7 @@
 package ttk.muxiuesd.system.abs;
 
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.util.Log;

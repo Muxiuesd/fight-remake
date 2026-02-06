@@ -1,7 +1,7 @@
 package ttk.muxiuesd.property;
 
-import ttk.muxiuesd.interfaces.data.DataReader;
-import ttk.muxiuesd.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 
 /**
  * 默认的布尔属性类型

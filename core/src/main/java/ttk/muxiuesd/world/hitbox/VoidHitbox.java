@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.hitbox;
 
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.interfaces.util.Voidable;
+import game.muxiuesd.bedrockcore.app.interfaces.Voidable;
 
 /**
  * 空的Hitbox

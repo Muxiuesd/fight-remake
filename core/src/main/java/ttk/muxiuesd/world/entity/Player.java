@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;

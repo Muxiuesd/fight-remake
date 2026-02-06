@@ -4,7 +4,7 @@ import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.lang.LangPack;

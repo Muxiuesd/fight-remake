@@ -1,9 +1,9 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.Gdx;
+import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
-import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.ui.components.UIButton;
 import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.ui.components.UITextButton;

@@ -1,7 +1,7 @@
 package ttk.muxiuesd.data.abs;
 
-import ttk.muxiuesd.interfaces.data.DataReader;
-import ttk.muxiuesd.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 import ttk.muxiuesd.property.PropertyType;
 
 import java.util.function.BiConsumer;

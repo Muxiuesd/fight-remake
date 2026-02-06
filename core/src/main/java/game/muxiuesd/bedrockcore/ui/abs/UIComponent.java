@@ -1,4 +1,4 @@
-package ttk.muxiuesd.ui.abs;
+package game.muxiuesd.bedrockcore.ui.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.gui.GUIResize;
 import ttk.muxiuesd.interfaces.gui.GUIDrawable;
-import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.ui.components.UIPanel;
 
 /**

@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.ui.abs.UIComponent;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 

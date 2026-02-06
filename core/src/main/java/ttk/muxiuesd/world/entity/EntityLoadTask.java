@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;

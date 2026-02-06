@@ -21,6 +21,7 @@ public class WorldsMenuScreen implements Screen {
 
     @Override
     public void show () {
+
         //设置UI界面
         GUISystem.getInstance().setCurScreen(this.getMenuUIScreen());
     }

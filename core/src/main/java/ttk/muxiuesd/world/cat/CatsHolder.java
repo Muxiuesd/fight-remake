@@ -1,6 +1,6 @@
 package ttk.muxiuesd.world.cat;
 
-import ttk.muxiuesd.interfaces.ShallowCopyable;
+import game.muxiuesd.bedrockcore.app.interfaces.ShallowCopyable;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

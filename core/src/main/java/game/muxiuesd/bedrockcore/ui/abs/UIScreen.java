@@ -1,4 +1,4 @@
-package ttk.muxiuesd.ui.abs;
+package game.muxiuesd.bedrockcore.ui.abs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.gui.GUIResize;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.interfaces.gui.GUIResize;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.render.camera.GUICamera;

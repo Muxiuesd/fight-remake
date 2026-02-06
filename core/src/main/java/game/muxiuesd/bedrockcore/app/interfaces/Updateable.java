@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package game.muxiuesd.bedrockcore.app.interfaces;
 /**
  * 每帧更新
  * */

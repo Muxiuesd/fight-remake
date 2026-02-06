@@ -1,9 +1,9 @@
 package ttk.muxiuesd.world;
 
 import com.badlogic.gdx.utils.Disposable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;

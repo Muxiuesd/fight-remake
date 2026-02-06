@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;

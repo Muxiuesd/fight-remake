@@ -1,7 +1,7 @@
 package ttk.muxiuesd.interfaces.world.entity;
 
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;

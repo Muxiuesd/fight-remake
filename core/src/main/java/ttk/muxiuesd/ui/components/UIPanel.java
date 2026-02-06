@@ -4,11 +4,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
-import ttk.muxiuesd.interfaces.util.Voidable;
+import game.muxiuesd.bedrockcore.app.interfaces.Voidable;
 import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.ui.abs.UIComponent;
-import ttk.muxiuesd.ui.abs.UIScreen;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 

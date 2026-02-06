@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces;
+package game.muxiuesd.bedrockcore.app.interfaces.render;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 

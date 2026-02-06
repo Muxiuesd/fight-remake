@@ -1,7 +1,7 @@
 package ttk.muxiuesd.data.abs;
 
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.interfaces.data.IDataOutput;
+import game.muxiuesd.bedrockcore.app.interfaces.data.IDataOutput;
 
 /**
  * json格式的数据的输出实现类

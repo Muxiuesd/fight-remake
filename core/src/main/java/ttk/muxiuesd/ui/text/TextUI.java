@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.ui.abs.UIComponent;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.util.TextUtil;
 

@@ -2,7 +2,7 @@ package ttk.muxiuesd.registry;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.*;
 import ttk.muxiuesd.serialization.abs.JsonCodec;

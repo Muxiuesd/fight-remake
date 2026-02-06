@@ -3,7 +3,7 @@ package ttk.muxiuesd.registrant;
 import ttk.muxiuesd.audio.Audio;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.lang.LangPack;

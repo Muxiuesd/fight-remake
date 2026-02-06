@@ -1,7 +1,7 @@
 package ttk.muxiuesd.property;
 
-import ttk.muxiuesd.interfaces.data.IReadData;
-import ttk.muxiuesd.interfaces.data.IWriteData;
+import game.muxiuesd.bedrockcore.app.interfaces.data.IReadData;
+import game.muxiuesd.bedrockcore.app.interfaces.data.IWriteData;
 
 /**
  * 属性类型，需要实现写入数据的逻辑接口：{@link IWriteData}

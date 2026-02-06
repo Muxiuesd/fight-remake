@@ -3,8 +3,8 @@ package ttk.muxiuesd.property;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.interfaces.data.DataReader;
-import ttk.muxiuesd.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 
 public class PropertyBlockSoundsID extends PropertyType<BlockSoundsID>{

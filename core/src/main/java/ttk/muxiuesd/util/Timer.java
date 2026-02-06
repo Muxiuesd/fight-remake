@@ -1,7 +1,7 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.utils.Pool;
-import ttk.muxiuesd.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 
 /**
  * 计时器,用于各种需要检查时间间隔的地方

@@ -3,9 +3,9 @@ package ttk.muxiuesd.system.abs;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 
 /**
  * 整个游戏的系统的抽象类

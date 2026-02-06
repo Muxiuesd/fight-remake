@@ -1,4 +1,4 @@
-package ttk.muxiuesd.interfaces.data;
+package game.muxiuesd.bedrockcore.app.interfaces.data;
 
 /**
  * 写入数据的逻辑接口

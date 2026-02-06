@@ -1,8 +1,8 @@
 package ttk.muxiuesd.property;
 
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.interfaces.data.DataReader;
-import ttk.muxiuesd.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**

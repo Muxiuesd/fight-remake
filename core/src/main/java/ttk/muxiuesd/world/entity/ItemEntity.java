@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Pool;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.EntityTypes;

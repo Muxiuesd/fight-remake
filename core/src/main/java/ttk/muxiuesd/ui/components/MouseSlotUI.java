@@ -2,7 +2,7 @@ package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
