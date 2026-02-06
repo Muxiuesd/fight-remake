@@ -1,4 +1,4 @@
-package ttk.muxiuesd.ui.components;
+package game.muxiuesd.bedrockcore.app.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

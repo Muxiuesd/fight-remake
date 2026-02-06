@@ -1,8 +1,8 @@
 package ttk.muxiuesd.ui.abs;
 
 import com.badlogic.gdx.math.GridPoint2;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.ui.components.UIPanel;
 
 /**
  * 含有玩家物品的slotUI的面板，抽象类

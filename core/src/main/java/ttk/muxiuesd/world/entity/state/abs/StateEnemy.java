@@ -1,8 +1,8 @@
 package ttk.muxiuesd.world.entity.state.abs;
 
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 

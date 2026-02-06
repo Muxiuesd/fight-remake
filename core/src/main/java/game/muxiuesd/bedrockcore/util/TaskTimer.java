@@ -1,4 +1,4 @@
-package ttk.muxiuesd.util;
+package game.muxiuesd.bedrockcore.util;
 
 /**
  * 任务计时器

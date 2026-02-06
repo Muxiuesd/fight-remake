@@ -3,6 +3,7 @@ package ttk.muxiuesd.ui;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.system.PlayerSystem;
@@ -10,7 +11,6 @@ import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
 import ttk.muxiuesd.ui.components.EquipmentPlayerSlotUI;
 import ttk.muxiuesd.ui.components.PlayerSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
-import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 

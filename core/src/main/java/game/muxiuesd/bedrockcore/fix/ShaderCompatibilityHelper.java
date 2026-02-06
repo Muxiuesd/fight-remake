@@ -1,10 +1,15 @@
-package ttk.muxiuesd.render.fix;
+package game.muxiuesd.bedrockcore.fix;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 
+/**
+ * 针对Macos的着色器编译解决方案
+ * <p>
+ * 以后只要是涉及着色器编译的地方全部使用此类
+ * */
 public class ShaderCompatibilityHelper {
     private ShaderCompatibilityHelper() {
         throw new UnsupportedOperationException();

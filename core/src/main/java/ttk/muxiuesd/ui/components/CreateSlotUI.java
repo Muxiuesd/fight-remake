@@ -2,6 +2,7 @@ package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.ItemStack;

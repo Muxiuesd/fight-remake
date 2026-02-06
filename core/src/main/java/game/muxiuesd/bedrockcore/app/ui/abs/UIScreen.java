@@ -1,4 +1,4 @@
-package game.muxiuesd.bedrockcore.ui.abs;
+package game.muxiuesd.bedrockcore.app.ui.abs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

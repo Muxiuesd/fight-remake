@@ -4,10 +4,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.app.ui.components.UIScrollBar;
 import ttk.muxiuesd.registry.ItemGroups;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
-import ttk.muxiuesd.ui.components.*;
+import ttk.muxiuesd.ui.components.CreateSlotUI;
+import ttk.muxiuesd.ui.components.PlayerSlotUI;
+import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.world.item.ItemGroup;
 
 /**

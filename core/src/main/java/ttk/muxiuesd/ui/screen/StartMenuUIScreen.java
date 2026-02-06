@@ -1,12 +1,12 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.Gdx;
-import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.app.ui.components.UITextButton;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
-import ttk.muxiuesd.ui.components.UIButton;
-import ttk.muxiuesd.ui.components.UIPanel;
-import ttk.muxiuesd.ui.components.UITextButton;
 import ttk.muxiuesd.ui.text.Text;
 
 /**

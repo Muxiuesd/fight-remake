@@ -1,4 +1,4 @@
-package ttk.muxiuesd.util;
+package game.muxiuesd.bedrockcore.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

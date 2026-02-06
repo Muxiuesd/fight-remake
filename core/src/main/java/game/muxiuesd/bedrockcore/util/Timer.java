@@ -1,4 +1,4 @@
-package ttk.muxiuesd.util;
+package game.muxiuesd.bedrockcore.util;
 
 import com.badlogic.gdx.utils.Pool;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;

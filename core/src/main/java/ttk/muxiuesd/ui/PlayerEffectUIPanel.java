@@ -2,9 +2,9 @@ package ttk.muxiuesd.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.EffectUI;
-import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 

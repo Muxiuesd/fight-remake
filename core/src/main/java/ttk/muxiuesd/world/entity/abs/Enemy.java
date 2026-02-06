@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.entity.abs;
 
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -8,7 +9,6 @@ import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;

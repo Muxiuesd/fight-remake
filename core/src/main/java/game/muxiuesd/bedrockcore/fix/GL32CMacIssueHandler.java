@@ -1,4 +1,4 @@
-package ttk.muxiuesd.render.fix;
+package game.muxiuesd.bedrockcore.fix;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;

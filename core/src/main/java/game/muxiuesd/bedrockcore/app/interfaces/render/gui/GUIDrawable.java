@@ -1,7 +1,7 @@
-package ttk.muxiuesd.interfaces.gui;
+package game.muxiuesd.bedrockcore.app.interfaces.render.gui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import ttk.muxiuesd.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 
 /**
  * GUI的绘制接口

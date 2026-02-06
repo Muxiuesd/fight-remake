@@ -1,7 +1,7 @@
 package ttk.muxiuesd.ui.screen;
 
-import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
-import ttk.muxiuesd.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 
 /**
  * 世界存档选择菜单UIScreen

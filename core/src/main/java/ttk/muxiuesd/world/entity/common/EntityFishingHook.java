@@ -2,13 +2,13 @@ package ttk.muxiuesd.world.entity.common;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
+import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.TaskTimer;
-import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;

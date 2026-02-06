@@ -1,13 +1,13 @@
-package ttk.muxiuesd.ui.components;
+package game.muxiuesd.bedrockcore.app.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-import game.muxiuesd.bedrockcore.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.app.interfaces.Voidable;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioPlayer;
-import game.muxiuesd.bedrockcore.app.interfaces.Voidable;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.util.Util;
 

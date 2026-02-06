@@ -2,7 +2,8 @@ package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-import game.muxiuesd.bedrockcore.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.PlayerSystem;
@@ -10,7 +11,6 @@ import ttk.muxiuesd.ui.PlayerCreateTabUIPanel;
 import ttk.muxiuesd.ui.PlayerEffectUIPanel;
 import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
 import ttk.muxiuesd.ui.components.MouseSlotUI;
-import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 
