@@ -2,8 +2,8 @@ package ttk.muxiuesd.system.game;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIResize;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
-import game.muxiuesd.bedrockcore.app.interfaces.render.gui.GUIResize;
 import ttk.muxiuesd.interfaces.render.IGUIRender;
 import ttk.muxiuesd.interfaces.render.IMenuGUIRender;
 import ttk.muxiuesd.system.abs.GameSystem;

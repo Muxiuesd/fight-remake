@@ -42,7 +42,7 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     }
 
     /**
-     * 面板的自动设置方法
+     * UI面板的自动设置方法
      * */
     public UIPanel auto () {
         this.autoSize();
@@ -72,11 +72,6 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
             if (r > right) {
                 right = r;
             }
-
-            /*//找组件的最大高度
-            if (componentSize.y > maxHeight) {
-                maxHeight = componentSize.y;
-            }*/
 
             //找最低点
             if (component.getY() < down) {

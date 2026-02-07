@@ -1,4 +1,4 @@
-package game.muxiuesd.bedrockcore.app.interfaces.render.gui;
+package game.muxiuesd.bedrockcore.app.interfaces.ui;
 
 /**
  * GUI组件的resize接口

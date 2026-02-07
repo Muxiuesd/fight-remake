@@ -1,4 +1,4 @@
-package game.muxiuesd.bedrockcore.app.interfaces.render.gui;
+package game.muxiuesd.bedrockcore.app.interfaces.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;

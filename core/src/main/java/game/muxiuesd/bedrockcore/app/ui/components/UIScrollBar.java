@@ -16,11 +16,14 @@ import ttk.muxiuesd.util.Util;
  * （垂直轨道终点在最下面，横向轨道终点在最右边）
  * */
 public class UIScrollBar extends UIComponent {
+    public static final float DEFAULT_SLIDER_WIDTH = 12f, DEFAULT_SLIDER_HEIGHT = 15f;
     public static final int SLIDER_LEFT = 2, SLIDER_RIGHT = 2, SLIDER_TOP = 2, SLIDER_BOTTOM = 3;
     //滚动条种类
     public enum Type {
-        VERTICAL, //竖直的
-        HORIZONTAL //横向的
+        /// 竖直的
+        VERTICAL,
+        /// 横向的
+        HORIZONTAL
     }
 
     private Type type;
@@ -28,6 +31,9 @@ public class UIScrollBar extends UIComponent {
     private NinePatch sliderPatch;
     private float sliderX, sliderY, sliderWidth, sliderHeight;  //滑块的坐标（相当对于滚动条的坐标）和宽高
 
+    /**
+     * 默认的滚动条构造方法
+     * */
     public UIScrollBar() {
         this(
             Fight.ID("slider"), Fight.UITexturePath("slider.png"),
@@ -128,21 +134,6 @@ public class UIScrollBar extends UIComponent {
      * */
     @Override
     public void mouseDrag (float dx, float dy, float mouseX, float mouseY) {
-        /*if (this.getType() == Type.VERTICAL) {
-            float nextY = getSliderY() + dy;
-            //计算滑块顶部坐标，确保不能超过滚动条的顶部
-            float sliderTopY = nextY + this.getSliderHeight();
-            if (sliderTopY > getHeight()) {
-                setSliderY(getHeight() - this.getSliderHeight());
-            }else if (nextY < 0) {
-                //计算滑块底部坐标，确保不能超过滚动条的底部
-                setSliderY(0);
-            }else {
-                setSliderY(nextY);
-            }
-        }else if (this.getType() == Type.HORIZONTAL) {
-            setX(getX() + dx);
-        }*/
         float sl = this.getSliderWidth();
         float sh = this.getSliderHeight();
         switch (this.getType()) {

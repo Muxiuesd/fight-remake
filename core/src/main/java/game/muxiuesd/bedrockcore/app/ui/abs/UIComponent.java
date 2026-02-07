@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.gui.GUIDrawable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.gui.GUIResize;
+import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIDrawable;
+import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIResize;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 
 /**
@@ -219,6 +219,16 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     public UIComponent setSize(float width, float height) {
         this.width = width;
+        this.height = height;
+        return this;
+    }
+
+    public UIComponent setWidth (float width) {
+        this.width = width;
+        return this;
+    }
+
+    public UIComponent setHeight (float height) {
         this.height = height;
         return this;
     }

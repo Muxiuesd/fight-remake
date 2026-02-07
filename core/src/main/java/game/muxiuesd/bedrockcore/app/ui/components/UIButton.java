@@ -101,6 +101,33 @@ public class UIButton extends UIComponent {
         this.mouseOver.handle(this, interactPos);
     }
 
+    public NinePatch getBackgroundPatch () {
+        return this.backgroundPatch;
+    }
+
+    public UIButton setBackgroundPatch (NinePatch backgroundPatch) {
+        this.backgroundPatch = backgroundPatch;
+        return this;
+    }
+
+    public NinePatch getClickBackgroundPatch () {
+        return this.clickBackgroundPatch;
+    }
+
+    public UIButton setClickBackgroundPatch (NinePatch clickBackgroundPatch) {
+        this.clickBackgroundPatch = clickBackgroundPatch;
+        return this;
+    }
+
+    public NinePatch getMouseOverBackgroundPatch () {
+        return this.mouseOverBackgroundPatch;
+    }
+
+    public UIButton setMouseOverBackgroundPatch (NinePatch mouseOverBackgroundPatch) {
+        this.mouseOverBackgroundPatch = mouseOverBackgroundPatch;
+        return this;
+    }
+
     /**
      * 点击按钮事件处理接口
      * */

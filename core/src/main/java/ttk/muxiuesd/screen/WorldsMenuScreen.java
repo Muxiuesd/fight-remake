@@ -21,19 +21,18 @@ public class WorldsMenuScreen implements Screen {
 
     @Override
     public void show () {
-
         //设置UI界面
         GUISystem.getInstance().setCurScreen(this.getMenuUIScreen());
     }
 
     @Override
     public void render (float delta) {
+        ScreenUtils.clear(BACKGROUND_COLOR);
+
         //按下退出按键就退回到主菜单界面
         if (KeyBindings.Exit.wasJustPressed()) {
             FightCore.getInstance().changeScreen(FightCore.getInstance().startMenuScreen);
         }
-
-        ScreenUtils.clear(BACKGROUND_COLOR);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class WorldsMenuScreen implements Screen {
     }
 
     public WorldsMenuUIScreen getMenuUIScreen () {
-        return menuUIScreen;
+        return this.menuUIScreen;
     }
 
     public WorldsMenuScreen setMenuUIScreen (WorldsMenuUIScreen menuUIScreen) {

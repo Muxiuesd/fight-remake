@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.gui.GUIResize;
+import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIResize;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.registry.Pools;
