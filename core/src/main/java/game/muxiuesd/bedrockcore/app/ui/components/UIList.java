@@ -101,7 +101,10 @@ public class UIList extends UIPanel {
                 UIListItem firstItem = itemList.get(0);
                 if (firstItem instanceof UIComponent uiComponent) {
                     float startY = getHeight() - firstItem.getItemHeight();
-                    uiComponent.setPosition(0f, startY + maxSize.y * sliderPathwayPos);
+                    uiComponent.setPosition(
+                        0f,
+                        startY + sliderPathwayPos * (maxSize.y - getHeight())
+                    );
                 }
             }else {
                 UIListItem lastItem = itemList.get(i - 1);

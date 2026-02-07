@@ -30,17 +30,7 @@ public class WorldsMenuUIScreen extends UIScreen {
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
+
 
         //this.savesList.auto();
 
