@@ -17,7 +17,11 @@ public interface UIListItem {
     }
 
     void update (UIList uiList, float delta);
-    void draw (Batch batch, UIList uiList, float itemX, float itemY);
+    /**
+     * @param itemRenderX 渲染的横坐标，是绝对坐标
+     * @param itemRenderY 渲染的纵坐标，是绝对坐标
+     * */
+    void draw (Batch batch, UIList uiList, float itemRenderX, float itemRenderY);
     void renderShape (ShapeRenderer batch, UIList uiList);
     float getItemWidth ();
     float getItemHeight ();

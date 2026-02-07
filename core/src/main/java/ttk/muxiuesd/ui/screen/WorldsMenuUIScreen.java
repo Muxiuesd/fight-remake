@@ -2,7 +2,7 @@ package ttk.muxiuesd.ui.screen;
 
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButtonListItem;
-import game.muxiuesd.bedrockcore.app.ui.components.UIList;
+import ttk.muxiuesd.ui.components.SavesListUI;
 
 /**
  * 世界存档选择菜单UIScreen
@@ -11,10 +11,10 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIList;
  * */
 public class WorldsMenuUIScreen extends UIScreen {
     //存档的UI列表面板
-    private UIList savesList;
+    private SavesListUI savesList;
 
     public WorldsMenuUIScreen() {
-        this.savesList = new UIList();
+        this.savesList = new SavesListUI();
         this.savesList.setSize(150f, 230f);
         this.savesList.setPosition(
             - this.savesList.getWidth() / 2f,
@@ -31,17 +31,27 @@ public class WorldsMenuUIScreen extends UIScreen {
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());
 
         //this.savesList.auto();
 
         addComponent(this.savesList);
     }
 
-    public UIList getSavesList () {
+    public SavesListUI getSavesList () {
         return this.savesList;
     }
 
-    public WorldsMenuUIScreen setSavesList (UIList savesList) {
+    public WorldsMenuUIScreen setSavesList (SavesListUI savesList) {
         this.savesList = savesList;
         return this;
     }

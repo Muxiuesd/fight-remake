@@ -1,10 +1,15 @@
 package game.muxiuesd.bedrockcore.app.ui.components;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import game.muxiuesd.bedrockcore.app.interfaces.ui.UIListItem;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 
@@ -15,12 +20,12 @@ import java.util.List;
  * 列表组件
  * */
 public class UIList extends UIPanel {
-    public static final float DEFAULT_WIDTH = 100, DEFAULT_HEIGHT = 300;
+    public static final float DEFAULT_WIDTH = 100, DEFAULT_HEIGHT = 200;
     public static final float DEFAULT_SCROLL_BAR_X = DEFAULT_WIDTH - UIScrollBar.DEFAULT_SLIDER_WIDTH;
+
 
     private List<UIListItem> items;
     private UIScrollBar scrollbar;
-
 
     public UIList () {
         this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, new GridPoint2((int) DEFAULT_WIDTH, (int) DEFAULT_HEIGHT));
@@ -75,6 +80,40 @@ public class UIList extends UIPanel {
         return this;
     }
 
+    @Override
+    public void update (float delta) {
+        super.update(delta);
+
+        this.calculateItemsPos();
+    }
+
+    /**
+     * 计算列表里的项目在列表面板里的相对坐标
+     * */
+    public void calculateItemsPos () {
+        List<UIListItem> itemList = this.getItems();
+        for (int i = 0; i < itemList.size(); i++) {
+            UIListItem item = itemList.get(i);
+            if (i == 0) {
+                //根据滑块的位置来计算每一个项目的渲染坐标，只要计算第一个项目，剩下的根据前一个的坐标来计算
+                float sliderPathwayPos = this.getScrollbar().getSliderPathwayPos();
+                Vector2 maxSize = calculateMaxSize();
+                UIListItem firstItem = itemList.get(0);
+                if (firstItem instanceof UIComponent uiComponent) {
+                    float startY = getHeight() - firstItem.getItemHeight();
+                    uiComponent.setPosition(0f, startY + maxSize.y * sliderPathwayPos);
+                }
+            }else {
+                UIListItem lastItem = itemList.get(i - 1);
+                if (item instanceof UIComponent uiComponent) {
+                    if (lastItem instanceof UIComponent uiComponent2) {
+                        uiComponent.setPosition(0, uiComponent2.getY() - lastItem.getItemHeight() - 1f);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * 绘制列表
      * <p>
@@ -82,24 +121,24 @@ public class UIList extends UIPanel {
      * */
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        this.calculateItemsPos();
-
-        float sliderPathwayPos = this.getScrollbar().getSliderPathwayPos();
-        float itemX = getX();
-        float itemY = getY() + getHeight(); //项目渲染的起点在最上面
-
+        //获取可以重复利用的矩形
         PoolableRectangle listRect = Pools.RECT.obtain();
         listRect.set(getX(), getY(), getWidth(), getHeight());
         PoolableRectangle itemRect = Pools.RECT.obtain();
+
         //绘制所有的项目
+        float itemRenderX = getX();
+        float itemRenderY = getY() + getHeight();
+        //启用裁剪
+        //超过列表大小的部分不绘制
+        this.enableScissor(batch, GUICamera.INSTANCE.getCamera());
         for (UIListItem listItem : this.getItems()) {
-            itemY -= listItem.getItemHeight(); //减去项目的高度
+            if (listItem instanceof UIComponent uiComponent) {
+                itemRenderX = uiComponent.getAbsX();
+                itemRenderY = uiComponent.getAbsY();
+            }
 
-            //检查项目矩形是否还在列表矩形里面，是的话就继续渲染，不是就跳过这个的
-            itemRect.set(itemX, itemY, listItem.getItemWidth(), listItem.getItemHeight());
-            //if (!listRect.overlaps(itemRect)) continue;
-
-            listItem.draw(batch, this, itemX, itemY);
+            listItem.draw(batch, this, itemRenderX, itemRenderY);
         }
 
         //用完回收
@@ -108,29 +147,8 @@ public class UIList extends UIPanel {
 
         //绘制滚动条
         this.getScrollbar().draw(batch, this);
-    }
-
-    /**
-     * 计算列表里的项目在列表面板里的相对坐标
-     * */
-    public void calculateItemsPos () {
-        float itemCompY = getHeight();
-        List<UIListItem> itemList = this.getItems();
-        for (int i = 0; i < itemList.size(); i++) {
-            UIListItem item = itemList.get(i);
-            if (i > 0) {
-                UIListItem lastItem = itemList.get(i - 1);
-                if (item instanceof UIComponent uiComponent) {
-                    itemCompY = itemCompY - lastItem.getItemHeight();
-                    uiComponent.setPosition(0, itemCompY);
-                }
-            }else {
-                if (item instanceof UIComponent uiComponent) {
-                    itemCompY -= item.getItemHeight();
-                    uiComponent.setPosition(0, itemCompY);
-                }
-            }
-        }
+        //关掉裁剪
+        this.disableScissor(batch);
     }
 
     /**
@@ -164,5 +182,44 @@ public class UIList extends UIPanel {
     public UIList setScrollbar (UIScrollBar scrollbar) {
         this.scrollbar = scrollbar;
         return this;
+    }
+
+    /**
+     * 启用裁剪区域
+     */
+    public void enableScissor(Batch batch, Camera camera) {
+        enableScissor(batch, camera, getAbsX(), getAbsY(), getWidth(), getHeight());
+    }
+
+    /**
+     * 启用指定矩形区域的裁剪
+     * @param batch 当前Batch
+     * @param camera batch对应的相机
+     */
+    public void enableScissor(Batch batch, Camera camera, float x, float y, float width, float height) {
+        if (width <= 0 || height <= 0) return;
+
+        batch.flush();
+        Rectangle scissors = new Rectangle();
+        Rectangle clipBounds = new Rectangle(x, y, width, height);
+
+        // 计算裁剪区域
+        ScissorStack.calculateScissors(
+            camera,
+            batch.getTransformMatrix(),
+            clipBounds,
+            scissors
+        );
+
+        // 压入裁剪栈
+        ScissorStack.pushScissors(scissors);
+    }
+
+    /**
+     * 禁用裁剪
+     */
+    public void disableScissor(Batch batch) {
+        batch.flush();
+        ScissorStack.popScissors();
     }
 }

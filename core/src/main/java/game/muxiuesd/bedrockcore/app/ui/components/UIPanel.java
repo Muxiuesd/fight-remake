@@ -51,11 +51,21 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     }
 
     /**
-     * 根据持有的UI组件大小来自动计算大小面板的尺寸大小，在添加完UI组件后调用
+     * 将面板的尺寸设置成最大的尺寸
      * */
     public UIPanel autoSize () {
+        Vector2 maxSize = this.calculateMaxSize();
+        setSize(maxSize.x, maxSize.y);
+
+        return this;
+    }
+
+    /**
+     * 根据持有的UI组件大小来计算面板最大尺寸
+     * */
+    public Vector2 calculateMaxSize () {
         LinkedHashSet<UIComponent> uiComponents = this.getComponents();
-        if (uiComponents.isEmpty()) return this;
+        if (uiComponents.isEmpty()) return new Vector2();
 
         float maxWidth = getWidth();
         float maxHeight = getHeight();
@@ -87,9 +97,8 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
         //取所有组件最高点和最低点的高度差和所有组件当中最大高度的最大值
         maxHeight = Math.max(Math.abs(up - down), maxHeight);
         maxWidth = Math.max(Math.abs(right - left), maxWidth);
-        setSize(maxWidth, maxHeight);
 
-        return this;
+        return new Vector2(maxWidth, maxHeight);
     }
 
     /**
