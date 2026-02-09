@@ -1,14 +1,14 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.util.CameraUtil;
+import game.muxiuesd.bedrockcore.util.CoordinateUtil;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
@@ -24,14 +24,14 @@ public class Util {
      * 获取鼠标指向的游戏世界坐标
      * */
     public static Vector2 getMouseWorldPosition() {
-        return getMousePosForCamera(PlayerCamera.INSTANCE.getCamera());
+        return CameraUtil.getMousePosForCamera(PlayerCamera.INSTANCE.getCamera());
     }
 
     /**
      * 获取鼠标指向的游戏GUI相机的坐标
      * */
     public static Vector2 getMouseUIPosition() {
-        return getMousePosForCamera(GUICamera.INSTANCE.getCamera());
+        return CameraUtil.getMousePosForCamera(GUICamera.INSTANCE.getCamera());
     }
 
     static Vector2 lastMouseUIPos = null;
@@ -51,46 +51,10 @@ public class Util {
     }
 
     /**
-     * 从相机获取鼠标的坐标
-     * */
-    public static Vector2 getMousePosForCamera(Camera camera) {
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
-    }
-
-
-    /**
-     * 从相机获取鼠标的的坐标增量
-     * */
-    public static Vector2 getMouseDeltaPosForCamera(Camera camera) {
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getDeltaX(), Gdx.input.getDeltaY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
-    }
-
-
-    /**
      * 获取鼠标的位置,相对于游戏窗口的中心
      */
     public static Vector2 getMouseWindowPos () {
-        return axeTransfer(Gdx.input.getX(), Gdx.input.getY());
-    }
-
-    public static Vector2 axeTransfer(Vector2 vector2) {
-        return axeTransfer(vector2.x, vector2.y);
-    }
-
-    /**
-     * 坐标转换,将以窗口左下角为原点的坐标系转换为以屏幕中心为原点的笛卡尔坐标系
-     *
-     * @param x 原始横坐标
-     * @param y 原始纵坐标
-     */
-    public static Vector2 axeTransfer(float x, float y) {
-        float newX = x - ((float) Gdx.graphics.getWidth() / 2);
-        float newY = ((float) Gdx.graphics.getHeight() / 2) - y;
-        return new Vector2(newX, newY);
+        return CoordinateUtil.axeTransfer(Gdx.input.getX(), Gdx.input.getY());
     }
 
     /**
@@ -110,8 +74,6 @@ public class Util {
 
         return new GridPoint2(x, y);
     }
-
-
 
     /**
      * 获取窗口中心到鼠标方向的单位向量
@@ -172,17 +134,11 @@ public class Util {
     public static Vector2 fastRound (float x, float y) {
         return new Vector2(fastRound(x), fastRound(y));
     }
+
     /**
      * 四舍五入取整工具
      * */
     public static float fastRound (float value) {
-        /*if (value < 0) {
-            return (float) Math.floor(value);
-            //return Math.round(value);
-        }
-        if (value > 0) {
-            return (float) Math.floor(value);
-        }*/
         return Math.round(value);
     }
 
