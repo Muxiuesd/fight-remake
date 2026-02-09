@@ -1,12 +1,18 @@
 package ttk.muxiuesd.screen;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.ui.screen.WorldsMenuUIScreen;
+import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.Log;
+
+import java.util.Arrays;
 
 /**
  * 游戏世界（存档）选择界面
@@ -33,13 +39,25 @@ public class WorldsMenuScreen implements Screen {
         if (KeyBindings.Exit.wasJustPressed()) {
             FightCore.getInstance().changeScreen(FightCore.getInstance().startMenuScreen);
         }
+
+        //this.readSavesDir();
     }
 
     /**
      * 读取存档目录
      * */
-    public void readSaves () {
+    public void readSavesDir () {
+        boolean saveDirIsExist = FileUtil.dirExists(Fight.PATH_SAVE);
+        if (!saveDirIsExist) {
+            Log.error(this.getClass().getName(), "没有存档文件夹， 已自动创建！！！");
+        }
 
+        //读取存档文件夹下所有的存档文件目录
+        FileHandle savesDirFileHandle = FileUtil.getFileHandle(Fight.PATH_SAVE);
+        FileHandle[] savesDir = savesDirFileHandle.list();
+        Arrays.stream(savesDir).forEach((dir) -> {
+            System.out.println(dir.name());
+        });
     }
 
     @Override

@@ -126,10 +126,17 @@ public class FileUtil {
     }
 
     /**
-     * 判断文件夹是否存在
+     * 判断文件夹是否存在（判断某个路径下是否有指定名称的文件夹）
      * */
     public static boolean dirExists(String path, String dirName) {
         FileHandle dir = getFileHandle(path, dirName);
+        return dir.exists() && dir.isDirectory();
+    }
+    /**
+     * 判断文件夹是否存在
+     * */
+    public static boolean dirExists(String path) {
+        FileHandle dir = getFileHandle(path);
         return dir.exists() && dir.isDirectory();
     }
 
@@ -147,5 +154,13 @@ public class FileUtil {
      * */
     public static FileHandle getFileHandle(String path, String name) {
         return Gdx.files.absolute(getRootPath() + "/" + path + "/" + name);
+    }
+
+    /**
+     * 获取文件处理，目前默认以游戏文件所在文件夹为基准
+     * @param path 基准路径下的路径
+     * */
+    public static FileHandle getFileHandle(String path) {
+        return Gdx.files.absolute(getRootPath() + "/" + path);
     }
 }
