@@ -1,8 +1,8 @@
 package ttk.muxiuesd;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import game.muxiuesd.bedrockcore.app.GameCore;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.lang.FI18N;
 import ttk.muxiuesd.registrant.RegistrantGroup;
@@ -20,11 +20,12 @@ import ttk.muxiuesd.screen.WorldsMenuScreen;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
+import ttk.muxiuesd.world.World;
 
 /**
  *  游戏的核心类
  * */
-public class FightCore extends Game {
+public class FightCore extends GameCore {
     /**
      * 游戏核心，单例模式，全局只有一个实例
      * */
@@ -86,29 +87,19 @@ public class FightCore extends Game {
 
     @Override
     public void render () {
-        //延迟交换Screen，防止冲突
-        if (this.nextScreen != null) {
-            setScreen(this.nextScreen);
-            this.nextScreen = null;
-        }
+        //延迟交换游戏屏幕
+        exchangeScreen();
 
         //游戏系统的更新
         float deltaTime = Gdx.graphics.getDeltaTime();
         GameSystemManager.getInstance().update(deltaTime);
 
         //screen的更新
-        if (getScreen() != null) getScreen().render(deltaTime);
+        updateScreen(deltaTime);
 
         //游戏渲染部分
         //处理渲染管线
         RenderPipe.getInstance().handleGameRender();
-    }
-
-    /**
-     * 延迟交换Screen，防止冲突
-     * */
-    public void changeScreen (Screen screen) {
-        this.nextScreen = screen;
     }
 
     @Override
@@ -122,6 +113,21 @@ public class FightCore extends Game {
     public void dispose() {
         super.dispose();
         GameSystemManager.getInstance().dispose();
-        getScreen().dispose();
+        getActiveScreen().dispose();
+    }
+
+    /**
+     * 获取当前的游戏世界
+     * */
+    public World getWorld () {
+        if (this.mainGameScreen != null && this.worldIsRunning()) return this.mainGameScreen.getWorld();
+        return null;
+    }
+
+    /**
+     * 检测游戏世界是否运行
+     * */
+    public boolean worldIsRunning () {
+        return getActiveScreen() == this.mainGameScreen;
     }
 }

@@ -13,7 +13,14 @@ public abstract class GameCore implements ApplicationListener {
 
     @Override
     public void render () {
-        //延迟交换游戏屏幕
+        this.exchangeScreen();
+        this.updateScreen(Gdx.graphics.getDeltaTime());
+    }
+
+    /**
+     * 延迟交换游戏屏幕
+     */
+    public void exchangeScreen () {
         if (this.nextScreen != null) {
             if (this.activeScreen != null) {
                 this.activeScreen.hide();
@@ -23,9 +30,15 @@ public abstract class GameCore implements ApplicationListener {
             this.activeScreen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             this.nextScreen = null;
         }
-
-        if (this.activeScreen != null) this.activeScreen.render(Gdx.graphics.getDeltaTime());
     }
+
+    /**
+    * 更新屏幕
+    * */
+    public void updateScreen (float deltaTime) {
+        if (this.activeScreen != null) this.activeScreen.render(deltaTime);
+    }
+
 
     @Override
     public void pause () {

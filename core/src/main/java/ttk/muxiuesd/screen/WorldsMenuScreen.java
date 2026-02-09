@@ -37,7 +37,7 @@ public class WorldsMenuScreen implements Screen {
 
         //按下退出按键就退回到主菜单界面
         if (KeyBindings.Exit.wasJustPressed()) {
-            FightCore.getInstance().changeScreen(FightCore.getInstance().startMenuScreen);
+            FightCore.getInstance().setScreen(FightCore.getInstance().startMenuScreen);
         }
 
         //this.readSavesDir();
@@ -54,10 +54,12 @@ public class WorldsMenuScreen implements Screen {
 
         //读取存档文件夹下所有的存档文件目录
         FileHandle savesDirFileHandle = FileUtil.getFileHandle(Fight.PATH_SAVE);
-        FileHandle[] savesDir = savesDirFileHandle.list();
-        Arrays.stream(savesDir).forEach((dir) -> {
+        FileHandle[] saveDirs = savesDirFileHandle.list();
+        Arrays.stream(saveDirs).forEach((dir) -> {
             System.out.println(dir.name());
         });
+
+        //读取目录中的世界信息
     }
 
     @Override

@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * 世界信息类，存储一些需要跟随存档读写的数据
+ * 世界信息类
+ * <p>
+ * 存储一些需要跟随存档读写的数据
  * */
 public class WorldInfo {
     public static final Codec CODEC = new Codec();

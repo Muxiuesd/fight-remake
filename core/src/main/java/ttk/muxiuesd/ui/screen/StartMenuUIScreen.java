@@ -28,7 +28,7 @@ public class StartMenuUIScreen extends UIScreen {
         this.startButton = new UITextButton(
             Text.ofText(Fight.ID("button_start_game")),
             (button, interactPos) -> {
-                FightCore.getInstance().changeScreen(FightCore.getInstance().worldsMenuScreen);
+                FightCore.getInstance().setScreen(FightCore.getInstance().worldsMenuScreen);
                 return false;
             }
         );

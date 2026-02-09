@@ -31,7 +31,6 @@ public class MainGameScreen implements Screen {
     private World world;
 
     public MainGameScreen () {
-
     }
 
     @Override
@@ -47,7 +46,7 @@ public class MainGameScreen implements Screen {
         EntityTypes.init();
         Entities.init();
         StatusEffects.init();
-        WorldInformationType.init();
+        WorldInfoTypes.init();
         ItemGroups.init();
 
         MainWorld mainWorld = new MainWorld(this);

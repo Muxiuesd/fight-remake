@@ -19,7 +19,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.registry.WorldInformationType;
+import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.*;
@@ -66,10 +66,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     public EntitySystem (World world) {
         super(world);
-        WorldInformationType.FLOAT.putIfNull(Fight.ENTITY_UPDATE_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.ENTITY_RENDER_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.ITEM_ENTITY_PICKUP_SPAN);
-        WorldInformationType.FLOAT.putIfNull(Fight.MAX_ITEM_ENTITY_LIVING_TIME);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.ENTITY_UPDATE_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.ENTITY_RENDER_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.ITEM_ENTITY_PICKUP_SPAN);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.MAX_ITEM_ENTITY_LIVING_TIME);
     }
 
     @Override
@@ -469,7 +469,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void loadEntities (ChunkSystem cs, Chunk chunk) {
         ChunkPosition chunkPosition = chunk.getChunkPosition();
         //文件不存在就是区块上没有实体，直接跳过
-        if (! FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString() + ".json")) {
+        if (! FileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
             return;
         }
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
@@ -483,13 +483,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void initLoadEntities (ChunkPosition chunkPosition) {
         String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, fileName)) return;
+        if (!FileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
 
-        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, fileName);
+        FileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
     }
 
     @Override

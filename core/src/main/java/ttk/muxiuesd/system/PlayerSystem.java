@@ -57,9 +57,9 @@ public class PlayerSystem extends WorldSystem {
         super(world);
         this.bubbleEmitTimer = new Timer<>(0.5f);
 
-        WorldInformationType.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
+        WorldInfoTypes.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
 
         PLAYER_HUD_SCREEN = new PlayerHUDUIScreen(this);
         PLAYER_INVENTORY_SCREEN = new PlayerUIScreen(this);
@@ -68,7 +68,7 @@ public class PlayerSystem extends WorldSystem {
     @Override
     public void initialize () {
         //有玩家数据就读取
-        if (FileUtil.fileExists(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME)) {
+        if (FileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
             this.player = readPlayerData();
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
@@ -229,7 +229,7 @@ public class PlayerSystem extends WorldSystem {
      * 读取玩家数据
      * */
     public Player readPlayerData () {
-        JsonValue playerValue = FileUtil.readJsonFile(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME);
+        JsonValue playerValue = FileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
         Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
         if (optionalPlayer.isPresent()) {
             return optionalPlayer.get();

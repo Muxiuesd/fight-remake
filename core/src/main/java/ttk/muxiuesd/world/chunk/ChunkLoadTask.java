@@ -23,7 +23,7 @@ public class ChunkLoadTask extends ChunkTask {
     public Chunk call() {
         //TODO 加载保存过的区块
         String name = getChunkPosition().toString() + ".json";
-        if (! FileUtil.fileExists(Fight.PATH_SAVE_CHUNKS, name)) {
+        if (! FileUtil.fileExists(Fight.getPathSaveChunks(), name)) {
             //文件不存在，新生成
             Chunk chunk = this.genNewChunk();
             chunk.setChunkPosition(getChunkPosition());
@@ -33,7 +33,7 @@ public class ChunkLoadTask extends ChunkTask {
         //文件存在，就从文件加载区块
         Optional<Chunk> optional = Optional.empty();
         //TODO 修复读取内容为空
-        String file = FileUtil.readFileAsString(Fight.PATH_SAVE_CHUNKS, name);
+        String file = FileUtil.readFileAsString(Fight.getPathSaveChunks(), name);
         JsonDataReader dataReader;
         try {
             dataReader = new JsonDataReader(file);

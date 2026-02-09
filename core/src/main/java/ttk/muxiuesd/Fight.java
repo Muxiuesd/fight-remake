@@ -12,6 +12,8 @@ public class Fight {
     public static final String FONT_ROOT = "font/";
     public static final String LANG_ROOT = "lang/";
 
+    //世界的名称，也会作为存档文件夹的名称
+    public static final Info<String> WORLD_NAME = Info.create("world_name", "null_world");
     //UI的调试框是否渲染
     public static final Info<Boolean> UI_DEBUG_BOX_RENDER = Info.create("ui_debug_box_render", true);
     //玩家的听觉范围，单位：世界中的1米
@@ -34,11 +36,35 @@ public class Fight {
      * 存档路径常量
      */
     public static final String PATH_SAVE = "save/";
-    public static final String PATH_SAVE_WORLD = PATH_SAVE + "world/";
-    public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
-    public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
-    public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
+    //public static final String PATH_SAVE_WORLD = PATH_SAVE + "world/";
+    //public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
+    //public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
+    //public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
 
+    /**
+     *  获取玩家数据保存的路径
+     * */
+    public static String getPathSavePlayer () {
+        return getPathSaveEntities() + "player/";
+    }
+    /**
+     *  获取实体数据保存的路径
+     * */
+    public static String getPathSaveEntities () {
+        return getPathSaveWorld() + "entities/";
+    }
+    /**
+     *  获取区块数据保存的路径
+     * */
+    public static String getPathSaveChunks () {
+        return getPathSaveWorld() + "chunks/";
+    }
+    /**
+     *  获取游戏世界数据保存路径，根据当前的世界名字作为值
+     * */
+    public static String getPathSaveWorld () {
+        return PATH_SAVE + WORLD_NAME.getValue() + "/world/";
+    }
 
     /**
      * 游戏本体的元素获取ID

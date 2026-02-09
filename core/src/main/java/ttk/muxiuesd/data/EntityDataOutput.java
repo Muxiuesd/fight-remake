@@ -19,7 +19,7 @@ public class EntityDataOutput extends JsonDataOutput {
     public void output (JsonDataWriter writer) {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
-        FileUtil.createFile(Fight.PATH_SAVE_ENTITIES, this.fileName + ".json")
+        FileUtil.createFile(Fight.getPathSaveEntities(), this.fileName + ".json")
             .writeString(json.prettyPrint(string), false);
     }
 }

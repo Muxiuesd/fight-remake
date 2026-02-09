@@ -2,9 +2,9 @@ package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;
@@ -27,7 +27,7 @@ public class EntityLoadTask extends EntityTask {
     public Array<Entity<?>> call (){
         Array<Entity<?>> entities = new Array<>();
         String chunkPosName = getChunkPosition().toString();
-        JsonValue entitiesValue = FileUtil.readJsonFile(Fight.PATH_SAVE_ENTITIES, chunkPosName);
+        JsonValue entitiesValue = FileUtil.readJsonFile(Fight.getPathSaveEntities(), chunkPosName);
 
         //对每一个实体数据值进行解析
         for (JsonValue entityValue : entitiesValue) {
@@ -42,7 +42,7 @@ public class EntityLoadTask extends EntityTask {
 
         }
         //读取完成后删除文件
-        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, chunkPosName + ".json");
+        FileUtil.deleteFile(Fight.getPathSaveEntities(), chunkPosName + ".json");
         return entities;
     }
 }

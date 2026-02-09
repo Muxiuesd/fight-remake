@@ -71,7 +71,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
             //如果是玩家HUD屏幕就是退出游戏世界，回到主菜单
             if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN) {
                 Log.print(TAG(), "游戏退出！");
-                FightCore.getInstance().changeScreen(FightCore.getInstance().startMenuScreen);
+                FightCore.getInstance().setScreen(FightCore.getInstance().startMenuScreen);
                 FightCore.getInstance().mainGameScreen.dispose();
             }else {
                 //否则就把当前的屏幕调整回玩家HUD屏幕

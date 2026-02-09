@@ -5,7 +5,7 @@ import ttk.muxiuesd.system.*;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
 
 /**
- *  主世界
+ * 主世界
  * */
 public class MainWorld extends World {
     public MainWorld(MainGameScreen screen) {
@@ -25,7 +25,6 @@ public class MainWorld extends World {
         addSystem("EntitySystem", new EntitySystem(this));
         addSystem("UndergroundEntityRenderSystem", new UndergroundEntityRenderSystem(this));
         addSystem("GroundEntityRenderSystem", new GroundEntityRenderSystem(this));
-        //addSystem("DaynightSystem", new DaynightSystem(this));
         addSystem("ParticleSystem", new ParticleSystem(this));
         addSystem("CameraFollowSystem", new CameraFollowSystem(this));
         addSystem("EntityCollisionSystem", new GroundEntityCollisionSystem(this));
@@ -35,10 +34,5 @@ public class MainWorld extends World {
         addSystem("MonsterGenerationSystem", new MonsterGenerationSystem(this));
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
-    }
-
-    @Override
-    public void update (float delta) {
-        super.update(delta);
     }
 }
