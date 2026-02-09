@@ -37,6 +37,13 @@ public class WorldsMenuUIScreen extends UIScreen {
         addComponent(this.savesList);
     }
 
+    /**
+     * 添加一个存档项目UI组件
+     * */
+    public void putSaveListItem () {
+
+    }
+
     public SavesListUI getSavesList () {
         return this.savesList;
     }

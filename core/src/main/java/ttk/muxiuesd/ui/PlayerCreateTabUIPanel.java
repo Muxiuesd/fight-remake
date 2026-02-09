@@ -38,6 +38,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             .setSliderWidth(12f)
             .setSliderHeight(15f)
             .sliderGotoStart()
+            .setSliderWayVisible(false)
             .setPosition(175f, 8f);
 
         addComponent(this.scrollBar);

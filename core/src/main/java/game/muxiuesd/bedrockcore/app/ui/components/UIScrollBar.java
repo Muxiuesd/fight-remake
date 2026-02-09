@@ -17,7 +17,11 @@ import ttk.muxiuesd.util.Util;
  * */
 public class UIScrollBar extends UIComponent {
     public static final float DEFAULT_SLIDER_WIDTH = 12f, DEFAULT_SLIDER_HEIGHT = 15f;
-    public static final int SLIDER_LEFT = 2, SLIDER_RIGHT = 2, SLIDER_TOP = 2, SLIDER_BOTTOM = 3;
+    //滑块点9属性
+    public static final int SLIDER_LEFT = 2, SLIDER_RIGHT = 2, SLIDER_TOP = 2, SLIDER_BOTTOM = 2;
+    //滑轨点9属性
+    public static final int SLIDE_WAY_LEFT = 1, SLIDE_WAY_RIGHT = 1, SLIDE_WAY_TOP = 1, SLIDE_WAY_BOTTOM = 1;
+
     //滚动条种类
     public enum Type {
         /// 竖直的
@@ -27,9 +31,10 @@ public class UIScrollBar extends UIComponent {
     }
 
     private Type type;
-    private NinePatch backgroundPatch;
-    private NinePatch sliderPatch;
+    private NinePatch slideWayPatch;    //滑轨
+    private NinePatch sliderPatch;      //滑块
     private float sliderX, sliderY, sliderWidth, sliderHeight;  //滑块的坐标（相当对于滚动条的坐标）和宽高
+    private boolean sliderVisible = true, sliderWayVisible = true;
 
     /**
      * 默认的滚动条构造方法
@@ -37,27 +42,36 @@ public class UIScrollBar extends UIComponent {
     public UIScrollBar() {
         this(
             Fight.ID("slider"), Fight.UITexturePath("slider.png"),
+            Fight.ID("slide_way"), Fight.UITexturePath("slideway.png"),
             12f, 110f, Type.VERTICAL
         );
     }
-    public UIScrollBar(String sliderPatchId, String sliderTexturePath, float width, float height, Type type) {
+    public UIScrollBar(String sliderPatchId, String sliderTexturePath,
+                       String sliderWayPatchId, String sliderWayTexturePath,
+                       float width, float height, Type type) {
         this(
             createNinePatch(
                 Util.loadTextureRegion(sliderPatchId, sliderTexturePath),
                 SLIDER_LEFT, SLIDER_RIGHT, SLIDER_TOP, SLIDER_BOTTOM
             ),
+            createNinePatch(
+                Util.loadTextureRegion(sliderWayPatchId, sliderWayTexturePath),
+                SLIDE_WAY_LEFT, SLIDE_WAY_RIGHT, SLIDE_WAY_TOP, SLIDE_WAY_BOTTOM
+            ),
             width, height, type
         );
     }
-    public UIScrollBar(NinePatch sliderPatch, float width, float height, Type type) {
-        this(0, 0, width, height, new GridPoint2((int) width, (int) height), sliderPatch, type);
+    public UIScrollBar(NinePatch sliderPatch, NinePatch sliderWayPatch,
+                       float width, float height, Type type) {
+        this(0, 0, width, height, new GridPoint2((int) width, (int) height), sliderPatch, sliderWayPatch, type);
     }
     public UIScrollBar(float x, float y,
                        float width, float height,
                        GridPoint2 interactGridSize,
-                       NinePatch sliderPatch, Type type) {
+                       NinePatch sliderPatch, NinePatch slideWayPatch,Type type) {
         super(x, y, width, height, interactGridSize);
         this.sliderPatch = sliderPatch;
+        this.slideWayPatch = slideWayPatch;
         this.type = type;
         switch (this.type) {
             case VERTICAL: {
@@ -161,19 +175,23 @@ public class UIScrollBar extends UIComponent {
             }
         }
 
-        System.out.println(this.getSliderPathwayPos());
+        //System.out.println(this.getSliderPathwayPos());
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        //TODO 绘制滚动条的背景（假如有的话）
+        //绘制轨道
+        if (this.isSliderWayVisible()) {
+            this.getSlideWayPatch()
+                .draw(batch, getAbsX(), getAbsY(), getWidth(), getHeight());
+        }
 
         //绘制滑块
-        NinePatch patch = this.getSliderPatch();
-        if (patch != null) {
+        if (this.isSliderVisible()) {
             float renderX = getSliderX() + getAbsX();
             float renderY = getSliderY() + getAbsY();
-            patch.draw(batch, renderX, renderY, getSliderWidth(), getSliderHeight());
+            this.getSliderPatch()
+                .draw(batch, renderX, renderY, getSliderWidth(), getSliderHeight());
         }
     }
 
@@ -186,12 +204,12 @@ public class UIScrollBar extends UIComponent {
         return this;
     }
 
-    public NinePatch getBackgroundPatch () {
-        return this.backgroundPatch;
+    public NinePatch getSlideWayPatch () {
+        return this.slideWayPatch;
     }
 
-    public UIScrollBar setBackgroundPatch (NinePatch backgroundPatch) {
-        this.backgroundPatch = backgroundPatch;
+    public UIScrollBar setSlideWayPatch (NinePatch slideWayPatch) {
+        this.slideWayPatch = slideWayPatch;
         return this;
     }
 
@@ -245,6 +263,24 @@ public class UIScrollBar extends UIComponent {
 
     public UIScrollBar setSliderHeight (float sliderHeight) {
         this.sliderHeight = sliderHeight;
+        return this;
+    }
+
+    public boolean isSliderVisible () {
+        return this.sliderVisible;
+    }
+
+    public boolean isSliderWayVisible () {
+        return this.sliderWayVisible;
+    }
+
+    public UIScrollBar setSliderVisible (boolean sliderVisible) {
+        this.sliderVisible = sliderVisible;
+        return this;
+    }
+
+    public UIScrollBar setSliderWayVisible (boolean sliderWayVisible) {
+        this.sliderWayVisible = sliderWayVisible;
         return this;
     }
 }

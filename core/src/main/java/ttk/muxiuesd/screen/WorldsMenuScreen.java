@@ -35,6 +35,13 @@ public class WorldsMenuScreen implements Screen {
         }
     }
 
+    /**
+     * 读取存档目录
+     * */
+    public void readSaves () {
+
+    }
+
     @Override
     public void resize (int width, int height) {
 
