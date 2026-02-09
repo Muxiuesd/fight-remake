@@ -89,14 +89,11 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     /**
      * 鼠标对这个UI组件进行拖拽
-     * @param dx 横坐标上的移动量
-     * @param dy 纵坐标上的移动量
      * @param mouseX 鼠标的横坐标（相对于UI组件自身）
      * @param mouseY 鼠标的纵坐标（相对于UI组件自身）
      * */
-    public void mouseDrag (float dx, float dy, float mouseX, float mouseY) {
+    public void mouseDrag (float mouseX, float mouseY) {
     }
-
 
     /**
      * 当相机视口大小更改时调用，传入的参数是改变大小后相机视口所能看到的宽高大小，单位：米

@@ -34,22 +34,6 @@ public class Util {
         return CameraUtil.getMousePosForCamera(GUICamera.INSTANCE.getCamera());
     }
 
-    static Vector2 lastMouseUIPos = null;
-    /**
-     * 获取鼠标指向的游戏GUI相机的坐标增量
-     * */
-    public static Vector2 getMouseUIPosDelta() {
-        if (lastMouseUIPos != null) {
-            Vector2 curMouseUIPos = getMouseUIPosition();
-            Vector2 sub = new Vector2(curMouseUIPos.x - lastMouseUIPos.x , curMouseUIPos.y - lastMouseUIPos.y);
-            lastMouseUIPos = curMouseUIPos;
-            return sub;
-        }
-        lastMouseUIPos = new Vector2(0, 0);
-        return lastMouseUIPos;
-        //return getMouseDeltaPosForCamera(GUICamera.INSTANCE.getCamera());
-    }
-
     /**
      * 获取鼠标的位置,相对于游戏窗口的中心
      */

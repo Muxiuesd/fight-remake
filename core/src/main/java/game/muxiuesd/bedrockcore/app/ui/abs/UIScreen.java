@@ -117,11 +117,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                         .click(grid);
                 }else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     //如果是按住鼠标左键，就是拖拽
-                    Vector2 uiPosDelta = Util.getMouseUIPosDelta();
-                    if (uiPosDelta.len() > 0f) {
-                        System.out.println(uiPosDelta);
-                        uiComponent.mouseDrag(uiPosDelta.x, uiPosDelta.y, relativePos.x, relativePos.y);
-                    }
+                    uiComponent.mouseDrag(relativePos.x, relativePos.y);
                 }
                 //这个ui屏幕的状态变成被鼠标覆盖
                 this.setMouseOver(true);

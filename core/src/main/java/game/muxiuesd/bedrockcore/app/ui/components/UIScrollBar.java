@@ -147,7 +147,7 @@ public class UIScrollBar extends UIComponent {
      * 滑块拖拽的核心算法
      * */
     @Override
-    public void mouseDrag (float dx, float dy, float mouseX, float mouseY) {
+    public void mouseDrag (float mouseX, float mouseY) {
         float sl = this.getSliderWidth();
         float sh = this.getSliderHeight();
         switch (this.getType()) {
