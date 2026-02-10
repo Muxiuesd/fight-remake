@@ -3,12 +3,12 @@ package ttk.muxiuesd.ui.screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
-import game.muxiuesd.bedrockcore.app.ui.components.UIButtonListItem;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
 import ttk.muxiuesd.ui.components.SavesListUI;
+import ttk.muxiuesd.ui.components.WorldSaveButtonUI;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Log;
@@ -90,7 +90,7 @@ public class WorldsMenuUIScreen extends UIScreen {
             String worldName = objValue.getString(Fight.WORLD_NAME.getKey());
 
             //添加存档按钮UI
-            UIButtonListItem worldButton = new UIButtonListItem();
+            WorldSaveButtonUI worldButton = new WorldSaveButtonUI(worldName);
             worldButton.setText(new Text().add(worldName).build());
             this.getSavesList().addItem(worldButton);
         }

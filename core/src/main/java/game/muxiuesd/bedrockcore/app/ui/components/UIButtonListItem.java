@@ -10,8 +10,7 @@ import ttk.muxiuesd.util.TextUtil;
 /**
  * 可以作为列表项目的按钮组件
  * */
-public class UIButtonListItem extends UITextButton implements UIListItem {
-
+public class UIButtonListItem extends UITextButton implements UIListItem{
 
     @Override
     public void update (UIList uiList, float delta) {
