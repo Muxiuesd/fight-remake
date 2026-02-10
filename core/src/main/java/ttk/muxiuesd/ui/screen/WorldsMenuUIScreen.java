@@ -34,16 +34,6 @@ public class WorldsMenuUIScreen extends UIScreen {
             - this.savesList.getHeight() / 2f
         );
 
-        /*this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());*/
-
         this.createNewWorldButton = new CreateNewWorldButtonUI(this);
         this.createNewWorldButton.setPosition(
             - this.createNewWorldButton.getWidth() / 2f,
@@ -82,9 +72,9 @@ public class WorldsMenuUIScreen extends UIScreen {
         //读取目录中的世界信息
         for (FileHandle saveDir : saveDirs) {
             //如果不存在世界信息文件就跳过这个目录
-            if (!FileUtil.fileExists(saveDir, WorldInfo.FILE_NAME)) continue;
+            if (!FileUtil.fileExists(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME)) continue;
             //有世界信息文件就读取
-            JsonValue worldInfoJsonFile = FileUtil.readJsonFile(saveDir, WorldInfo.FILE_NAME);
+            JsonValue worldInfoJsonFile = FileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
             JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
             JsonValue objValue = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
             String worldName = objValue.getString(Fight.WORLD_NAME.getKey());

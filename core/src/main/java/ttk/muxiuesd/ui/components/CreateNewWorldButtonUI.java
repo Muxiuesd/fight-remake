@@ -21,7 +21,7 @@ public class CreateNewWorldButtonUI extends UITextButton {
             (button, interactPos) -> {
                 //点击就新建一个世界
                 String worldName = UUID.randomUUID().toString();
-                String worldDirPath = Fight.PATH_SAVE + worldName;
+                String worldDirPath = Fight.PATH_SAVE + worldName + "/" + Fight.PATH_SAVE_WORLD;
                 FileUtil.createDir(worldDirPath);
                 FileUtil.createFile(worldDirPath, WorldInfo.FILE_NAME).writeString(
                     "{\n" +

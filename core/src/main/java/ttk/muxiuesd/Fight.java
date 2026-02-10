@@ -36,34 +36,34 @@ public class Fight {
      * 存档路径常量
      */
     public static final String PATH_SAVE = "save/";
-    //public static final String PATH_SAVE_WORLD = PATH_SAVE + "world/";
-    //public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
-    //public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
-    //public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
+    public static final String PATH_SAVE_WORLD = "world/";
+    public static final String PATH_SAVE_CHUNKS = "chunks/";
+    public static final String PATH_SAVE_ENTITIES = "entities/";
+    public static final String PATH_SAVE_PLAYER = "player/";
 
     /**
      *  获取玩家数据保存的路径
      * */
     public static String getPathSavePlayer () {
-        return getPathSaveEntities() + "player/";
+        return getPathSaveEntities() + PATH_SAVE_PLAYER;
     }
     /**
      *  获取实体数据保存的路径
      * */
     public static String getPathSaveEntities () {
-        return getPathSaveWorld() + "entities/";
+        return getPathSaveWorld() + PATH_SAVE_ENTITIES;
     }
     /**
      *  获取区块数据保存的路径
      * */
     public static String getPathSaveChunks () {
-        return getPathSaveWorld() + "chunks/";
+        return getPathSaveWorld() + PATH_SAVE_CHUNKS;
     }
     /**
      *  获取游戏世界数据保存路径，根据当前的世界名字作为值
      * */
     public static String getPathSaveWorld () {
-        return PATH_SAVE + WORLD_NAME.getValue() + "/world/";
+        return PATH_SAVE + WORLD_NAME.getValue() + "/" + PATH_SAVE_WORLD;
     }
 
     /**
