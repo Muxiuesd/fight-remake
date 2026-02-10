@@ -12,7 +12,7 @@ import ttk.muxiuesd.util.TextUtil;
  * */
 public class UITextButton extends UIButton {
 
-    public static final Click VOID_CLICK = (button, interactPos) -> {
+    public static final ClickEvent VOID_CLICK_EVENT = (button, interactPos) -> {
         //啥也不做
         return false;
     };
@@ -21,12 +21,12 @@ public class UITextButton extends UIButton {
     private FontHolder fontHolder;
 
     public UITextButton () {
-        this(Text.NULL_TEXT, VOID_CLICK);
+        this(Text.NULL_TEXT, VOID_CLICK_EVENT);
     }
-    public UITextButton (Text text, Click clickEvent) {
+    public UITextButton (Text text, ClickEvent clickEvent) {
         this(text, Fonts.MC, clickEvent);
     }
-    public UITextButton (Text text, FontHolder fontHolder, Click clickEvent) {
+    public UITextButton (Text text, FontHolder fontHolder, ClickEvent clickEvent) {
         super(clickEvent);
         this.text = text;
         this.fontHolder = fontHolder;

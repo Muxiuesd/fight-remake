@@ -15,6 +15,7 @@ import ttk.muxiuesd.util.Util;
  * 按钮组件，没有字体文本渲染
  * */
 public class UIButton extends UIComponent {
+    public static final MouseOverEvent VOID_MOUSE_OVER_EVENT = (button, interactPos) -> {};
     public static final int DEFAULT_EDGE = 3;
     public static final float DEFAULT_WIDTH = 80f;
     public static final float DEFAULT_HEIGHT = 14f;
@@ -23,15 +24,15 @@ public class UIButton extends UIComponent {
     private NinePatch backgroundPatch;
     private NinePatch clickBackgroundPatch;
     private NinePatch mouseOverBackgroundPatch;
-    private Click click;
-    private MouseOver mouseOver;
+    private ClickEvent clickEvent;
+    private MouseOverEvent mouseOverEvent;
 
 
-    public UIButton(Click click) {
-        this(click, (button, interactPos) -> {});
+    public UIButton(ClickEvent clickEvent) {
+        this(clickEvent, VOID_MOUSE_OVER_EVENT);
     }
 
-    public UIButton(Click click, MouseOver mouseOver) {
+    public UIButton(ClickEvent clickEvent, MouseOverEvent mouseOverEvent) {
         this(
             Util.loadTextureRegion(
                 Fight.ID("button"),
@@ -45,29 +46,29 @@ public class UIButton extends UIComponent {
                 Fight.ID("button_mouse_over"),
                 Fight.UITexturePath("button_mouse_over.png")
             ),
-            click,
-            mouseOver
+            clickEvent,
+            mouseOverEvent
         );
     }
     public UIButton(TextureRegion background, TextureRegion clickBackground, TextureRegion mouseOverBackground,
-                    Click click, MouseOver mouseOver) {
+                    ClickEvent clickEvent, MouseOverEvent mouseOverEvent) {
         this(
             createNinePatch(background, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             createNinePatch(clickBackground, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             createNinePatch(mouseOverBackground, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             DEFAULT_WIDTH, DEFAULT_HEIGHT, new GridPoint2(DEFAULT_EDGE, DEFAULT_EDGE),
-            click, mouseOver
+            clickEvent, mouseOverEvent
         );
     }
 
     public UIButton (NinePatch backgroundPatch, NinePatch clickBackground, NinePatch mouseOverBackground,
                      float width, float height, GridPoint2 interactSize,
-                     Click click, MouseOver mouseOver) {
+                     ClickEvent clickEvent, MouseOverEvent mouseOverEvent) {
         this.backgroundPatch = backgroundPatch;
         this.clickBackgroundPatch = clickBackground;
         this.mouseOverBackgroundPatch = mouseOverBackground;
-        this.click = click;
-        this.mouseOver = mouseOver;
+        this.clickEvent = clickEvent;
+        this.mouseOverEvent = mouseOverEvent;
 
         setSize(width, height);
         setInteractGridSize(interactSize);
@@ -90,15 +91,15 @@ public class UIButton extends UIComponent {
     public boolean click (GridPoint2 interactPos) {
         AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
 
-        if (this.click == null) return super.click(interactPos);
+        if (this.clickEvent == null) return super.click(interactPos);
 
-        return this.click.handle(this, interactPos);
+        return this.clickEvent.handle(this, interactPos);
     }
 
     @Override
     public void mouseOver (GridPoint2 interactPos) {
-        if (this.mouseOver == null) super.mouseOver(interactPos);
-        this.mouseOver.handle(this, interactPos);
+        if (this.mouseOverEvent == null) super.mouseOver(interactPos);
+        this.mouseOverEvent.handle(this, interactPos);
     }
 
     public NinePatch getBackgroundPatch () {
@@ -128,17 +129,35 @@ public class UIButton extends UIComponent {
         return this;
     }
 
+    public ClickEvent getClickEvent () {
+        return this.clickEvent;
+    }
+
+    public UIButton setClickEvent (ClickEvent clickEvent) {
+        this.clickEvent = clickEvent;
+        return this;
+    }
+
+    public MouseOverEvent getMouseOverEvent () {
+        return this.mouseOverEvent;
+    }
+
+    public UIButton setMouseOverEvent (MouseOverEvent mouseOverEvent) {
+        this.mouseOverEvent = mouseOverEvent;
+        return this;
+    }
+
     /**
      * 点击按钮事件处理接口
      * */
-    public interface Click extends Voidable {
+    public interface ClickEvent extends Voidable {
         boolean handle (UIButton button, GridPoint2 interactPos);
     }
 
     /**
      * 鼠标放在按钮上面的事件处理接口
      * */
-    public interface MouseOver {
+    public interface MouseOverEvent extends Voidable {
         void handle (UIButton button, GridPoint2 interactPos);
     }
 }

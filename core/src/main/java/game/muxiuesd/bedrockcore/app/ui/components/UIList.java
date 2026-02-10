@@ -80,6 +80,19 @@ public class UIList extends UIPanel {
         return this;
     }
 
+    /**
+     * 清空所有项目
+     * */
+    public UIList clearItems() {
+        this.getItems().forEach((listItem)-> {
+            getComponents().remove(listItem);
+        });
+
+        this.getItems().clear();
+
+        return this;
+    }
+
     @Override
     public void update (float delta) {
         super.update(delta);

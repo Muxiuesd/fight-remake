@@ -1,8 +1,20 @@
 package ttk.muxiuesd.ui.screen;
 
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButtonListItem;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.data.JsonDataReader;
+import ttk.muxiuesd.registry.WorldInfoTypes;
+import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
 import ttk.muxiuesd.ui.components.SavesListUI;
+import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.world.WorldInfo;
+
+import java.util.Arrays;
 
 /**
  * 世界存档选择菜单UIScreen
@@ -12,6 +24,7 @@ import ttk.muxiuesd.ui.components.SavesListUI;
 public class WorldsMenuUIScreen extends UIScreen {
     //存档的UI列表面板
     private SavesListUI savesList;
+    private CreateNewWorldButtonUI createNewWorldButton;
 
     public WorldsMenuUIScreen() {
         this.savesList = new SavesListUI();
@@ -21,6 +34,7 @@ public class WorldsMenuUIScreen extends UIScreen {
             - this.savesList.getHeight() / 2f
         );
 
+        /*this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
@@ -28,20 +42,58 @@ public class WorldsMenuUIScreen extends UIScreen {
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
         this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
-        this.savesList.addItem(new UIButtonListItem());
+        this.savesList.addItem(new UIButtonListItem());*/
 
-
-        //this.savesList.auto();
+        this.createNewWorldButton = new CreateNewWorldButtonUI(this);
+        this.createNewWorldButton.setPosition(
+            - this.createNewWorldButton.getWidth() / 2f,
+            this.savesList.getY() - this.createNewWorldButton.getHeight()
+        );
 
         addComponent(this.savesList);
+        addComponent(this.createNewWorldButton);
     }
 
     /**
-     * 添加一个存档项目UI组件
+     * 刷新存档列表
      * */
-    public void putSaveListItem () {
+    public void flashSaveList () {
+        //清理旧的
+        this.getSavesList().clearItems();
+        this.readSavesDir();
+    }
 
+    /**
+     * 读取存档目录
+     * */
+    public void readSavesDir () {
+        boolean saveDirIsExist = FileUtil.dirExists(Fight.PATH_SAVE);
+        if (!saveDirIsExist) {
+            Log.error(this.getClass().getName(), "没有存档文件夹， 已自动创建！！！");
+        }
+
+        //读取存档文件夹下所有的存档文件目录
+        FileHandle savesDirFileHandle = FileUtil.getFileHandle(Fight.PATH_SAVE);
+        FileHandle[] saveDirs = savesDirFileHandle.list();
+        Arrays.stream(saveDirs).forEach((dir) -> {
+            System.out.println(dir.name());
+        });
+
+        //读取目录中的世界信息
+        for (FileHandle saveDir : saveDirs) {
+            //如果不存在世界信息文件就跳过这个目录
+            if (!FileUtil.fileExists(saveDir, WorldInfo.FILE_NAME)) continue;
+            //有世界信息文件就读取
+            JsonValue worldInfoJsonFile = FileUtil.readJsonFile(saveDir, WorldInfo.FILE_NAME);
+            JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
+            JsonValue objValue = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
+            String worldName = objValue.getString(Fight.WORLD_NAME.getKey());
+
+            //添加存档按钮UI
+            UIButtonListItem worldButton = new UIButtonListItem();
+            worldButton.setText(new Text().add(worldName).build());
+            this.getSavesList().addItem(worldButton);
+        }
     }
 
     public SavesListUI getSavesList () {

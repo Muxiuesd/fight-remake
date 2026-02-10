@@ -1,7 +1,6 @@
 package ttk.muxiuesd.registry;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
@@ -9,10 +8,6 @@ import ttk.muxiuesd.serialization.hashmap.FloatHashMapCodec;
 import ttk.muxiuesd.serialization.hashmap.IntHashMapCodec;
 import ttk.muxiuesd.serialization.hashmap.LongHashMapCodec;
 import ttk.muxiuesd.serialization.hashmap.StringHashMapCodec;
-import ttk.muxiuesd.util.FileUtil;
-import ttk.muxiuesd.world.WorldInfo;
-
-import java.util.Optional;
 
 /**
  * 世界信息类型注册表
@@ -25,7 +20,7 @@ public final class WorldInfoTypes {
     public static final WorldInfoHashMap<FloatHashMapCodec, Float> FLOAT = register("float", new FloatHashMapCodec());
     public static final WorldInfoHashMap<StringHashMapCodec, String> STRING = register("string", new StringHashMapCodec());
 
-    static {
+    /*static {
         //检查世界信息文件是否存在
         if(FileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
             //存在就读取
@@ -39,7 +34,7 @@ public final class WorldInfoTypes {
             //新建一个
             WorldInfo.INSTANCE = new WorldInfo();
         }
-    }
+    }*/
 
     /**
      * 注册一种信息类型的hashmap
