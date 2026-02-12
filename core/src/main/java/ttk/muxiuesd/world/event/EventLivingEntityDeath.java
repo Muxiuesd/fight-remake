@@ -1,9 +1,9 @@
 package ttk.muxiuesd.world.event;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.abs.LivingEntityDeathEvent;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 

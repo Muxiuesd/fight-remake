@@ -1,9 +1,9 @@
 package ttk.muxiuesd.registrant;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**

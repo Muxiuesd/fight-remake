@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ObjectMap;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 /**
  * 游戏中的字体持有者

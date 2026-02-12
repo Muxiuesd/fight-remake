@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 /**
  * 着色器实现的日夜循环效果

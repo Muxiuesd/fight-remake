@@ -2,9 +2,9 @@ package ttk.muxiuesd.system.abs;
 
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.render.RenderProcessorManager;
-import ttk.muxiuesd.util.Log;
 
 import java.util.LinkedHashMap;
 

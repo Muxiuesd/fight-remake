@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.entity.damage;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;

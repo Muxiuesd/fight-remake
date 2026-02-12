@@ -2,7 +2,7 @@ package ttk.muxiuesd.audio;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 import java.util.LinkedHashMap;
 

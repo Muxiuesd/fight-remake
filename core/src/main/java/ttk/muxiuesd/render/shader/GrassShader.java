@@ -2,7 +2,7 @@ package ttk.muxiuesd.render.shader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 /**
  * 草地的着色器

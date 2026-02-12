@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 
 import java.util.HashMap;
@@ -13,16 +13,17 @@ import java.util.Objects;
 
 /**
  * 游戏资源加载管理器
- * 通过唯一的id获取对应的资源
+ * <p>
+ * 每一个资源的文件路径都会对应一个id
  * */
 public class AssetsLoader implements Disposable {
-    public final String TAG = this.getClass().getSimpleName();
+    public final String TAG = this.getClass().getName();
 
     private final AssetManager gameAssetManager = new AssetManager();
     private final HashMap<String, AssetManager> modAssetManagers = new HashMap<>();  //每一个mod分配一个资源管理器
     private final AsyncExecutor asyncExecutor = new AsyncExecutor(10);
 
-    private final HashMap<String, String> idToPath; //id映射路径，规范id例子： fight:grass_block
+    private final HashMap<String, String> idToPath; ///id映射路径，规范id例子： fight:grass_block
 
     private AssetsLoader () {
         this.idToPath = new HashMap<>();

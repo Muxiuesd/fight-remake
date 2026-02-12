@@ -2,6 +2,7 @@ package ttk.muxiuesd.world;
 
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
@@ -11,7 +12,6 @@ import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
 import ttk.muxiuesd.util.FileUtil;
-import ttk.muxiuesd.util.Log;
 
 import java.util.Optional;
 

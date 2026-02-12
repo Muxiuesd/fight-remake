@@ -5,8 +5,9 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.TextureUtil;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 
 /**
@@ -50,11 +51,11 @@ public class UIScrollBar extends UIComponent {
                        String sliderWayPatchId, String sliderWayTexturePath,
                        float width, float height, Type type) {
         this(
-            createNinePatch(
+            TextureUtil.createNinePatch(
                 Util.loadTextureRegion(sliderPatchId, sliderTexturePath),
                 SLIDER_LEFT, SLIDER_RIGHT, SLIDER_TOP, SLIDER_BOTTOM
             ),
-            createNinePatch(
+            TextureUtil.createNinePatch(
                 Util.loadTextureRegion(sliderWayPatchId, sliderWayTexturePath),
                 SLIDE_WAY_LEFT, SLIDE_WAY_RIGHT, SLIDE_WAY_TOP, SLIDE_WAY_BOTTOM
             ),

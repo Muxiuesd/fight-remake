@@ -1,8 +1,8 @@
 package ttk.muxiuesd.world.cat;
 
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.util.Log;
 
 /**
  * 用于存储cat值的包装类

@@ -1,9 +1,9 @@
 package ttk.muxiuesd.mod.api;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.mod.Mod;
 import ttk.muxiuesd.mod.ModContainer;
-import ttk.muxiuesd.util.Log;
 
 import java.util.HashMap;
 

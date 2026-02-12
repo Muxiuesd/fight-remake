@@ -3,10 +3,9 @@ package ttk.muxiuesd.screen;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventTypes;
-import ttk.muxiuesd.mod.ModLibManager;
-import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.render.RenderProcessorManager;
@@ -17,7 +16,6 @@ import ttk.muxiuesd.render.instance.EntityUndergroundRenderProcessor;
 import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
 import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.render.shader.ShadersReg;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
 
@@ -56,9 +54,10 @@ public class MainGameScreen implements Screen {
         this.setWorld(mainWorld);
 
         //执行mod代码
-        ModLibManager.getInstance().loadCoreLib();
+        //TODO Mod系统重做
+        /*ModLibManager.getInstance().loadCoreLib();
         ModLoader.getInstance().loadAllMods();
-        ModLoader.getInstance().runAllMods();
+        ModLoader.getInstance().runAllMods();*/
 
         //初始化世界系统
         this.getWorld().getSystemManager().initAllSystems();

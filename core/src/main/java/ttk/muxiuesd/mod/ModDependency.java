@@ -1,8 +1,8 @@
 package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.SemanticVersion;
-import ttk.muxiuesd.util.Log;
 
 import java.util.HashMap;
 

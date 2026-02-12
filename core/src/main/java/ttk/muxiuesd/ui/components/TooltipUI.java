@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.util.TextureUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.text.FontHolder;
@@ -99,13 +100,13 @@ public class TooltipUI extends UIComponent {
 
     public TooltipUI () {
         super(1145f, 1145f, 100, 100, new GridPoint2(10, 10));
-        this.backgroundNinePatch = this.createNinePatch(Util.loadTextureRegion(
+        this.backgroundNinePatch = TextureUtil.createNinePatch(Util.loadTextureRegion(
                 Fight.ID("tooltip_background"),
                 Fight.UITexturePath("tooltip_background.png")
             ),
             LEFT, RIGHT, TOP, BOTTOM
         );
-        this.frameNinePatch = this.createNinePatch(Util.loadTextureRegion(
+        this.frameNinePatch = TextureUtil.createNinePatch(Util.loadTextureRegion(
                 Fight.ID("tooltip_frame"),
                 Fight.UITexturePath("tooltip_frame.png")
             ),

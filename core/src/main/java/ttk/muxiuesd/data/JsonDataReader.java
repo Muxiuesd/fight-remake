@@ -3,7 +3,7 @@ package ttk.muxiuesd.data;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 /**
  * Json格式的数据读取类

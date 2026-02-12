@@ -1,10 +1,10 @@
 package ttk.muxiuesd.lang;
 
 import com.badlogic.gdx.Gdx;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.Log;
 
 /**
  * 游戏的语言国际化系统

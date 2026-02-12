@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 版本号大小比较
+ * 工具：版本号大小比较
  * */
 public class SemanticVersion implements Comparable<SemanticVersion> {
     private final int major;

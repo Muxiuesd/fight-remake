@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.util.TextureUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.text.FontHolder;
@@ -43,7 +44,7 @@ public class EffectUI extends UIComponent {
 
     public EffectUI () {
         this(
-            createNinePatch(
+            TextureUtil.createNinePatch(
                 Util.loadTextureRegion(
                     Fight.ID("effect_background"),
                     Fight.UITexturePath("effect_background.png")

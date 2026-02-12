@@ -1,7 +1,7 @@
 package ttk.muxiuesd.system.manager;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.system.abs.SystemManager;
-import ttk.muxiuesd.util.Log;
 
 /**
  * 游戏底层系统的管理

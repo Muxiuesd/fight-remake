@@ -1,8 +1,6 @@
 package game.muxiuesd.bedrockcore.app.ui.abs;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
@@ -16,21 +14,13 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
  * 基础 UI 组件
  * */
 public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRenderable, GUIResize {
-    /**
-     * 创建点九
-     * */
-    public static NinePatch createNinePatch(TextureRegion textureRegion, int left, int right, int top, int bottom) {
-        return new NinePatch(textureRegion, left, right, top, bottom);
-    }
-
-
     private UIScreen screen;  //隶属于哪一个screen
     private UIPanel parentPanel = UIPanel.VOID_INSTANCE;  //隶属于哪一个UI面板，无论如何不能为null
     private float x, y; //这里的坐标是相对于父组件的（如果有的话）
     private float width, height;
     private boolean visible = true;
     private boolean enabled = true;
-    private int zIndex = 0; // 渲染顺序
+    private int zIndex = 0;     // 渲染顺序
     ///交互区域网格
     private GridPoint2 interactGridSize;
     private boolean mouseIsOver = false;

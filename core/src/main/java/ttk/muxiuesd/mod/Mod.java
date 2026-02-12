@@ -3,7 +3,7 @@ package ttk.muxiuesd.mod;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;

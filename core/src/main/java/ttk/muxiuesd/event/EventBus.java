@@ -1,6 +1,6 @@
 package ttk.muxiuesd.event;
 
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 import java.util.concurrent.ConcurrentHashMap;
 

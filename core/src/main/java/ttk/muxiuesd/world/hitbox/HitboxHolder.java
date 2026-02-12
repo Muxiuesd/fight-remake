@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.hitbox;
 
 import game.muxiuesd.bedrockcore.app.interfaces.Voidable;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

@@ -8,9 +8,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import game.muxiuesd.bedrockcore.app.interfaces.ui.UIListItem;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.render.camera.GUICamera;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 
 import java.util.ArrayList;

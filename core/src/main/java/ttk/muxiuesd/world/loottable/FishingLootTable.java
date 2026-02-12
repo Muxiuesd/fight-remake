@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.loottable;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.List;

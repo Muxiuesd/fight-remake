@@ -1,12 +1,12 @@
 package ttk.muxiuesd.system.abs;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.world.entity.EntityGenFactory;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.system.TimeSystem;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.World;
 
 import java.util.concurrent.ConcurrentHashMap;

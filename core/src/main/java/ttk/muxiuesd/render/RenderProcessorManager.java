@@ -2,9 +2,9 @@ package ttk.muxiuesd.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.render.IRenderTask;
 import ttk.muxiuesd.render.abs.RenderProcessor;
-import ttk.muxiuesd.util.Log;
 
 import java.util.ArrayList;
 import java.util.Comparator;

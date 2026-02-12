@@ -1,9 +1,9 @@
 package ttk.muxiuesd.world.item;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.ItemFishPole;
 import ttk.muxiuesd.world.item.common.ItemRubbish;

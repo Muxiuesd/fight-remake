@@ -29,6 +29,8 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
     private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
 
     private boolean mouseOver = false;  ///当鼠标指针在任意的可交互的组件上就标记为true，否则为false
+    private UIComponent focusComponent; ///焦点组件，当有焦点组件时，键盘输入只在焦点组件里生效
+
 
     public UIScreen () {
     }
@@ -56,30 +58,15 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
      * 被隐藏时调用
      * */
     public void hide () {
-        //加入系统底层的输入处理器
     }
 
     @Override
     public void update (float delta) {
         //检查延迟添加和延迟删除
-        if (!this.delayAddComponents.isEmpty()) {
-            this.delayAddComponents.forEach(delayAddComponent -> {
-                delayAddComponent.setScreen(this);
-                this.components.add(delayAddComponent);
-            });
-            this.delayAddComponents.clear();
-            //添加完新的组件后调用一次排序
-            sortComponents();
-        }
-        if (!this.delayRemoveComponents.isEmpty()) {
-            this.delayRemoveComponents.forEach(delayRemoveComponent -> {
-                delayRemoveComponent.setScreen(null);
-                this.components.remove(delayRemoveComponent);
-            });
-            this.delayRemoveComponents.clear();
-        }
+        this.handleDelayEvents();
 
-        setMouseOver(false);    //清理标记
+        //清理标记
+        setMouseOver(false);
         //没东西就直接返回
         if (getComponents().isEmpty()) return;
 
@@ -134,6 +121,28 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
         Pools.RECT.free(rectangle);
     }
 
+    /**
+     * 处理延迟添加和删除
+     * */
+    private void handleDelayEvents () {
+        if (!this.delayAddComponents.isEmpty()) {
+            this.delayAddComponents.forEach(delayAddComponent -> {
+                delayAddComponent.setScreen(this);
+                this.components.add(delayAddComponent);
+            });
+            this.delayAddComponents.clear();
+            //添加完新的组件后调用一次排序
+            sortComponents();
+        }
+        if (!this.delayRemoveComponents.isEmpty()) {
+            this.delayRemoveComponents.forEach(delayRemoveComponent -> {
+                delayRemoveComponent.setScreen(null);
+                this.components.remove(delayRemoveComponent);
+            });
+            this.delayRemoveComponents.clear();
+        }
+    }
+
     @Override
     public void draw (Batch batch) {
         if (getComponents().isEmpty()) return;
@@ -160,6 +169,15 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
 
     public void setMouseOver (boolean mouseOver) {
         this.mouseOver = mouseOver;
+    }
+
+    public UIComponent getFocusComponent () {
+        return focusComponent;
+    }
+
+    public UIScreen setFocusComponent (UIComponent focusComponent) {
+        this.focusComponent = focusComponent;
+        return this;
     }
 
     @Override

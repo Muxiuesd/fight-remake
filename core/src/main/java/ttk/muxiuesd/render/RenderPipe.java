@@ -2,11 +2,11 @@ package ttk.muxiuesd.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import game.muxiuesd.bedrockcore.fix.GL32CMacIssueHandler;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.render.camera.CameraController;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
-import game.muxiuesd.bedrockcore.fix.GL32CMacIssueHandler;
-import ttk.muxiuesd.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
