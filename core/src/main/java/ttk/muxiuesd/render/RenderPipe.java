@@ -32,7 +32,7 @@ public class RenderPipe {
         );
     }
     /// 支持注入
-    private RenderPipe(Batch batch, ShapeRenderer shapeRenderer) {
+    private RenderPipe (Batch batch, ShapeRenderer shapeRenderer) {
         this.batch = batch;
         this.shapeRenderer = shapeRenderer;
         this.shapeRenderer.setAutoShapeType(true);
@@ -64,7 +64,7 @@ public class RenderPipe {
         //更新相机
         this.cameraControllers.forEach(controller-> controller.getCamera().update());
 
-        RenderProcessorManager.sort();
+        RenderProcessorManager.swap();
 
         this.batch.begin();
         RenderProcessorManager.batchRender(batch);
@@ -73,6 +73,12 @@ public class RenderPipe {
         this.shapeRenderer.begin();
         RenderProcessorManager.shapeRender(this.shapeRenderer);
         this.shapeRenderer.end();
+
+        /*this.batch.begin();
+        this.shapeRenderer.begin();
+        RenderProcessorManager.handleRender(this.batch, this.shapeRenderer);
+        this.batch.end();
+        this.shapeRenderer.end();*/
     }
 
     /**
