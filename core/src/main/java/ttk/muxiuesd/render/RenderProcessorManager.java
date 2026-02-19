@@ -117,10 +117,16 @@ public class RenderProcessorManager {
             String key = entry.getKey();
             RenderProcessor processor = processors.get(key);
             if (processor != null) {
+                batch.begin();
+                shapeRenderer.begin();
+
                 processor.beginShader(batch);
                 processor.handleBatchRender(batch);
                 processor.handleShapeRender(shapeRenderer);
                 processor.endShader();
+
+                batch.end();
+                shapeRenderer.end();
             }
         }
     }

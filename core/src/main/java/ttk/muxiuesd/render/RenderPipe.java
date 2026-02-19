@@ -66,19 +66,16 @@ public class RenderPipe {
 
         RenderProcessorManager.swap();
 
-        this.batch.begin();
+        /*this.batch.begin();
         RenderProcessorManager.batchRender(batch);
         this.batch.end();
 
         this.shapeRenderer.begin();
         RenderProcessorManager.shapeRender(this.shapeRenderer);
-        this.shapeRenderer.end();
-
-        /*this.batch.begin();
-        this.shapeRenderer.begin();
-        RenderProcessorManager.handleRender(this.batch, this.shapeRenderer);
-        this.batch.end();
         this.shapeRenderer.end();*/
+
+
+        RenderProcessorManager.handleRender(this.batch, this.shapeRenderer);
     }
 
     /**
