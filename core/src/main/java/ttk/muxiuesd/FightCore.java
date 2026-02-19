@@ -1,6 +1,7 @@
 package ttk.muxiuesd;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import game.muxiuesd.bedrockcore.app.GameCore;
 import ttk.muxiuesd.event.EventTypes;
@@ -20,6 +21,7 @@ import ttk.muxiuesd.screen.WorldsMenuScreen;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
+import ttk.muxiuesd.util.Perf;
 import ttk.muxiuesd.world.World;
 
 /**
@@ -90,16 +92,35 @@ public class FightCore extends GameCore {
         //延迟交换游戏屏幕
         exchangeScreen();
 
-        //游戏系统的更新
         float deltaTime = Gdx.graphics.getDeltaTime();
+
+        Perf.begin();
+        //游戏系统的更新
+        Perf.start("game_system_update");
         GameSystemManager.getInstance().update(deltaTime);
+        Perf.stop();
 
         //screen的更新
+        Perf.start("game_screen_update");
         updateScreen(deltaTime);
+        Perf.stop();
 
         //游戏渲染部分
         //处理渲染管线
+        Perf.start("game_render");
         RenderPipe.getInstance().handleGameRender();
+        Perf.stop();
+
+        Perf.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            System.out.println("------");
+            Perf.RECORDER.getDataStack().forEach((data) -> {
+                System.out.println("操作：" + data.getName() + " 耗时：" + data.getCostTime() + " 毫秒");
+
+            });
+            System.out.println("------");
+        }
     }
 
     @Override
