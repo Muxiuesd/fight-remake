@@ -117,7 +117,6 @@ public class FightCore extends GameCore {
             System.out.println("------");
             Perf.RECORDER.getDataStack().forEach((data) -> {
                 System.out.println("操作：" + data.getName() + " 耗时：" + data.getCostTime() + " 毫秒");
-
             });
             System.out.println("------");
         }

@@ -34,10 +34,6 @@ public class PerfRecorder {
         //如果是空的就提前返回
         if (this.curDataStack.empty()) return;
 
-        //如果不是空的就执行回收
-        for (Data data : this.curDataStack) {
-            this.dataPool.free(data);
-        }
         //清理上次记录的数据
         this.curDataStack.clear();
     }
@@ -46,6 +42,7 @@ public class PerfRecorder {
      * 结束记录
      * */
     public void end () {
+        this.dataStack.clear();
         //将这次记录的数据全部加入
         this.dataStack.addAll(this.curDataStack);
     }
@@ -64,7 +61,7 @@ public class PerfRecorder {
     public void stop () {
         Data data = this.dataPool.obtain()
             .setName(this.curName)
-            .setCostTime(TimeUtils.nanosToMillis(this.getCurNanoTime() - this.lastTime));
+            .setCostTime((this.getCurNanoTime() - this.lastTime) / 1000000f);
         this.curDataStack.push(data);
 
         this.curName = null;
