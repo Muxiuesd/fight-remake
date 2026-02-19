@@ -29,7 +29,6 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
         entity.writeCatData(entity.getProperty().getCatsHolder());
         Codecs.ENTITY_PROPERTY.encode(entity.getProperty(), dataWriter);
         dataWriter.objEnd();
-
     }
 
     @Override
@@ -45,6 +44,7 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
             new JsonDataReader(propertyValue)
         );
         propertyOptional.ifPresent(entity::setProperty);
+
         //读取cat
         entity.readCatData(propertyValue.get(PropertyTypes.CATS.getId()));
 

@@ -87,8 +87,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         if (cycle > 1f) cycle %= 1f;
         this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.3f);
 
-        x += delta * getCurSpeed() * velX;
-        y += delta * getCurSpeed() * velY;
+        positionChange(delta);
 
         super.update(delta);
     }

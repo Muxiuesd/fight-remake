@@ -81,6 +81,8 @@ public abstract class Entity<T extends Entity<?>>
         this.scaleY = values.getFloat("scaleY", 1f);
         this.rotation = values.getFloat("rotation", 0);
         this.onGround = values.getBoolean("onGround", true);
+
+        this.updateHitboxCenterPos(this.x, this.y);
     }
 
     @Override
@@ -110,6 +112,10 @@ public abstract class Entity<T extends Entity<?>>
     @Override
     public void update(float delta) {
         //更新持有的hitbox的中心点坐标
+        this.updateHitboxCenterPos(this.x, this.y);
+    }
+
+    public void updateHitboxCenterPos (float x, float y) {
         this.getHitboxHolder().getBoxes().forEach((id, box) -> {
             box.setCenterPos(this.x, this.y);
         });
@@ -151,26 +157,6 @@ public abstract class Entity<T extends Entity<?>>
         return (T) this;
     }
 
-    public float getSpeed () {
-        return this.speed;
-    }
-
-    public T setSpeed (float speed) {
-        if (this.speed >= 0) {
-            this.speed = speed;
-        }
-        return (T) this;
-    }
-
-    public float getCurSpeed () {
-        return curSpeed;
-    }
-
-    public T setCurSpeed (float curSpeed) {
-        this.curSpeed = curSpeed;
-        return (T) this;
-    }
-
     /**
      * 设置旋转中心，这个中心是相对于贴图渲染起点的（贴图的左下角）
      * */
@@ -179,25 +165,28 @@ public abstract class Entity<T extends Entity<?>>
         this.originY = originY;
         return (T) this;
     }
-
     public Vector2 getOrigin() {
         return new Vector2(this.originX, this.originY);
     }
 
+    public T setPosition(Vector2 vector2) {
+        this.setPosition(vector2.x, vector2.y);
+        return (T) this;
+    }
     public T setPosition(float x, float y) {
         this.x = x;
         this.y = y;
-        return (T) this;
-    }
-
-    public T setSize(float width, float height) {
-        this.width = width;
-        this.height = height;
+        this.updateHitboxCenterPos(x, y);
         return (T) this;
     }
 
     public T setSize (Vector2 size) {
         this.setSize(size.x, size.y);
+        return (T) this;
+    }
+    public T setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
         return (T) this;
     }
 
@@ -211,18 +200,13 @@ public abstract class Entity<T extends Entity<?>>
         return new Vector2(this.x, this.y);
     }
 
-    public T setPosition(Vector2 vector2) {
-        this.x = vector2.x;
-        this.y = vector2.y;
-        return (T) this;
-    }
-
     /**
      * 在当前的坐标基础上做出改变
      * */
     public T positionChange(Vector2 deltaPos) {
         this.x += deltaPos.x;
         this.y += deltaPos.y;
+        this.updateHitboxCenterPos(this.x, this.y);
         return (T) this;
     }
 
@@ -233,6 +217,27 @@ public abstract class Entity<T extends Entity<?>>
     public T positionChange(float delta) {
         this.x += this.velX * delta;
         this.y += this.velY * delta;
+        this.updateHitboxCenterPos(this.x, this.y);
+        return (T) this;
+    }
+
+    public float getSpeed () {
+        return this.speed;
+    }
+
+    public T setSpeed (float speed) {
+        if (this.speed >= 0) {
+            this.speed = speed;
+        }
+        return (T) this;
+    }
+
+    public float getCurSpeed () {
+        return this.curSpeed;
+    }
+
+    public T setCurSpeed (float curSpeed) {
+        this.curSpeed = curSpeed;
         return (T) this;
     }
 
@@ -243,11 +248,13 @@ public abstract class Entity<T extends Entity<?>>
         return new Vector2(this.velX, this.velY);
     }
 
+    /**
+     * 设置速度矢量
+     * */
     public T setVelocity(Vector2 velocity) {
         this.setVelocity(velocity.x, velocity.y);
         return (T) this;
     }
-
     public T setVelocity(float x, float y) {
         this.velX = x;
         this.velY = y;
@@ -270,7 +277,6 @@ public abstract class Entity<T extends Entity<?>>
      * 获取实体的中心点的坐标
      * */
     public Vector2 getCenter() {
-        //return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
         return new Vector2(this.x, this.y);
     }
 

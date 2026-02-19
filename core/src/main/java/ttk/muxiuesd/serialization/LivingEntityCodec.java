@@ -67,7 +67,6 @@ public class LivingEntityCodec extends JsonCodec<LivingEntity<?>> {
         propertyOptional.ifPresent(livingEntity::setProperty);
 
         //读取cat
-        //livingEntity.readCAT(propertyValue.get(Fight.ID("cat")));
         livingEntity.readCatData(propertyValue.get(PropertyTypes.CATS.getId()));
 
         //读取背包数据
