@@ -22,7 +22,12 @@ public class PerfRecorder {
     private long lastTime;
 
     public PerfRecorder () {
-        this.dataPool = new ConvPool<>(Data.class);
+        this.dataPool = new ConvPool<>(Data.class, new Pool<Data>(10) {
+            @Override
+            protected Data newObject () {
+                return new Data();
+            }
+        });
         this.dataStack = new Stack<>();
         this.curDataStack = new Stack<>();
     }
@@ -42,7 +47,13 @@ public class PerfRecorder {
      * 结束记录
      * */
     public void end () {
-        this.dataStack.clear();
+        if (! this.dataStack.empty()) {
+            //清理并且回收旧数据
+            this.dataStack.forEach((data) -> {
+                dataPool.free(data);
+            });
+            this.dataStack.clear();
+        }
         //将这次记录的数据全部加入
         this.dataStack.addAll(this.curDataStack);
     }
