@@ -7,16 +7,16 @@ import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.interfaces.Voidable;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.util.TextureUtil;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
-import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.util.Util;
 
 /**
- * 按钮组件，没有字体文本渲染
+ * 单纯的按钮组件，没有字体文本渲染
  * */
 public class UIButton extends UIComponent {
     public static final MouseOverEvent VOID_MOUSE_OVER_EVENT = (button, interactPos) -> {};
+    public static final ClickEvent VOID_CLICK_EVENT = (button, interactPos) -> {
+        //啥也不做
+        return false;
+    };
     public static final int DEFAULT_EDGE = 3;
     public static final float DEFAULT_WIDTH = 80f;
     public static final float DEFAULT_HEIGHT = 14f;
@@ -28,36 +28,18 @@ public class UIButton extends UIComponent {
     private ClickEvent clickEvent;
     private MouseOverEvent mouseOverEvent;
 
-
-    public UIButton(ClickEvent clickEvent) {
-        this(clickEvent, VOID_MOUSE_OVER_EVENT);
-    }
-
-    public UIButton(ClickEvent clickEvent, MouseOverEvent mouseOverEvent) {
-        this(
-            Util.loadTextureRegion(
-                Fight.ID("button"),
-                Fight.UITexturePath("button.png")
-            ),
-            Util.loadTextureRegion(
-                Fight.ID("button_clicked"),
-                Fight.UITexturePath("button_clicked.png")
-            ),
-            Util.loadTextureRegion(
-                Fight.ID("button_mouse_over"),
-                Fight.UITexturePath("button_mouse_over.png")
-            ),
-            clickEvent,
-            mouseOverEvent
-        );
-    }
+    /**
+     * @param background 背景的材质贴图
+     * @param clickBackground 点击按钮后的材质贴图
+     * @param mouseOverBackground 鼠标放在按钮上的材质贴图
+     * */
     public UIButton(TextureRegion background, TextureRegion clickBackground, TextureRegion mouseOverBackground,
                     ClickEvent clickEvent, MouseOverEvent mouseOverEvent) {
         this(
             TextureUtil.createNinePatch(background, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             TextureUtil.createNinePatch(clickBackground, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
             TextureUtil.createNinePatch(mouseOverBackground, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE, DEFAULT_EDGE),
-            DEFAULT_WIDTH, DEFAULT_HEIGHT, new GridPoint2(DEFAULT_EDGE, DEFAULT_EDGE),
+            DEFAULT_WIDTH, DEFAULT_HEIGHT, new GridPoint2((int) DEFAULT_WIDTH, (int) DEFAULT_HEIGHT),
             clickEvent, mouseOverEvent
         );
     }
@@ -90,7 +72,8 @@ public class UIButton extends UIComponent {
 
     @Override
     public boolean click (GridPoint2 interactPos) {
-        AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
+        //AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
+        this.playClickSound();
 
         if (this.clickEvent == null) return super.click(interactPos);
 
@@ -102,6 +85,11 @@ public class UIButton extends UIComponent {
         if (this.mouseOverEvent == null) super.mouseOver(interactPos);
         this.mouseOverEvent.handle(this, interactPos);
     }
+
+    /**
+     * 播放点击音效，需要自己实现
+     * */
+    public void playClickSound () {}
 
     public NinePatch getBackgroundPatch () {
         return this.backgroundPatch;

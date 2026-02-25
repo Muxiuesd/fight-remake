@@ -1,6 +1,5 @@
 package ttk.muxiuesd.ui.components;
 
-import game.muxiuesd.bedrockcore.app.ui.components.UITextButton;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.ui.screen.WorldsMenuUIScreen;
 import ttk.muxiuesd.ui.text.Text;
@@ -12,7 +11,7 @@ import java.util.UUID;
 /**
  * 新建世界的按钮UI组件
  * */
-public class CreateNewWorldButtonUI extends UITextButton {
+public class CreateNewWorldButtonUI extends FightUITextButton {
     private WorldsMenuUIScreen worldsMenuUIScreen;
 
     public CreateNewWorldButtonUI (WorldsMenuUIScreen worldsMenuUIScreen) {

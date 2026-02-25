@@ -1,4 +1,4 @@
-package ttk.muxiuesd.ui.text;
+package game.muxiuesd.bedrockcore.font;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -16,7 +16,7 @@ public class FontManager {
     /**
      * 注册一种字体
      * */
-    public static FontHolder registerFont(String id, FileHandle fontFile) {
+    public static FontHolder registerFont (String id, FileHandle fontFile) {
         FontHolder fontHolder = new FontHolder(id, loadGenerator(fontFile));
         FONT_HOLDERS.put(id, fontHolder);
         return fontHolder;

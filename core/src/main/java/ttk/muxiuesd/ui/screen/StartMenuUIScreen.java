@@ -7,6 +7,7 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import game.muxiuesd.bedrockcore.app.ui.components.UITextButton;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
+import ttk.muxiuesd.ui.components.FightUITextButton;
 import ttk.muxiuesd.ui.text.Text;
 
 /**
@@ -25,7 +26,7 @@ public class StartMenuUIScreen extends UIScreen {
         addComponent(this.buttonsPanel);
 
         //开始游戏按钮
-        this.startButton = new UITextButton(
+        this.startButton = new FightUITextButton(
             Text.ofText(Fight.ID("button_start_game")),
             (button, interactPos) -> {
                 FightCore.getInstance().setScreen(FightCore.getInstance().worldsMenuScreen);
@@ -35,7 +36,7 @@ public class StartMenuUIScreen extends UIScreen {
         this.startButton.setPosition(0, UIButton.DEFAULT_HEIGHT * 2 + 20);
 
         //游戏设置按钮
-        this.settingsButton = new UITextButton(
+        this.settingsButton = new FightUITextButton(
             Text.ofText(Fight.ID("button_game_settings")),
             (button, interactPos) -> {
                 return false;
@@ -44,7 +45,7 @@ public class StartMenuUIScreen extends UIScreen {
         this.settingsButton.setPosition(0, UIButton.DEFAULT_HEIGHT + 10);
 
         //退出游戏的按钮
-        this.exitButton = new UITextButton(
+        this.exitButton = new FightUITextButton(
             Text.ofText(Fight.ID("button_exit_game")),
             (button, interactPos) -> {
                 Gdx.app.exit();

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.font.FontHolder;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.util.TextUtil;
 

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import ttk.muxiuesd.ui.text.FontHolder;
+import game.muxiuesd.bedrockcore.font.FontHolder;
 import ttk.muxiuesd.ui.text.Text;
 
 /**

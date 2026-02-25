@@ -4,13 +4,19 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import game.muxiuesd.bedrockcore.app.interfaces.ui.UIListItem;
-import ttk.muxiuesd.ui.text.FontHolder;
+import game.muxiuesd.bedrockcore.font.FontHolder;
+import ttk.muxiuesd.ui.components.FightUITextButton;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.TextUtil;
 
 /**
- * 可以作为列表项目的按钮组件
+ * 可以作为列表UI项目的按钮组件
  * */
-public class UIButtonListItem extends UITextButton implements UIListItem{
+public class UIButtonListItem extends FightUITextButton implements UIListItem {
+
+    public UIButtonListItem (Text text, ClickEvent clickEvent) {
+        super(text, clickEvent);
+    }
 
     @Override
     public void update (UIList uiList, float delta) {

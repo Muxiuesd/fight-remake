@@ -11,6 +11,9 @@ public abstract class GameCore implements ApplicationListener {
     private Screen activeScreen;    //当前活跃的游戏屏幕
     private Screen nextScreen;      //下一个要被切换的游戏屏幕
 
+    /**
+     * 游戏主循环：更新、渲染等等
+     * */
     @Override
     public void render () {
         this.exchangeScreen();

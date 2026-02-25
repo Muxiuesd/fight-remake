@@ -5,6 +5,7 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButtonListItem;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
+import ttk.muxiuesd.ui.text.Text;
 
 /**
  * 世界存档按钮，点击进入存档
@@ -13,6 +14,7 @@ public class WorldSaveButtonUI extends UIButtonListItem implements UIButton.Clic
     private String worldName;
 
     public WorldSaveButtonUI (String worldName) {
+        super(Text.ofText(worldName), VOID_CLICK_EVENT);
         this.worldName = worldName;
 
         setClickEvent(this);

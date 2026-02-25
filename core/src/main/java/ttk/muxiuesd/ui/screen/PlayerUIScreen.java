@@ -58,7 +58,6 @@ public class PlayerUIScreen extends UIScreen {
             playerInventoryBackground.getRegionWidth(), playerInventoryBackground.getRegionHeight()
             )
         );
-        //addComponent(INVENTORY_UI_PANEL_INSTANCE);
 
         /// 玩家创造背包
         TextureRegion playerCreateTabBackground = Util.loadTextureRegion(
@@ -70,7 +69,6 @@ public class PlayerUIScreen extends UIScreen {
             playerCreateTabBackground.getRegionWidth(), playerCreateTabBackground.getRegionHeight()
             )
         );
-        //addComponent(CREATE_TAB_UI_PANEL_INSTANCE);
 
         //默认先显示玩家背包面板
         this.setCurrentTopPanel(getInventoryUIPanel());
