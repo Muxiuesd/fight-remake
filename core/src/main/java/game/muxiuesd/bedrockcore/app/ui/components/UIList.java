@@ -1,14 +1,12 @@
 package game.muxiuesd.bedrockcore.app.ui.components;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import game.muxiuesd.bedrockcore.app.interfaces.ui.UIListItem;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.ScissorUtil;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
@@ -147,7 +145,10 @@ public class UIList extends UIPanel {
         float itemRenderY = getY() + getHeight();
         //启用裁剪
         //超过列表大小的部分不绘制
-        this.enableScissor(batch, GUICamera.INSTANCE.getCamera());
+        ScissorUtil.beginScissor(
+            batch, GUICamera.INSTANCE.getCamera(),
+            getAbsX(), getY(), getWidth(), getHeight()
+        );
         for (UIListItem listItem : this.getItems()) {
             if (listItem instanceof UIComponent uiComponent) {
                 itemRenderX = uiComponent.getAbsX();
@@ -164,7 +165,7 @@ public class UIList extends UIPanel {
         //绘制滚动条
         this.getScrollbar().draw(batch, this);
         //关掉裁剪
-        this.disableScissor(batch);
+        ScissorUtil.endScissor(batch);
     }
 
     /**
@@ -198,44 +199,5 @@ public class UIList extends UIPanel {
     public UIList setScrollbar (UIScrollBar scrollbar) {
         this.scrollbar = scrollbar;
         return this;
-    }
-
-    /**
-     * 启用裁剪区域
-     */
-    public void enableScissor(Batch batch, Camera camera) {
-        enableScissor(batch, camera, getAbsX(), getAbsY(), getWidth(), getHeight());
-    }
-
-    /**
-     * 启用指定矩形区域的裁剪
-     * @param batch 当前Batch
-     * @param camera batch对应的相机
-     */
-    public void enableScissor(Batch batch, Camera camera, float x, float y, float width, float height) {
-        if (width <= 0 || height <= 0) return;
-
-        batch.flush();
-        Rectangle scissors = new Rectangle();
-        Rectangle clipBounds = new Rectangle(x, y, width, height);
-
-        // 计算裁剪区域
-        ScissorStack.calculateScissors(
-            camera,
-            batch.getTransformMatrix(),
-            clipBounds,
-            scissors
-        );
-
-        // 压入裁剪栈
-        ScissorStack.pushScissors(scissors);
-    }
-
-    /**
-     * 禁用裁剪
-     */
-    public void disableScissor(Batch batch) {
-        batch.flush();
-        ScissorStack.popScissors();
     }
 }
