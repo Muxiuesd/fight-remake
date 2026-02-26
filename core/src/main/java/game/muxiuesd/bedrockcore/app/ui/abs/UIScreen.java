@@ -2,6 +2,7 @@ package game.muxiuesd.bedrockcore.app.ui.abs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,8 +23,14 @@ import java.util.LinkedHashSet;
 
 /**
  * UI屏幕，UI组件都绘制在这个Screen里面
+ * <p>
+ * 需要自己实现 {@link UIComponentsHolder#getComponents()}
+ * <p>
+ * 如果要处理全局的键盘和鼠标的输入，就把实例加入gdx的input处理
  * */
-public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder{
+public abstract class UIScreen
+    implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder, InputProcessor{
+
     private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayAddComponents = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
@@ -49,7 +56,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
      * 被展示出来时调用
      * */
     public void show () {
-        //调整
+        //调整大小
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
         resize(camera.viewportWidth, camera.viewportHeight);
     }
@@ -88,7 +95,7 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
                 //计算交互区域坐标
                 GridPoint2 interactGrid = uiComponent.getInteractGridSize();
                 Vector2 position = uiComponent.getPosition();
-                //鼠标相对于UI组件的坐标
+                //计算鼠标相对于UI组件的坐标
                 Vector2 relativePos = new Vector2((mouseUIPosition.x - position.x), (mouseUIPosition.y - position.y));
                 Vector2 size = uiComponent.getSize();
                 int xn = (int) (relativePos.x / size.x * interactGrid.x);
@@ -160,7 +167,109 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
      * */
     @Override
     public void resize (float width, float height) {
+        if (getComponents().isEmpty()) return;
         getComponents().forEach(uiComponent -> uiComponent.resize(width, height));
+    }
+
+    @Override
+    public boolean keyDown (int keycode) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.keyDown(keycode);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyDown(keycode));
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean keyUp (int keycode) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.keyUp(keycode);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyUp(keycode));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped (char character) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.keyTyped(character);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyTyped(character));
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchDown(screenX, screenY, pointer, button);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchDown(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchUp(screenX, screenY, pointer, button);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchUp(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchCancelled(screenX, screenY, pointer, button);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchCancelled(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged (int screenX, int screenY, int pointer) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchDragged(screenX, screenY, pointer);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchDragged(screenX, screenY, pointer));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.mouseMoved(screenX, screenY);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.mouseMoved(screenX, screenY));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean scrolled (float amountX, float amountY) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.scrolled(amountX, amountY);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.scrolled(amountX, amountY));
+        }
+        return false;
     }
 
     public boolean isMouseOver () {
@@ -171,10 +280,16 @@ public abstract class UIScreen implements Updateable, Drawable, ShapeRenderable,
         this.mouseOver = mouseOver;
     }
 
+    /**
+     * 获取焦点组件
+     * */
     public UIComponent getFocusComponent () {
-        return focusComponent;
+        return this.focusComponent;
     }
 
+    /**
+     * 设置焦点组件
+     * */
     public UIScreen setFocusComponent (UIComponent focusComponent) {
         this.focusComponent = focusComponent;
         return this;

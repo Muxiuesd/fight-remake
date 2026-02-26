@@ -239,6 +239,79 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     }
 
     @Override
+    public boolean keyDown (int keycode) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyDown(keycode));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyUp (int keycode) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyUp(keycode));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped (char character) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyTyped(character));
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchDown(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchUp(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchCancelled(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged (int screenX, int screenY, int pointer) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchDragged(screenX, screenY, pointer));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.mouseMoved(screenX, screenY));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean scrolled (float amountX, float amountY) {
+        if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.scrolled(amountX, amountY));
+        }
+        return false;
+    }
+
+    @Override
     public LinkedHashSet<UIComponent> getComponents () {
         return this.components;
     }

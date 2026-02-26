@@ -1,5 +1,6 @@
 package game.muxiuesd.bedrockcore.app.ui.abs;
 
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -12,8 +13,10 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 
 /**
  * 基础 UI 组件
+ * <p>
+ * 有实现 {@link InputProcessor} 这是对于全局的输入处理
  * */
-public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRenderable, GUIResize {
+public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRenderable, GUIResize, InputProcessor {
     private UIScreen screen;  //隶属于哪一个screen
     private UIPanel parentPanel = UIPanel.VOID_INSTANCE;  //隶属于哪一个UI面板，无论如何不能为null
     private float x, y; //这里的坐标是相对于父组件的（如果有的话）
@@ -94,6 +97,50 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     public void resize (float viewportWidth, float viewportHeight) {
     }
 
+    @Override
+    public boolean keyDown (int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp (int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped (char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged (int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled (float amountX, float amountY) {
+        return false;
+    }
 
     public UIScreen getScreen () {
         return this.screen;
