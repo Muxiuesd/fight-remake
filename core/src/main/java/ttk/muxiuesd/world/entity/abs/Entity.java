@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codecable;
+import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
@@ -43,13 +44,13 @@ public abstract class Entity<T extends Entity<T>>
 
     private String id;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
-    public float speed, curSpeed;
-    public float x, y;
-    public float velX, velY;
-    public float width, height;
-    public float originX = 0f, originY = 0f;
-    public float scaleX = 1f, scaleY = 1f;
-    public float rotation;
+    private float speed, curSpeed;
+    private float x, y;
+    private float velX, velY;
+    private float width, height;
+    private float originX = 0f, originY = 0f;
+    private float scaleX = 1f, scaleY = 1f;
+    private float rotation;
     private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
     public TextureRegion textureRegion;
@@ -65,6 +66,9 @@ public abstract class Entity<T extends Entity<T>>
         this.hitboxHolder = new HitboxHolder<>(this);
     }
 
+    /**
+     * 读取自定义属性标签数据
+     * */
     @Override
     public void readCatData (JsonValue values) {
         this.speed = values.getFloat("speed", 1.145f);
@@ -85,6 +89,9 @@ public abstract class Entity<T extends Entity<T>>
         this.updateHitboxCenterPos(this.x, this.y);
     }
 
+    /**
+     * 写入自定义属性标签数据
+     * */
     @Override
     public void writeCatData (CatsHolder holder) {
         holder
@@ -121,6 +128,9 @@ public abstract class Entity<T extends Entity<T>>
         });
     }
 
+    /**
+     * 实体每tick调用方法
+     * */
     @Override
     public void tick (World world, float delta) {
     }
@@ -155,18 +165,6 @@ public abstract class Entity<T extends Entity<T>>
             new RectHitbox().setStartPos(startX, startY).setEndPos(endX, endY).setCenterPos(this.x, this.y)
         );
         return (T) this;
-    }
-
-    /**
-     * 设置旋转中心，这个中心是相对于贴图渲染起点的（贴图的左下角）
-     * */
-    public T setOrigin(float originX, float originY) {
-        this.originX = originX;
-        this.originY = originY;
-        return (T) this;
-    }
-    public Vector2 getOrigin() {
-        return new Vector2(this.originX, this.originY);
     }
 
     public T setPosition(Vector2 vector2) {
@@ -206,6 +204,7 @@ public abstract class Entity<T extends Entity<T>>
     public T positionChange(Vector2 deltaPos) {
         this.x += deltaPos.x;
         this.y += deltaPos.y;
+        //及时更新碰撞箱中心坐标
         this.updateHitboxCenterPos(this.x, this.y);
         return (T) this;
     }
@@ -217,6 +216,7 @@ public abstract class Entity<T extends Entity<T>>
     public T positionChange(float delta) {
         this.x += this.velX * delta;
         this.y += this.velY * delta;
+        //及时更新碰撞箱中心坐标
         this.updateHitboxCenterPos(this.x, this.y);
         return (T) this;
     }
@@ -232,12 +232,41 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
+    /**
+     * 获取当前速率
+     * */
     public float getCurSpeed () {
-        return this.curSpeed;
+        return Vec2.len(this.getX(), this.getY());
     }
 
+    /**
+     * 设置当前速率
+     * */
     public T setCurSpeed (float curSpeed) {
-        this.curSpeed = curSpeed;
+        float len = Vec2.len(this.getX(), this.getY());
+        this.setVelocity((this.getX() / len) * curSpeed, (this.getY() / len) * curSpeed);
+        return (T) this;
+    }
+
+    public float getX () {
+        return this.x;
+    }
+
+    public T setX (float x) {
+        this.x = x;
+        //及时更新碰撞箱中心坐标
+        this.updateHitboxCenterPos(this.x, this.y);
+        return (T) this;
+    }
+
+    public float getY () {
+        return this.y;
+    }
+
+    public T setY (float y) {
+        this.y = y;
+        //及时更新碰撞箱中心坐标
+        this.updateHitboxCenterPos(this.x, this.y);
         return (T) this;
     }
 
@@ -245,7 +274,7 @@ public abstract class Entity<T extends Entity<T>>
      * 获取速度矢量
      * */
     public Vector2 getVelocity() {
-        return new Vector2(this.velX, this.velY);
+        return new Vector2(this.getVelX(), this.getVelY());
     }
 
     /**
@@ -255,9 +284,27 @@ public abstract class Entity<T extends Entity<T>>
         this.setVelocity(velocity.x, velocity.y);
         return (T) this;
     }
-    public T setVelocity(float x, float y) {
-        this.velX = x;
-        this.velY = y;
+    public T setVelocity(float xVel, float yVel) {
+        this.setVelX(xVel);
+        this.setVelY(yVel);
+        return (T) this;
+    }
+
+    public float getVelX () {
+        return this.velX;
+    }
+
+    public T setVelX (float velX) {
+        this.velX = velX;
+        return (T) this;
+    }
+
+    public float getVelY () {
+        return this.velY;
+    }
+
+    public T setVelY (float velY) {
+        this.velY = velY;
         return (T) this;
     }
 
@@ -265,12 +312,50 @@ public abstract class Entity<T extends Entity<T>>
         return new Vector2(this.width, this.height);
     }
 
+    /**
+     * 设置实体宽度（世界渲染）
+     * */
     public float getWidth() {
         return this.width;
     }
 
+    /**
+     * 设置实体高度（世界渲染）
+     * */
     public float getHeight() {
         return this.height;
+    }
+
+    /**
+     * 设置旋转中心，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public T setOrigin(float originX, float originY) {
+        this.originX = originX;
+        this.originY = originY;
+        return (T) this;
+    }
+
+    public Vector2 getOrigin() {
+        return new Vector2(this.originX, this.originY);
+    }
+
+    public Vector2 getScale () {
+        return new Vector2(this.scaleX, this.scaleY);
+    }
+
+    /**
+     * 获取旋转角度（世界渲染）
+     * */
+    public float getRotation () {
+        return this.rotation;
+    }
+
+    /**
+     * 设置旋转角度（世界渲染）
+     * */
+    public T setRotation (float rotation) {
+        this.rotation = rotation;
+        return (T) this;
     }
 
     /**
@@ -280,19 +365,6 @@ public abstract class Entity<T extends Entity<T>>
         return new Vector2(this.x, this.y);
     }
 
-    public Vector2 getScale () {
-        return new Vector2(this.scaleX, this.scaleY);
-    }
-
-    public float getRotation () {
-        return rotation;
-    }
-
-    public T setRotation (float rotation) {
-        this.rotation = rotation;
-        return (T) this;
-    }
-
     /**
      * 获取实体的身体碰撞箱
      * */
@@ -300,6 +372,9 @@ public abstract class Entity<T extends Entity<T>>
         return this.getHitboxHolder().getBox(HITBOX_BODY);
     }
 
+    /**
+     * 获取实体的碰撞箱持有类
+     * */
     public HitboxHolder<Entity<T>> getHitboxHolder () {
         return this.hitboxHolder;
     }
@@ -365,6 +440,9 @@ public abstract class Entity<T extends Entity<T>>
         return this.onGround;
     }
 
+    /**
+     * 设置当前的状态是否贴地
+     * */
     public T setOnGround (boolean onGround) {
         this.onGround = onGround;
         return (T) this;
