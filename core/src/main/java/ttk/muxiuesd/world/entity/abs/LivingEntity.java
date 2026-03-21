@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
  * <p>
  * TODO 活物实体能有buff影响其行为状态
  * */
-public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> {
+public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间

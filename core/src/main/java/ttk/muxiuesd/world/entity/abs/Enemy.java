@@ -18,7 +18,7 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
 /**
  * 敌人实体抽象类
  * */
-public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
+public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
     public static final int MAX_RANDOM_COUNT = 5;
 
     private Entity<?> curTarget;   //敌人当前需要攻击的目标

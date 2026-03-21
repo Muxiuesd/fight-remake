@@ -35,7 +35,7 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  * <p>
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
-public abstract class Entity<T extends Entity<?>>
+public abstract class Entity<T extends Entity<T>>
     implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
 
     //实体的默认碰撞箱ID（默认就一个身体碰撞箱）
