@@ -236,15 +236,15 @@ public abstract class Entity<T extends Entity<T>>
      * 获取当前速率
      * */
     public float getCurSpeed () {
-        return Vec2.len(this.getX(), this.getY());
+        return Vec2.len(this.getVelX(), this.getVelY());
     }
 
     /**
      * 设置当前速率
      * */
     public T setCurSpeed (float curSpeed) {
-        float len = Vec2.len(this.getX(), this.getY());
-        this.setVelocity((this.getX() / len) * curSpeed, (this.getY() / len) * curSpeed);
+        float len = Vec2.len(this.getVelX(), this.getVelY());
+        this.setVelocity((this.getVelY() / len) * curSpeed, (this.getVelY() / len) * curSpeed);
         return (T) this;
     }
 

@@ -20,7 +20,6 @@ import ttk.muxiuesd.world.wall.Wall;
 public class GroundEntityCollisionSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
 
-
     // 精度控制
     private static final float EPS = 0.0001f;
     // 最大碰撞修正次数
@@ -66,7 +65,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
                 // X轴分步移动
                 if (Math.abs(stepX) > EPS) {
                     rect.x += stepX;
-                    if (fixCollisions(rect, 1, 0, stepX)) {
+                    if (this.fixCollisions(rect, 1, 0, stepX)) {
                         // 如果发生碰撞，剩余步数不再移动X轴
                         stepX = 0;
                     }
@@ -75,7 +74,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
                 // Y轴分步移动
                 if (Math.abs(stepY) > EPS) {
                     rect.y += stepY;
-                    if (fixCollisions(rect, 0, 1, stepY)) {
+                    if (this.fixCollisions(rect, 0, 1, stepY)) {
                         // 如果发生碰撞，剩余步数不再移动Y轴
                         stepY = 0;
                     }
@@ -101,7 +100,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
      * 修正碰撞并返回是否发生了碰撞
      */
     private boolean fixCollisions(Rectangle hitbox, int axisX, int axisY, float move) {
-        Array<Wall<?>> collidingWalls = getCollidingWalls(hitbox);
+        Array<Wall<?>> collidingWalls = this.getCollidingWalls(hitbox);
         if (collidingWalls.isEmpty()) {
             return false; // 无碰撞
         }
@@ -114,7 +113,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
             for (Wall<?> wall : collidingWalls) {
                 Rectangle wallBox = wall.getHitboxRectangle();
                 if (hitbox.overlaps(wallBox)) {
-                    float overlap = calculateOverlap(hitbox, wallBox, axisX, axisY, move);
+                    float overlap = this.calculateOverlap(hitbox, wallBox, axisX, axisY, move);
                     totalSeparation += overlap;
                     collided = true;
                 }
@@ -129,7 +128,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
                 hitbox.y += axisY * separation;
             }
 
-            collidingWalls = getCollidingWalls(hitbox);
+            collidingWalls = this.getCollidingWalls(hitbox);
             fixes++;
         }
 
