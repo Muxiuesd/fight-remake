@@ -1,13 +1,10 @@
 package game.muxiuesd.bedrockcore.math;
 
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
- * 二维向量
+ * 二维向量（x，y值都是私有化的）
  * <p>
  * 方法实现全部照搬gdx原有的类
  * */
@@ -26,11 +23,11 @@ public class Vec2 implements Vector<Vec2> {
         this.x = x;
         this.y = y;
     }
-
-    /** Constructs a vector from the given vector
-     * @param v The vector */
     public Vec2 (Vec2 v) {
         set(v);
+    }
+    public Vec2 (Vector2 vector2) {
+        set(vector2.x, vector2.y);
     }
 
     @Override
