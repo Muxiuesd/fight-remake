@@ -44,9 +44,9 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
 
         this.visionRange = visionRange;
         this.attackRange = attackRange;
-        this.speed = speed;
         this.attackTimer = Pools.TASK_TIMER.obtain().setMaxSpan(attackSpan);
 
+        setSpeed(speed);
         setSize(1f, 1f);
     }
 
@@ -69,10 +69,9 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
      * */
     public void walkToTarget (float delta) {
         Entity<?> target = this.getCurTarget();
-        Direction direction = new Direction(target.x - x, target.y - y);
-        setVelocity(direction.getX() * curSpeed, direction.getY() * curSpeed);
-        this.x += velX * delta;
-        this.y += velY * delta;
+        Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
+        setVelocity(direction.getX() * getCurSpeed(), direction.getY() * getCurSpeed());
+        positionChange(delta);
     }
 
     /**
@@ -121,7 +120,10 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
             return;
         }
         //在攻击范围之内且攻击间隔到了就要攻击
-        Bullet bullet = this.createBullet(this, new Direction(target.x - x, target.y - y));
+        Bullet bullet = this.createBullet(
+            this,
+            new Direction(target.getX() - getX(), target.getY() - getY())
+        );
         es.add(bullet);
         EventBus.post(EventTypes.BULLET_SHOOT, new EventPosterBulletShoot(es.getWorld(), this, bullet));
     }
@@ -134,7 +136,7 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.ID("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
-        bullet.setPosition(x + (getWidth() - bullet.getWidth())/2, y + (getHeight() - bullet.getHeight())/2);
+        bullet.setPosition(getX() + (getWidth() - bullet.getWidth())/2, getY() + (getHeight() - bullet.getHeight())/2);
         bullet.setVelocity(direction, bullet.getSpeed());
         return bullet;
     }

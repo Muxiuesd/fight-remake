@@ -82,7 +82,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
-        this.playerLastPosition = new Vector2(this.player.x + 10000, this.player.y + 10000);
+        this.playerLastPosition = new Vector2(this.player.getX() + 10000, this.player.getY() + 10000);
 
         this.initPool();
 
@@ -174,7 +174,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         if (this.chunkLoadTimer.isReady() && this.playerMoved()) {
             this.calculateNeedLoadedChunk();
             this.calculateNeedUnloadedChunk();
-            this.playerLastPosition.set(this.player.x, this.player.y);
+            this.playerLastPosition.set(this.player.getX(), this.player.getY());
         }
     }
 
@@ -483,7 +483,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     private void calculateNeedUnloadedChunk() {
         Integer value = Fight.PLAYER_VISUAL_RANGE.getValue();
         for (Chunk chunk : this.activeChunks) {
-            float distance = Util.getDistance(this.player.x, this.player.y,
+            float distance = Util.getDistance(this.player.getX(), this.player.getY(),
                 chunk.getChunkPosition().getX() * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f,
                 chunk.getChunkPosition().getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f
             );

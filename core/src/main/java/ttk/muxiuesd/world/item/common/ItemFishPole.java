@@ -148,7 +148,7 @@ public class ItemFishPole extends Item {
             //玩家抛竿
             Vector2 ownerPos = player.getCenter();
             Vector2 mwp = Util.getMouseWorldPosition();
-            float distance = Util.getDistance(ownerPos.x, owner.y, mwp.x, mwp.y);
+            float distance = Util.getDistance(ownerPos.x, ownerPos.y, mwp.x, mwp.y);
             fishingHook.setSpeed(Math.min(distance, this.castSpeed));
         }else {
             //TODO 其他生物抛竿的抛竿方向，速度方向
@@ -186,32 +186,38 @@ public class ItemFishPole extends Item {
             //没抛竿渲染
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
+            Vector2 holderScale = holder.getScale();
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                batch.draw(this.textureRegion,
+                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                     0, 0,
-                    holder.width, holder.height,
-                    - holder.scaleX, holder.scaleY, rotation + 180);
+                    holder.getWidth(), holder.getHeight(),
+                    - holderScale.x, holderScale.y, rotation + 180);
             } else {
-                batch.draw(textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                batch.draw(this.textureRegion,
+                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                     0, 0,
-                    holder.width, holder.height,
-                    holder.scaleX, holder.scaleY, rotation);
+                    holder.getWidth(), holder.getHeight(),
+                    holderScale.x, holderScale.y, rotation);
             }
         }else {
             if (this.castTexture == null) return;
             //抛竿渲染
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
+            Vector2 holderScale = holder.getScale();
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(this.castTexture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                batch.draw(this.castTexture,
+                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                     0, 0,
-                    holder.width, holder.height,
-                    - holder.scaleX, holder.scaleY, rotation + 225f);
+                    holder.getWidth(), holder.getHeight(),
+                    - holderScale.x, holderScale.y, rotation + 225f);
             } else {
-                batch.draw(this.castTexture, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+                batch.draw(this.castTexture,
+                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                     0, 0,
-                    holder.width, holder.height,
-                    holder.scaleX, holder.scaleY, rotation - 45f);
+                    holder.getWidth(), holder.getHeight(),
+                    holderScale.x, holderScale.y, rotation - 45f);
             }
         }
     }
@@ -219,10 +225,15 @@ public class ItemFishPole extends Item {
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
         if (this.textureRegion != null) {
-            batch.draw(this.textureRegion, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
-                itemEntity.originX, itemEntity.originY,
-                itemEntity.width, itemEntity.height,
-                itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
+            Vector2 itemEntityOrigin = itemEntity.getOrigin();
+            Vector2 itemEntityScale = itemEntity.getScale();
+            batch.draw(this.textureRegion,
+                itemEntity.getX(), itemEntity.getY() + itemEntity.getPositionOffset().y,
+                itemEntityOrigin.x, itemEntityOrigin.y,
+                itemEntity.getWidth(), itemEntity.getHeight(),
+                itemEntityScale.x, itemEntityScale.y,
+                itemEntity.getRotation()
+            );
         }
     }
 

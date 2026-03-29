@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
@@ -61,16 +62,19 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         Direction direction = holder.getDirection();
         float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         float rotationOffset = holder.getSwingHandDegreeOffset();
+        Vector2 holderScale = holder.getScale();
         if (rotation > 90f && rotation <= 270f) {
-            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion,
+                holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                 0, 0,
-                holder.width, holder.height,
-                - holder.scaleX, holder.scaleY, rotation + 225f + rotationOffset);
+                holder.getWidth(), holder.getHeight(),
+                - holderScale.x, holderScale.y, rotation + 225f + rotationOffset);
         } else {
-            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion,
+                holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                 0, 0,
-                holder.width, holder.height,
-                holder.scaleX, holder.scaleY, rotation - 45f + rotationOffset);
+                holder.getWidth(), holder.getHeight(),
+                holderScale.x, holderScale.y, rotation - 45f + rotationOffset);
         }
     }
 
@@ -81,12 +85,16 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
         if (this.textureRegion != null) {
+            Vector2 origin = itemEntity.getOrigin();
+            Vector2 scale = itemEntity.getScale();
             batch.draw(this.textureRegion,
-                itemEntity.x - itemEntity.getWidth() / 2f,
-                itemEntity.y - itemEntity.getHeight() / 2f + itemEntity.getPositionOffset().y,
-                itemEntity.originX, itemEntity.originY,
-                itemEntity.width, itemEntity.height,
-                itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
+                itemEntity.getX() - itemEntity.getWidth() / 2f,
+                itemEntity.getY() - itemEntity.getHeight() / 2f + itemEntity.getPositionOffset().y,
+                origin.x, origin.y,
+                itemEntity.getWidth(), itemEntity.getHeight(),
+                scale.x, scale.y,
+                itemEntity.getRotation()
+            );
         }
     }
 

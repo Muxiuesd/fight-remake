@@ -93,8 +93,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
                 rect.y + (player.getHeight() / 2f - Player.HITBOX_OFFSET.y)
             );
             // 重置速度
-            player.velX = 0;
-            player.velY = 0;
+            player.setVelocity(0, 0);
         }
     }
 

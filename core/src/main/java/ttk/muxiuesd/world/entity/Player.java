@@ -38,8 +38,8 @@ public class Player extends LivingEntity<Player> {
     public Player(World world, EntityType<? super Player> entityType, float maxHealth, float curHealth) {
         super(world, entityType, maxHealth, curHealth, BACKPACK_SIZE);
         renderHandItem = true;
-        speed = 3.3f;
-        curSpeed = speed;
+        setSpeed(3.3f);
+        setCurSpeed(getSpeed());
         textureRegion = getTextureRegion(Fight.ID("player"), "player/player.png");
         this.shield = getTextureRegion(Fight.ID("player_shield"), "player/shield.png");
 
@@ -103,7 +103,7 @@ public class Player extends LivingEntity<Player> {
         ItemEntity itemEntity = super.dropItem(index, amount);
         if (itemEntity != null) {
             Vector2 mwp = Util.getMouseWorldPosition();
-            float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+            float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
             float v = Math.min(distance, 4f);
             itemEntity.setSpeed(v);
             itemEntity.setCurSpeed(v);
@@ -119,7 +119,7 @@ public class Player extends LivingEntity<Player> {
      * */
     public ItemEntity dropItem (ItemStack stack) {
         Vector2 mwp = Util.getMouseWorldPosition();
-        float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+        float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
         float v = Math.min(distance, 4f);
 
         return spawnItemEntity(stack)

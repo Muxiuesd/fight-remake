@@ -67,7 +67,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
             this.moveTimer.update(delta);
         }else {
             setOnGround(true);
-            if (this.cs.getBlock(x, y) instanceof BlockWater) {
+            if (this.cs.getBlock(getX(), getY()) instanceof BlockWater) {
                 //只有鱼钩在水中才上下漂浮和产生气泡粒子
                 this.cycle += delta / 2;
                 if (this.cycle > 1f) this.cycle -= 1f;
@@ -97,10 +97,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 抛钩移动
      * */
     private void throwMovement (float delta) {
-        velX = speed * throwDirection.getX();
-        velY = speed * throwDirection.getY();
-        x += velX * delta;
-        y += velY * delta;
+        setVelocity(getCurSpeed() * throwDirection.getX(), getCurSpeed() * throwDirection.getY());
+        positionChange(delta);
     }
 
     /**
@@ -108,10 +106,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * */
     private void returningMovement (float delta) {
         Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
-        velX = speed * dir.getX();
-        velY = speed * dir.getY();
-        x += velX * delta;
-        y += velY * delta;
+        setVelocity(getSpeed() * dir.getX(), getSpeed() * dir.getY());
+        positionChange(delta);
     }
 
     public LivingEntity<?> getOwner () {

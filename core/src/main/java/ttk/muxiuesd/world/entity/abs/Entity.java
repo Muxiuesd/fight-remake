@@ -273,7 +273,7 @@ public abstract class Entity<T extends Entity<T>>
     /**
      * 获取速度矢量
      * */
-    public Vector2 getVelocity() {
+    public Vector2 getVelocity () {
         return new Vector2(this.getVelX(), this.getVelY());
     }
 

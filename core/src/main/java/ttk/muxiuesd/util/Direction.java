@@ -1,6 +1,7 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.math.Vec2;
 
 /**
  * 方向矢量
@@ -23,7 +24,12 @@ public class Direction {
     public Direction (Vector2 from, Vector2 to) {
         this(to.x - from.x, to.y - from.y);
     }
-
+    public Direction (Vec2 from, Vec2 to) {
+        this(to.getX() - from.getX(), to.getY() - from.getY());
+    }
+    public Direction (Vec2 direction) {
+        this(direction.getX(), direction.getY());
+    }
     public Direction (float xDirection, float yDirection) {
         this.x = xDirection;
         this.y = yDirection;
