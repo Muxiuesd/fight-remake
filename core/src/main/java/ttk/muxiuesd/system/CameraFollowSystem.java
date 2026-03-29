@@ -51,8 +51,8 @@ public class CameraFollowSystem extends WorldSystem {
         float xOffset = Math.abs(vector2.x) * direction.getX() / 300;
         float yOffset = Math.abs(vector2.y) * direction.getY() / 300;
         PlayerCamera.INSTANCE.setPosition(
-            follower.x + xOffset,
-            follower.y + yOffset
+            follower.getX() + xOffset,
+            follower.getY() + yOffset
         );
 
     }

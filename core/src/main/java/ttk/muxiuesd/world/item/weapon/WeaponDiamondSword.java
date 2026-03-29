@@ -23,7 +23,7 @@ public class WeaponDiamondSword extends RangedWeapon {
                     BulletFire bullet = Entities.BULLET_FIRE.create(world);
                     bullet.setOwner(owner);
                     bullet.setType(owner.getType().getChildType("bullet"));
-                    bullet.setPosition(owner.x, owner.y);
+                    bullet.setPosition(owner.getPosition());
                     bullet.setVelocity(direction, bullet.getSpeed());
 
                     bullet.fastAddBodyHitBox();

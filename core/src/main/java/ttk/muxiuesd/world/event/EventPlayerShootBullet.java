@@ -28,7 +28,7 @@ public class EventPlayerShootBullet extends BulletShootEvent {
                 bullet.getOrigin(),
                 bullet.getSize().scl(0.9f), bullet.getSize().scl(0.1f),
                 bullet.getScale(),
-                bullet.rotation, bullet.getMaxLiveTime() * 0.6f);
+                bullet.getRotation(), bullet.getMaxLiveTime() * 0.6f);
         }
     }
 }

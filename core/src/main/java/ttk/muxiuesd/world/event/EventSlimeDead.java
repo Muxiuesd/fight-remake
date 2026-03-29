@@ -30,8 +30,8 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
             for (int i = 0; i < MathUtils.random(generation, generation + 2); i++) {
                 Slime child = Entities.SLIME.create(world);
                 child.generation = generation + 1;
-                float x = (float) (mom.x + MathUtils.random(mom.getWidth(), 2f) * Util.randomCos());
-                float y = (float) (mom.y + MathUtils.random(mom.getHeight(), 2f) * Util.randomSin());
+                float x = (float) (mom.getX() + MathUtils.random(mom.getWidth(), 2f) * Util.randomCos());
+                float y = (float) (mom.getY() + MathUtils.random(mom.getHeight(), 2f) * Util.randomSin());
                 float width = mom.getWidth() * 0.8f;
                 float height = mom.getHeight() * 0.8f;
                 child.setBounds(x, y, width, height);
