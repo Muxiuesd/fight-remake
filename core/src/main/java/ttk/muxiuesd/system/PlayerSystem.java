@@ -173,7 +173,7 @@ public class PlayerSystem extends WorldSystem {
             // 计算方向向量的长度
             float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
             // 归一化并乘以当前速度
-            float playerSpeed = curPlayer.getCurSpeed();
+            float playerSpeed = curPlayer.getSpeed();
             float velX = (inputX / length) * playerSpeed;
             float velY = (inputY / length) * playerSpeed;
             curPlayer.setVelocity(velX, velY);
