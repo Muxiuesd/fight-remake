@@ -201,7 +201,7 @@ public abstract class Entity<T extends Entity<T>>
     /**
      * 在当前的坐标基础上做出改变
      * */
-    public T positionChange(Vector2 deltaPos) {
+    public T positionChange (Vector2 deltaPos) {
         this.x += deltaPos.x;
         this.y += deltaPos.y;
         //及时更新碰撞箱中心坐标
@@ -213,7 +213,7 @@ public abstract class Entity<T extends Entity<T>>
      * 坐标根据时间间隔与速度矢量发生变化
      * @param delta 更新间隔时间
      * */
-    public T positionChange(float delta) {
+    public T positionChange (float delta) {
         this.x += this.velX * delta;
         this.y += this.velY * delta;
         //及时更新碰撞箱中心坐标
@@ -245,7 +245,7 @@ public abstract class Entity<T extends Entity<T>>
     public T setCurSpeed (float curSpeed) {
         float len = Vec2.len(this.getVelX(), this.getVelY());
         if (len < 0.0001f) {
-            // 当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
+            //当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
             this.setVelocity(0, 0);
             return (T) this;
         }
