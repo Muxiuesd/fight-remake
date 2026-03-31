@@ -72,8 +72,8 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         Entity<?> target = this.getCurTarget();
         Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
         setVelocity(direction.getX(),direction.getY());
-        //setVelocity(direction.getX() * moveSpeed, direction.getY() * moveSpeed);
         setCurSpeed(getSpeed());
+        //坐标变化
         positionChange(delta);
     }
 

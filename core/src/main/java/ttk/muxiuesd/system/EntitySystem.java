@@ -283,6 +283,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Vector2 center = entity.getCenter();
         Block block = cs.getBlock(center.x, center.y);
         if (block == null) return;
+
         float friction = block.getProperty().getFriction();
         float curSpeed = entity.getSpeed() * friction;
         //速度过小直接为0
