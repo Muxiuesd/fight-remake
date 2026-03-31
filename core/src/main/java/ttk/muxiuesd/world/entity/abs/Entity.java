@@ -44,7 +44,7 @@ public abstract class Entity<T extends Entity<T>>
 
     private String id;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
-    private float speed, curSpeed;
+    private float speed;
     private float x, y;
     private float velX, velY;
     private float width, height;
@@ -72,7 +72,7 @@ public abstract class Entity<T extends Entity<T>>
     @Override
     public void readCatData (JsonValue values) {
         this.speed = values.getFloat("speed", 1.145f);
-        this.curSpeed = values.getFloat("curSpeed", 1.145f);
+        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
         this.x = values.getFloat("x", 1.145f);
         this.y = values.getFloat("y", 1.145f);
         this.velX = values.getFloat("velX", 0);
@@ -96,7 +96,7 @@ public abstract class Entity<T extends Entity<T>>
     public void writeCatData (CatsHolder holder) {
         holder
             .put("speed", new CatFloat(this.speed))
-            .put("curSpeed", new CatFloat(this.curSpeed))
+            .put("curSpeed", new CatFloat(this.getCurSpeed()))
             .put("x", new CatFloat(this.x))
             .put("y", new CatFloat(this.y))
             .put("velX", new CatFloat(this.velX))
@@ -202,10 +202,7 @@ public abstract class Entity<T extends Entity<T>>
      * 在当前的坐标基础上做出改变
      * */
     public T positionChange (Vector2 deltaPos) {
-        this.x += deltaPos.x;
-        this.y += deltaPos.y;
-        //及时更新碰撞箱中心坐标
-        this.updateHitboxCenterPos(this.x, this.y);
+        this.setPosition(this.x + deltaPos.x, this.y + deltaPos.y);
         return (T) this;
     }
 
@@ -214,10 +211,7 @@ public abstract class Entity<T extends Entity<T>>
      * @param delta 更新间隔时间
      * */
     public T positionChange (float delta) {
-        this.x += this.velX * delta;
-        this.y += this.velY * delta;
-        //及时更新碰撞箱中心坐标
-        this.updateHitboxCenterPos(this.x, this.y);
+        this.setPosition(this.x + this.velX * delta, this.y + this.velY * delta);
         return (T) this;
     }
 
@@ -243,8 +237,9 @@ public abstract class Entity<T extends Entity<T>>
      * 设置当前速率
      * */
     public T setCurSpeed (float curSpeed) {
+        curSpeed = Math.abs(curSpeed);
         float len = Vec2.len(this.getVelX(), this.getVelY());
-        if (len < 0.0001f) {
+        if (len < EntitySystem.MIN_SPEED) {
             //当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
             this.setVelocity(0, 0);
             return (T) this;

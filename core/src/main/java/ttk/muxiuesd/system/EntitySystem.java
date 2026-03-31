@@ -47,6 +47,7 @@ import java.util.concurrent.*;
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
 public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender, Tickable {
+    public static final float MIN_SPEED = 0.0000001f;
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -285,8 +286,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         float friction = block.getProperty().getFriction();
         float curSpeed = entity.getSpeed() * friction;
         //速度过小直接为0
-        if (curSpeed < 0.0000001) {
-            entity.setSpeed(0);
+        if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
             return;
         }
@@ -310,13 +310,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             curSpeed *= block.getProperty().getFriction();
         }
         //速度过小直接为0
-        if (curSpeed < 0.0000001) {
-            entity.setSpeed(0);
+        if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
             return;
         }
         entity.setCurSpeed(curSpeed);
-        //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
+        //物品实体的基准速度逐渐下降
         entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
