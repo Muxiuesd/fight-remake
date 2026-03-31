@@ -244,7 +244,12 @@ public abstract class Entity<T extends Entity<T>>
      * */
     public T setCurSpeed (float curSpeed) {
         float len = Vec2.len(this.getVelX(), this.getVelY());
-        this.setVelocity((this.getVelY() / len) * curSpeed, (this.getVelY() / len) * curSpeed);
+        if (len < 0.0001f) {
+            // 当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
+            this.setVelocity(0, 0);
+            return (T) this;
+        }
+        this.setVelocity((this.getVelX() / len) * curSpeed, (this.getVelY() / len) * curSpeed);
         return (T) this;
     }
 
