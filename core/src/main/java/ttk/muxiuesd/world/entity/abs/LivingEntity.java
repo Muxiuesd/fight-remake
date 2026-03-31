@@ -195,7 +195,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), stack);
         //使得物品中心与实体中心对齐
         return itemEntity
-            .setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            //.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            .setPosition(getCenter())
             .setOnGround(false)
             .setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
             .setTask(() -> {
