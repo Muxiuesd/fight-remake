@@ -38,6 +38,7 @@ public final class ItemGroups {
             .add(Items.WOOL_SILVER)
             .add(Items.WOOL_WHITE)
             .add(Items.WOOL_YELLOW)
+            .add(Items.SPAWN_EGG_SLIME)
         ;
         });
 
