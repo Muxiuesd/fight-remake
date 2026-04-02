@@ -196,7 +196,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 //对于非物品实体进行当前速度更新
                 this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
             }
-            entity.update(delta);
             //细化实体更新
             //对于活物实体
             if (entity instanceof LivingEntity livingEntity) {
@@ -206,6 +205,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             else if (entity instanceof ItemEntity itemEntity) {
                 this.updateItemEntity(itemEntity, delta);
             }
+
+            entity.update(delta);
         }
 
 
@@ -277,7 +278,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0) return;
+        if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
 
         //计算脚下方块摩擦对速度的影响
         Vector2 center = entity.getCenter();

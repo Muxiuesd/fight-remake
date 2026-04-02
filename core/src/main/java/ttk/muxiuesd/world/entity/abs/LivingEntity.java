@@ -116,6 +116,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             .put("curHealth", new CatFloat(this.curHealth));
     }
 
+    /**
+     * 活物实体的更新方法，涉及计时器、状态等的更新，不涉及坐标更新
+     * */
     @Override
     public void update (float delta) {
         super.update(delta);

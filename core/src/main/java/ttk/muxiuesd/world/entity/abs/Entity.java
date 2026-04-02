@@ -117,7 +117,7 @@ public abstract class Entity<T extends Entity<T>>
     public void lazyInitialize () {}
 
     /**
-     * 这里面调用每帧需要更新的东西，对性能影响较大
+     * 这里面调用每帧需要更新的东西，对性能影响较大，不涉及实体坐标的更新
      * */
     @Override
     public void update(float delta) {

@@ -61,20 +61,19 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
             this.attack(delta, getEntitySystem());
         }*/
 
+        //先坐标更新，再更新其他的，否则实体移动速度有bug
+        positionChange(delta);
         super.update(delta);
     }
 
     /**
      * 朝向目标走去
-     * TODO 待修复
      * */
     public void walkToTarget (float delta) {
         Entity<?> target = this.getCurTarget();
         Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
-        setVelocity(direction.getX(),direction.getY());
+        setVelocity(direction.getX(), direction.getY());
         setCurSpeed(getSpeed());
-        //坐标变化
-        positionChange(delta);
     }
 
     /**
@@ -83,6 +82,7 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
     public void updateTarget () {
         this.updateTarget(getEntitySystem());
     }
+
     /**
      * 自定义敌人的目标更新逻辑
      * */
