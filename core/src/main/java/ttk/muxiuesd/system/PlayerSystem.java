@@ -178,6 +178,9 @@ public class PlayerSystem extends WorldSystem {
             float velY = (inputY / length) * playerSpeed;
             curPlayer.setVelocity(velX, velY);
         }
+        if (inputX == 0 && inputY == 0) {
+            curPlayer.setVelocity(0, 0);
+        }
     }
 
     public void setItemStack (int index, String itemId) {
