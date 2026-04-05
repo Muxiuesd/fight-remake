@@ -10,6 +10,7 @@ import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
  * 方块
@@ -95,7 +96,9 @@ public abstract class Block implements ID<Block>, Disposable {
 
         private Property() {
             /// 这里有可能浅拷贝
-            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
+            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP
+                .copy()
+                .add(PropertyTypes.CATS, new CatsHolder());
         }
 
         public float getFriction() {
