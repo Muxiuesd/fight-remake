@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
  * <p>
  * TODO 活物实体能有buff影响其行为状态
  * */
-public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> {
+public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
@@ -116,6 +116,9 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
             .put("curHealth", new CatFloat(this.curHealth));
     }
 
+    /**
+     * 活物实体的更新方法，涉及计时器、状态等的更新，不涉及坐标更新
+     * */
     @Override
     public void update (float delta) {
         super.update(delta);
@@ -195,7 +198,8 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), stack);
         //使得物品中心与实体中心对齐
         return itemEntity
-            .setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            //.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            .setPosition(getCenterPos())
             .setOnGround(false)
             .setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
             .setTask(() -> {
@@ -321,7 +325,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * 获取当前实体的朝向
      * */
     public Direction getDirection () {
-        return new Direction(velX, velY);
+        return new Direction(getVelX(), getVelY());
     }
 
     /**

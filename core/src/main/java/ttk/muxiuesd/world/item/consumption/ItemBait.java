@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.item.consumption;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -25,10 +26,14 @@ public class ItemBait extends ConsumptionItem {
         if (textureRegion != null) {
             Direction direction = Util.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
-            batch.draw(textureRegion, holder.x, holder.y,
-                holder.width / 2, holder.height / 2,
-                holder.width, holder.height,
-                -holder.scaleX, -holder.scaleY, rotation);
+            Vector2 holderScale = holder.getScale();
+            batch.draw(textureRegion,
+                holder.getX(), holder.getY(),
+                holder.getWidth() / 2, holder.getHeight() / 2,
+                holder.getWidth(), holder.getHeight(),
+                - holderScale.x, - holderScale.y,
+                rotation
+            );
         }
     }
 }

@@ -96,7 +96,7 @@ public class PlayerSystem extends WorldSystem {
         }
         //玩家速度计算
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
-        Vector2 playerCenter = this.player.getCenter();
+        Vector2 playerCenter = this.player.getCenterPos();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
 
         //玩家游泳
@@ -173,10 +173,13 @@ public class PlayerSystem extends WorldSystem {
             // 计算方向向量的长度
             float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
             // 归一化并乘以当前速度
-            float playerSpeed = curPlayer.getCurSpeed();
+            float playerSpeed = curPlayer.getSpeed();
             float velX = (inputX / length) * playerSpeed;
             float velY = (inputY / length) * playerSpeed;
             curPlayer.setVelocity(velX, velY);
+        }
+        if (inputX == 0 && inputY == 0) {
+            curPlayer.setVelocity(0, 0);
         }
     }
 
@@ -265,7 +268,7 @@ public class PlayerSystem extends WorldSystem {
             Direction direction = this.player.getDirection();
             itemEntity.setVelocity(direction.toVector2().scl(MathUtils.random(0.7f, 1.2f)));
             itemEntity.setSpeed(3f);
-            itemEntity.setPosition(this.player.getCenter());
+            itemEntity.setPosition(this.player.getCenterPos());
         });
 
         Array<ItemEntity> entityArray = this.getPlayer().getEntitySystem().getEntityArray(EntityTypes.ITEM_ENTITY);

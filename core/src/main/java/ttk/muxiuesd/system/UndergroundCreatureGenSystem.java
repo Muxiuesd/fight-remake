@@ -42,7 +42,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
 
         //附近的生物数量超过最大值不刷生物
         int entityCount = Util.entityCount(getEntitySystem().getEntityArray(EntityTypes.CREATURE),
-            getPlayerSystem().getPlayer().getCenter(),
+            getPlayerSystem().getPlayer().getCenterPos(),
             getMaxGenRange()
         );
         if (entityCount >= maxCount) return;
@@ -56,7 +56,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
     @Override
     public void run () {
         Player player = getPlayerSystem().getPlayer();
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
 
         for (CreatureGenFactory<?> factory: getGenFactories().values()) {
             float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());

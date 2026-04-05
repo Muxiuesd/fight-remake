@@ -48,7 +48,7 @@ public class PufferFishRestState extends StatePufferFish{
      * */
     public void randomWalkPath (World world, PufferFish entity) {
         ChunkSystem cs = world.getSystem(ChunkSystem.class);
-        Vector2 position = entity.getCenter();
+        Vector2 position = entity.getCenterPos();
         float dx = 0;
         float dy = 0;
 

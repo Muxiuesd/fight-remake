@@ -68,8 +68,8 @@ public class BulletCollisionSystem extends WorldSystem {
             Rectangle bulletRectHitbox = rectHitbox.getRectangle();
             Vector2 velocity = bullet.getVelocity();
             Rectangle pathBounds = new Rectangle(
-                Math.min(bullet.x, bullet.x + velocity.x * delta),
-                Math.min(bullet.y, bullet.y + velocity.y * delta),
+                Math.min(bullet.getX(), bullet.getX() + velocity.x * delta),
+                Math.min(bullet.getY(), bullet.getY() + velocity.y * delta),
                 Math.abs(velocity.x * delta) + bulletRectHitbox.width,
                 Math.abs(velocity.y * delta) + bulletRectHitbox.height
             );
@@ -133,8 +133,8 @@ public class BulletCollisionSystem extends WorldSystem {
 
             // 计算子弹移动路径的边界框
             Rectangle pathBounds = new Rectangle(
-                Math.min(bullet.x, bullet.x + velocity.x * delta),
-                Math.min(bullet.y, bullet.y + velocity.y * delta),
+                Math.min(bullet.getX(), bullet.getX() + velocity.x * delta),
+                Math.min(bullet.getY(), bullet.getY() + velocity.y * delta),
                 Math.abs(velocity.x * delta) + bulletRectHitbox.width,
                 Math.abs(velocity.y * delta) + bulletRectHitbox.height
             );
@@ -173,13 +173,12 @@ public class BulletCollisionSystem extends WorldSystem {
 
             // 2. 分步移动并检测碰撞
             for (int i = 0; i < steps; i++) {
-                float prevX = bullet.x;
-                float prevY = bullet.y;
+                float prevX = bullet.getX();
+                float prevY = bullet.getY();
 
                 // 移动一步
-                bullet.x += step.x;
-                bullet.y += step.y;
-                bulletRectHitbox.setPosition(bullet.x, bullet.y);
+                bullet.positionChange(step);
+                bulletRectHitbox.setPosition(bullet.getX(), bullet.getY());
 
                 // 3. 检测与墙体碰撞（复用之前的逻辑）
                 if (checkWallCollision(bullet, walls, prevX, prevY)) {
@@ -205,8 +204,7 @@ public class BulletCollisionSystem extends WorldSystem {
                 Rectangle wallHitbox = wall.getHitboxRectangle();
                 if (bulletRectHitbox.overlaps(wallHitbox)) {
                     // 回退到碰撞前位置
-                    bullet.x = prevX;
-                    bullet.y = prevY;
+                    bullet.setPosition(prevX, prevY);
                     bulletRectHitbox.setPosition(prevX, prevY);
                     return true; // 碰撞发生
                 }
@@ -228,8 +226,7 @@ public class BulletCollisionSystem extends WorldSystem {
                 if (targetBodyHitbox instanceof RectHitbox targetRectHitbox) {
                     if (bulletRectHitbox.overlaps(targetRectHitbox.getRectangle())) {
                         // 回退子弹位置（视觉上更自然）
-                        bullet.x = prevX;
-                        bullet.y = prevY;
+                        bullet.setPosition(prevX, prevY);
                         bulletRectHitbox.setPosition(prevX, prevY);
 
                         // 处理伤害（根据实体类型调用不同逻辑）

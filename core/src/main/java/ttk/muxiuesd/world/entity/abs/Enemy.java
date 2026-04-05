@@ -18,7 +18,7 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
 /**
  * 敌人实体抽象类
  * */
-public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
+public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
     public static final int MAX_RANDOM_COUNT = 5;
 
     private Entity<?> curTarget;   //敌人当前需要攻击的目标
@@ -44,9 +44,9 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
 
         this.visionRange = visionRange;
         this.attackRange = attackRange;
-        this.speed = speed;
         this.attackTimer = Pools.TASK_TIMER.obtain().setMaxSpan(attackSpan);
 
+        setSpeed(speed);
         setSize(1f, 1f);
     }
 
@@ -61,6 +61,8 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
             this.attack(delta, getEntitySystem());
         }*/
 
+        //先坐标更新，再更新其他的，否则实体移动速度有bug
+        positionChange(delta);
         super.update(delta);
     }
 
@@ -69,10 +71,9 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
      * */
     public void walkToTarget (float delta) {
         Entity<?> target = this.getCurTarget();
-        Direction direction = new Direction(target.x - x, target.y - y);
-        setVelocity(direction.getX() * curSpeed, direction.getY() * curSpeed);
-        this.x += velX * delta;
-        this.y += velY * delta;
+        Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
+        setVelocity(direction.getX(), direction.getY());
+        setCurSpeed(getSpeed());
     }
 
     /**
@@ -81,6 +82,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
     public void updateTarget () {
         this.updateTarget(getEntitySystem());
     }
+
     /**
      * 自定义敌人的目标更新逻辑
      * */
@@ -113,7 +115,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
         Entity<?> target = this.getCurTarget();
         float distance = Util.getDistance(this, target);
         //在攻击范围之外不攻击
-        if (distance > getAttackRange()) {
+        if (distance > this.getAttackRange()) {
             return;
         }
         //攻击间隔没到就不攻击
@@ -121,7 +123,10 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
             return;
         }
         //在攻击范围之内且攻击间隔到了就要攻击
-        Bullet bullet = this.createBullet(this, new Direction(target.x - x, target.y - y));
+        Bullet bullet = this.createBullet(
+            this,
+            new Direction(target.getX() - getX(), target.getY() - getY())
+        );
         es.add(bullet);
         EventBus.post(EventTypes.BULLET_SHOOT, new EventPosterBulletShoot(es.getWorld(), this, bullet));
     }
@@ -134,7 +139,7 @@ public abstract class Enemy<E extends Enemy<?>> extends LivingEntity<E> {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.ID("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
-        bullet.setPosition(x + (getWidth() - bullet.getWidth())/2, y + (getHeight() - bullet.getHeight())/2);
+        bullet.setPosition(getX() + (getWidth() - bullet.getWidth())/2, getY() + (getHeight() - bullet.getHeight())/2);
         bullet.setVelocity(direction, bullet.getSpeed());
         return bullet;
     }

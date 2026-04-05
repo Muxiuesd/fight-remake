@@ -51,7 +51,7 @@ public abstract class Bullet extends Entity<Bullet> {
         //全部指定
         this.owner = owner;
         this.damage = damage;
-        this.speed = speed;
+        setSpeed(speed);
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
         textureRegion = getTextureRegion(textureId, texturePath);
@@ -131,8 +131,7 @@ public abstract class Bullet extends Entity<Bullet> {
      * @param speed 速度大小
      * */
     public void setVelocity (Direction direction, float speed) {
-        this.velX = direction.getX() * speed;
-        this.velY = direction.getY() * speed;
+        setVelocity(direction.getX() * speed, direction.getY() * speed);
         this.setDegrees();
     }
 

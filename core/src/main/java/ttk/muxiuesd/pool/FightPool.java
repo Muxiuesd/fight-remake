@@ -1,5 +1,6 @@
 package ttk.muxiuesd.pool;
 
+import com.badlogic.gdx.utils.DefaultPool;
 import com.badlogic.gdx.utils.Pool;
 import game.muxiuesd.bedrockcore.util.ConvPool;
 
@@ -12,7 +13,7 @@ public class FightPool<T> extends ConvPool<T> {
         super(clazz, pool);
     }
 
-    public <P extends Pool<T>> FightPool (Class<T> clazz) {
-        super(clazz);
+    public <P extends Pool<T>> FightPool (DefaultPool.PoolSupplier supplier) {
+        super(supplier);
     }
 }

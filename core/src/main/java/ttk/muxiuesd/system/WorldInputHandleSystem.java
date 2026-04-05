@@ -62,7 +62,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
     public void update(float delta) {
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Player player = playerSystem.getPlayer();
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
@@ -249,7 +249,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
      */
     public BlockPosition getPlayerBlockPosition() {
         BlockPosition bp = new BlockPosition();
-        Vector2 playerCenter = playerSystem.getPlayer().getCenter();
+        Vector2 playerCenter = playerSystem.getPlayer().getCenterPos();
         bp.setX((int) Util.fastRound(playerCenter.x));
         bp.setY((int) Util.fastRound(playerCenter.y));
         return bp;

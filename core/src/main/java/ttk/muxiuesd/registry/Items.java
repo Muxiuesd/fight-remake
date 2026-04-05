@@ -3,17 +3,20 @@ package ttk.muxiuesd.registry;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.item.FishPoleRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.CommonItem;
 import ttk.muxiuesd.world.item.common.ItemFishPole;
 import ttk.muxiuesd.world.item.common.ItemStick;
 import ttk.muxiuesd.world.item.consumption.BlockItem;
 import ttk.muxiuesd.world.item.consumption.ItemBait;
+import ttk.muxiuesd.world.item.consumption.SpawnEggItem;
 import ttk.muxiuesd.world.item.consumption.WallItem;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
@@ -55,6 +58,12 @@ public final class Items {
     public static final Item DIAMOND_LEGGINGS = register("diamond_leggings", EquipmentDiamondLeggings::new);
     public static final Item DIAMOND_BOOTS = register("diamond_boots", EquipmentDiamondBoots::new);
 
+    /// 刷怪蛋物品
+    //怪物刷怪蛋
+    public static final Item SPAWN_EGG_SLIME = register("spawn_egg_slime", Entities.SLIME);
+    //生物刷怪蛋
+    public static final Item SPAWN_EGG_PUFFER_FISH = register("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
+
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
     public static final Item GRASS = register(Blocks.GRASS);
@@ -95,6 +104,13 @@ public final class Items {
      * */
     public static Item register (String name) {
         return register(name, () -> new CommonItem(name));
+    }
+
+    /**
+     * 刷怪蛋物品的注册
+     * */
+    public static <T extends Entity<T>> Item register (String name, EntityProvider<T> entityProvider) {
+        return register(name, () -> new SpawnEggItem<>(name, entityProvider));
     }
 
     /**

@@ -47,6 +47,7 @@ import java.util.concurrent.*;
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
 public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender, Tickable {
+    public static final float MIN_SPEED = 0.0000001f;
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -195,7 +196,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 //对于非物品实体进行当前速度更新
                 this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
             }
-            entity.update(delta);
             //细化实体更新
             //对于活物实体
             if (entity instanceof LivingEntity livingEntity) {
@@ -205,6 +205,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             else if (entity instanceof ItemEntity itemEntity) {
                 this.updateItemEntity(itemEntity, delta);
             }
+
+            entity.update(delta);
         }
 
 
@@ -262,7 +264,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
                 && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
-                Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
+                Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
                 itemEntity.setVelocity(direction.getX(), direction.getY());
                 itemEntity.setSpeed(7.7f);
             }
@@ -276,17 +278,17 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0) return;
+        if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
 
         //计算脚下方块摩擦对速度的影响
-        Vector2 center = entity.getCenter();
+        Vector2 center = entity.getCenterPos();
         Block block = cs.getBlock(center.x, center.y);
         if (block == null) return;
+
         float friction = block.getProperty().getFriction();
         float curSpeed = entity.getSpeed() * friction;
         //速度过小直接为0
-        if (curSpeed < 0.0000001) {
-            entity.setSpeed(0);
+        if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
             return;
         }
@@ -304,19 +306,18 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //实体在地面上
         if (entity.isOnGround()) {
             //计算脚下方块摩擦对速度的影响
-            Vector2 center = entity.getCenter();
+            Vector2 center = entity.getCenterPos();
             Block block = cs.getBlock(center.x, center.y);
             if (block == null) return;
             curSpeed *= block.getProperty().getFriction();
         }
         //速度过小直接为0
-        if (curSpeed < 0.0000001) {
-            entity.setSpeed(0);
+        if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
             return;
         }
         entity.setCurSpeed(curSpeed);
-        //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
+        //物品实体的基准速度逐渐下降
         entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
@@ -415,7 +416,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Array<Entity<?>> unload = new Array<>();    //需要被卸载的实体组
 
         for (Entity<?> entity: copy) {
-            ChunkPosition chunkPosition = cs.getChunkPosition(entity.getCenter());
+            ChunkPosition chunkPosition = cs.getChunkPosition(entity.getCenterPos());
             EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
             //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
             if (chunkPosition.equals(chunk.getChunkPosition())
@@ -447,7 +448,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
             if (!entityProvider.canBeSaved) continue;
 
-            Vector2 position = entity.getCenter();
+            Vector2 position = entity.getCenterPos();
             ChunkPosition chunkPosition = chunkSystem.getChunkPosition(position.x, position.y);
             String name = chunkPosition.toString();
             //没有就新建一个
@@ -514,7 +515,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     Rectangle box = rectHitbox.getRectangle();
                     batch.rect(box.x, box.y, box.width, box.height);
                 }
-                Vector2 entityCenter = entity.getCenter();
+                Vector2 entityCenter = entity.getCenterPos();
                 if (entity instanceof LivingEntity livingEntity) {
                     batch.line(entityCenter, new Vector2(entityCenter).add(livingEntity.getDirection().toVector2()));
                 }else {

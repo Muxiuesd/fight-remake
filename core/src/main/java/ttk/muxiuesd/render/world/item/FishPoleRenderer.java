@@ -95,12 +95,12 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
         float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         //绘制鱼线
         LivingEntity<?> hookOwner = hook.getOwner();
-        Vector2 ownerPos = hookOwner.getCenter();
+        Vector2 ownerPos = hookOwner.getCenterPos();
         float xOffset = hookOwner.getWidth() * 1.314f * MathUtils.cosDeg(rotation);
         float yOffset = hookOwner.getHeight()* 1.314f * MathUtils.sinDeg(rotation);
         ownerPos.add(xOffset, yOffset);
 
-        Vector2 hookPos = hook.getCenter();
+        Vector2 hookPos = hook.getCenterPos();
         //让鱼线绘制在钩子上方
         hookPos.add(0, hook.getHeight() / 2f - 0.07f + hook.getPositionOffset().y);
         //控制鱼线绘制方向
