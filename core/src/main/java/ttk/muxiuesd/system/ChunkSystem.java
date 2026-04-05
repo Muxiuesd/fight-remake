@@ -455,7 +455,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         ChunkPosition chunkPosition = this.getPlayerChunkPosition(this.player);
         int playerChunkX = chunkPosition.getX();
         int playerChunkY = chunkPosition.getY();
-        Vector2 playerCenter = this.player.getCenter();
+        Vector2 playerCenter = this.player.getCenterPos();
 
         // System.out.println("("+ player.x+ "," + player.y +")" + "("+ playerChunkX + "," + playerChunkY +")");
         // TODO 实现更好的循环
@@ -714,7 +714,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 获取玩家所在的区块编号
      */
     private ChunkPosition getPlayerChunkPosition(Player player) {
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
         return this.getChunkPosition(playerCenter.x, playerCenter.y);
     }
 

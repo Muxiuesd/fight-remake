@@ -40,7 +40,7 @@ public class Sword extends Weapon {
         //检测剑的伤害区域内的敌人实体
         Array<Enemy<?>> entities = Util.sectorArea(
             es.getEnemyEntity(),
-            user.getCenter(), user.getDirection().toVector2(),
+            user.getCenterPos(), user.getDirection().toVector2(),
             range, 60f
         );
         for (Enemy<?> enemy : entities) {
@@ -51,7 +51,7 @@ public class Sword extends Weapon {
         //检测剑的伤害区域内的生物实体
         Array<LivingEntity<?>> livingEntities = Util.sectorArea(
             es.getEntityArray(EntityTypes.CREATURE),
-            user.getCenter(), user.getDirection().toVector2(),
+            user.getCenterPos(), user.getDirection().toVector2(),
             range, 60f
         );
         for (LivingEntity<?> le : livingEntities) {

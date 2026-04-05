@@ -39,26 +39,27 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
 public abstract class Entity<T extends Entity<T>>
     implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
 
-    //实体的默认碰撞箱ID（默认就一个身体碰撞箱）
+    /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
     private String id;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
     private float speed;
-    private float x, y;
-    private float velX, velY;
-    private float width, height;
+    private float x, y;                     //实体的世界坐标
+    private float velX, velY;               //实体的速度
+    private float width, height;            //实体的宽高（世界渲染）
     private float originX = 0f, originY = 0f;
     private float scaleX = 1f, scaleY = 1f;
-    private float rotation;
-    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
+    private float rotation;                 //实体的旋转角度（世界渲染）
+
+    private boolean onGround = true;        //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
     public TextureRegion textureRegion;
-    private HitboxHolder<Entity<T>> hitboxHolder;
 
-    private EntitySystem es;    //此实体所属的实体系统
-    private EntityType<?> type;
-    private Property property;  //实体的属性
+    private EntitySystem es;                        //此实体所属的实体系统
+    private EntityType<?> type;                     //实体的类型
+    private Property property;                      //实体的属性
+    private HitboxHolder<Entity<T>> hitboxHolder;   //实体的碰撞箱持有者
 
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
@@ -125,6 +126,9 @@ public abstract class Entity<T extends Entity<T>>
         this.updateHitboxCenterPos(this.x, this.y);
     }
 
+    /**
+     * 更新碰撞箱中心坐标，默认是跟实体坐标（默认也是中心坐标）重合的
+     * */
     public void updateHitboxCenterPos (float x, float y) {
         this.getHitboxHolder().getBoxes().forEach((id, box) -> {
             box.setCenterPos(this.x, this.y);
@@ -197,6 +201,9 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
+    /**
+     * 获取实体坐标
+     * */
     public Vector2 getPosition() {
         return new Vector2(this.x, this.y);
     }
@@ -218,6 +225,9 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
+    /**
+     * 获取实体的基准速度（比如移动速度）
+     * */
     public float getSpeed () {
         return this.speed;
     }
@@ -362,9 +372,11 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 获取实体的中心点的坐标
+     * 获取实体的中心点的坐标（与世界坐标是两个概念），会影响实体的某些渲染坐标
+     * <p>
+     * 默认是实体的世界坐标
      * */
-    public Vector2 getCenter() {
+    public Vector2 getCenterPos () {
         return new Vector2(this.x, this.y);
     }
 
@@ -382,6 +394,9 @@ public abstract class Entity<T extends Entity<T>>
         return this.hitboxHolder;
     }
 
+    /**
+     * 设置实体碰撞箱持有类
+     * */
     public T setHitboxHolder (HitboxHolder<Entity<T>> hitboxHolder) {
         if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
         return (T) this;
@@ -396,6 +411,9 @@ public abstract class Entity<T extends Entity<T>>
         return this.es;
     }
 
+    /**
+     * 获取实体类型
+     * */
     public EntityType<?> getType () {
         return this.type;
     }
@@ -484,7 +502,6 @@ public abstract class Entity<T extends Entity<T>>
         public Property () {
             setPropertiesMap(
                 new JsonPropertiesMap()
-                    //.add(PropertyTypes.CAT, new CAT())
                     .add(PropertyTypes.CATS, new CatsHolder())
             );
         }

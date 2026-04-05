@@ -21,7 +21,7 @@ public class TorchRenderer extends ItemRenderer.StandardRenderer<ItemTorch> {
     public void drawOnHand (Batch batch, Context context, LivingEntity<?> holder, ItemStack itemStack) {
         super.drawOnHand(batch, context, holder, itemStack);
         //计算光源的正确位置
-        Vector2 holderCenter = holder.getCenter();
+        Vector2 holderCenter = holder.getCenterPos();
         Direction direction = holder.getDirection();
         float deg = direction.toVector2().angleDeg() + holder.getSwingHandDegreeOffset();
         float xOffset = holder.getWidth() * 1.014f * MathUtils.cosDeg(deg);

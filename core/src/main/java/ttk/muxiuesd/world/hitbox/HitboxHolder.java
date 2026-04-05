@@ -5,6 +5,7 @@ import game.muxiuesd.bedrockcore.util.Log;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * 碰撞箱持有类，存有并且管理多种、多个碰撞箱
@@ -67,14 +68,11 @@ public class HitboxHolder<T> {
      * */
     public Hitbox getBox (String id) {
         Hitbox hitbox = this.getBoxes().get(id);
-        if (hitbox == null) {
-            /*Log.error(
+        /*Log.error(
                 this.getClass().getName(),
                 this.getHolder().getClass().getName() + "没有ID为：" + id + " 的碰撞箱！！！已用空对象代替！！！"
             );*/
-            return VOID_HITBOX;
-        }
-        return hitbox;
+        return Objects.requireNonNullElse(hitbox, VOID_HITBOX);
     }
 
     /**

@@ -104,7 +104,8 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     }
 
     /**
-     *  对于某个实体的碰撞箱检测
+     * 核心算法：对于某个实体的碰撞箱检测
+     *
      * @param entity 待检测的实体
      * @param delta 帧间隔时间
      * @param hitboxOffsetX 实体的碰撞箱x坐标偏移量
@@ -112,8 +113,21 @@ public class GroundEntityCollisionSystem extends WorldSystem {
      * */
     public void checkEntityWithWallCollisions (Entity<?> entity, float delta, float hitboxOffsetX, float hitboxOffsetY) {
         Hitbox bodyHitbox = entity.getBodyHitbox();
-        if (bodyHitbox instanceof RectHitbox rectHitbox) {
-            Rectangle rect = rectHitbox.getRectangle();
+        if (bodyHitbox instanceof RectHitbox rectBodyHitbox) {
+            Rectangle rect = rectBodyHitbox.getRectangle();
+            Vector2 rectBodyHitboxCenterPos = rectBodyHitbox.getCenterPos();
+            //计算碰撞箱左下角坐标与碰撞箱中心坐标的偏移量
+            Vector2 rectPosToCenterDelta = new Vector2(
+                rectBodyHitboxCenterPos.x - rect.x,
+                rectBodyHitboxCenterPos.y - rect.y
+            );
+            //计算碰撞箱中心坐标与实体坐标的偏移量
+            Vector2 entityCenterPos = entity.getPosition();
+            Vector2 entityCenterToRectCenterDelta = new Vector2(
+                rectBodyHitboxCenterPos.x - entityCenterPos.x,
+                rectBodyHitboxCenterPos.y - entityCenterPos.y
+            );
+
             Vector2 vel = entity.getVelocity();
 
             // 计算总移动距离
@@ -157,8 +171,8 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
             // 更新实体位置
             entity.setPosition(
-                rect.x + (entity.getWidth() / 2f - hitboxOffsetX),
-                rect.y + (entity.getHeight() / 2f - hitboxOffsetY)
+                rect.x + rectPosToCenterDelta.x - entityCenterToRectCenterDelta.x,
+                rect.y + rectPosToCenterDelta.y - entityCenterToRectCenterDelta.y
             );
         }
     }

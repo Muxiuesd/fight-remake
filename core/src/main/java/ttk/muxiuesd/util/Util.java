@@ -70,8 +70,8 @@ public class Util {
      * 获取两个实体之间的距离
      * */
     public static float getDistance (Entity entity1, Entity entity2) {
-        float xd = entity1.getCenter().x - entity2.getCenter().x;
-        float yd = entity1.getCenter().y - entity2.getCenter().y;
+        float xd = entity1.getCenterPos().x - entity2.getCenterPos().x;
+        float yd = entity1.getCenterPos().y - entity2.getCenterPos().y;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
     }
 
@@ -79,8 +79,8 @@ public class Util {
      * 计算实体与一个指定坐标的距离
      * */
     public static float getDistance (Entity entity, float x, float y) {
-        float xd = entity.getCenter().x - x;
-        float yd = entity.getCenter().y - y;
+        float xd = entity.getCenterPos().x - x;
+        float yd = entity.getCenterPos().y - y;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
     }
 
@@ -176,7 +176,7 @@ public class Util {
                                                           float radius, float angleDegrees) {
         Array<T> results = new Array<>();
         for (T entity : entities) {
-            Vector2 entityCenter = entity.getCenter();
+            Vector2 entityCenter = entity.getCenterPos();
             //从中心点到实体中心的矢量
             Vector2 ce = new Vector2(entityCenter.x - center.x, entityCenter.y - center.y);
             //超过扇形的半径不在
@@ -198,7 +198,7 @@ public class Util {
     public static <T extends Entity> int entityCount (Array<T> entities, Vector2 center, float radius) {
         int count = 0;
         for (T entity : entities) {
-            Vector2 subbed = new Vector2(center).sub(entity.getCenter());
+            Vector2 subbed = new Vector2(center).sub(entity.getCenterPos());
             if (subbed.len() <= radius) count++;
         }
         return count;

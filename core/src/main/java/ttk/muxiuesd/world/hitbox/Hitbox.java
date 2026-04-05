@@ -29,6 +29,8 @@ public abstract class Hitbox {
 
     /**
      * 设置中心坐标，是世界坐标
+     * <p>
+     * 大多与实体中心坐标重合，但有可能不会
      * */
     abstract public Hitbox setCenterPos (float cx, float cy);
 

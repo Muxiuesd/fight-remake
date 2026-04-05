@@ -72,7 +72,7 @@ public class ItemFishPole extends Item {
             this.throwHook(itemStack, world, fishingHook);
             return super.use(itemStack, world, user);
         }else if (!hook.onCasting() && !hook.isReturning){ //鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
-            Vector2 hookPos = hook.getCenter();
+            Vector2 hookPos = hook.getCenterPos();
             ChunkSystem cs = world.getSystem(ChunkSystem.class);
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
@@ -87,7 +87,7 @@ public class ItemFishPole extends Item {
                     itemEntity.setItemStack(genItemStack);
                     itemEntity.setSpeed(this.pullSpeed);
                     itemEntity.setCurSpeed(this.pullSpeed);
-                    itemEntity.setVelocity(new Direction(hook.getCenter(), hook.getOwner().getCenter()).toVector2());
+                    itemEntity.setVelocity(new Direction(hook.getCenterPos(), hook.getOwner().getCenterPos()).toVector2());
                     itemEntity.setOnGround(false);
                     itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
                         itemEntity.setOnAirTimer(null);
@@ -146,7 +146,7 @@ public class ItemFishPole extends Item {
         LivingEntity<?> owner = fishingHook.getOwner();
         if (owner instanceof Player player) {
             //玩家抛竿
-            Vector2 ownerPos = player.getCenter();
+            Vector2 ownerPos = player.getCenterPos();
             Vector2 mwp = Util.getMouseWorldPosition();
             float distance = Util.getDistance(ownerPos.x, ownerPos.y, mwp.x, mwp.y);
             fishingHook.setSpeed(Math.min(distance, this.castSpeed));
@@ -246,12 +246,12 @@ public class ItemFishPole extends Item {
         float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         //绘制鱼线
         LivingEntity<?> hookOwner = hook.getOwner();
-        Vector2 ownerPos = hookOwner.getCenter();
+        Vector2 ownerPos = hookOwner.getCenterPos();
         float xOffset = hookOwner.getWidth() * 1.314f * MathUtils.cosDeg(rotation);
         float yOffset = hookOwner.getHeight()* 1.314f * MathUtils.sinDeg(rotation);
         ownerPos.add(xOffset, yOffset);
 
-        Vector2 hookPos = hook.getCenter();
+        Vector2 hookPos = hook.getCenterPos();
         //让鱼线绘制在钩子上方
         hookPos.add(0, hook.getHeight() / 2 - 0.07f + hook.getPositionOffset().y);
         //控制鱼线绘制方向

@@ -48,7 +48,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
             this.pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(2, 5),
-                getCenter().add(0, - getHeight() / 2),
+                getCenterPos().add(0, - getHeight() / 2),
                 new Vector2(MathUtils.random(0.5f, 1.2f), 0),
                 getOrigin(),
                 getSize().scl(0.3f), getSize().scl(0.06f),
@@ -105,7 +105,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 返回移动
      * */
     private void returningMovement (float delta) {
-        Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
+        Direction dir = new Direction(getCenterPos(), this.getOwner().getCenterPos());
         setVelocity(getSpeed() * dir.getX(), getSpeed() * dir.getY());
         positionChange(delta);
     }

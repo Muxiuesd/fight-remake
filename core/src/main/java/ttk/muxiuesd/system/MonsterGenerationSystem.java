@@ -72,7 +72,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void run () {
         EntitySystem es = getEntitySystem();
         Player player = getPlayerSystem().getPlayer();
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
 
         //对每一个生成工厂执行一次生成，具体生成取决于工厂接口的实现
         for (EnemyGenFactory<?> factory : getGenFactories().values()) {
