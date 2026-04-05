@@ -51,7 +51,7 @@ public final class Blocks {
 
     /// 带有方块实体的方块
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
-    public static final Block FURNACE = register("furnace", BlockFurnace::new, BlockFurnace.RENDERER);
+    public static final Block FURNACE = register("furnace", BlockFurnace::new);
 
     /**
      * 注册一个非常普通的方块
