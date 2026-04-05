@@ -13,9 +13,9 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.wall.Wall;
 
 /**
- * 实体碰撞系统
+ * 地面的实体的碰撞系统
  * <p>
- * 实体与实体之间的碰撞，实体与墙体的碰撞
+ * TODO 实体与实体之间的碰撞，实体与墙体的碰撞
  * */
 public class GroundEntityCollisionSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
@@ -68,6 +68,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
                     if (this.fixCollisions(rect, 1, 0, stepX)) {
                         // 如果发生碰撞，剩余步数不再移动X轴
                         stepX = 0;
+
                     }
                 }
 

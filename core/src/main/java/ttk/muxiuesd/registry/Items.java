@@ -59,8 +59,10 @@ public final class Items {
     public static final Item DIAMOND_BOOTS = register("diamond_boots", EquipmentDiamondBoots::new);
 
     /// 刷怪蛋物品
+    //怪物刷怪蛋
     public static final Item SPAWN_EGG_SLIME = register("spawn_egg_slime", Entities.SLIME);
-    //public static final Item SPAWN_EGG_TARGET = register("spawn_egg_slime", Entities.TARGET);
+    //生物刷怪蛋
+    public static final Item SPAWN_EGG_PUFFER_FISH = register("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
 
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);

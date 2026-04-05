@@ -115,7 +115,7 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         Entity<?> target = this.getCurTarget();
         float distance = Util.getDistance(this, target);
         //在攻击范围之外不攻击
-        if (distance > getAttackRange()) {
+        if (distance > this.getAttackRange()) {
             return;
         }
         //攻击间隔没到就不攻击
