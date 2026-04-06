@@ -24,7 +24,7 @@ public class PufferFish extends LivingEntity<PufferFish> {
 
     public PufferFish (World world, EntityType<? super PufferFish> entityType) {
         super(world, entityType, 5, 5, 1);
-        loadBodyTextureRegion(Fight.ID("puffer_fish"), "fish/puffer_fish.png");
+        setBodyTextureRegion(getTextureRegion(Fight.ID("puffer_fish"), "fish/puffer_fish.png"));
         setSize(DEFAULT_SIZE);
         fastAddBodyHitBox();
         setSpeed(1f);

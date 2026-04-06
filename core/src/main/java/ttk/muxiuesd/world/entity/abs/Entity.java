@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.entity.abs;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -10,7 +9,6 @@ import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codecable;
 import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ICatData;
@@ -22,6 +20,7 @@ import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
@@ -38,6 +37,17 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  */
 public abstract class Entity<T extends Entity<T>>
     implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
+
+    /**
+     * 加载纹理区域
+     * @param textureId 纹理材质id
+     * @param entityTexturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
+     * */
+    public static TextureRegion getTextureRegion (String textureId, String entityTexturePath) {
+        if (entityTexturePath == null) return Util.loadTextureRegion(textureId, entityTexturePath);
+        return Util.loadTextureRegion(textureId, Fight.EntityTexturePath(entityTexturePath));
+    }
+
 
     /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
@@ -433,25 +443,10 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 加载身体材质
+     * 设置实体身体渲染材质
      * */
-    public void loadBodyTextureRegion (String textureId, String texturePath) {
-        textureRegion = this.getTextureRegion(textureId, texturePath);
-    }
-
-    /**
-     * 加载纹理区域
-     * @param textureId 纹理材质id
-     * @param texturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
-     * */
-    public TextureRegion getTextureRegion (String textureId, String texturePath) {
-        if (texturePath == null) {
-            return new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
-        }
-
-        AssetsLoader.getInstance().loadAsync(textureId, Fight.EntityTexturePath(texturePath), Texture.class, null);
-        Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
-        return new TextureRegion(texture);
+    public void setBodyTextureRegion (TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
     }
 
     /**

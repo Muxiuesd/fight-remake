@@ -30,7 +30,8 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
                   String textureId, float maxHealth, float curHealth,
                   float visionRange, float attackRange, float attackSpan, float speed) {
         this(world, entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
-        this.loadBodyTextureRegion(textureId, null);
+
+        this.setBodyTextureRegion(getTextureRegion(textureId, null));
     }
 
     public Enemy (World world, EntityType<?> entityType) {

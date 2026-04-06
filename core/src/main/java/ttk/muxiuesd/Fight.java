@@ -5,10 +5,11 @@ import ttk.muxiuesd.util.Info;
 public class Fight {
     public static final String NAMESPACE = "fight";
     public static final String AUDIO_ROOT = "audio/";
-    public static final String BLOCK_TEXTURE_ROOT = "texture/blocks/";
-    public static final String ENTITY_TEXTURE_ROOT = "texture/entity/";
-    public static final String ITEM_TEXTURE_ROOT = "texture/item/";
-    public static final String UI_TEXTURE_ROOT = "texture/ui/";
+    public static final String TEXTURE_ROOT = "texture/";
+    public static final String BLOCK_TEXTURE_ROOT   = TEXTURE_ROOT + "blocks/";
+    public static final String ENTITY_TEXTURE_ROOT  = TEXTURE_ROOT + "entity/";
+    public static final String ITEM_TEXTURE_ROOT    = TEXTURE_ROOT + "item/";
+    public static final String UI_TEXTURE_ROOT      = TEXTURE_ROOT + "ui/";
     public static final String FONT_ROOT = "font/";
     public static final String LANG_ROOT = "lang/";
 

@@ -67,6 +67,7 @@ public final class Items {
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
     public static final Item GRASS = register(Blocks.GRASS);
+    public static final Item FARMLAND_DRY = register(Blocks.FARMLAND_DRY);
     public static final Item STONE = register(Blocks.STONE);
     public static final Item SAND = register(Blocks.SAND);
     public static final Item WATER = register(Blocks.WATER);

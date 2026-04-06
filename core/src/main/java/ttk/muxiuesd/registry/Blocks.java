@@ -24,6 +24,7 @@ public final class Blocks {
     public static final BlockAir ARI = register("air", BlockAir::new, BlockAir.RENDERER);
     public static final BlockTest TEST_BLOCK = register("block_test", BlockTest::new);
     public static final BlockGrass GRASS = register("grass", BlockGrass::new);
+    public static final Block FARMLAND_DRY = register("farmland_dry");
     public static final BlockStone STONE = register("stone", BlockStone::new);
     public static final BlockSand SAND = register("sand", BlockSand::new);
     public static final BlockWater WATER = register("water", BlockWater::new, BlockWater.RENDERER);

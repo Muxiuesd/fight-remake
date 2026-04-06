@@ -17,11 +17,18 @@ public final class ItemGroups {
             .add(Items.COAL)
             .add(Items.STICK)
             .add(Items.PUFFER_FISH)
+
             .add(Items.DIAMOND_HELMET)
             .add(Items.DIAMOND_CHESTPLATE)
             .add(Items.DIAMOND_LEGGINGS)
             .add(Items.DIAMOND_BOOTS)
+
+            .add(Items.SPAWN_EGG_SLIME)
+            .add(Items.SPAWN_EGG_PUFFER_FISH)
+
             .add(Items.FURNACE)
+            .add(Items.CRAFTING_TABLE)
+
             .add(Items.WOOL_BLACK)
             .add(Items.WOOL_BLUE)
             .add(Items.WOOL_BROWN)
@@ -38,8 +45,10 @@ public final class ItemGroups {
             .add(Items.WOOL_SILVER)
             .add(Items.WOOL_WHITE)
             .add(Items.WOOL_YELLOW)
-            .add(Items.SPAWN_EGG_SLIME)
-            .add(Items.SPAWN_EGG_PUFFER_FISH)
+
+            .add(Items.GRASS)
+            .add(Items.FARMLAND_DRY)
+            .add(Items.STONE)
         ;
         });
 
