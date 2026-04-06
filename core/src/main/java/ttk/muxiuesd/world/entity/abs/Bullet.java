@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.entity.EntityType;
 /**
  * 子弹
  */
-public abstract class Bullet extends Entity<Bullet> {
+public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     public Entity<?> owner;
 
     public float damage;

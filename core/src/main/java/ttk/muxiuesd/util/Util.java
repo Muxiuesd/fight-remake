@@ -195,7 +195,7 @@ public class Util {
     /**
      * 检查给定半径内的实体数量
      * */
-    public static <T extends Entity> int entityCount (Array<T> entities, Vector2 center, float radius) {
+    public static <T extends Entity<?>> int entityCount (Array<T> entities, Vector2 center, float radius) {
         int count = 0;
         for (T entity : entities) {
             Vector2 subbed = new Vector2(center).sub(entity.getCenterPos());

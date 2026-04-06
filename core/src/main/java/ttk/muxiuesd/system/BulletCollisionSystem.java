@@ -256,16 +256,16 @@ public class BulletCollisionSystem extends WorldSystem {
     @Override
     public void renderShape(ShapeRenderer batch) {
         EntitySystem es = getWorld().getSystem(EntitySystem.class);
-        Array<Bullet> playerBulletEntity = es.getPlayerBulletEntity();
-        Array<Bullet> enemyBulletEntity = es.getEnemyBulletEntity();
-        for (Bullet bullet : playerBulletEntity) {
+        Array<Bullet<?>> playerBulletEntity = es.getPlayerBulletEntity();
+        Array<Bullet<?>> enemyBulletEntity = es.getEnemyBulletEntity();
+        for (Bullet<?> bullet : playerBulletEntity) {
             Hitbox hitbox = bullet.getBodyHitbox();
             if (hitbox instanceof RectHitbox rectHitbox) {
                 Rectangle box = rectHitbox.getRectangle();
                 batch.rect(box.getX(), box.getY(), box.getWidth(), box.getHeight());
             }
         }
-        for (Bullet bullet : enemyBulletEntity) {
+        for (Bullet<?> bullet : enemyBulletEntity) {
             Hitbox hitbox = bullet.getBodyHitbox();
             if (hitbox instanceof RectHitbox rectHitbox) {
                 Rectangle box = rectHitbox.getRectangle();

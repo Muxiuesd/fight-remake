@@ -8,7 +8,7 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 /**
  * 火焰子弹
  * */
-public class BulletFire extends Bullet {
+public class BulletFire extends Bullet<BulletFire> {
     public BulletFire (World world, EntityType<?> entityType) {
         super(
             world, entityType,

@@ -41,7 +41,8 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
         if (!getTimeSystem().isDay()) return;
 
         //附近的生物数量超过最大值不刷生物
-        int entityCount = Util.entityCount(getEntitySystem().getEntityArray(EntityTypes.CREATURE),
+        int entityCount = Util.entityCount(
+            getEntitySystem().getEntityArray(EntityTypes.CREATURE),
             getPlayerSystem().getPlayer().getCenterPos(),
             getMaxGenRange()
         );

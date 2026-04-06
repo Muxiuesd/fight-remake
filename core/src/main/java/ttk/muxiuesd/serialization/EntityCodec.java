@@ -34,7 +34,8 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
     @Override
     public Optional<Entity<?>> parse (JsonDataReader dataReader) {
         String id = dataReader.readString("id");
-        EntityProvider<Entity<?>> entityProvider = (EntityProvider<Entity<?>>) Registries.ENTITY.get(id);
+        EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
+
         String typeId = dataReader.readString("type");
         EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.get(typeId);
         Entity<?> entity = entityProvider.create(FightCore.getInstance().mainGameScreen.getWorld(), entityType);

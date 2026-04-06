@@ -570,7 +570,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 获取实体类型相应的管理组
      * */
-    public <T extends Entity<?>> Array<T> getEntityArray (EntityType<T> type) {
+    public <T extends Entity<?>> Array<T> getEntityArray (EntityType<? extends T> type) {
         return (Array<T>) this.entityTypes.get(type);
     }
 
@@ -578,11 +578,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return this.getEntityArray(EntityTypes.ENEMY);
     }
 
-    public Array<Bullet> getPlayerBulletEntity () {
+    public Array<Bullet<?>> getPlayerBulletEntity () {
         return this.getEntityArray(EntityTypes.PLAYER_BULLET);
     }
 
-    public Array<Bullet> getEnemyBulletEntity () {
+    public Array<Bullet<?>> getEnemyBulletEntity () {
         return this.getEntityArray(EntityTypes.ENEMY_BULLET);
     }
 
