@@ -214,9 +214,10 @@ public class BlockEntityFurnace extends BlockEntity {
     public void workingParticle (World world) {
         if (this.isWorking() && MathUtils.random() < 0.07f) {
             ParticleSystem ps = world.getSystemManager().getSystem(ParticleSystem.class);
+            //TODO 有些常量可以提出，减少new的次数
             ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
-                new Vector2(getBlockPos()).add(0.45f, 0), new Vector2(0, 1.7f), new Vector2(),
-                new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
+                new Vector2(getBlockPos()).add(0, -0.42f), new Vector2(0, 0.6f), new Vector2(),
+                new Vector2(0.2f, 0.2f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
                 0f, 2.2f);
         }
     }
