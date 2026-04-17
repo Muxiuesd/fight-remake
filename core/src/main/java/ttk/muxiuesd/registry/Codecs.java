@@ -1,13 +1,14 @@
 package ttk.muxiuesd.registry;
 
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.*;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -30,6 +31,7 @@ public final class Codecs {
     public static final JsonCodec<BlockEntity> BLOCK_ENTITY = register("block_entity", new BlockEntityCodec());
     public static final JsonCodec<Block.Property> BLOCK_PROPERTY = register("block_property", new BlockPropertyCodec());
     public static final JsonCodec<Wall<?>> WALL = register("wall", new WallCodec());
+    public static final JsonCodec<Botany> BOTANY = register("wall", new BotanyCodec());
     public static final JsonCodec<Chunk> CHUNK = register("chunk", new ChunkCodec());
 
     /// 物品相关的编解码器

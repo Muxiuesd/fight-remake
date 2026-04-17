@@ -333,17 +333,24 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
 
     /**
-     * 添加方块实例
+     * 向世界添加方块实例
      * <p>
-     * 普通方块全世界一个实例，方块实体每一个都是单独实例，植物方块单独实例
+     * 普通方块全世界一个实例，方块实体每一个都是单独实例，植物方块也是单独实例
      * */
     private void addBlockInstance (Block block) {
         //如果是带有方块实体的方块
-        if (block instanceof BlockWithEntity blockWithEntity) {
+        /*if (block instanceof BlockWithEntity blockWithEntity) {
             this.blockInstances.put(this.getBlockKey(blockWithEntity), blockWithEntity);
-        }else if (! this.blockInstances.containsKey(block.getID())) {
+        } else if (block instanceof Botany botany) {
+            this.blockInstances.put(this.getBlockKey(botany), botany);
+        } else if (! this.blockInstances.containsKey(block.getID())) {
             //普通方块
             this.blockInstances.put(block.getID(), block);
+        }*/
+
+        String blockKey = this.getBlockKey(block);
+        if (! this.blockInstances.containsKey(blockKey)) {
+            this.blockInstances.put(blockKey, block);
         }
 
         //如果方快实现了tick方法就加进去执行tick更新
@@ -357,6 +364,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 移除方块实例
      * */
     private Block removeBlockInstance (Block block) {
+        //如果方快实现了tick方法就移除它的tick更新
         if (block instanceof Tickable tickableBlock) {
             TimeSystem timeSystem = getWorld().getSystem(TimeSystem.class);
             timeSystem.remove(tickableBlock);
@@ -486,6 +494,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     /**
      * 放置植物
+     * <p>
+     * 当对应坐标上没有其他植物时就放置此植物
      * */
     public void placeBotany (Botany botany, float wx, float wy) {
         Chunk chunk = this.getChunk(wx, wy);
@@ -493,6 +503,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         GridPoint2 chunkPos = Chunk.worldToChunk(roundPos.x, roundPos.y);
         //如果这个坐标上没有其他植物就可以放置
         if (!chunk.hasBotany(chunkPos.x, chunkPos.y)) {
+            //创建新的植物实例并添加
             Botany self = botany.createSelf();
             this.addBlock(self, wx, wy);
             chunk.setBotany(self, chunkPos.x, chunkPos.y);
@@ -861,10 +872,17 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     /**
      * 获取方块键
+     * <p>
+     * 对于一个方块对应一个实例的方块来说，方快类型不同，键的类型就不同。普通方块全世界一个共享的实例，就直接用方快id当键
+     * <p>
+     * TODO 多种类型的方快的方快键的判断
      * */
     private String getBlockKey (Block block) {
         if (block instanceof BlockWithEntity blockWithEntity) {
             return blockWithEntity.getID() + ":" + blockWithEntity.hashCode();
+        }
+        if (block instanceof Botany botany) {
+            return botany.getID() + ":" + botany.hashCode();
         }
         return block.getID();
     }

@@ -9,6 +9,7 @@ import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -31,7 +32,6 @@ public class ChunkCodec extends JsonCodec<Chunk> {
             dataWriter.objEnd();
         });
 
-
         //墙体
         this.encodeTraversal("walls", dataWriter, chunk, (x, y) -> {
             Wall<?> wall = chunk.getWall(x, y);
@@ -42,13 +42,21 @@ public class ChunkCodec extends JsonCodec<Chunk> {
             }
         });
 
+        //植物
+        this.encodeTraversal("botany", dataWriter, chunk, (x, y) -> {
+            Botany botany = chunk.getBotany(x, y);
+            if (botany != null) {
+                dataWriter.objStart(this.getObjName(x, y));
+                Codecs.BOTANY.encode(botany, dataWriter);
+                dataWriter.objEnd();
+            }
+        });
 
         //高度信息
         this.encodeTraversal("heights", dataWriter, chunk, (x, y) -> {
             int height = chunk.getHeight(x, y);
             dataWriter.writeInt(this.getObjName(x, y), height);
         });
-
     }
 
     @Override
@@ -77,6 +85,16 @@ public class ChunkCodec extends JsonCodec<Chunk> {
                 if (wallValue != null) {
                     Optional<Wall<?>> optional = Codecs.WALL.decode(new JsonDataReader(wallValue));
                     optional.ifPresent(wall -> resultChunk.setWall(wall, x, y));
+                }
+        });
+
+        //解析植物
+        this.decodeTraversal("botany", dataReader, resultChunk,
+            (botanyObj, chunk, x, y) -> {
+                JsonValue botanyValue = botanyObj.get(this.getObjName(x, y));
+                if (botanyValue != null) {
+                    Optional<Botany> optional = Codecs.BOTANY.decode(new JsonDataReader(botanyValue));
+                    optional.ifPresent(botany -> resultChunk.setBotany(botany, x, y));
                 }
         });
 

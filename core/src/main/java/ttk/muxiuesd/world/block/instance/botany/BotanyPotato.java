@@ -28,6 +28,8 @@ public class BotanyPotato extends Botany {
 
     @Override
     public BotanyPotato createSelf () {
-        return new BotanyPotato();
+        BotanyPotato instance = new BotanyPotato();
+        instance.setID(getID());
+        return instance;
     }
 }

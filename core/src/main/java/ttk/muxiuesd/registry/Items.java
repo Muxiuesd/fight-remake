@@ -9,6 +9,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.item.FishPoleRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.CommonItem;
@@ -45,7 +46,7 @@ public final class Items {
     public static final Item SLIME_BALL = register("slime_ball");
 
     /// 农作物物品
-    public static final Item POTATO = registerCrop("potato");
+    public static final Item POTATO = registerCrop("potato", Blocks.POTATO);
 
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
@@ -102,8 +103,8 @@ public final class Items {
     /**
      * 注册农作物物品
      * */
-    public static <T extends CropItem> CropItem registerCrop (String name) {
-        CropItem cropItem = register(name, () -> new CropItem(name));
+    public static <T extends CropItem> CropItem registerCrop (String name, Botany crop) {
+        CropItem cropItem = register(name, () -> new CropItem(name, crop));
 
         return cropItem;
     }
