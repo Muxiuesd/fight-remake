@@ -9,6 +9,9 @@ import ttk.muxiuesd.world.block.abs.Block;
  * 方块的渲染器接口
  * */
 public interface BlockRenderer<T extends Block> {
+    /**
+     * 待实现的渲染方法
+     * */
     void render(Batch batch, T block, Context context);
 
     default Context getContext () {

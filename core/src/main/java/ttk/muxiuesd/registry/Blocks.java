@@ -7,10 +7,13 @@ import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.render.world.block.BotanyRenderer;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.block.instance.*;
+import ttk.muxiuesd.world.block.instance.botany.BotanyPotato;
 
 import java.util.function.Supplier;
 
@@ -50,9 +53,13 @@ public final class Blocks {
     public static final Block WOOL_WHITE = register("wool_colored_white", "wool/wool_colored_white");
     public static final Block WOOL_YELLOW = register("wool_colored_yellow", "wool/wool_colored_yellow");
 
+    /// 植物
+    public static final Botany POTATO = registerBotany("potato", BotanyPotato::new);
+
     /// 带有方块实体的方块
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
     public static final Block FURNACE = register("furnace", BlockFurnace::new);
+
 
     /**
      * 注册一个非常普通的方块
@@ -75,6 +82,13 @@ public final class Blocks {
 
     public static <T extends Block> T register (String name, Supplier<T> factory) {
         return register(name, factory, new BlockRenderer.StandardRenderer<>());
+    }
+
+    /**
+     * 注册一个植物
+     * */
+    public static <T extends Botany> T registerBotany (String name, Supplier<T> factory) {
+        return register(name, factory, new BotanyRenderer<>());
     }
 
     /**

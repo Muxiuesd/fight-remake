@@ -19,14 +19,39 @@ import ttk.muxiuesd.registrant.WallRendererRegistry;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.wall.Wall;
 
 
 /**
  * 一个区块
+ * <p>
  * 一行一行更新绘制
  * */
 public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
+    /**
+     * 将传入的世界坐标转换为这个区块里的方块数组坐标
+     * @param rwx 四舍五入过的世界横坐标
+     * @param rwy 四舍五入过的世界纵坐标
+     * */
+    public static GridPoint2 worldToChunk (float rwx, float rwy) {
+        GridPoint2 cp = new GridPoint2();
+        if (rwx < 0) {
+            cp.x = ChunkWidth + (int)(rwx % ChunkWidth);
+            cp.x %= ChunkWidth;
+        }else {
+            cp.x = (int) (rwx % ChunkWidth);
+        }
+        if (rwy < 0) {
+            cp.y = ChunkHeight + (int)(rwy % ChunkHeight);
+            cp.y %= ChunkHeight;
+        }else {
+            cp.y = (int) (rwy % ChunkHeight);
+        }
+        return cp;
+    }
+
+
     public final String TAG = this.getClass().getName();
 
     public static final int ChunkWidth = 16;
@@ -52,6 +77,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
     private final Wall<?>[][]  walls;
+    private final Botany[][]  botanys;
     private final int[][] heights;
 
 
@@ -62,12 +88,14 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public Chunk () {
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
+        this.botanys = new Botany[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
     }
 
     @Override
     public void draw(Batch batch) {
         ChunkPosition cp = this.chunkPosition;
+        //绘制方快
         this.traversal((x, y) -> {
             Block block = this.blocks[y][x];
             if (block != null) {
@@ -81,6 +109,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
                 }
             }
         });
+        //绘制墙体
         this.traversal((x, y) -> {
             Wall<?> wall = this.walls[y][x];
             if (wall != null) {
@@ -92,10 +121,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
                     renderer.render(batch, wall, context);
                     renderer.freeContext(context);
                 }
-                //wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
-
+        //绘制植物
+        this.traversal((x, y) -> {
+            Botany botany = this.botanys[y][x];
+            if (botany != null) {
+                BlockRenderer<Block> renderer = BlockRendererRegistry.get(botany);
+                if (renderer != null) {
+                    BlockRenderer.Context context = renderer.getContext();
+                    context.x = x + cp.x * ChunkWidth;
+                    context.y = y + cp.y * ChunkHeight;
+                    renderer.render(batch, botany, context);
+                    renderer.freeContext(context);
+                }
+            }
+        });
     }
 
     @Override
@@ -128,11 +169,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         return this.blocks[cy][cx];
     }
 
-    public Wall<?> getWall(int cx, int cy) {
+    public Wall<?> getWall (int cx, int cy) {
         return this.walls[cy][cx];
     }
 
-    public void setWall(Wall<?> wall, int cx, int cy) {
+    public void setWall (Wall<?> wall, int cx, int cy) {
         this.walls[cy][cx] = wall;
     }
 
@@ -141,7 +182,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * <p>
      * 需要传入的世界坐标都在这个区块里，否则不准
      */
-    public Wall<?> removeWall(float wx, float wy) {
+    public Wall<?> removeWall (float wx, float wy) {
         GridPoint2 gridPoint2 = this.worldPos2ChunkPos(wx, wy);
         Wall<?> wall = this.getWall(gridPoint2.x, gridPoint2.y);
         if (wall != null) {
@@ -151,6 +192,28 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         //是null就返回null;
         return null;
     }
+
+    /**
+     * 设置这个区块上的某一个植物
+     * */
+    public void setBotany (Botany botany, int cx, int cy) {
+        this.botanys[cy][cx] = botany;
+    }
+
+    /**
+     * 获取这个区块上的某一个植物
+     * */
+    public Botany getBotany (int cx, int cy) {
+        return this.botanys[cy][cx];
+    }
+
+    /**
+     * 检测这个区块上是否有植物
+     * */
+    public boolean hasBotany (int cx, int cy) {
+        return this.botanys[cy][cx] != null;
+    }
+
 
     public void setHeight (int cx, int cy, int height) {
         if (height < LowestHeight || height > HighestHeight) {
@@ -165,25 +228,35 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 查找方块
-     * @param wx
-     * @param wy
+     * @param wx 世界坐标x
+     * @param wy 世界坐标y
      * @return 方块
      */
     public Block seekBlock (float wx, float wy) {
         GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
-
         return this.getBlock(chunkPos.x, chunkPos.y);
     }
 
     /**
      * 查找墙体
-     * @param wx
-     * @param wy
+     * @param wx 世界坐标x
+     * @param wy 世界坐标y
      * @return 墙体或者null
      */
     public Wall<?> seekWall (float wx, float wy) {
         GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
         return this.getWall(chunkPos.x, chunkPos.y);
+    }
+
+    /**
+     * 查找植物
+     * @param wx 世界坐标x
+     * @param wy 世界坐标y
+     * @return 找到植物就返回对应的实例，否则为null
+     */
+    public Botany seekBotany (float wx, float wy) {
+        GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
+        return this.getBotany(chunkPos.x, chunkPos.y);
     }
 
     /**
@@ -353,10 +426,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 将传入的世界坐标转换为这个区块里的方块数组坐标
-     * @param rwx 四舍五入过的世界横坐标
-     * @param rwy 四舍五入过的世界纵坐标
      * */
-    public GridPoint2 worldToChunk (float rwx, float rwy) {
+    /*public GridPoint2 worldToChunk (float rwx, float rwy) {
         GridPoint2 cp = new GridPoint2();
         if (rwx < 0) {
             cp.x = ChunkWidth + (int)(rwx % ChunkWidth);
@@ -371,7 +442,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             cp.y = (int) (rwy % ChunkHeight);
         }
         return cp;
-    }
+    }*/
 
     public ChunkSystem getChunkSystem () {
         return this.chunkSystem;

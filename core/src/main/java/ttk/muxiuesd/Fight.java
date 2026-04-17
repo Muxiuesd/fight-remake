@@ -7,6 +7,7 @@ public class Fight {
     public static final String AUDIO_ROOT = "audio/";
     public static final String TEXTURE_ROOT = "texture/";
     public static final String BLOCK_TEXTURE_ROOT   = TEXTURE_ROOT + "blocks/";
+    public static final String BOTANY_TEXTURE_ROOT   = TEXTURE_ROOT + "botany/";
     public static final String ENTITY_TEXTURE_ROOT  = TEXTURE_ROOT + "entity/";
     public static final String ITEM_TEXTURE_ROOT    = TEXTURE_ROOT + "item/";
     public static final String UI_TEXTURE_ROOT      = TEXTURE_ROOT + "ui/";
@@ -85,6 +86,13 @@ public class Fight {
      * */
     public static String BlockTexturePath (String path) {
         return BLOCK_TEXTURE_ROOT + path;
+    }
+
+    /**
+     * 从植物的材质根路径中获取植物的材质
+     * */
+    public static String BotanyTexturePath (String path) {
+        return BOTANY_TEXTURE_ROOT + path;
     }
 
     public static String EntityTexturePath (String path) {

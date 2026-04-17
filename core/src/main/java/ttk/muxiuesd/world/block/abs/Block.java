@@ -22,10 +22,6 @@ public abstract class Block implements ID<Block>, Disposable {
     public static final float HITBOX_START_X_OFFSET = - WIDTH / 2, HITBOX_START_Y_OFFSET = - HEIGHT / 2;
     public static final float HITBOX_END_X_OFFSET = WIDTH / 2, HITBOX_END_Y_OFFSET = HEIGHT / 2;
 
-    private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-        .add(PropertyTypes.BLOCK_FRICTON, 1f)
-        .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
-
     /**
      * 生成默认的属性
      * 有些需要实例化的东西就放里面防止浅拷贝
@@ -58,19 +54,22 @@ public abstract class Block implements ID<Block>, Disposable {
     }
 
     public Property getProperty () {
-        return property;
+        return this.property;
     }
 
     public void setProperty (Property property) {
         this.property = property;
     }
 
+    /**
+     * 检测方快的材质贴图是否存在
+     * */
     public boolean textureIsValid() {
-        return this.textureRegion != null;
+        return this.getTextureRegion() != null;
     }
 
     public TextureRegion getTextureRegion () {
-        return textureRegion;
+        return this.textureRegion;
     }
 
     public Block setTextureRegion (TextureRegion textureRegion) {
@@ -92,12 +91,17 @@ public abstract class Block implements ID<Block>, Disposable {
      * 使用构建者模式
      * */
     public static class Property {
+        private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+            .add(PropertyTypes.BLOCK_FRICTON, 1f)
+            .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
+
         private PropertiesDataMap<?, ?, ?> propertiesDataMap;
 
-        private Property() {
+        public Property() {
             /// 这里有可能浅拷贝
-            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP
-                .copy()
+            this.propertiesDataMap = new JsonPropertiesMap()
+                .add(PropertyTypes.BLOCK_FRICTON, 1f)
+                .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
                 .add(PropertyTypes.CATS, new CatsHolder());
         }
 
