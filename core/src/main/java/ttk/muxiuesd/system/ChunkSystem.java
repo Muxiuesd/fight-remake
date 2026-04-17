@@ -193,7 +193,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         for (Chunk chunk : this.activeChunks) {
             chunkEdgeRect.set(
                 chunk.getWorldX(0) - Block.WIDTH / 2f,
-                chunk.getWorldY(0)- Block.HEIGHT / 2f,
+                chunk.getWorldY(0) - Block.HEIGHT / 2f,
                 Chunk.ChunkWidth, Chunk.ChunkHeight
             );
             //判断这个区块是否可以被看见
