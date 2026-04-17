@@ -201,7 +201,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             //如果这个区块的边界矩形与相机视野相交，就调用区块的渲染
             if (camera.frustum.boundsInFrustum(
                 chunkEdgeRect.x, chunkEdgeRect.y, 0,
-                chunkEdgeRect.width / 2f, chunkEdgeRect.height / 2f, 0
+                chunkEdgeRect.width, chunkEdgeRect.height, 0
             )) {
                 chunk.draw(batch);
             }
