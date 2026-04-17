@@ -13,7 +13,7 @@ public class BotanyRenderer<T extends Botany> extends BlockRenderer.StandardRend
         if (botany.textureIsValid()) {
             batch.draw(
                 botany.getCurGrowLevelTextureRegion(),
-                context.x + OFFSET_X, context.y + OFFSET_Y,
+                context.x + OFFSET_X, context.y,
                 context.originX, context.originY,
                 context.width, context.height,
                 context.scaleX, context.scaleY,
