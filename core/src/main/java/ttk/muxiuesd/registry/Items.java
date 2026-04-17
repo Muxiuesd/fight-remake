@@ -46,7 +46,7 @@ public final class Items {
     public static final Item SLIME_BALL = register("slime_ball");
 
     /// 农作物物品
-    public static final Item POTATO = registerCrop("potato", Blocks.POTATO);
+    public static final Item POTATO = register("potato", Blocks.POTATO);
 
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
@@ -103,10 +103,8 @@ public final class Items {
     /**
      * 注册农作物物品
      * */
-    public static <T extends CropItem> CropItem registerCrop (String name, Botany crop) {
-        CropItem cropItem = register(name, () -> new CropItem(name, crop));
-
-        return cropItem;
+    public static CropItem register (String name, Botany crop) {
+        return register(name, () -> new CropItem(name, crop));
     }
 
     /**

@@ -10,6 +10,7 @@ import ttk.muxiuesd.world.item.consumption.ConsumptionItem;
 
 /**
  * 食物类型的物品
+ * TODO 食物物品的特有属性数据
  * */
 public class FoodItem extends ConsumptionItem {
     /**

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.instance.botany;
 
-import ttk.muxiuesd.util.Util;
+import com.badlogic.gdx.math.MathUtils;
+import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Botany;
 
@@ -21,7 +22,9 @@ public class BotanyPotato extends Botany {
 
     @Override
     public void tick (World world, float delta) {
-        if (getGrowLevel() < 4 && Util.randomSin() > 0.98768834f) {
+        TimeSystem timeSystem = world.getSystem(TimeSystem.class);
+        //植物需要在白天生长
+        if (timeSystem.isDay() && getGrowLevel() < 4 && MathUtils.random() > 0.999f) {
             growLevelIncrease(1);
         }
     }

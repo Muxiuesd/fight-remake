@@ -33,15 +33,15 @@ public class CropItem extends ConsumptionItem {
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        //TODO 对着耕地使用可以种植
         Vector2 mouseWorldPosition = Util.getMouseWorldPosition();
         ChunkSystem chunkSystem = world.getSystem(ChunkSystem.class);
         Block block = chunkSystem.getBlock(mouseWorldPosition);
         //目前只能在耕地上种植农作物
         if (block == Blocks.FARMLAND_DRY) {
             chunkSystem.placeBotany(this.getBotany(), mouseWorldPosition.x, mouseWorldPosition.y);
+            return super.use(itemStack, world, user);
         }
-        return super.use(itemStack, world, user);
+        return false;
     }
 
     public Botany getBotany () {

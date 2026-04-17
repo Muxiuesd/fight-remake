@@ -188,7 +188,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void draw(Batch batch) {
-        //区块绘制
+        //区块绘制，看不见的区块将会被剔除
         PoolableRectangle chunkEdgeRect = Pools.RECT.obtain();
         for (Chunk chunk : this.activeChunks) {
             chunkEdgeRect.set(
