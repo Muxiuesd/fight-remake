@@ -28,7 +28,7 @@ public class RangedWeapon extends Weapon {
      */
     public static Property createDefaultProperty() {
         return new Property().setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy())
-            .setUseSoundId(Sounds.ENTITY_SHOOT.getId());
+            .setUseSoundId(Sounds.ENTITY_SHOOT.getID());
     }
 
     private BulletFactory<?> factory;   //子弹的工厂实现类

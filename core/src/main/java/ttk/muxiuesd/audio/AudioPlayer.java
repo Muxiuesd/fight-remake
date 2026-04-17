@@ -23,10 +23,10 @@ public class AudioPlayer {
     }
 
     public Sound playSound (Audio audio) {
-        return playSound(audio.getId());
+        return playSound(audio.getID());
     }
     public Sound playSound (Audio audio, float volume) {
-        return playSound(audio.getId(), volume);
+        return playSound(audio.getID(), volume);
     }
 
     public Sound playSound(String id) {
@@ -58,7 +58,7 @@ public class AudioPlayer {
     }
 
     public void playMusic (Audio audio) {
-        this.playMusic(audio.getId());
+        this.playMusic(audio.getID());
     }
     /**
      * 播放音乐，若已经在播放则中途停下来再重头播放

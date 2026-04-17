@@ -1,13 +1,11 @@
 package ttk.muxiuesd.world.item.abs;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
@@ -21,6 +19,7 @@ import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.SoundEffectSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -32,16 +31,10 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
 public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, ItemShapeRenderable {
-    public static final JsonPropertiesMap ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-        .add(PropertyTypes.ITEM_MAX_COUNT, 64)
-        .add(PropertyTypes.ITEM_ON_USING, false)
-        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getId());
-
     private String id;
-    public Type type;
-    //物品最原始的属性，原则上不直接对这个原始数据进行操作
-    public Property property;
-    public TextureRegion textureRegion;
+    public Type type;                   //物品的类型
+    public Property property;           //物品最原始的属性，原则上不直接对这个原始数据进行操作
+    public TextureRegion textureRegion; //物品的贴图材质
 
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
@@ -49,7 +42,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public Item (Type type, Property property, String textureId, String texturePath) {
         this.type = type;
         this.property = property;
-        this.loadTextureRegion(textureId, texturePath);
+        this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -114,7 +107,6 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         return array;
     }
 
-
     /**
      * 使用此物品
      * @return 是否使用成功
@@ -141,27 +133,8 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     }
 
     /**
-     * 获取材质
-     * <p>
-     * 有返回值，以便于有多个材质的物品使用
-     * @param texturePath 当此为null时默认之前加载过
+     * 获取物品的属性
      * */
-    public TextureRegion getTextureRegion (String id, String texturePath) {
-        if (texturePath == null) {
-            texturePath = AssetsLoader.getInstance().getPath(id);
-        }
-
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
-        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
-    }
-
-    /**
-     * 直接把物品的texture加载并赋值
-     * */
-    public void loadTextureRegion (String id, String texturePath) {
-        this.textureRegion = this.getTextureRegion(id, texturePath);
-    }
-
     public Property getProperty () {
         return this.property;
     }
@@ -171,20 +144,24 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         return this;
     }
 
-    /**
-     * 获取这个物品的行为
-     * */
-    public abstract IItemStackBehaviour getBehaviour ();
-
     @Override
     public String getID () {
         return this.id;
     }
+
     @Override
     public Item setID (String id) {
         this.id = id;
         return this;
     }
+
+    /**
+     * 必须实现的类：获取这个物品的行为。
+     * <p>
+     * 没有物品行为的物品将不能正常被使用
+     * */
+    public abstract IItemStackBehaviour getBehaviour ();
+
 
     /**
      * 物品的类型
@@ -200,14 +177,24 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * 物品的属性
      * */
     public static class Property {
+        public static final JsonPropertiesMap ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+            .add(PropertyTypes.ITEM_MAX_COUNT, 64)
+            .add(PropertyTypes.ITEM_ON_USING, false)
+            .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getID());
+
         //属性映射
         private PropertiesDataMap<?, ?, ?> propertiesMap;
 
         /**
-         * 实例化后默认属性
+         * 实例化默认属性
          * */
         public Property () {
-            this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
+            this.setPropertiesMap(new JsonPropertiesMap()
+                .add(PropertyTypes.ITEM_MAX_COUNT, 64)
+                .add(PropertyTypes.ITEM_ON_USING, false)
+                .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getID())
+            );
+            //this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
         }
 
         /**

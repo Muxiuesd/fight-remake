@@ -133,7 +133,7 @@ public class SoundEffectSystem extends WorldSystem {
     }
 
     public void newSpatialSound (Audio audio, Entity<?> sounder) {
-        this.newSpatialSound(audio.getId(), sounder);
+        this.newSpatialSound(audio.getID(), sounder);
     }
     /**
      * 新建一个空间音效

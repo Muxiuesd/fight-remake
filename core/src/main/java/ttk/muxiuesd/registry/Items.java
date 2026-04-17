@@ -14,10 +14,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.CommonItem;
 import ttk.muxiuesd.world.item.common.ItemFishPole;
 import ttk.muxiuesd.world.item.common.ItemStick;
-import ttk.muxiuesd.world.item.consumption.BlockItem;
-import ttk.muxiuesd.world.item.consumption.ItemBait;
-import ttk.muxiuesd.world.item.consumption.SpawnEggItem;
-import ttk.muxiuesd.world.item.consumption.WallItem;
+import ttk.muxiuesd.world.item.consumption.*;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
@@ -46,6 +43,9 @@ public final class Items {
     public static final Item RUBBISH = register("rubbish");
     public static final Item COAL = register("coal");
     public static final Item SLIME_BALL = register("slime_ball");
+
+    /// 农作物物品
+    public static final Item POTATO = registerCrop("potato");
 
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
@@ -99,6 +99,14 @@ public final class Items {
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
 
+    /**
+     * 注册农作物物品
+     * */
+    public static <T extends CropItem> CropItem registerCrop (String name) {
+        CropItem cropItem = register(name, () -> new CropItem(name));
+
+        return cropItem;
+    }
 
     /**
      * 普通物品的注册

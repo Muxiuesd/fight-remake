@@ -49,6 +49,8 @@ public final class ItemGroups {
             .add(Items.GRASS)
             .add(Items.FARMLAND_DRY)
             .add(Items.STONE)
+
+            .add(Items.POTATO)
         ;
         });
 

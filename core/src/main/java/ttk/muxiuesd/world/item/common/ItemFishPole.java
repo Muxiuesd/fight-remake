@@ -46,7 +46,7 @@ public class ItemFishPole extends Item {
             Fight.ID("fish_pole"),
             Fight.ItemTexturePath("fish_pole.png"));
 
-        this.castTexture = getTextureRegion(
+        this.castTexture = Util.loadTextureRegion(
             Fight.ID("fish_pole_cast"),
             Fight.ItemTexturePath("fish_pole_cast.png")
         );

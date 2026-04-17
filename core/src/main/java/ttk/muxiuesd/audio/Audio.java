@@ -18,7 +18,7 @@ public class Audio {
     //TODO 更多操作
 
 
-    public String getId () {
+    public String getID () {
         return this.id;
     }
 }

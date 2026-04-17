@@ -26,7 +26,7 @@ public class Sword extends Weapon {
     public static Property createDefaultProperty() {
         return Weapon.createDefaultProperty()
             .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2.5f)
-            .setUseSoundId(Sounds.ENTITY_SWEEP.getId());
+            .setUseSoundId(Sounds.ENTITY_SWEEP.getID());
     }
 
     public Sword (Property property, String textureId, String texturePath) {
