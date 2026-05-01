@@ -9,6 +9,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 空间音效实例
+ * <p>
  * 为了控制音效播放以及检测播放状态，迫不得已改为 {@link Music}
  * */
 public class SpatialSoundInstance extends MusicInstance implements Updateable {
@@ -43,7 +44,7 @@ public class SpatialSoundInstance extends MusicInstance implements Updateable {
      * 计算音量
      * 距离越近自然音量越大
      * */
-    public float calculateVolume() {
+    public float calculateVolume () {
         float distance = receiver.getPosition().dst(sounder.getPosition());
         Float hearingRange = Fight.PLAYER_HEARING_RANGE.getValue();
         if (distance > hearingRange) {

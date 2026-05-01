@@ -5,6 +5,8 @@ import ttk.muxiuesd.world.block.abs.Block;
 
 /**
  * 空气方块，就是啥也没有
+ * <p>
+ * 用于当作占位符的存在
  * */
 public class BlockAir extends Block {
     public static final BlockRenderer<BlockAir> RENDERER = (batch, block, context) -> {};

@@ -361,7 +361,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 移除方块实例
+     * 移除方块在这个区块系统所持有的实例
      * */
     private Block removeBlockInstance (Block block) {
         //如果方快实现了tick方法就移除它的tick更新
@@ -446,7 +446,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         //chunk.setBlock(this.getBlockInstancesMap().get(this.getBlockKey(newBlock)), chunkBlockPos.x, chunkBlockPos.y);
-         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
+        EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
         return oldBlock;
     }
@@ -469,8 +469,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
         GridPoint2 chunkWallPos = Chunk.worldToChunk(round.x, round.y);
         chunk.setWall(instance, chunkWallPos.x, chunkWallPos.y);
+
         System.out.println("在区块：" + chunk.getChunkPosition().toString()
             + " 的" + chunkWallPos.toString() + "上放置墙体");
+
         return true;
     }
 
@@ -509,6 +511,26 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             chunk.setBotany(self, chunkPos.x, chunkPos.y);
         }
     }
+
+    /**
+     * 破坏植物
+     * @return 返回被破坏的植物的实例
+     * */
+    public Botany destroyBotany (float wx, float wy) {
+        Chunk chunk = this.getChunk(wx, wy);
+        Vector2 roundPos = Util.fastRound(wx, wy);
+        GridPoint2 chunkPos = Chunk.worldToChunk(roundPos.x, roundPos.y);
+        if (chunk.hasBotany(chunkPos.x, chunkPos.y)) {
+            //有植物就破坏，并且返回被破坏的植物实例
+            Botany botanyInstance = chunk.getBotany(chunkPos.x, chunkPos.y);
+            this.removeBlockInstance(botanyInstance);
+            chunk.setBotany(null, chunkPos.x, chunkPos.y);
+            return botanyInstance;
+        }
+
+        return null;
+    }
+
 
 
     /**

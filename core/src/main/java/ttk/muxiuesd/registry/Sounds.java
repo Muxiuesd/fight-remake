@@ -20,9 +20,9 @@ public final class Sounds {
     public static final Audio ENTITY_HURT_1 = registerSoundAsMusic("hurt_1",  "entity/damage/hit_1.ogg");
     public static final Audio ENTITY_HURT_2 = registerSoundAsMusic("hurt_2",  "entity/damage/hit_2.ogg");
     public static final Audio ENTITY_HURT_3 = registerSoundAsMusic("hurt_3",  "entity/damage/hit_3.ogg");
-    public static final Audio ENTITY_EAT_1 = registerSoundAsMusic("eat_1",  "entity/eat/eat1.ogg");
+    public static final Audio ENTITY_EAT_1  = registerSoundAsMusic("eat_1",  "entity/eat/eat1.ogg");
     public static final Audio ENTITY_EAT_2  = registerSoundAsMusic("eat_2",  "entity/eat/eat2.ogg");
-    public static final Audio ENTITY_EAT_3 = registerSoundAsMusic("eat_3",  "entity/eat/eat3.ogg");
+    public static final Audio ENTITY_EAT_3  = registerSoundAsMusic("eat_3",  "entity/eat/eat3.ogg");
 
     public static final Audio ENTITY_SLIME_SMALL = registerSoundAsMusic("slime_small",  "entity/slime/small.ogg");
 
@@ -41,7 +41,13 @@ public final class Sounds {
     ///装备物品
     public static final Audio EQUIP = registerSound("equip", "item/equipment/equip.ogg");
 
-    ///方块
+    ///方块相关音效
+    //草
+    public static final Audio GRASS_1 = registerSoundAsMusic("grass_1",  "block/grass_1.ogg");
+    public static final Audio GRASS_2 = registerSoundAsMusic("grass_2",  "block/grass_2.ogg");
+    public static final Audio GRASS_3 = registerSoundAsMusic("grass_3",  "block/grass_3.ogg");
+    public static final Audio GRASS_4 = registerSoundAsMusic("grass_4",  "block/grass_4.ogg");
+    //
     public static final BlockSoundsID STONE = registerBlockSounds("stone", "stone.ogg");
     public static final BlockSoundsID SAND =  registerBlockSounds("sand", "sand.ogg");
     public static final BlockSoundsID GRASS =  registerBlockSounds("grass", "grass.ogg");
@@ -51,7 +57,11 @@ public final class Sounds {
         String walk = name + "_walk";
         String put = name + "_put";
         String destroy = name + "_destroy";
-        BlockSoundsID ids = new BlockSoundsID(Fight.ID(walk), Fight.ID(put), Fight.ID(destroy));
+        BlockSoundsID ids = new BlockSoundsID(
+            Fight.ID(walk),
+            Fight.ID(put),
+            Fight.ID(destroy)
+        );
         registerBlockSoundAsMusic(walk, "walk/" + soundFileName);
         registerBlockSoundAsMusic(put, "put/" + soundFileName);
         registerBlockSoundAsMusic(destroy, "destroy/" + soundFileName);
