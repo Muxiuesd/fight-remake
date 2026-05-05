@@ -1,13 +1,21 @@
 package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatInt;
 import ttk.muxiuesd.world.cat.CatsHolder;
+import ttk.muxiuesd.world.entity.ItemEntity;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 植物基础抽象类
@@ -19,7 +27,7 @@ public abstract class Botany extends Block implements Tickable, ICatData {
         return Util.loadTextureRegion(Fight.ID(name), Fight.BotanyTexturePath("crops/" + name));
     }
 
-
+    private Item droppedItem;   //植物生长过程中被破坏后的掉落物
     private int growLevel = 0;  //生长等级，每一个生长等级会有不同的贴图
     private TextureRegion[] textureRegions; //不同生长等级的贴图
 
@@ -41,6 +49,32 @@ public abstract class Botany extends Block implements Tickable, ICatData {
     @Override
     public void writeCatData (CatsHolder holder) {
         holder.put("growLevel", new CatInt(this.getGrowLevel()));
+    }
+
+    @Override
+    public void beDestroyed (World world, Vector2 position) {
+        Item item = this.getDroppedItem();
+        if (item == null) return;
+
+        //掉落物品
+        EntitySystem es = world.getSystem(EntitySystem.class);
+        Vector2 pos = new Vector2(position);
+        pos.add(
+            MathUtils.random(-0.3f, 0.3f),
+            MathUtils.random(-0.3f, 0.3f)
+        );
+        ItemEntity itemEntity = ItemEntityGetter.get(es, pos, new ItemStack(item, 1));
+        itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
+
+    }
+
+    public Item getDroppedItem () {
+        return this.droppedItem;
+    }
+
+    public Botany setDroppedItem (Item droppedItem) {
+        this.droppedItem = droppedItem;
+        return this;
     }
 
     /**

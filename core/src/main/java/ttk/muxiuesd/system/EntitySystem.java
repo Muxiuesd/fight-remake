@@ -416,7 +416,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Array<Entity<?>> unload = new Array<>();    //需要被卸载的实体组
 
         for (Entity<?> entity: copy) {
-            ChunkPosition chunkPosition = cs.getChunkPosition(entity.getCenterPos());
+            ChunkPosition chunkPosition = cs.getChunkPos(entity.getCenterPos());
             EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
             //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
             if (chunkPosition.equals(chunk.getChunkPosition())
@@ -449,7 +449,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             if (!entityProvider.canBeSaved) continue;
 
             Vector2 position = entity.getCenterPos();
-            ChunkPosition chunkPosition = chunkSystem.getChunkPosition(position.x, position.y);
+            ChunkPosition chunkPosition = chunkSystem.getChunkPos(position.x, position.y);
             String name = chunkPosition.toString();
             //没有就新建一个
             if (!chunkPos.containsKey(name)) {

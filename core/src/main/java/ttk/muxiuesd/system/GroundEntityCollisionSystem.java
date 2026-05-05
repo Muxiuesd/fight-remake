@@ -269,7 +269,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         Array<ChunkPosition> positions = new Array<>();
         for (int x : xChecks) {
             for (int y : yChecks) {
-                ChunkPosition pos = cs.getChunkPosition(x, y);
+                ChunkPosition pos = cs.getChunkPos(x, y);
                 if (!positions.contains(pos, false)) {
                     positions.add(pos);
                 }

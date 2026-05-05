@@ -75,8 +75,8 @@ public class BulletCollisionSystem extends WorldSystem {
             );
 
             // 收集路径范围内的墙体（和之前逻辑一致）
-            ChunkPosition startPos = cs.getChunkPosition(pathBounds.x, pathBounds.y);
-            ChunkPosition endPos = cs.getChunkPosition(
+            ChunkPosition startPos = cs.getChunkPos(pathBounds.x, pathBounds.y);
+            ChunkPosition endPos = cs.getChunkPos(
                 pathBounds.x + pathBounds.width,
                 pathBounds.y + pathBounds.height
             );

@@ -85,9 +85,11 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void update (float delta) {
+        //默认为false
         this.bubbleEmitTimer.update(delta);
 
         Player player = this.getPlayer();
+        player.setUsingItem(false);
 
         if (player.isDeath()) {
             EventBus.post(EventTypes.PLAYER_DEATH, new EventPosterPlayerDeath(getWorld(), player));
@@ -130,7 +132,7 @@ public class PlayerSystem extends WorldSystem {
             }
             //左键使用物品
             if (KeyBindings.PlayerUseItem.wasJustPressed()) {
-                curPlayer.useItem(getWorld());
+                curPlayer.setUsingItem(curPlayer.useItem(getWorld()));
             }
             //头两个物品槽（0号和1号）快捷循环
             if (KeyBindings.PlayerChangeItem.wasJustPressed()) {

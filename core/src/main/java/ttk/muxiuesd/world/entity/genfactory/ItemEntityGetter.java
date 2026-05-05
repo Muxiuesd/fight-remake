@@ -28,7 +28,7 @@ public class ItemEntityGetter implements EntityGenFactory<ItemEntity> {
         entity.setEntitySystem(entitySystem);
         entity.setItemStack(itemStack);
         entitySystem.add(entity);
-        //System.out.println("物品实体池拿取实体");
+
         return entity;
     }
 }

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
@@ -9,6 +10,7 @@ import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSoundsID;
 import ttk.muxiuesd.world.cat.CatsHolder;
 
@@ -46,11 +48,10 @@ public abstract class Block implements ID<Block>, Disposable {
         this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
     }
 
-    @Override
-    public void dispose() {
-        if (this.textureRegion != null) {
-            this.textureRegion = null;
-        }
+    /**
+     * 方块被破坏调用的方法
+     * */
+    public void beDestroyed (World world, Vector2 position) {
     }
 
     public Property getProperty () {
@@ -85,6 +86,13 @@ public abstract class Block implements ID<Block>, Disposable {
     public Block setID (String id) {
         this.id = id;
         return this;
+    }
+
+    @Override
+    public void dispose() {
+        if (this.textureRegion != null) {
+            this.textureRegion = null;
+        }
     }
 
     /**方块属性

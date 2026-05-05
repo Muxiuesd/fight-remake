@@ -45,9 +45,6 @@ public final class Items {
     public static final Item COAL = register("coal");
     public static final Item SLIME_BALL = register("slime_ball");
 
-    /// 农作物物品
-    public static final Item POTATO = register("potato", Blocks.POTATO);
-
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
     public static final Item TEST_WEAPON = register("diamond_sword", WeaponDiamondSword::new);
@@ -96,6 +93,9 @@ public final class Items {
     public static final Item CRAFTING_TABLE = register(Blocks.CRAFTING_TABLE);
     public static final Item FURNACE = register(Blocks.FURNACE);
 
+    /// 农作物物品
+    public static final Item POTATO = register("potato", Blocks.POTATO);
+
     /// 墙体物品
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
@@ -104,7 +104,9 @@ public final class Items {
      * 注册农作物物品
      * */
     public static CropItem register (String name, Botany crop) {
-        return register(name, () -> new CropItem(name, crop));
+        CropItem cropItem = register(name, () -> new CropItem(name, crop));
+        crop.setDroppedItem(cropItem);
+        return cropItem;
     }
 
     /**

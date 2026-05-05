@@ -30,7 +30,8 @@ public class Player extends LivingEntity<Player> {
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器
     public boolean isDefend = false;
-    public float defenseRadius = 1.23f; //防御半径
+    private float defenseRadius = 1.23f; //防御半径
+    private boolean isUsingItem = false;
 
     public Player (World world, EntityType<? super Player> entityType) {
         this(world, entityType, 20, 20);
@@ -155,5 +156,14 @@ public class Player extends LivingEntity<Player> {
     @Override
     public Codec getCodec () {
         return Codecs.PLAYER;
+    }
+
+    public boolean isUsingItem () {
+        return this.isUsingItem;
+    }
+
+    public Player setUsingItem (boolean usingItem) {
+        this.isUsingItem = usingItem;
+        return this;
     }
 }
