@@ -4,13 +4,19 @@ package game.muxiuesd.bedrockcore.app.interfaces.audio;
  * 空间音效引擎
  * */
 public interface SpatialAudioEngine {
+    /**
+     * 音频引擎的初始化
+     * */
     void init ();
 
     /**
      * 创建一个空间化音频源（不区分短音效与音乐）
      * */
-    SpatialAudio createSpatialAudio (String filePath, boolean looping);
+    SpatialAudio createAudio (String filePath);
 
+    /**
+     * 获取音频的收听者
+     * */
     SpatialAudioListener getListener ();
 
     void setMasterVolume (float volume);

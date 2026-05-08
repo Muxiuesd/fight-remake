@@ -32,6 +32,10 @@ public class Lwjgl3Launcher {
         configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 3);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+
+        /// 禁用gdx的音频来使用TuningFork的音频实现
+        configuration.disableAudio(true);
+
         return configuration;
     }
 }
