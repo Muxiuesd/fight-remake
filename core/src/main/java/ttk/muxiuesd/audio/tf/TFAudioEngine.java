@@ -42,7 +42,7 @@ public class TFAudioEngine implements SpatialAudioEngine {
      * */
     @Override
     public SpatialAudio createAudio (String filePath) {
-
+        //TODO 先这么写着
         SoundBuffer soundBuffer = SoundLoader.load(Gdx.files.internal(filePath));
         TFAudio tfAudio = new TFAudio(this.audio.obtainSource(soundBuffer));
         return tfAudio;
@@ -76,5 +76,13 @@ public class TFAudioEngine implements SpatialAudioEngine {
     @Override
     public void dispose () {
         this.audio.dispose();
+    }
+
+    public Audio getAudio () {
+        return this.audio;
+    }
+
+    public SpatialAudioListener getAudioListener () {
+        return this.audioListener;
     }
 }

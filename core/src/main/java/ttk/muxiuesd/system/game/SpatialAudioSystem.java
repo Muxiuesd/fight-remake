@@ -46,6 +46,7 @@ public class SpatialAudioSystem extends GameSystem {
      * @param source 音频的发声源
      * */
     public SpatialAudio playAudio (Audio audio, SpatialAudioSource source) {
+        //通过id来获取音频文件路径
         String filePath = AssetsLoader.getInstance().getPath(audio.getID());
         SpatialAudio spatialAudio = this.audioEngine.createAudio(filePath);
         spatialAudio.setSpatialSource(source);
