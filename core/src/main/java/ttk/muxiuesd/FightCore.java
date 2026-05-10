@@ -68,7 +68,7 @@ public class FightCore extends GameCore {
             .addSystem("GUISystem", GUISystem.getInstance())
             .addSystem("SpatialAudioSystem", SpatialAudioSystem.getInstance())
         ;
-        //初始化游戏底层系统
+        //延迟初始化游戏底层系统
         GameSystemManager.getInstance().initAllSystems();
 
         //setScreen(this.mainGameScreen);

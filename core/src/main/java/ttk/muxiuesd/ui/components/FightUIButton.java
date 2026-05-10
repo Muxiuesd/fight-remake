@@ -36,7 +36,7 @@ public class FightUIButton extends UIButton {
 
     @Override
     public void playClickSound () {
-        SpatialAudioSystem.getInstance().playAudio(
+        SpatialAudioSystem.getInstance().playUIAudio(
             Sounds.ITEM_CLICK,
             () -> new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0)
         );

@@ -7,9 +7,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioEngine;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioListener;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TuningFork实现的游戏立体音效引擎
@@ -27,8 +25,10 @@ public class TFAudioEngine implements SpatialAudioEngine {
 
     private Audio audio;
     private SpatialAudioListener audioListener;
+    private Map<FileHandle, SoundBuffer> soundBuffersCache;     //音频文件数据的缓存
     private Set<SpatialAudio> activeAudios;
 
+    //TODO 缓存SoundBuffer，减少AL开销，避免报错
 
     @Override
     public void init () {
@@ -42,6 +42,7 @@ public class TFAudioEngine implements SpatialAudioEngine {
         this.audio = Audio.init(config);
 
         this.audioListener = new TFAudioListener(this.audio.getListener());
+        this.soundBuffersCache = new HashMap<>();
         this.activeAudios = new HashSet<>();
     }
 
@@ -51,10 +52,20 @@ public class TFAudioEngine implements SpatialAudioEngine {
     @Override
     public SpatialAudio createAudio (FileHandle fileHandle) {
         //TODO 先这么写着
-        SoundBuffer soundBuffer = SoundLoader.load(fileHandle);
-        TFAudio audio = new TFAudio(this, this.audio.obtainSource(soundBuffer));
-        ///如果音频没有播放就加入了活跃音频集合，就会在更新循环里从集合中删掉
-        return audio;
+        Map<FileHandle, SoundBuffer> cache = this.getSoundBuffersCache();
+        //一个buffer就是一个音频的内存数据，需要控制数量，可重复使用
+        SoundBuffer soundBuffer;
+        //先查找有无缓存
+        if (cache.containsKey(fileHandle)) {
+            soundBuffer = cache.get(fileHandle);
+        }else {
+            //没有就加载，并放进缓存
+            soundBuffer = SoundLoader.load(fileHandle);
+            cache.put(fileHandle, soundBuffer);
+        }
+        //一个source就是一个播放实例，数量可以很多
+        //如果音频没有播放就加入了活跃音频集合，就会在更新循环里从集合中删掉
+        return new TFAudio(this, this.audio.obtainSource(soundBuffer));
     }
 
     @Override
@@ -104,6 +115,8 @@ public class TFAudioEngine implements SpatialAudioEngine {
 
     @Override
     public void dispose () {
+        this.soundBuffersCache.clear();
+        this.activeAudios.forEach(SpatialAudio::dispose);
         this.audio.dispose();
     }
 
@@ -113,5 +126,14 @@ public class TFAudioEngine implements SpatialAudioEngine {
 
     public SpatialAudioListener getAudioListener () {
         return this.audioListener;
+    }
+
+    public Map<FileHandle, SoundBuffer> getSoundBuffersCache () {
+        return this.soundBuffersCache;
+    }
+
+    public TFAudioEngine setSoundBuffersCache (Map<FileHandle, SoundBuffer> soundBuffersCache) {
+        this.soundBuffersCache = soundBuffersCache;
+        return this;
     }
 }

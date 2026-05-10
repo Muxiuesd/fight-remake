@@ -15,7 +15,7 @@ import ttk.muxiuesd.system.abs.GameSystem;
 public class SpatialAudioSystem extends GameSystem {
     /// 单例模式
     private static SpatialAudioSystem INSTANCE = new SpatialAudioSystem();
-    public static SpatialAudioSystem getInstance() {
+    public static SpatialAudioSystem getInstance () {
         return INSTANCE;
     }
     private SpatialAudioSystem() {}
