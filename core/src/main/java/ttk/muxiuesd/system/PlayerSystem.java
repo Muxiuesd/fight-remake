@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.PlayerDataOutput;
@@ -210,7 +209,8 @@ public class PlayerSystem extends WorldSystem {
         CameraFollowSystem cfs = getManager().getSystem(CameraFollowSystem.class);
         cfs.setFollower(this.player);
 
-        AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);
+        //播放复活音频
+        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
     }
 
     @Override

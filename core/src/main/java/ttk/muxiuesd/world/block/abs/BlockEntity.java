@@ -3,8 +3,10 @@ package ttk.muxiuesd.world.block.abs;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
@@ -32,13 +34,13 @@ import java.util.List;
  * */
 public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     private BlockEntityProvider<? extends BlockEntity> provider;
-    private World world;                    //方块实体所属的世界
-    private BlockWithEntity block;          //方块
-    private BlockPos blockPos;              //方块实体的位置
-    private GridPoint2 interactGridSize;    //方块实体的交互网格大小
-    private Inventory inventory;            //方块实体所拥有的容器
-    private List<InteractSlot> interactSlots;               //交互槽位
-
+    private World world;                                //方块实体所属的世界
+    private BlockWithEntity block;                      //方块
+    private BlockPos blockPos;                          //方块实体的位置
+    private GridPoint2 interactGridSize;                //方块实体的交互网格大小
+    private Inventory inventory;                        //方块实体所拥有的容器
+    private List<InteractSlot> interactSlots;           //交互槽位
+    private SpatialAudioSource sounder;                 //方块实体的发声源
 
     public BlockEntity (BlockEntityProvider<?> blockEntityProvider, BlockPos blockPos) {
         this(blockPos);
@@ -46,9 +48,9 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     }
     private BlockEntity (BlockPos blockPos) {
         this.blockPos = blockPos;
-
         this.setInteractGridSize(new GridPoint2(16, 16));
         this.interactSlots = new ArrayList<>();
+        this.sounder = () -> new Vector3(blockPos, 0f);
     }
 
     /**
@@ -237,6 +239,15 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
 
     public BlockEntity setSlots (List<InteractSlot> interactSlots) {
         this.interactSlots = interactSlots;
+        return this;
+    }
+
+    public SpatialAudioSource getSounder () {
+        return this.sounder;
+    }
+
+    public BlockEntity setSounder (SpatialAudioSource sounder) {
+        this.sounder = sounder;
         return this;
     }
 }

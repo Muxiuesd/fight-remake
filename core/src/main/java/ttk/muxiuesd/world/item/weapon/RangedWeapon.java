@@ -27,8 +27,8 @@ public class RangedWeapon extends Weapon {
      * 新建一个默认的远程武器的属性
      */
     public static Property createDefaultProperty() {
-        return new Property().setPropertiesMap(DEFAULT_WEAPON_PROPERTIES_DATA_MAP.copy())
-            .setUseSoundId(Sounds.ENTITY_SHOOT.getID());
+        return Weapon.createDefaultProperty()
+            .setUseSound(Sounds.ENTITY_SHOOT);  //远程武器的发射音效
     }
 
     private BulletFactory<?> factory;   //子弹的工厂实现类

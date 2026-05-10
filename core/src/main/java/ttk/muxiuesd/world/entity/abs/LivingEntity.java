@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;
@@ -185,8 +184,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
 
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
-        AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
-
+        playSound(Sounds.ITEM_POP);
         return this.spawnItemEntity(itemStack);
     }
 

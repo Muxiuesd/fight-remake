@@ -12,6 +12,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * <p>
  * 为了控制音效播放以及检测播放状态，迫不得已改为 {@link Music}
  * */
+@Deprecated
 public class SpatialSoundInstance extends MusicInstance implements Updateable {
     private final Entity<?> sounder;   //发声者
     private final Entity<?> receiver;  //接收者

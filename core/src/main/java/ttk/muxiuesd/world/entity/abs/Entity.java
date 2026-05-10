@@ -5,10 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codecable;
 import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ICatData;
@@ -20,11 +22,13 @@ import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatsHolder;
+import ttk.muxiuesd.world.entity.EntitySounder;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.HitboxHolder;
@@ -70,11 +74,13 @@ public abstract class Entity<T extends Entity<T>>
     private EntityType<?> type;                     //实体的类型
     private Property property;                      //实体的属性
     private HitboxHolder<Entity<T>> hitboxHolder;   //实体的碰撞箱持有者
+    private EntitySounder sounder;                  //实体的音频发声者
 
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
-        this.property = new Property();
-        this.hitboxHolder = new HitboxHolder<>(this);
+        this.property       = new Property();
+        this.hitboxHolder   = new HitboxHolder<>(this);
+        this.sounder        = new EntitySounder(this);
     }
 
     /**
@@ -183,6 +189,17 @@ public abstract class Entity<T extends Entity<T>>
         );
         return (T) this;
     }
+
+    /**
+     * 让这个实体发出某个音效
+     * */
+    public SpatialAudio playSound (AudioHolder sound) {
+        return this.getEntitySystem()
+            .getWorld()
+            .getSystem(SoundSystem.class)
+            .playSpatialSound(sound, this);
+    }
+
 
     public T setPosition(Vector2 vector2) {
         this.setPosition(vector2.x, vector2.y);
@@ -410,6 +427,18 @@ public abstract class Entity<T extends Entity<T>>
     public T setHitboxHolder (HitboxHolder<Entity<T>> hitboxHolder) {
         if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
         return (T) this;
+    }
+
+    /**
+     * 获取这个实体的发声源
+     * */
+    public EntitySounder getSounder () {
+        return this.sounder;
+    }
+
+    public Entity<T> setSounder (EntitySounder sounder) {
+        this.sounder = sounder;
+        return this;
     }
 
     public T setEntitySystem(EntitySystem es) {

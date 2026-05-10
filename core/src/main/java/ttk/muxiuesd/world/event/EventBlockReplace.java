@@ -1,15 +1,16 @@
 package ttk.muxiuesd.world.event;
 
-import ttk.muxiuesd.audio.AudioPlayer;
+import com.badlogic.gdx.math.Vector3;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.event.abs.BlockReplaceEvent;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 
 public class EventBlockReplace extends BlockReplaceEvent {
     @Override
     public void handle (World world, Block newBlock, Block oldBlock, float wx, float wy) {
-        String id = oldBlock.getProperty().getSounds().getTypeID(BlockSounds.Type.DESTROY);
-        AudioPlayer.getInstance().playMusic(id);
+        AudioHolder destroySound = oldBlock.getProperty().getSounds().destroy();
+        world.getSystem(SoundSystem.class).playSpatialSound(destroySound, () -> new Vector3(wx, wy, 0));
     }
 }

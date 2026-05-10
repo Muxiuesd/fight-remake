@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.BlockEntities;
@@ -14,6 +13,7 @@ import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
@@ -110,7 +110,7 @@ public class BlockEntityFurnace extends BlockEntity {
             handItemStack.setAmount(handItemStack.getAmount() - addAmount - bePutStack.getAmount());
         }
 
-        AudioPlayer.getInstance().playSound(Sounds.ITEM_PUT, 2.5f);
+        world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_PUT, getSounder());
         return InteractResult.SUCCESS;
     }
 
@@ -130,6 +130,8 @@ public class BlockEntityFurnace extends BlockEntity {
 
         user.setHandItemStack(outStack);
         inventory.clear();
+
+        world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, getSounder());
 
         return InteractResult.SUCCESS;
     }

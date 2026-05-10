@@ -9,9 +9,9 @@ import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
  * TuningFork实现的立体音频
  * */
 public class TFAudio implements SpatialAudio {
-    private TFAudioEngine audioEngine;
+    private TFAudioEngine audioEngine;          //音效引擎
     private SpatialAudioSource boundSource;     //绑定的声音源
-    private BufferedSoundSource soundBuffer;
+    private BufferedSoundSource soundBuffer;    //音效缓冲
 
     public TFAudio (TFAudioEngine audioEngine, BufferedSoundSource soundBuffer) {
         this.audioEngine = audioEngine;
@@ -72,8 +72,24 @@ public class TFAudio implements SpatialAudio {
     }
 
     @Override
-    public void setAttenuation (float maxDistance) {
+    public void setMinAttenuation (float minDistance) {
+        this.soundBuffer.setAttenuationMinDistance(minDistance);
+    }
+
+    @Override
+    public void setMaxAttenuation (float maxDistance) {
         this.soundBuffer.setAttenuationMaxDistance(maxDistance);
+    }
+
+    @Override
+    public void setAttenuationFactor (float factor) {
+        this.soundBuffer.setAttenuationFactor(factor);
+    }
+
+    @Override
+    public void setAttenuationEnabled (boolean enabled) {
+        if (enabled) this.soundBuffer.enableAttenuation();
+        else this.soundBuffer.disableAttenuation();
     }
 
     @Override

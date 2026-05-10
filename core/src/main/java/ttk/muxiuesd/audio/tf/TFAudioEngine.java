@@ -52,7 +52,7 @@ public class TFAudioEngine implements SpatialAudioEngine {
         //TODO 先这么写着
         SoundBuffer soundBuffer = SoundLoader.load(fileHandle);
         TFAudio audio = new TFAudio(this, this.audio.obtainSource(soundBuffer));
-
+        ///如果音频没有播放就加入了活跃音频集合，就会在更新循环里从集合中删掉
         return audio;
     }
 
@@ -86,6 +86,7 @@ public class TFAudioEngine implements SpatialAudioEngine {
         });
         //移除不再播放的音频
         needRemovedAudios.forEach(this.activeAudios::remove);
+        needRemovedAudios.clear();
 
         //对每一个活跃的空间音频进行坐标更新
         this.activeAudios.forEach(SpatialAudio::updatePos);

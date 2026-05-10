@@ -30,7 +30,8 @@ public class MainWorld extends World {
         addSystem("EntityCollisionSystem", new GroundEntityCollisionSystem(this));
         addSystem("BulletCollisionSystem", new BulletCollisionSystem(this));
         addSystem("WorldInputHandleSystem", new WorldInputHandleSystem(this));
-        addSystem("SoundEffectSystem", new SoundEffectSystem(this));
+        //addSystem("SoundEffectSystem", new SoundEffectSystem(this));
+        addSystem("SoundSystem", new SoundSystem(this));
         addSystem("MonsterGenerationSystem", new MonsterGenerationSystem(this));
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));

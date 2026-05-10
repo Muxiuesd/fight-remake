@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.item.stack.behaviour;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -38,7 +38,7 @@ public abstract class HasDurationItemStackBehaviour implements IItemStackBehavio
      * */
     public boolean noDuration (World world, LivingEntity<?> user, ItemStack itemStack) {
         //播放破损音效
-        world.getSystem(SoundEffectSystem.class).newSpatialSound(Sounds.ITEM_BREAK, user);
+        world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_BREAK, user);
         return false;
     }
 

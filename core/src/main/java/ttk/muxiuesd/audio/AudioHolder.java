@@ -21,6 +21,10 @@ public class AudioHolder {
         return this.identifier.getID();
     }
 
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
     public FileHandle getFileHandle () {
         return this.fileHandle;
     }

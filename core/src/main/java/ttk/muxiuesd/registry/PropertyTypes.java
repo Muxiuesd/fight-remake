@@ -1,6 +1,7 @@
 package ttk.muxiuesd.registry;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.property.*;
 import ttk.muxiuesd.registrant.Registries;
@@ -23,7 +24,8 @@ public final class PropertyTypes {
     public static final PropertyType<Integer> ITEM_DURATION = register("item_duration", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
     public static final PropertyType<Boolean> FISHING_POLE_USING = register("fishing_pole_using", new PropertyFishingPoleUsing());
-    public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
+    //public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
+    public static final PropertyType<AudioHolder> ITEM_USE_SOUND = register("item_use_sound", new PropertyItemUseSound());
     public static final PropertyType<Entity<?>> ITEM_WITH_ENTITY = register("item_with_entity", new PropertyItemWithEntity());
 
     /// 武器属性

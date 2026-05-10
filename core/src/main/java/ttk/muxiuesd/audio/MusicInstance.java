@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 /**
  * 播放中的音乐实例
  * */
+@Deprecated
 public class MusicInstance implements Music {
     private final Music music;
 

@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
  * <p>
  * 没有特殊音效方面的需求的话可以直接调用此类播放，mod也调用此类
  * */
+@Deprecated
 public class AudioPlayer {
     public final String TAG = this.getClass().getName();
 

@@ -43,12 +43,22 @@ public class SpatialAudioSystem extends GameSystem {
     }
 
     /**
-     * 播放音效
+     * 播放UI音频，也就是没有距离衰减的音频
+     * */
+    public SpatialAudio playUIAudio (AudioHolder audioHolder, SpatialAudioSource source) {
+        SpatialAudio audio = this.playAudio(audioHolder, source);
+        audio.setAttenuationEnabled(false);
+        return audio;
+    }
+
+    /**
+     * 播放音频
      * @param audioHolder 音频的注册类
      * @param source 音频的发声源
      * */
     public SpatialAudio playAudio (AudioHolder audioHolder, SpatialAudioSource source) {
         SpatialAudio audio = this.audioEngine.createAudio(audioHolder.getFileHandle());
+        //绑定音频的发声源
         audio.setBoundSource(source);
         audio.play();
 

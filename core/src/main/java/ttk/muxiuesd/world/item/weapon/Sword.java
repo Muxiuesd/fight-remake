@@ -1,13 +1,14 @@
 package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -26,7 +27,7 @@ public class Sword extends Weapon {
     public static Property createDefaultProperty() {
         return Weapon.createDefaultProperty()
             .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2.5f)
-            .setUseSoundId(Sounds.ENTITY_SWEEP.getID());
+            .setUseSound(Sounds.ENTITY_SWEEP);
     }
 
     public Sword (Property property, String textureId, String texturePath) {
@@ -60,9 +61,9 @@ public class Sword extends Weapon {
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, le));
         }
 
-        String useSoundId = this.property.getUseSoundId();
-        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-        ses.newSpatialSound(useSoundId, user);
+        AudioHolder useSound = this.property.getUseSound();
+        SoundSystem ses = world.getSystem(SoundSystem.class);
+        ses.playSpatialSound(useSound, user);
         return true;
     }
 

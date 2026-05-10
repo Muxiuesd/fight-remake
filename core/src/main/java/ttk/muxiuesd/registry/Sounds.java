@@ -3,7 +3,6 @@ package ttk.muxiuesd.registry;
 import com.badlogic.gdx.files.FileHandle;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
-import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.util.FileUtil;
@@ -16,7 +15,7 @@ public final class Sounds {
     public static void init () {
     }
 
-    public static final AudioLoader LOADER = AudioLoader.getInstance();
+    //public static final AudioLoader LOADER = AudioLoader.getInstance();
 
     ///实体
     public static final AudioHolder ENTITY_HURT_1 = registerSound("hurt_1",  "entity/damage/hit_1.ogg");

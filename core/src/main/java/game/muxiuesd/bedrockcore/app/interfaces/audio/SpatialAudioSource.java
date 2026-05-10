@@ -15,13 +15,13 @@ public interface SpatialAudioSource {
      * 返回声源的前方朝向（默认朝向 -Z）
      * */
     default Vector3 getForward () {
-        return new Vector3(0, 0, -1);
+        return new Vector3(0, 0, -1f);
     }
 
     /**
      * 返回声源的上方向（默认 Y 轴向上）
      * */
     default Vector3 getUp () {
-        return new Vector3(0, 1, 0);
+        return new Vector3(0, 1f, 0);
     }
 }

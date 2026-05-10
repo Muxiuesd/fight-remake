@@ -18,11 +18,28 @@ public interface SpatialAudio extends Disposable {
     // 手动设置位置（设置后会自动解除 SpatialAudioSource 绑定）
     void setPos (float x, float y, float z);
     void setDirection (float x, float y, float z);
-    void setAttenuation (float maxDistance);
 
-    /*特效（示例使用预设 ID）*//*
-    void applyReverb (int presetID);
-    void removeReverb ();*/
+    /**
+     * 设置最小衰减距离，这个距离之内都是最大音量播放
+     * */
+    void setMinAttenuation (float minDistance);
+
+
+    /**
+     * 设置最大衰减距离，这个距离之外完全听不见
+     * */
+    void setMaxAttenuation (float maxDistance);
+
+    /**
+     * 设置衰减因子
+     * */
+    void setAttenuationFactor (float factor);
+
+    /**
+     * 启用或者禁用距离衰减
+     * */
+    void setAttenuationEnabled(boolean enabled);
+
 
     /**
      * 绑定空间音效发声源
