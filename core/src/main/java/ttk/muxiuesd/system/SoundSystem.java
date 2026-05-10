@@ -104,6 +104,7 @@ public class SoundSystem extends WorldSystem {
      * */
     public void startPlayerWalkSound (AudioHolder walkAudio, Player player) {
         SpatialAudio audio = this.playSpatialSound(walkAudio, player);
+        audio.setLooping(true);
         this.activeSoundsMap.put(walkAudio.getIdentifier(), audio);
         this.curWalkAudio = walkAudio;
     }
@@ -117,7 +118,6 @@ public class SoundSystem extends WorldSystem {
         {
             SpatialAudio removed = this.activeSoundsMap.remove(this.curWalkAudio.getIdentifier());
             removed.stop();
-            removed.dispose();
         }
     }
 

@@ -66,8 +66,9 @@ public final class Sounds {
             registerBlockSound(put, "put/" + soundFileName),
             registerBlockSound(destroy, "destroy/" + soundFileName)
         );
-
-        return Registries.BLOCK_SOUNDS.register(new Identifier(Fight.ID(name)), sounds);
+        Identifier identifier = new Identifier(Fight.ID(name));
+        sounds.setIdentifier(identifier);
+        return Registries.BLOCK_SOUNDS.register(identifier, sounds);
     }
 
     /**
