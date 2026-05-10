@@ -28,7 +28,7 @@ public class Identifier {
         this.id = id;
     }
 
-    public String getId () {
+    public String getID () {
         return this.id;
     }
 }

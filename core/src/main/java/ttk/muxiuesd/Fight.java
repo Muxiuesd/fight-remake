@@ -5,6 +5,8 @@ import ttk.muxiuesd.util.Info;
 public class Fight {
     public static final String NAMESPACE = "fight";
     public static final String AUDIO_ROOT = "audio/";
+    public static final String MUSIC_ROOT = AUDIO_ROOT + "music/";
+    public static final String SOUND_ROOT = AUDIO_ROOT + "sound/";
     public static final String TEXTURE_ROOT = "texture/";
     public static final String BLOCK_TEXTURE_ROOT   = TEXTURE_ROOT + "blocks/";
     public static final String BOTANY_TEXTURE_ROOT   = TEXTURE_ROOT + "botany/";
@@ -113,6 +115,18 @@ public class Fight {
     public static String LangPath (String path) {
         if (path.endsWith(".json")) return LANG_ROOT + path;
         return LANG_ROOT + path + ".json";
+    }
+
+    public static String MusicPath (String path) {
+        return MUSIC_ROOT + path;
+    }
+
+    public static String SoundPath (String path) {
+        return SOUND_ROOT + path;
+    }
+
+    public static String AudioPath (String path) {
+        return AUDIO_ROOT + path;
     }
 
     public static String GameSavePath (String name) {

@@ -7,7 +7,7 @@ import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.hitbox.Hitbox;
@@ -22,7 +22,7 @@ public class WallItem extends ConsumptionItem {
     private final Wall<?> wall;
 
     public WallItem(final Wall<?> wall, String textureId) {
-        this(wall, new Property().setUseSoundId(Sounds.STONE.getID(BlockSoundsID.Type.PUT)), textureId);
+        this(wall, new Property().setUseSoundId(Sounds.STONE.getTypeID(BlockSounds.Type.PUT)), textureId);
     }
 
     public WallItem (final Wall<?> wall, Property property, String textureId) {

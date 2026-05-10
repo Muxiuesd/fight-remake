@@ -8,7 +8,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioListener;
  * TuningFork实现的音频接听者
  * */
 public class TFAudioListener implements SpatialAudioListener {
-    private final SoundListener listener;
+    private SoundListener listener;
     public TFAudioListener (SoundListener listener) {
         this.listener = listener;
     }
@@ -25,5 +25,10 @@ public class TFAudioListener implements SpatialAudioListener {
 
     public SoundListener getListener () {
         return this.listener;
+    }
+
+    public TFAudioListener setListener (SoundListener listener) {
+        this.listener = listener;
+        return this;
     }
 }

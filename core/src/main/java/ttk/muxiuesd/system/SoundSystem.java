@@ -1,7 +1,7 @@
 package ttk.muxiuesd.system;
 
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
-import ttk.muxiuesd.audio.Audio;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.audio.SpatialSoundInstance;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
@@ -81,10 +81,10 @@ public class SoundSystem extends WorldSystem {
 
     /**
      * 新建一个空间音效
-     * @param audio 音效的注册类
+     * @param audioHolder 音效的注册类
      * @param sounder 发出声音的实体
      * */
-    public void playSpatialSound (Audio audio, Entity<?> sounder) {
+    public void playSpatialSound (AudioHolder audioHolder, Entity<?> sounder) {
 
     }
 

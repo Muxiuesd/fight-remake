@@ -2,7 +2,7 @@ package ttk.muxiuesd.registrant;
 
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.audio.Audio;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
@@ -13,7 +13,7 @@ import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
-import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
 import ttk.muxiuesd.world.entity.EntityType;
@@ -48,8 +48,8 @@ public class Registries {
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
     public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);
 
-    public static final Registry<Audio> AUDIOS = create(RegistryKeys.AUDIOS);
-    public static final Registry<BlockSoundsID> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
+    public static final Registry<AudioHolder> AUDIOS = create(RegistryKeys.AUDIOS);
+    public static final Registry<BlockSounds> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
     public static final BlockRendererRegistry BLOCK_RENDERER = create(
@@ -98,14 +98,14 @@ public class Registries {
 
         @Override
         public T register (Identifier identifier, T value) {
-            if (this.contains(identifier.getId()) || this.contains(identifier)) {
-                Identifier oldId = this.idMap.get(identifier.getId());
+            if (this.contains(identifier.getID()) || this.contains(identifier)) {
+                Identifier oldId = this.idMap.get(identifier.getID());
                 T oldValue = this.regedit.get(oldId);
                 Log.print(this.getClass().getName(),
-                    "覆盖旧的注册元素：" + identifier.getId() + "@@" + oldValue
+                    "覆盖旧的注册元素：" + identifier.getID() + "@@" + oldValue
                     + " 新的值为：" + value);
             }
-            this.idMap.put(identifier.getId(), identifier);
+            this.idMap.put(identifier.getID(), identifier);
             this.regedit.put(identifier, value);
             return value;
         }
@@ -116,7 +116,7 @@ public class Registries {
                 throw new RuntimeException();
             }
             if (!this.contains(identifier)) {
-                throw new RuntimeException("注册Id：" + identifier.getId() + " 不存在！！！");
+                throw new RuntimeException("注册Id：" + identifier.getID() + " 不存在！！！");
             }
             return this.regedit.get(identifier);
         }

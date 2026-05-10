@@ -4,7 +4,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.property.*;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -36,7 +36,7 @@ public final class PropertyTypes {
 
     /// 方块属性
     public static final PropertyType<Float> BLOCK_FRICTON = register("block_friction", new DefaultFloatPropertyType());
-    public static final PropertyType<BlockSoundsID> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSoundsID());
+    public static final PropertyType<BlockSounds> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSounds());
 
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {

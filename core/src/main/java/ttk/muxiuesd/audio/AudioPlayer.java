@@ -22,11 +22,11 @@ public class AudioPlayer {
         return AudioPlayer.Holder.INSTANCE;
     }
 
-    public Sound playSound (Audio audio) {
-        return playSound(audio.getID());
+    public Sound playSound (AudioHolder audioHolder) {
+        return playSound(audioHolder.getID());
     }
-    public Sound playSound (Audio audio, float volume) {
-        return playSound(audio.getID(), volume);
+    public Sound playSound (AudioHolder audioHolder, float volume) {
+        return playSound(audioHolder.getID(), volume);
     }
 
     public Sound playSound(String id) {
@@ -57,8 +57,8 @@ public class AudioPlayer {
         return null;
     }
 
-    public void playMusic (Audio audio) {
-        this.playMusic(audio.getID());
+    public void playMusic (AudioHolder audioHolder) {
+        this.playMusic(audioHolder.getID());
     }
     /**
      * 播放音乐，若已经在播放则中途停下来再重头播放

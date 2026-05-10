@@ -9,7 +9,7 @@ import ttk.muxiuesd.system.game.SpatialAudioSystem;
  * */
 public class SpatialAudioPlayer {
 
-    public static SpatialAudio play (Audio audio, SpatialAudioSource source) {
-        return SpatialAudioSystem.getInstance().playAudio(audio, source);
+    public static SpatialAudio play (AudioHolder audioHolder, SpatialAudioSource source) {
+        return SpatialAudioSystem.getInstance().playAudio(audioHolder, source);
     }
 }

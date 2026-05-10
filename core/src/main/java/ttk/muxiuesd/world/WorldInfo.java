@@ -26,7 +26,7 @@ public class WorldInfo {
         this.information = new HashMap<>();
         //将注册表里的信息类型map全部加进来
         Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
-            this.information.put(key.getId(), value);
+            this.information.put(key.getID(), value);
         });
     }
 

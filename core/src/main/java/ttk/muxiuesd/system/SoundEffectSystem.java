@@ -5,13 +5,13 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.audio.Audio;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.audio.AudioLoader;
 import ttk.muxiuesd.audio.SoundInstance;
 import ttk.muxiuesd.audio.SpatialSoundInstance;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -82,7 +82,7 @@ public class SoundEffectSystem extends WorldSystem {
             Player player = this.ps.getPlayer();
             Vector2 playerCenter = player.getCenterPos();
             Block underfootBlock = cs.getBlock(playerCenter.x, playerCenter.y);
-            String walkSoundId = underfootBlock.getProperty().getSounds().getID(BlockSoundsID.Type.WALK);
+            String walkSoundId = underfootBlock.getProperty().getSounds().getTypeID(BlockSounds.Type.WALK);
             //检测方块不一样时curWalkSoundId
             if ((this.curWalkSoundId != null) && (!Objects.equals(this.curWalkSoundId, walkSoundId))) {
                 //先停止先前的音效
@@ -132,8 +132,8 @@ public class SoundEffectSystem extends WorldSystem {
         }
     }
 
-    public void newSpatialSound (Audio audio, Entity<?> sounder) {
-        this.newSpatialSound(audio.getID(), sounder);
+    public void newSpatialSound (AudioHolder audioHolder, Entity<?> sounder) {
+        this.newSpatialSound(audioHolder.getID(), sounder);
     }
     /**
      * 新建一个空间音效
