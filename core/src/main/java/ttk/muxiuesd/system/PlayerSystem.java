@@ -21,6 +21,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.ui.screen.PlayerHUDUIScreen;
 import ttk.muxiuesd.ui.screen.PlayerUIScreen;
 import ttk.muxiuesd.util.Direction;
@@ -113,6 +114,9 @@ public class PlayerSystem extends WorldSystem {
         }
 
         this.handleInput(delta);
+
+        //实时更新立体音效的接听者坐标为玩家的坐标
+        SpatialAudioSystem.getInstance().getAudioListener().setPos(this.player.getX(), this.player.getY(), 0f);
     }
 
     /**

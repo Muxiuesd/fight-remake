@@ -1,6 +1,7 @@
 package ttk.muxiuesd.audio.tf;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Disposable;
 import de.pottgames.tuningfork.*;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioEngine;
@@ -14,8 +15,8 @@ import java.util.Set;
  * TuningFork实现的游戏立体音效引擎
  */
 public class TFAudioEngine implements SpatialAudioEngine {
-    public static final int SIMULTANEOUS_SOURCES = 200;
-    public static final int IDLE_TASKS = 20;
+    public static final int SIMULTANEOUS_SOURCES = 500;
+    public static final int IDLE_TASKS = 100;
 
     /// 单例模式
     private static final TFAudioEngine INSTANCE = new TFAudioEngine();
@@ -86,6 +87,7 @@ public class TFAudioEngine implements SpatialAudioEngine {
         });
         //移除不再播放的音频
         needRemovedAudios.forEach(this.activeAudios::remove);
+        needRemovedAudios.forEach(Disposable::dispose);
         needRemovedAudios.clear();
 
         //对每一个活跃的空间音频进行坐标更新
