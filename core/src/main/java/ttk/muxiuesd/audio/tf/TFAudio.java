@@ -9,16 +9,19 @@ import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
  * TuningFork实现的立体音频
  * */
 public class TFAudio implements SpatialAudio {
+    private TFAudioEngine audioEngine;
     private SpatialAudioSource boundSource;     //绑定的声音源
     private BufferedSoundSource soundBuffer;
 
-    public TFAudio (BufferedSoundSource soundBuffer) {
+    public TFAudio (TFAudioEngine audioEngine, BufferedSoundSource soundBuffer) {
+        this.audioEngine = audioEngine;
         this.soundBuffer = soundBuffer;
     }
 
     @Override
     public void play() {
         this.soundBuffer.play();
+        this.audioEngine.addActive(this);
     }
 
     @Override
@@ -74,7 +77,7 @@ public class TFAudio implements SpatialAudio {
     }
 
     @Override
-    public void setSpatialSource (SpatialAudioSource source) {
+    public void setBoundSource (SpatialAudioSource source) {
         this.boundSource = source;
         // 立即同步一次位置与朝向
         if (source != null) {
@@ -82,6 +85,11 @@ public class TFAudio implements SpatialAudio {
             this.soundBuffer.setPosition(pos.x, pos.y, pos.z);
             this.soundBuffer.setDirection(source.getForward());
         }
+    }
+
+    @Override
+    public SpatialAudioSource getBoundSource () {
+        return this.boundSource;
     }
 
     @Override
@@ -101,14 +109,8 @@ public class TFAudio implements SpatialAudio {
     @Override
     public void dispose () {
         this.soundBuffer.free();
-    }
-
-    public SpatialAudioSource getBoundSource () {
-        return boundSource;
-    }
-
-    public TFAudio setBoundSource (SpatialAudioSource boundSource) {
-        this.boundSource = boundSource;
-        return this;
+        this.soundBuffer = null;
+        this.audioEngine = null;
+        this.removeSpatialSource();
     }
 }

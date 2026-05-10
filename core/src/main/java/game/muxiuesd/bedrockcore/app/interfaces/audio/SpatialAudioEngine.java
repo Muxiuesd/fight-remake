@@ -1,5 +1,7 @@
 package game.muxiuesd.bedrockcore.app.interfaces.audio;
 
+import com.badlogic.gdx.files.FileHandle;
+
 /**
  * 空间音效引擎
  * */
@@ -11,14 +13,18 @@ public interface SpatialAudioEngine {
 
     /**
      * 创建一个空间化音频源（不区分短音效与音乐）
+     * @param fileHandle 音频的文件持有
      * */
-    SpatialAudio createAudio (String filePath);
+    SpatialAudio createAudio (FileHandle fileHandle);
 
     /**
      * 获取音频的收听者
      * */
     SpatialAudioListener getListener ();
 
+    /**
+     * 设置主要的音量
+     * */
     void setMasterVolume (float volume);
 
     /**
@@ -36,5 +42,8 @@ public interface SpatialAudioEngine {
      * */
     void update (float delta);
 
+    /**
+     * 释放资源
+     * */
     void dispose ();
 }

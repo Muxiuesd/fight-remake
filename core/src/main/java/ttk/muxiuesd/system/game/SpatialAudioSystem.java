@@ -4,7 +4,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioEngine;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioListener;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.audio.tf.TFAudioEngine;
 import ttk.muxiuesd.system.abs.GameSystem;
@@ -24,8 +24,6 @@ public class SpatialAudioSystem extends GameSystem {
     private SpatialAudioListener audioListener; //游戏音频的接听者
 
 
-
-
     @Override
     public void initialize () {
         //初始化具体的音频引擎的实现类，这里是使用的TuningFork
@@ -33,7 +31,10 @@ public class SpatialAudioSystem extends GameSystem {
 
         //初始化
         this.audioEngine.init();
+        this.audioEngine.setMasterVolume(1f);
         this.audioListener = this.audioEngine.getListener();
+
+        Log.print(TAG(), "立体音频系统初始化完成");
     }
 
     @Override
@@ -47,13 +48,11 @@ public class SpatialAudioSystem extends GameSystem {
      * @param source 音频的发声源
      * */
     public SpatialAudio playAudio (AudioHolder audioHolder, SpatialAudioSource source) {
-        //通过id来获取音频文件路径
-        String filePath = AssetsLoader.getInstance().getPath(audioHolder.getID());
-        SpatialAudio spatialAudio = this.audioEngine.createAudio(filePath);
-        spatialAudio.setSpatialSource(source);
-        spatialAudio.play();
+        SpatialAudio audio = this.audioEngine.createAudio(audioHolder.getFileHandle());
+        audio.setBoundSource(source);
+        audio.play();
 
-        return spatialAudio;
+        return audio;
     }
 
     @Override

@@ -25,11 +25,17 @@ public interface SpatialAudio extends Disposable {
     void removeReverb ();*/
 
     /**
-     * 绑定
+     * 绑定空间音效发声源
      * */
-    void setSpatialSource (SpatialAudioSource source);
+    void setBoundSource (SpatialAudioSource source);
+
     /**
-     * 解绑空间源
+     * 获取空间音效发声源
+     * */
+    SpatialAudioSource getBoundSource ();
+
+    /**
+     * 解绑空间音效发声源
      * */
     void removeSpatialSource ();
 
