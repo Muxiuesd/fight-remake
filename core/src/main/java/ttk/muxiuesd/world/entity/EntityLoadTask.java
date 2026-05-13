@@ -8,8 +8,8 @@ import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.EntityTask;
 
@@ -27,7 +27,7 @@ public class EntityLoadTask extends EntityTask {
     public Array<Entity<?>> call (){
         Array<Entity<?>> entities = new Array<>();
         String chunkPosName = getChunkPosition().toString();
-        JsonValue entitiesValue = FileUtil.readJsonFile(Fight.getPathSaveEntities(), chunkPosName);
+        JsonValue entitiesValue = AbsFileUtil.readJsonFile(Fight.getPathSaveEntities(), chunkPosName);
 
         //对每一个实体数据值进行解析
         for (JsonValue entityValue : entitiesValue) {
@@ -42,7 +42,7 @@ public class EntityLoadTask extends EntityTask {
 
         }
         //读取完成后删除文件
-        FileUtil.deleteFile(Fight.getPathSaveEntities(), chunkPosName + ".json");
+        AbsFileUtil.deleteFile(Fight.getPathSaveEntities(), chunkPosName + ".json");
         return entities;
     }
 }

@@ -3,7 +3,7 @@ package ttk.muxiuesd.data;
 import com.badlogic.gdx.utils.Json;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.JsonDataOutput;
-import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.AbsFileUtil;
 
 /**
  * 区块的json数据输出
@@ -19,7 +19,7 @@ public class ChunkJsonDataOutput extends JsonDataOutput {
     public void output (JsonDataWriter writer) {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
-        FileUtil.createFile(Fight.getPathSaveChunks(), this.fileName + ".json")
+        AbsFileUtil.createFile(Fight.getPathSaveChunks(), this.fileName + ".json")
             .writeString(json.prettyPrint(string), false);
     }
 }

@@ -24,8 +24,8 @@ import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.ui.screen.PlayerHUDUIScreen;
 import ttk.muxiuesd.ui.screen.PlayerUIScreen;
+import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
@@ -68,7 +68,7 @@ public class PlayerSystem extends WorldSystem {
     @Override
     public void initialize () {
         //有玩家数据就读取
-        if (FileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
+        if (AbsFileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
             this.player = this.readPlayerData();
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
@@ -238,7 +238,7 @@ public class PlayerSystem extends WorldSystem {
      * 读取玩家数据
      * */
     public Player readPlayerData () {
-        JsonValue playerValue = FileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
+        JsonValue playerValue = AbsFileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
         Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
         if (optionalPlayer.isPresent()) {
             return optionalPlayer.get();

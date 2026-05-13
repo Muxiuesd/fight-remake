@@ -11,7 +11,7 @@ import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
-import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.AbsFileUtil;
 
 import java.util.Optional;
 
@@ -84,9 +84,9 @@ public abstract class World implements Updateable, Disposable {
      * */
     public void readWorldInfo() {
         //检查世界信息文件是否存在
-        if(FileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
+        if(AbsFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
             //存在就读取
-            String file = FileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
+            String file = AbsFileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
             Optional<WorldInfo> optional = WorldInfo.CODEC.parse(new JsonDataReader(file));
             //让这个实例存在
             optional.ifPresent(worldInfo -> WorldInfo.INSTANCE = worldInfo);
