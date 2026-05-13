@@ -5,5 +5,5 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 /**
  * 子弹的渲染器
  * */
-public class BulletRenderer<T extends Bullet> extends StandardEntityRenderer<T> {
+public class BulletRenderer<T extends Bullet<T>> extends StandardEntityRenderer<T> {
 }

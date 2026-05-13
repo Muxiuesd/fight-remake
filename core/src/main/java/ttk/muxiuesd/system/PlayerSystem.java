@@ -4,8 +4,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.PlayerDataOutput;
@@ -20,12 +21,11 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
-import ttk.muxiuesd.ui.screen.PlayerHUDScreen;
-import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
+import ttk.muxiuesd.ui.screen.PlayerHUDUIScreen;
+import ttk.muxiuesd.ui.screen.PlayerUIScreen;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.FileUtil;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
@@ -45,8 +45,8 @@ public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
 
     //玩家相关的GUIScreen
-    public static PlayerHUDScreen PLAYER_HUD_SCREEN;
-    public static PlayerInventoryScreen PLAYER_INVENTORY_SCREEN;
+    public static PlayerHUDUIScreen PLAYER_HUD_SCREEN;
+    public static PlayerUIScreen PLAYER_INVENTORY_SCREEN;
 
     private Player player;
     private Vector2 playerLastPosition;
@@ -57,19 +57,19 @@ public class PlayerSystem extends WorldSystem {
         super(world);
         this.bubbleEmitTimer = new Timer<>(0.5f);
 
-        WorldInformationType.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
+        WorldInfoTypes.INT.putIfNull(Fight.PLAYER_VISUAL_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.PLAYER_HEARING_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.PLAYER_PICKUP_RANGE);
 
-        PLAYER_HUD_SCREEN = new PlayerHUDScreen(this);
-        PLAYER_INVENTORY_SCREEN = new PlayerInventoryScreen(this);
+        PLAYER_HUD_SCREEN = new PlayerHUDUIScreen(this);
+        PLAYER_INVENTORY_SCREEN = new PlayerUIScreen(this);
     }
 
     @Override
     public void initialize () {
         //有玩家数据就读取
-        if (FileUtil.fileExists(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME)) {
-            this.player = readPlayer();
+        if (FileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
+            this.player = this.readPlayerData();
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
             this.player = Entities.PLAYER.create(getWorld());
@@ -85,9 +85,11 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void update (float delta) {
+        //默认为false
         this.bubbleEmitTimer.update(delta);
 
         Player player = this.getPlayer();
+        player.setUsingItem(false);
 
         if (player.isDeath()) {
             EventBus.post(EventTypes.PLAYER_DEATH, new EventPosterPlayerDeath(getWorld(), player));
@@ -96,7 +98,7 @@ public class PlayerSystem extends WorldSystem {
         }
         //玩家速度计算
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
-        Vector2 playerCenter = this.player.getCenter();
+        Vector2 playerCenter = this.player.getCenterPos();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
 
         //玩家游泳
@@ -112,6 +114,9 @@ public class PlayerSystem extends WorldSystem {
         }
 
         this.handleInput(delta);
+
+        //实时更新立体音效的接听者坐标为玩家的坐标
+        SpatialAudioSystem.getInstance().getAudioListener().setPos(this.player.getX(), this.player.getY(), 0f);
     }
 
     /**
@@ -130,7 +135,7 @@ public class PlayerSystem extends WorldSystem {
             }
             //左键使用物品
             if (KeyBindings.PlayerUseItem.wasJustPressed()) {
-                curPlayer.useItem(getWorld());
+                curPlayer.setUsingItem(curPlayer.useItem(getWorld()));
             }
             //头两个物品槽（0号和1号）快捷循环
             if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
@@ -140,6 +145,15 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerDropItem.wasJustPressed()) {
                 curPlayer.dropItem(curPlayer.getHandIndex(), 1);
             }
+            if (KeyBindings.PlayerShortcutKey_1.wasJustPressed()) curPlayer.setHandIndex(0);
+            if (KeyBindings.PlayerShortcutKey_2.wasJustPressed()) curPlayer.setHandIndex(1);
+            if (KeyBindings.PlayerShortcutKey_3.wasJustPressed()) curPlayer.setHandIndex(2);
+            if (KeyBindings.PlayerShortcutKey_4.wasJustPressed()) curPlayer.setHandIndex(3);
+            if (KeyBindings.PlayerShortcutKey_5.wasJustPressed()) curPlayer.setHandIndex(4);
+            if (KeyBindings.PlayerShortcutKey_6.wasJustPressed()) curPlayer.setHandIndex(5);
+            if (KeyBindings.PlayerShortcutKey_7.wasJustPressed()) curPlayer.setHandIndex(6);
+            if (KeyBindings.PlayerShortcutKey_8.wasJustPressed()) curPlayer.setHandIndex(7);
+            if (KeyBindings.PlayerShortcutKey_9.wasJustPressed()) curPlayer.setHandIndex(8);
         }
 
         //移动方向
@@ -164,10 +178,13 @@ public class PlayerSystem extends WorldSystem {
             // 计算方向向量的长度
             float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
             // 归一化并乘以当前速度
-            float playerSpeed = curPlayer.getCurSpeed();
+            float playerSpeed = curPlayer.getSpeed();
             float velX = (inputX / length) * playerSpeed;
             float velY = (inputY / length) * playerSpeed;
             curPlayer.setVelocity(velX, velY);
+        }
+        if (inputX == 0 && inputY == 0) {
+            curPlayer.setVelocity(0, 0);
         }
     }
 
@@ -196,18 +213,19 @@ public class PlayerSystem extends WorldSystem {
         CameraFollowSystem cfs = getManager().getSystem(CameraFollowSystem.class);
         cfs.setFollower(this.player);
 
-        AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);
+        //播放复活音频
+        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
     }
 
     @Override
     public void dispose () {
-        this.savePlayer();
+        this.savePlayerData();
     }
 
     /**
      * 保存玩家数据
      * */
-    public void savePlayer () {
+    public void savePlayerData () {
         JsonDataWriter dataWriter = new JsonDataWriter();
         dataWriter.objStart();
         Codecs.PLAYER.encode(this.getPlayer(), dataWriter);
@@ -219,8 +237,8 @@ public class PlayerSystem extends WorldSystem {
     /**
      * 读取玩家数据
      * */
-    public Player readPlayer () {
-        JsonValue playerValue = FileUtil.readJsonFile(Fight.PATH_SAVE_PLAYER, PLAYER_DATA_FILE_NAME);
+    public Player readPlayerData () {
+        JsonValue playerValue = FileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
         Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
         if (optionalPlayer.isPresent()) {
             return optionalPlayer.get();
@@ -233,7 +251,7 @@ public class PlayerSystem extends WorldSystem {
     /**
      * 获取玩家的唯一方式，其他地方获取玩家也是通过这个方法
      * */
-    public Player getPlayer() {
+    public Player getPlayer () {
         return this.player;
     }
 
@@ -254,9 +272,9 @@ public class PlayerSystem extends WorldSystem {
             ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Entities.ITEM_ENTITY, this.getPlayer().getEntitySystem());
             itemEntity.setItemStack(itemStack);
             Direction direction = this.player.getDirection();
-            itemEntity.setVelocity(direction.scl(MathUtils.random(0.7f, 1.2f)));
+            itemEntity.setVelocity(direction.toVector2().scl(MathUtils.random(0.7f, 1.2f)));
             itemEntity.setSpeed(3f);
-            itemEntity.setPosition(this.player.getCenter());
+            itemEntity.setPosition(this.player.getCenterPos());
         });
 
         Array<ItemEntity> entityArray = this.getPlayer().getEntitySystem().getEntityArray(EntityTypes.ITEM_ENTITY);

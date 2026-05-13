@@ -1,9 +1,9 @@
 package ttk.muxiuesd.registrant;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -13,7 +13,7 @@ public class EntityRendererRegistry extends Registries.DefaultRegistry<EntityRen
     /**
      * 静态调用
      * */
-    public static <T extends Entity<?>> EntityRenderer<T> register (EntityProvider<T> entityProvider, EntityRenderer<T> renderer) {
+    public static <T extends Entity<T>> EntityRenderer<T> register (EntityProvider<T> entityProvider, EntityRenderer<T> renderer) {
         return EntityRendererRegistry.getInstance().registerRenderer(entityProvider, renderer);
     }
 
@@ -38,7 +38,7 @@ public class EntityRendererRegistry extends Registries.DefaultRegistry<EntityRen
         return INSTANCE;
     }
 
-    public <T extends Entity<?>> EntityRenderer<T> registerRenderer (EntityProvider<T> entityProvider, EntityRenderer<T> entityRenderer) {
+    public <T extends Entity<T>> EntityRenderer<T> registerRenderer (EntityProvider<T> entityProvider, EntityRenderer<T> entityRenderer) {
         if (entityProvider != null && entityRenderer != null) {
             Identifier identifier = new Identifier(entityProvider.getID());
             if (contains(identifier)) {

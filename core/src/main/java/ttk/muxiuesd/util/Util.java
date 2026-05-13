@@ -1,14 +1,14 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.util.CameraUtil;
+import game.muxiuesd.bedrockcore.util.CoordinateUtil;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
@@ -24,44 +24,21 @@ public class Util {
      * 获取鼠标指向的游戏世界坐标
      * */
     public static Vector2 getMouseWorldPosition() {
-        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
+        return CameraUtil.getMousePosForCamera(PlayerCamera.INSTANCE.getCamera());
     }
 
     /**
-     * 获取鼠标指向的游戏GUI坐标
+     * 获取鼠标指向的游戏GUI相机的坐标
      * */
     public static Vector2 getMouseUIPosition() {
-        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
-        Vector3 mp = new Vector3(new Vector2(Gdx.input.getX(), Gdx.input.getY()), camera.position.z);
-        Vector3 up = camera.unproject(mp);
-        return new Vector2(up.x, up.y);
+        return CameraUtil.getMousePosForCamera(GUICamera.INSTANCE.getCamera());
     }
-
 
     /**
      * 获取鼠标的位置,相对于游戏窗口的中心
      */
-    public static Vector2 getMousePosition() {
-        return axeTransfer(Gdx.input.getX(), Gdx.input.getY());
-    }
-
-    public static Vector2 axeTransfer(Vector2 vector2) {
-        return axeTransfer(vector2.x, vector2.y);
-    }
-
-    /**
-     * 坐标转换,将以窗口左下角为原点的坐标系转换为以屏幕中心为原点的笛卡尔坐标系
-     *
-     * @param x 原始横坐标
-     * @param y 原始纵坐标
-     */
-    public static Vector2 axeTransfer(float x, float y) {
-        float newX = x - ((float) Gdx.graphics.getWidth() / 2);
-        float newY = ((float) Gdx.graphics.getHeight() / 2) - y;
-        return new Vector2(newX, newY);
+    public static Vector2 getMouseWindowPos () {
+        return CoordinateUtil.axeTransfer(Gdx.input.getX(), Gdx.input.getY());
     }
 
     /**
@@ -82,8 +59,6 @@ public class Util {
         return new GridPoint2(x, y);
     }
 
-
-
     /**
      * 获取窗口中心到鼠标方向的单位向量
      * */
@@ -95,8 +70,8 @@ public class Util {
      * 获取两个实体之间的距离
      * */
     public static float getDistance (Entity entity1, Entity entity2) {
-        float xd = entity1.getCenter().x - entity2.getCenter().x;
-        float yd = entity1.getCenter().y - entity2.getCenter().y;
+        float xd = entity1.getCenterPos().x - entity2.getCenterPos().x;
+        float yd = entity1.getCenterPos().y - entity2.getCenterPos().y;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
     }
 
@@ -104,8 +79,8 @@ public class Util {
      * 计算实体与一个指定坐标的距离
      * */
     public static float getDistance (Entity entity, float x, float y) {
-        float xd = entity.getCenter().x - x;
-        float yd = entity.getCenter().y - y;
+        float xd = entity.getCenterPos().x - x;
+        float yd = entity.getCenterPos().y - y;
         return (float) Math.sqrt(Math.pow(xd, 2) + Math.pow(yd, 2));
     }
 
@@ -138,19 +113,25 @@ public class Util {
     }
 
     /**
-     * 取整工具
+     * 快速对坐标值四舍五入
      * */
-    public static float fastRound (float value) {
-        if (value < 0) {
-            return (float) Math.floor(value);
-            //return Math.round(value);
-        }
-        if (value > 0) {
-            return (float) Math.floor(value);
-        }
-        return value;
+    public static Vector2 fastRound (float x, float y) {
+        return new Vector2(fastRound(x), fastRound(y));
     }
 
+    /**
+     * 四舍五入取整工具
+     * */
+    public static float fastRound (float value) {
+        return Math.round(value);
+    }
+
+    /**
+     * 快速向下取整
+     * */
+    public static Vector2 fastFloor (Vector2 value) {
+        return fastFloor(value.x, value.y);
+    }
     /**
      * 快速向下取整
      * */
@@ -195,7 +176,7 @@ public class Util {
                                                           float radius, float angleDegrees) {
         Array<T> results = new Array<>();
         for (T entity : entities) {
-            Vector2 entityCenter = entity.getCenter();
+            Vector2 entityCenter = entity.getCenterPos();
             //从中心点到实体中心的矢量
             Vector2 ce = new Vector2(entityCenter.x - center.x, entityCenter.y - center.y);
             //超过扇形的半径不在
@@ -214,10 +195,10 @@ public class Util {
     /**
      * 检查给定半径内的实体数量
      * */
-    public static <T extends Entity> int entityCount (Array<T> entities, Vector2 center, float radius) {
+    public static <T extends Entity<?>> int entityCount (Array<T> entities, Vector2 center, float radius) {
         int count = 0;
         for (T entity : entities) {
-            Vector2 subbed = new Vector2(center).sub(entity.getCenter());
+            Vector2 subbed = new Vector2(center).sub(entity.getCenterPos());
             if (subbed.len() <= radius) count++;
         }
         return count;
@@ -225,6 +206,8 @@ public class Util {
 
     /**
      * 加载纹理区域
+     * @param id 纹理ID
+     * @param texturePath 纹理路径，为null时默认之前加载过就会直接根据id来获取
      * */
     public static TextureRegion loadTextureRegion (String id, String texturePath) {
         if (texturePath == null) {
@@ -234,4 +217,6 @@ public class Util {
         AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
+
+
 }

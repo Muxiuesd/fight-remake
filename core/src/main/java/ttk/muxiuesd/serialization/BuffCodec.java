@@ -1,10 +1,10 @@
 package ttk.muxiuesd.serialization;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 
 import java.util.LinkedHashMap;

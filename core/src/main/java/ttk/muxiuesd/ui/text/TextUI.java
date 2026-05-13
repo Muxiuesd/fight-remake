@@ -2,14 +2,19 @@ package ttk.muxiuesd.ui.text;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.font.FontHolder;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.ui.abs.UIComponent;
-import ttk.muxiuesd.ui.components.UIPanel;
+import ttk.muxiuesd.util.TextUtil;
 
 /**
  * 文本UI组件
  * */
 public class TextUI extends UIComponent {
+    private GlyphLayout glyphLayout;
     private String text;
     private FontHolder fontHolder;
     private int fontSize;
@@ -21,6 +26,7 @@ public class TextUI extends UIComponent {
         this(Fonts.MC, text, 7);
     }
     public TextUI (FontHolder fontHolder, String text, int fontSize) {
+        this.glyphLayout = new GlyphLayout();
         this.text = text;
         this.fontHolder = fontHolder;
         this.fontSize = fontSize;
@@ -29,7 +35,24 @@ public class TextUI extends UIComponent {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         BitmapFont font = this.getFontHolder().getFont(this.getFontSize());
-        font.draw(batch, this.getText(), getX(), getY() + this.getFontSize());
+        TextUtil.draw(batch, font, this.getText(), getX(), getY() + this.getFontSize());
+    }
+
+    /**
+     * 获取整个文本渲染出来的宽度
+     * */
+    public float getRenderWidth () {
+        this.glyphLayout.setText(this.getFontHolder().getFont(this.getFontSize()), this.getText());
+        return glyphLayout.width;
+    }
+
+    public GlyphLayout getGlyphLayout () {
+        return this.glyphLayout;
+    }
+
+    public TextUI setGlyphLayout (GlyphLayout glyphLayout) {
+        this.glyphLayout = glyphLayout;
+        return this;
     }
 
     public String getText () {
@@ -56,6 +79,18 @@ public class TextUI extends UIComponent {
 
     public TextUI setFontSize (int fontSize) {
         this.fontSize = fontSize;
+        return this;
+    }
+
+    @Override
+    public TextUI setPosition (float x, float y) {
+        super.setPosition(x, y);
+        return this;
+    }
+
+    @Override
+    public TextUI setPosition (Vector2 pos) {
+        super.setPosition(pos);
         return this;
     }
 }

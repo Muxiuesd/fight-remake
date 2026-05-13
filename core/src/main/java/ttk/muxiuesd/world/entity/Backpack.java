@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.entity;
 
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.Inventory;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.LinkedHashMap;

@@ -1,15 +1,18 @@
 package ttk.muxiuesd.render.shader;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import ttk.muxiuesd.Fight;
+import game.muxiuesd.bedrockcore.fix.GL32CMacIssueHandler;
 
 /**
- * 着色器注册
+ * 游戏内用到的着色器的注册
  * */
 public class ShadersReg {
+
     //gdx默认的着色器
+    public static final ShaderProgram BatchDefaultShader = GL32CMacIssueHandler.createSpriteBatchShader();
+
     public static final String DEFAULT_SHADER = registerDefault();
 
     public static final String DAYNIGHT_SHADER = register(
@@ -36,6 +39,7 @@ public class ShadersReg {
     public static String register (String id, String vertPath, String fragPath) {
         String vert = Gdx.files.internal(vertPath).readString();
         String frag = Gdx.files.internal(fragPath).readString();
+
         ShaderProgram shader = new ShaderProgram(vert, frag);
         ShaderScheduler.getInstance().registry(id, shader);
         return id;
@@ -43,8 +47,7 @@ public class ShadersReg {
 
     private static String registerDefault() {
         String id = Fight.ID("default_shader");
-        ShaderProgram shader = SpriteBatch.createDefaultShader();
-        ShaderScheduler.getInstance().registry(id, shader);
+        ShaderScheduler.getInstance().registry(id, BatchDefaultShader);
         return id;
     }
 }

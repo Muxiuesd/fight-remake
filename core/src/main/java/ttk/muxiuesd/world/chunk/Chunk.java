@@ -5,27 +5,53 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.ShapeRenderable;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
 import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.WallRendererRegistry;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.wall.Wall;
 
 
 /**
  * 一个区块
+ * <p>
  * 一行一行更新绘制
  * */
 public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
+    /**
+     * 将传入的世界坐标转换为这个区块里的方块数组坐标
+     * @param rwx 四舍五入过的世界横坐标
+     * @param rwy 四舍五入过的世界纵坐标
+     * */
+    public static GridPoint2 worldToChunk (float rwx, float rwy) {
+        GridPoint2 cp = new GridPoint2();
+        if (rwx < 0) {
+            cp.x = ChunkWidth + (int)(rwx % ChunkWidth);
+            cp.x %= ChunkWidth;
+        }else {
+            cp.x = (int) (rwx % ChunkWidth);
+        }
+        if (rwy < 0) {
+            cp.y = ChunkHeight + (int)(rwy % ChunkHeight);
+            cp.y %= ChunkHeight;
+        }else {
+            cp.y = (int) (rwy % ChunkHeight);
+        }
+        return cp;
+    }
+
+
     public final String TAG = this.getClass().getName();
 
     public static final int ChunkWidth = 16;
@@ -34,11 +60,13 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public static final int HighestHeight = 7;
 
     //区块分区
+    public static final Vector2 ZONE_RECTANGLE_OFFSET = new Vector2(- Block.WIDTH / 2, - Block.HEIGHT / 2);
     public static final int NotInChunk = -1;
     public static final int LeftUp   = 6, Up     = 7, RightUp   = 8;
     public static final int Left     = 3, Center = 4, Right     = 5;
     public static final int LeftDown = 0, Down   = 1, RightDown = 2;
     public Rectangle[] chunkZone;
+
 
     private ChunkSystem chunkSystem;
 
@@ -49,6 +77,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
     private final Wall<?>[][]  walls;
+    private final Botany[][]  botanys;
     private final int[][] heights;
 
 
@@ -59,26 +88,14 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public Chunk () {
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
+        this.botanys = new Botany[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
     }
 
     @Override
     public void draw(Batch batch) {
-        /*ChunkPosition cp = this.chunkPosition;
-        this.traversal((x, y) -> {
-            Block block = this.blocks[y][x];
-            if (block != null) {
-                block.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
-            }
-        });
-        this.traversal((x, y) -> {
-            Wall<?> wall = this.walls[y][x];
-            if (wall != null) {
-                wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
-            }
-        });*/
-
         ChunkPosition cp = this.chunkPosition;
+        //绘制方快
         this.traversal((x, y) -> {
             Block block = this.blocks[y][x];
             if (block != null) {
@@ -92,6 +109,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
                 }
             }
         });
+        //绘制墙体
         this.traversal((x, y) -> {
             Wall<?> wall = this.walls[y][x];
             if (wall != null) {
@@ -103,10 +121,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
                     renderer.render(batch, wall, context);
                     renderer.freeContext(context);
                 }
-                //wall.draw(batch, x + cp.x * ChunkWidth, y + cp.y * ChunkHeight);
             }
         });
-
+        //绘制植物
+        this.traversal((x, y) -> {
+            Botany botany = this.botanys[y][x];
+            if (botany != null) {
+                BlockRenderer<Block> renderer = BlockRendererRegistry.get(botany);
+                if (renderer != null) {
+                    BlockRenderer.Context context = renderer.getContext();
+                    context.x = x + cp.x * ChunkWidth;
+                    context.y = y + cp.y * ChunkHeight;
+                    renderer.render(batch, botany, context);
+                    renderer.freeContext(context);
+                }
+            }
+        });
     }
 
     @Override
@@ -116,17 +146,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     @Override
     public void dispose() {
-        /*this.traversal((x, y) -> {
-            Block block = blocks[y][x];
-            if (block != null) {
-                blocks[y][x] = null;
-            }
-
-            Wall<?> wall = walls[y][x];
-            if (wall != null) {
-                walls[y][x] = null;
-            }
-        });*/
     }
 
     /**
@@ -150,11 +169,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         return this.blocks[cy][cx];
     }
 
-    public Wall<?> getWall(int cx, int cy) {
+    public Wall<?> getWall (int cx, int cy) {
         return this.walls[cy][cx];
     }
 
-    public void setWall(Wall<?> wall, int cx, int cy) {
+    public void setWall (Wall<?> wall, int cx, int cy) {
         this.walls[cy][cx] = wall;
     }
 
@@ -163,7 +182,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
      * <p>
      * 需要传入的世界坐标都在这个区块里，否则不准
      */
-    public Wall<?> removeWall(float wx, float wy) {
+    public Wall<?> removeWall (float wx, float wy) {
         GridPoint2 gridPoint2 = this.worldPos2ChunkPos(wx, wy);
         Wall<?> wall = this.getWall(gridPoint2.x, gridPoint2.y);
         if (wall != null) {
@@ -173,6 +192,28 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         //是null就返回null;
         return null;
     }
+
+    /**
+     * 设置这个区块上的某一个植物
+     * */
+    public void setBotany (Botany botany, int cx, int cy) {
+        this.botanys[cy][cx] = botany;
+    }
+
+    /**
+     * 获取这个区块上的某一个植物
+     * */
+    public Botany getBotany (int cx, int cy) {
+        return this.botanys[cy][cx];
+    }
+
+    /**
+     * 检测这个区块上是否有植物
+     * */
+    public boolean hasBotany (int cx, int cy) {
+        return this.botanys[cy][cx] != null;
+    }
+
 
     public void setHeight (int cx, int cy, int height) {
         if (height < LowestHeight || height > HighestHeight) {
@@ -187,25 +228,35 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 查找方块
-     * @param wx
-     * @param wy
+     * @param wx 世界坐标x
+     * @param wy 世界坐标y
      * @return 方块
      */
     public Block seekBlock (float wx, float wy) {
         GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
-
         return this.getBlock(chunkPos.x, chunkPos.y);
     }
 
     /**
      * 查找墙体
-     * @param wx
-     * @param wy
+     * @param wx 世界坐标x
+     * @param wy 世界坐标y
      * @return 墙体或者null
      */
     public Wall<?> seekWall (float wx, float wy) {
         GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
         return this.getWall(chunkPos.x, chunkPos.y);
+    }
+
+    /**
+     * 查找植物
+     * @param wx 世界坐标x
+     * @param wy 世界坐标y
+     * @return 找到植物就返回对应的实例，否则为null
+     */
+    public Botany seekBotany (float wx, float wy) {
+        GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
+        return this.getBotany(chunkPos.x, chunkPos.y);
     }
 
     /**
@@ -236,15 +287,18 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         //绘制区块边界
         if (this.chunkSystem.chunkEdgeRender) {
             batch.setColor(Color.PURPLE);
+            //内部区域边界
             for (int i = 0; i < chunkZone.length; i++) {
                 Rectangle zone = chunkZone[i];
                 batch.rect(zone.x, zone.y, zone.width, zone.height);
             }
+            //区块整个边界
             batch.setColor(new Color(255, 0, 0, 255));
             batch.rect(
-                this.chunkPosition.x * ChunkWidth,
-                this.chunkPosition.y * ChunkHeight,
-                ChunkWidth, ChunkHeight);
+                this.chunkPosition.x * ChunkWidth + ZONE_RECTANGLE_OFFSET.x,
+                this.chunkPosition.y * ChunkHeight+ ZONE_RECTANGLE_OFFSET.y,
+                ChunkWidth, ChunkHeight
+            );
             //还原颜色
             batch.setColor(Color.WHITE);
         }
@@ -253,7 +307,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             batch.setColor(Color.BLUE);
             this.traversal(((x, y) -> {
                 Wall wall = walls[y][x];
-                if (wall != null && wall.getHitbox() != null) {
+                if (wall != null && wall.getHitboxRectangle() != null) {
                     /*Rectangle hitbox = wall.getHitbox();
                     batch.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());*/
                     wall.renderShape(batch);
@@ -267,9 +321,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 获取坐标在这个区块内的区域，首先要确保传入的坐标在这个区块内
-     * @param wx
-     * @param wy
-     * @return
      */
     public int getChunkZone (float wx, float wy) {
         ChunkPosition cp = getChunkPosition();
@@ -325,8 +376,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private void updateChunkZone () {
         this.chunkZone = new Rectangle[9];
         chunkZone[LeftDown] = new Rectangle(
-            chunkPosition.getX() * ChunkWidth,
-            chunkPosition.getY() * ChunkHeight,
+            chunkPosition.getX() * ChunkWidth + ZONE_RECTANGLE_OFFSET.x,
+            chunkPosition.getY() * ChunkHeight + ZONE_RECTANGLE_OFFSET.y,
             5f, 5f);
         chunkZone[Down] = new Rectangle(
             chunkZone[LeftDown].getX() + chunkZone[LeftDown].getWidth(),
@@ -375,25 +426,23 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 将传入的世界坐标转换为这个区块里的方块数组坐标
-     * @param fwx 向下取整过的世界横坐标
-     * @param fwy 向下取整过的世界纵坐标
      * */
-    public GridPoint2 worldToChunk (float fwx, float fwy) {
+    /*public GridPoint2 worldToChunk (float rwx, float rwy) {
         GridPoint2 cp = new GridPoint2();
-        if (fwx < 0) {
-            cp.x = ChunkWidth + (int)(fwx % ChunkWidth);
+        if (rwx < 0) {
+            cp.x = ChunkWidth + (int)(rwx % ChunkWidth);
             cp.x %= ChunkWidth;
         }else {
-            cp.x = (int) (fwx % ChunkWidth);
+            cp.x = (int) (rwx % ChunkWidth);
         }
-        if (fwy < 0) {
-            cp.y = ChunkHeight + (int)(fwy % ChunkHeight);
+        if (rwy < 0) {
+            cp.y = ChunkHeight + (int)(rwy % ChunkHeight);
             cp.y %= ChunkHeight;
         }else {
-            cp.y = (int) (fwy % ChunkHeight);
+            cp.y = (int) (rwy % ChunkHeight);
         }
         return cp;
-    }
+    }*/
 
     public ChunkSystem getChunkSystem () {
         return this.chunkSystem;

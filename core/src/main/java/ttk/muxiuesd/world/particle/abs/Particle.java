@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
-import ttk.muxiuesd.interfaces.Drawable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
 
 /**
  * 粒子

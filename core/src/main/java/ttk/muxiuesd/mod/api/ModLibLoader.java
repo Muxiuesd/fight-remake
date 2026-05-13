@@ -2,8 +2,8 @@ package ttk.muxiuesd.mod.api;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.mod.ModLibManager;
-import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptException;
 import java.util.Objects;

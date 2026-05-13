@@ -13,15 +13,18 @@ import ttk.muxiuesd.system.LightSystem;
  * GUI的渲染处理器
  * */
 public class GUIRenderProcessor extends RenderProcessor {
-    private MainGameScreen mainGameScreen;
-    public GUIRenderProcessor (Camera camera, String shaderId, int renderOrder, MainGameScreen mainGameScreen) {
+    private MainGameScreen mainGameScreen = null;
+    public GUIRenderProcessor (Camera camera, String shaderId, int renderOrder) {
         super(camera, shaderId, renderOrder);
-        this.mainGameScreen = mainGameScreen;
     }
 
     @Override
     public void handleBatchRender (Batch batch) {
-        this.mainGameScreen.getWorld().getSystem(LightSystem.class).afterProcess();
+        if (this.mainGameScreen != null) {
+            //GUI在世界中渲染时需要后处理光照
+            this.mainGameScreen.getWorld().getSystem(LightSystem.class).afterProcess();
+        }
+
 
         defaultHandleBatchRender(batch);
     }
@@ -38,5 +41,10 @@ public class GUIRenderProcessor extends RenderProcessor {
             return true;
         }
         return false;
+    }
+
+    public GUIRenderProcessor setMainGameScreen (MainGameScreen mainGameScreen) {
+        this.mainGameScreen = mainGameScreen;
+        return this;
     }
 }

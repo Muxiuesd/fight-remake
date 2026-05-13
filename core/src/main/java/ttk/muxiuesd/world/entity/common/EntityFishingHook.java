@@ -2,21 +2,20 @@ package ttk.muxiuesd.world.entity.common;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
+import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.TaskTimer;
-import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.cat.CAT;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -43,12 +42,13 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
             Fight.ID("fishing_hook"),
             Fight.EntityTexturePath("fish/fishing_hook.png")
         );
+        fastAddBodyHitBox();
 
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
             this.pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(2, 5),
-                getCenter().add(0, - getHeight() / 2),
+                getCenterPos().add(0, - getHeight() / 2),
                 new Vector2(MathUtils.random(0.5f, 1.2f), 0),
                 getOrigin(),
                 getSize().scl(0.3f), getSize().scl(0.06f),
@@ -60,16 +60,6 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-    }
-
-    @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-    }
-
-    @Override
     public void update (float delta) {
         if (this.moveTimer != null && !this.moveTimer.isReady()) {
             //抛钩移动
@@ -77,7 +67,7 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
             this.moveTimer.update(delta);
         }else {
             setOnGround(true);
-            if (this.cs.getBlock(x, y) instanceof BlockWater) {
+            if (this.cs.getBlock(getX(), getY()) instanceof BlockWater) {
                 //只有鱼钩在水中才上下漂浮和产生气泡粒子
                 this.cycle += delta / 2;
                 if (this.cycle > 1f) this.cycle -= 1f;
@@ -90,7 +80,9 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         //在收杆返回途中
         if (this.isReturning) {
             this.returningMovement(delta);
-            if (this.hitbox.overlaps(this.getOwner().hitbox)) {
+            Hitbox hookHitbox = getBodyHitbox();
+            Hitbox ownerHitbox = this.getOwner().getBodyHitbox();
+            if (hookHitbox.checkCollision(ownerHitbox)) {
                 this.removeSelf();
                 //this.getPole().isCasting = false;
                 this.getPole().getProperty().add(PropertyTypes.ITEM_ON_USING, false);
@@ -105,21 +97,17 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 抛钩移动
      * */
     private void throwMovement (float delta) {
-        velX = speed * throwDirection.x;
-        velY = speed * throwDirection.y;
-        x += velX * delta;
-        y += velY * delta;
+        setVelocity(getCurSpeed() * throwDirection.getX(), getCurSpeed() * throwDirection.getY());
+        positionChange(delta);
     }
 
     /**
      * 返回移动
      * */
     private void returningMovement (float delta) {
-        Direction dir = new Direction(getCenter(), this.getOwner().getCenter());
-        velX = speed * dir.x;
-        velY = speed * dir.y;
-        x += velX * delta;
-        y += velY * delta;
+        Direction dir = new Direction(getCenterPos(), this.getOwner().getCenterPos());
+        setVelocity(getSpeed() * dir.getX(), getSpeed() * dir.getY());
+        positionChange(delta);
     }
 
     public LivingEntity<?> getOwner () {

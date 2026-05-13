@@ -1,13 +1,14 @@
 package ttk.muxiuesd.registry;
 
+import com.badlogic.gdx.utils.DefaultPool;
 import com.badlogic.gdx.utils.Pool;
+import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
+import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.TaskTimer;
-import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 import ttk.muxiuesd.util.pool.PoolableVec2;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -28,10 +29,10 @@ public final class Pools {
     }
 
     /// 工具类池
-    public static final FightPool<PoolableVec2> VEC2 = register("vec2", PoolableVec2.class);
-    public static final FightPool<PoolableRectangle> RECT = register("rectangle", PoolableRectangle.class);
-    public static final FightPool<Timer> TIMER = register("timer", Timer.class);
-    public static final FightPool<TaskTimer> TASK_TIMER = register("timer", TaskTimer.class);
+    public static final FightPool<PoolableVec2> VEC2 = register("vec2", PoolableVec2::new);
+    public static final FightPool<PoolableRectangle> RECT = register("rectangle", PoolableRectangle::new);
+    public static final FightPool<Timer> TIMER = register("timer", Timer::new);
+    public static final FightPool<TaskTimer> TASK_TIMER = register("task_timer", TaskTimer::new);
 
     /// 粒子池
     public static final FightPool<ParticleSpell> SPELL = register("spell", ParticleSpell.class, EmitterEnemyShootParticle.POOL);
@@ -42,9 +43,13 @@ public final class Pools {
     public static final FightPool<ItemEntity> ITEM_ENTITY = register("item_entity", ItemEntity.class, ItemEntityGetter.POOL);
 
 
-
-    public static <T> FightPool<T> register (String name, Class<T> type) {
-        FightPool<T> fightPool = new FightPool<>(type);
+    /**
+     * 注册一个对象池
+     * @param name 对象池名称
+     * @param poolSupplier 对象池的对象提供类（快捷方式）
+     * */
+    public static <T> FightPool<T> register (String name, DefaultPool.PoolSupplier poolSupplier) {
+        FightPool<T> fightPool = new FightPool<>(poolSupplier);
         return register(name, fightPool);
     }
 

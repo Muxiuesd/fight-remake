@@ -1,7 +1,7 @@
 package ttk.muxiuesd.interfaces.world.entity;
 
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
-import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 /**
  * 实体的提供类
  * */
-public class EntityProvider<T extends Entity<?>> {
+public class EntityProvider<T extends Entity<T>> {
     private String id;
 
     public final Factory<T> factory;
@@ -60,7 +60,7 @@ public class EntityProvider<T extends Entity<?>> {
 
 
 
-    public static class Builder<T extends Entity<?>> {
+    public static class Builder<T extends Entity<T>> {
         final Factory<T> factory;
         EntityType<? super T> defaultType;
         EntityRenderer<T> renderer;
@@ -72,7 +72,7 @@ public class EntityProvider<T extends Entity<?>> {
             this.factory = factory;
         }
 
-        public static <T extends Entity<?>> Builder<T> create (Factory<T> factory) {
+        public static <T extends Entity<T>> Builder<T> create (Factory<T> factory) {
             return new Builder<>(factory);
         }
 
@@ -120,7 +120,7 @@ public class EntityProvider<T extends Entity<?>> {
     }
 
     @FunctionalInterface
-    public interface Factory<T extends Entity<?>> {
+    public interface Factory<T extends Entity<T>> {
         T create (World world, EntityType<? super T> entityType);
     }
 }

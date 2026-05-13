@@ -6,13 +6,14 @@ import com.badlogic.gdx.InputProcessor;
 import ttk.muxiuesd.system.abs.GameSystem;
 
 /**
- * 游戏最底层的输入系统
+ * 游戏最底层的输入系统，所有输入尽量从此调用
  * */
 public class InputHandleSystem extends GameSystem {
     private final InputMultiplexer inputMultiplexer;
 
     private InputHandleSystem() {
         this.inputMultiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(this.inputMultiplexer);
     }
     private static InputHandleSystem INSTANCE;
     public static InputHandleSystem getInstance() {
@@ -22,12 +23,11 @@ public class InputHandleSystem extends GameSystem {
         return INSTANCE;
     }
 
-    @Override
-    public void initialize () {
-        Gdx.input.setInputProcessor(this.inputMultiplexer);
-    }
-
     public void addProcessor (InputProcessor processor) {
         this.inputMultiplexer.addProcessor(processor);
+    }
+
+    public void removeProcessor (InputProcessor processor) {
+        this.inputMultiplexer.removeProcessor(processor);
     }
 }

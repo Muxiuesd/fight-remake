@@ -3,24 +3,19 @@ package ttk.muxiuesd.screen;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import game.muxiuesd.bedrockcore.util.Log;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventTypes;
-import ttk.muxiuesd.lang.FI18N;
-import ttk.muxiuesd.mod.ModLibManager;
-import ttk.muxiuesd.mod.ModLoader;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registry.*;
-import ttk.muxiuesd.render.RenderPipe;
 import ttk.muxiuesd.render.RenderProcessorManager;
 import ttk.muxiuesd.render.RenderProcessorsReg;
-import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
-import ttk.muxiuesd.render.instance.*;
-import ttk.muxiuesd.render.shader.ShaderScheduler;
+import ttk.muxiuesd.render.instance.EntityGroundRenderProcessor;
+import ttk.muxiuesd.render.instance.EntityUndergroundRenderProcessor;
+import ttk.muxiuesd.render.instance.ParticleRenderProcessor;
+import ttk.muxiuesd.render.instance.WorldChunkRenderProcessor;
 import ttk.muxiuesd.render.shader.ShadersReg;
-import ttk.muxiuesd.system.game.GUISystem;
-import ttk.muxiuesd.system.game.InputHandleSystem;
-import ttk.muxiuesd.system.manager.GameSystemManager;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.MainWorld;
 import ttk.muxiuesd.world.World;
 
@@ -33,14 +28,12 @@ public class MainGameScreen implements Screen {
     //游戏目前加载的世界，后续可能有多个世界
     private World world;
 
+    public MainGameScreen () {
+    }
+
     @Override
     public void show() {
-        Fonts.init();
-        FI18N.init();
-        //初始化游戏底层系统
-        GameSystemManager.init();
-
-        //手动注册游戏内的元素
+        //手动初始化注册游戏世界内的元素
         Pools.init();
         EventTypes.init();
         Sounds.init();
@@ -51,21 +44,36 @@ public class MainGameScreen implements Screen {
         EntityTypes.init();
         Entities.init();
         StatusEffects.init();
-        WorldInformationType.init();
+        WorldInfoTypes.init();
+        ItemGroups.init();
 
+        MainWorld mainWorld = new MainWorld(this);
+        //游戏世界的渲染处理器注册
+        this.registerWorldRenderProcessors(mainWorld);
+        mainWorld.addAllSystems();
+        this.setWorld(mainWorld);
 
-        //初始化着色器调度器
-        ShaderScheduler.init();
-        RenderPipe.init();
+        //执行mod代码
+        //TODO Mod系统重做
+        /*ModLibManager.getInstance().loadCoreLib();
+        ModLoader.getInstance().loadAllMods();
+        ModLoader.getInstance().runAllMods();*/
 
-        this.setWorld(new MainWorld(this));
+        //初始化世界系统
+        this.getWorld().getSystemManager().initAllSystems();
 
+        FightCore.getInstance().guiRenderProcessor.setMainGameScreen(this);
+
+        Log.print(TAG, "------游戏正式开始运行------");
+    }
+
+    private void registerWorldRenderProcessors (World world) {
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_UNDERGROUND,
             new EntityUndergroundRenderProcessor(
                 PlayerCamera.INSTANCE.getCamera(),
                 ShadersReg.DAYNIGHT_SHADER,
                 100,
-                this.world
+                world
             )
         );
         RenderProcessorManager.register(RenderProcessorsReg.WORLD_CHUNK,
@@ -73,7 +81,7 @@ public class MainGameScreen implements Screen {
                 PlayerCamera.INSTANCE.getCamera(),
                 ShadersReg.DAYNIGHT_SHADER,
                 200,
-                this.world
+                world
             )
         );
         RenderProcessorManager.register(RenderProcessorsReg.ENTITY_GROUND,
@@ -81,7 +89,7 @@ public class MainGameScreen implements Screen {
                 PlayerCamera.INSTANCE.getCamera(),
                 ShadersReg.DAYNIGHT_SHADER,
                 300,
-                this.world
+                world
             )
         );
         RenderProcessorManager.register(RenderProcessorsReg.PARTICLE,
@@ -89,50 +97,30 @@ public class MainGameScreen implements Screen {
                 PlayerCamera.INSTANCE.getCamera(),
                 ShadersReg.PARTICLE_SHADER,
                 400,
-                this.world
+                world
             )
         );
-        RenderProcessorManager.register(RenderProcessorsReg.GUI,
-            new GUIRenderProcessor(
-                GUICamera.INSTANCE.getCamera(),
-                ShadersReg.DEFAULT_SHADER,
-                10000,
-                this
-            )
-        );
+    }
 
-        //执行mod代码
-        ModLibManager.getInstance().loadCoreLib();
-        ModLoader.getInstance().loadAllMods();
-        ModLoader.getInstance().runAllMods();
-
-        this.world.getSystemManager().initAllSystems();
-
-
-        GameSystemManager.getInstance().addSystem("InputHandleSystem", InputHandleSystem.getInstance());
-        GameSystemManager.getInstance().addSystem("GUISystem", GUISystem.getInstance());
-        GameSystemManager.getInstance().initAllSystems();
-
-        Log.print(TAG, "------游戏正式开始运行------");
+    /**
+     * 把世界里注册的渲染器全部取消掉
+     * */
+    public void unregisterWorldRenderProcessors () {
+        RenderProcessorManager.unregister(RenderProcessorsReg.ENTITY_UNDERGROUND);
+        RenderProcessorManager.unregister(RenderProcessorsReg.WORLD_CHUNK);
+        RenderProcessorManager.unregister(RenderProcessorsReg.ENTITY_GROUND);
+        RenderProcessorManager.unregister(RenderProcessorsReg.PARTICLE);
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
-
-        GameSystemManager.getInstance().update(delta);
-
         this.world.update(delta);
-
-        //处理渲染管线
-        RenderPipe.getInstance().handleGameRender();
-
-        //System.out.println("FPS：" + Gdx.graphics.getFramesPerSecond());
     }
 
     @Override
     public void resize(int width, int height) {
-        RenderPipe.getInstance().resize(width, height);
+
     }
 
     @Override
@@ -152,6 +140,7 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void dispose() {
+        this.unregisterWorldRenderProcessors();
         this.world.dispose();
     }
 

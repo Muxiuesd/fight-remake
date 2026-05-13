@@ -1,18 +1,14 @@
 package ttk.muxiuesd.world.item;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
-import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.ui.text.Text;
-import ttk.muxiuesd.util.Timer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -84,24 +80,24 @@ public class ItemStack implements Updateable {
     /**
      * 物品在持有实体手上的贴图绘制
      * */
-    public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
+    /*public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
         //获取物品的渲染器来渲染
         ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
         if (renderer == null) return;
         ItemRenderer.Context context = renderer.getContextByEntity(holder);
         renderer.drawOnHand(batch, context, holder, this);
         renderer.freeContext(context);
-    }
+    }*/
 
     /**
      * 物品在持有实体手上的形状绘制
      * */
-    public void renderShapeOnHand (ShapeRenderer batch, LivingEntity<?> holder) {
+    /*public void renderShapeOnHand (ShapeRenderer batch, LivingEntity<?> holder) {
         //获取物品的渲染器来渲染
         ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
         if (renderer == null) return;
         renderer.renderShapeOnHand(batch, holder, this);
-    }
+    }*/
 
     /**
      * 获取物品的词条文本
@@ -146,15 +142,39 @@ public class ItemStack implements Updateable {
      * */
     public ItemStack split (int amount) {
         if (amount <= 0) return null;
-        //超过或者等于最大数量
+        ItemStack newStack;
+        //超过或者等于最大数量，直接返回目前的数量
         if (amount >= this.getAmount()) {
+            newStack = new ItemStack(this.getItem(), this.getAmount(), this.behaviour, this.property.getPropertiesMap());
             this.setAmount(0);
-            return new ItemStack(this.getItem(), this.getAmount(), this.behaviour, this.property.getPropertiesMap());
+        }else {
+            //没达到最大数量
+            newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
+            this.amountDecrease(amount);
         }
-        //没达到最大数量
-        ItemStack newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
-        this.amountDecrease(amount);
         return newStack;
+    }
+
+    /**
+     * 物品堆叠的合并
+     * @param stack 需要被合并的物品堆叠
+     * */
+    public void merge (ItemStack stack) {
+        //物品相同就执行合并
+        if (this.equals(stack)) {
+            int stackAmount = stack.getAmount();
+            int maxCount = stack.getProperty().getMaxCount();
+            int newAmount = this.getAmount() + stackAmount;
+            if (newAmount > maxCount) {
+                //要是超出堆叠上限，传入的物品堆叠的数量变为超出的部分
+                this.amount = maxCount;
+                stack.setAmount(newAmount - maxCount);
+            }else {
+                //合并后没超出堆叠上限
+                this.amount = newAmount;
+                stack.setAmount(0);
+            }
+        }
     }
 
     /**

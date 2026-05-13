@@ -5,7 +5,7 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldTick;
 import ttk.muxiuesd.interfaces.Tickable;
-import ttk.muxiuesd.registry.WorldInformationType;
+import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Info;
 import ttk.muxiuesd.world.World;
@@ -34,9 +34,9 @@ public class TimeSystem extends WorldSystem implements Tickable {
         this.tickUpdates = new Array<>();
         this._delayAdd = new Array<>();
         this._delayRemove = new Array<>();
-        WorldInformationType.FLOAT.putIfNull(GAME_TIME);
+        WorldInfoTypes.FLOAT.putIfNull(GAME_TIME);
 
-        this.gameTime = WorldInformationType.FLOAT.get(GAME_TIME);
+        this.gameTime = WorldInfoTypes.FLOAT.get(GAME_TIME);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class TimeSystem extends WorldSystem implements Tickable {
 
     @Override
     public void dispose () {
-        WorldInformationType.FLOAT.put(GAME_TIME.getKey(), this.getGameTime());
+        WorldInfoTypes.FLOAT.put(GAME_TIME.getKey(), this.getGameTime());
     }
 
     /**

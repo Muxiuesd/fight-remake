@@ -1,35 +1,35 @@
 package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ICAT;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.block.BlockSoundsID;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.BlockSounds;
+import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
  * 方块
  * */
-public abstract class Block implements ID<Block>, Disposable, ICAT {
-    private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-        .add(PropertyTypes.BLOCK_FRICTON, 1f)
-        .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
-
-    public static final float BlockWidth = 1f, BlockHeight = 1f;
+public abstract class Block implements ID<Block>, Disposable {
+    /// 方块的大小（最基础的属性）
+    public static final float WIDTH = 1f, HEIGHT = 1f;
+    /// 方块碰撞箱坐标偏移，自带正负号
+    public static final float HITBOX_START_X_OFFSET = - WIDTH / 2, HITBOX_START_Y_OFFSET = - HEIGHT / 2;
+    public static final float HITBOX_END_X_OFFSET = WIDTH / 2, HITBOX_END_Y_OFFSET = HEIGHT / 2;
 
     /**
      * 生成默认的属性
      * 有些需要实例化的东西就放里面防止浅拷贝
      * */
     public static Property createProperty() {
-        return new Property().setCAT(new CAT());
+        return Property.create();
     }
 
     private String id;
@@ -48,27 +48,29 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
         this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
     }
 
-    @Override
-    public void dispose() {
-        if (this.textureRegion != null) {
-            this.textureRegion = null;
-        }
+    /**
+     * 方块被破坏调用的方法
+     * */
+    public void beDestroyed (World world, Vector2 position) {
     }
 
     public Property getProperty () {
-        return property;
+        return this.property;
     }
 
     public void setProperty (Property property) {
         this.property = property;
     }
 
+    /**
+     * 检测方快的材质贴图是否存在
+     * */
     public boolean textureIsValid() {
-        return this.textureRegion != null;
+        return this.getTextureRegion() != null;
     }
 
     public TextureRegion getTextureRegion () {
-        return textureRegion;
+        return this.textureRegion;
     }
 
     public Block setTextureRegion (TextureRegion textureRegion) {
@@ -86,38 +88,35 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
         return this;
     }
 
-    /**
-     * 在方块属性写入前一刻调用
-     * */
     @Override
-    public void writeCAT (CAT cat) {
-    }
-
-    /**
-     * 从json中获取值
-     * */
-    @Override
-    public void readCAT (JsonValue values) {
+    public void dispose() {
+        if (this.textureRegion != null) {
+            this.textureRegion = null;
+        }
     }
 
     /**方块属性
      * 使用构建者模式
      * */
     public static class Property {
+        private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
+            .add(PropertyTypes.BLOCK_FRICTON, 1f)
+            .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
+
+        public static Property create () {
+            return new Property();
+        }
+
         private PropertiesDataMap<?, ?, ?> propertiesDataMap;
 
-        private Property() {
-            ////这里有可能浅拷贝
-            this.propertiesDataMap = BLOCK_DEFAULT_PROPERTIES_DATA_MAP.copy();
+        public Property () {
+            /// 这里有可能浅拷贝
+            this.propertiesDataMap = new JsonPropertiesMap()
+                .add(PropertyTypes.BLOCK_FRICTON, 1f)
+                .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
+                .add(PropertyTypes.CATS, new CatsHolder());
         }
 
-        public CAT getCAT () {
-            return this.propertiesDataMap.get(PropertyTypes.CAT);
-        }
-
-        public Property setCAT (CAT cat) {
-            return this.set(PropertyTypes.CAT, cat);
-        }
 
         public float getFriction() {
             return this.get(PropertyTypes.BLOCK_FRICTON);
@@ -128,11 +127,11 @@ public abstract class Block implements ID<Block>, Disposable, ICAT {
             return this;
         }
 
-        public BlockSoundsID getSounds() {
+        public BlockSounds getSounds() {
             return this.get(PropertyTypes.BLOCK_SOUNDS_ID);
         }
 
-        public Property setSounds(BlockSoundsID sounds) {
+        public Property setSounds(BlockSounds sounds) {
             return this.set(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
         }
 

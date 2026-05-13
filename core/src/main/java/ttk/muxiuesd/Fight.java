@@ -5,13 +5,21 @@ import ttk.muxiuesd.util.Info;
 public class Fight {
     public static final String NAMESPACE = "fight";
     public static final String AUDIO_ROOT = "audio/";
-    public static final String BLOCK_TEXTURE_ROOT = "texture/blocks/";
-    public static final String ENTITY_TEXTURE_ROOT = "texture/entity/";
-    public static final String ITEM_TEXTURE_ROOT = "texture/item/";
-    public static final String UI_TEXTURE_ROOT = "texture/ui/";
+    public static final String MUSIC_ROOT = AUDIO_ROOT + "music/";
+    public static final String SOUND_ROOT = AUDIO_ROOT + "sound/";
+    public static final String TEXTURE_ROOT = "texture/";
+    public static final String BLOCK_TEXTURE_ROOT   = TEXTURE_ROOT + "blocks/";
+    public static final String BOTANY_TEXTURE_ROOT   = TEXTURE_ROOT + "botany/";
+    public static final String ENTITY_TEXTURE_ROOT  = TEXTURE_ROOT + "entity/";
+    public static final String ITEM_TEXTURE_ROOT    = TEXTURE_ROOT + "item/";
+    public static final String UI_TEXTURE_ROOT      = TEXTURE_ROOT + "ui/";
     public static final String FONT_ROOT = "font/";
     public static final String LANG_ROOT = "lang/";
 
+    //世界的名称，也会作为存档文件夹的名称
+    public static final Info<String> WORLD_NAME = Info.create("world_name", "null_world");
+    //UI的调试框是否渲染
+    public static final Info<Boolean> UI_DEBUG_BOX_RENDER = Info.create("ui_debug_box_render", true);
     //玩家的听觉范围，单位：世界中的1米
     public static final Info<Float> PLAYER_HEARING_RANGE = Info.create("player_hearing_range", 16f);
     //物品实体最大存活时间，单位：秒
@@ -32,11 +40,35 @@ public class Fight {
      * 存档路径常量
      */
     public static final String PATH_SAVE = "save/";
-    public static final String PATH_SAVE_WORLD = PATH_SAVE + "world/";
-    public static final String PATH_SAVE_CHUNKS = PATH_SAVE_WORLD + "chunks/";
-    public static final String PATH_SAVE_ENTITIES = PATH_SAVE_WORLD + "entities/";
-    public static final String PATH_SAVE_PLAYER = PATH_SAVE_ENTITIES + "player/";
+    public static final String PATH_SAVE_WORLD = "world/";
+    public static final String PATH_SAVE_CHUNKS = "chunks/";
+    public static final String PATH_SAVE_ENTITIES = "entities/";
+    public static final String PATH_SAVE_PLAYER = "player/";
 
+    /**
+     *  获取玩家数据保存的路径
+     * */
+    public static String getPathSavePlayer () {
+        return getPathSaveEntities() + PATH_SAVE_PLAYER;
+    }
+    /**
+     *  获取实体数据保存的路径
+     * */
+    public static String getPathSaveEntities () {
+        return getPathSaveWorld() + PATH_SAVE_ENTITIES;
+    }
+    /**
+     *  获取区块数据保存的路径
+     * */
+    public static String getPathSaveChunks () {
+        return getPathSaveWorld() + PATH_SAVE_CHUNKS;
+    }
+    /**
+     *  获取游戏世界数据保存路径，根据当前的世界名字作为值
+     * */
+    public static String getPathSaveWorld () {
+        return PATH_SAVE + WORLD_NAME.getValue() + "/" + PATH_SAVE_WORLD;
+    }
 
     /**
      * 游戏本体的元素获取ID
@@ -58,6 +90,13 @@ public class Fight {
         return BLOCK_TEXTURE_ROOT + path;
     }
 
+    /**
+     * 从植物的材质根路径中获取植物的材质
+     * */
+    public static String BotanyTexturePath (String path) {
+        return BOTANY_TEXTURE_ROOT + path;
+    }
+
     public static String EntityTexturePath (String path) {
         return ENTITY_TEXTURE_ROOT + path;
     }
@@ -76,6 +115,18 @@ public class Fight {
     public static String LangPath (String path) {
         if (path.endsWith(".json")) return LANG_ROOT + path;
         return LANG_ROOT + path + ".json";
+    }
+
+    public static String MusicPath (String path) {
+        return MUSIC_ROOT + path;
+    }
+
+    public static String SoundPath (String path) {
+        return SOUND_ROOT + path;
+    }
+
+    public static String AudioPath (String path) {
+        return AUDIO_ROOT + path;
     }
 
     public static String GameSavePath (String name) {

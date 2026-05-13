@@ -2,7 +2,7 @@ package ttk.muxiuesd.data;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
-import ttk.muxiuesd.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 
 import java.io.StringWriter;
 

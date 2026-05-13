@@ -14,7 +14,8 @@ public class PlayerRenderer extends LivingEntityRenderer<Player> {
 
         //绘制护盾
         if (player.isDefend && player.shield != null) {
-            batch.draw(player.shield, context.x, context.y,
+            batch.draw(player.shield,
+                context.x - context.width / 2f, context.y - context.height / 2f,
                 context.originX, context.originY,
                 context.width, context.height,
                 context.scaleX, context.scaleY,

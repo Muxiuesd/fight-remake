@@ -2,11 +2,11 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.CreatureGenFactory;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
@@ -41,8 +41,9 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
         if (!getTimeSystem().isDay()) return;
 
         //附近的生物数量超过最大值不刷生物
-        int entityCount = Util.entityCount(getEntitySystem().getEntityArray(EntityTypes.CREATURE),
-            getPlayerSystem().getPlayer().getCenter(),
+        int entityCount = Util.entityCount(
+            getEntitySystem().getEntityArray(EntityTypes.CREATURE),
+            getPlayerSystem().getPlayer().getCenterPos(),
             getMaxGenRange()
         );
         if (entityCount >= maxCount) return;
@@ -56,7 +57,7 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
     @Override
     public void run () {
         Player player = getPlayerSystem().getPlayer();
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
 
         for (CreatureGenFactory<?> factory: getGenFactories().values()) {
             float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());

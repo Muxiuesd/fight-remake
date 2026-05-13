@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.assetsloader.AssetsLoader;
-import ttk.muxiuesd.interfaces.Drawable;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.pool.particle.ParticlePool;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.particle.motion.ParticleMotionComp;
 
 /**

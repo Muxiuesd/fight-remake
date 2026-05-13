@@ -18,7 +18,7 @@ public class SlimeGenFactory implements EnemyGenFactory<Slime> {
             float x = genX + MathUtils.random(-1f, 1f);
             float y = genY + MathUtils.random(-1f, 1f);
             slime.setBounds(x, y, 1.5f, 1.5f);
-
+            slime.fastAddBodyHitBox();
             slimes[i] = slime;
         }
         return slimes;

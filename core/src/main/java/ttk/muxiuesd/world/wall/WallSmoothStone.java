@@ -13,7 +13,7 @@ public class WallSmoothStone extends Wall<WallSmoothStone> {
     @Override
     public WallSmoothStone createSelf (Vector2 position) {
         WallSmoothStone wallSmoothStone = new WallSmoothStone();
-        wallSmoothStone.setPosition(position.x, position.y);
+        wallSmoothStone.setPos(position.x, position.y);
         wallSmoothStone.setID(getID());
         return wallSmoothStone;
     }

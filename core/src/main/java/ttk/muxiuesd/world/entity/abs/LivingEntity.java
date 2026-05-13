@@ -4,18 +4,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
-import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatInt;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.ItemEntity;
@@ -32,7 +33,7 @@ import java.util.LinkedHashMap;
  * <p>
  * TODO 活物实体能有buff影响其行为状态
  * */
-public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> {
+public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> {
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
@@ -98,21 +99,25 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-        this.handIndex = values.getInt("hand_index", 0);
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
+        this.handIndex = values.getInt("handIndex", 0);
         this.maxHealth = values.getFloat("maxHealth", 10f);
         this.curHealth = values.getFloat("curHealth", 10f);
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("hand_index", this.handIndex);
-        cat.set("maxHealth", this.maxHealth);
-        cat.set("curHealth", this.curHealth);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder
+            .put("handIndex", new CatInt(this.handIndex))
+            .put("maxHealth", new CatFloat(this.maxHealth))
+            .put("curHealth", new CatFloat(this.curHealth));
     }
 
+    /**
+     * 活物实体的更新方法，涉及计时器、状态等的更新，不涉及坐标更新
+     * */
     @Override
     public void update (float delta) {
         super.update(delta);
@@ -179,8 +184,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
 
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
-        AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
-
+        playSound(Sounds.ITEM_POP);
         return this.spawnItemEntity(itemStack);
     }
 
@@ -192,7 +196,8 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
         ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), stack);
         //使得物品中心与实体中心对齐
         return itemEntity
-            .setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            //.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
+            .setPosition(getCenterPos())
             .setOnGround(false)
             .setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
             .setTask(() -> {
@@ -318,7 +323,7 @@ public abstract class LivingEntity<T extends LivingEntity<?>> extends Entity<T> 
      * 获取当前实体的朝向
      * */
     public Direction getDirection () {
-        return new Direction(velX, velY);
+        return new Direction(getVelX(), getVelY());
     }
 
     /**

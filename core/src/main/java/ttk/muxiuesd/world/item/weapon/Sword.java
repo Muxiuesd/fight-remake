@@ -1,13 +1,14 @@
 package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -26,7 +27,7 @@ public class Sword extends Weapon {
     public static Property createDefaultProperty() {
         return Weapon.createDefaultProperty()
             .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2.5f)
-            .setUseSoundId(Sounds.ENTITY_SWEEP.getId());
+            .setUseSound(Sounds.ENTITY_SWEEP);
     }
 
     public Sword (Property property, String textureId, String texturePath) {
@@ -38,23 +39,31 @@ public class Sword extends Weapon {
         Float range = itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE);
         EntitySystem es = world.getSystem(EntitySystem.class);
         //检测剑的伤害区域内的敌人实体
-        Array<Enemy<?>> entities = Util.sectorArea(es.getEnemyEntity(), user.getCenter(), user.getDirection(), range, 60f);
+        Array<Enemy<?>> entities = Util.sectorArea(
+            es.getEnemyEntity(),
+            user.getCenterPos(), user.getDirection().toVector2(),
+            range, 60f
+        );
         for (Enemy<?> enemy : entities) {
             enemy.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, enemy));
         }
         //检测剑的伤害区域内的生物实体
-        Array<LivingEntity<?>> livingEntities = Util.sectorArea(es.getEntityArray(EntityTypes.CREATURE), user.getCenter(), user.getDirection(), range, 60f);
+        Array<LivingEntity<?>> livingEntities = Util.sectorArea(
+            es.getEntityArray(EntityTypes.CREATURE),
+            user.getCenterPos(), user.getDirection().toVector2(),
+            range, 60f
+        );
         for (LivingEntity<?> le : livingEntities) {
             le.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, le));
         }
 
-        String useSoundId = this.property.getUseSoundId();
-        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-        ses.newSpatialSound(useSoundId, user);
+        AudioHolder useSound = this.property.getUseSound();
+        SoundSystem ses = world.getSystem(SoundSystem.class);
+        ses.playSpatialSound(useSound, user);
         return true;
     }
 

@@ -3,14 +3,18 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
 
 /**
  * 子弹
  */
-public abstract class Bullet extends Entity<Bullet> {
+public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     public Entity<?> owner;
 
     public float damage;
@@ -47,19 +51,36 @@ public abstract class Bullet extends Entity<Bullet> {
         //全部指定
         this.owner = owner;
         this.damage = damage;
-        this.speed = speed;
+        setSpeed(speed);
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        textureRegion = getTextureRegion(textureId, texturePath);
+        setBodyTextureRegion(getTextureRegion(textureId, texturePath));
+
         //默认大小
         setSize(0.5f, 0.5f);
+        fastAddBodyHitBox();
     }
 
+    @Override
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
+        this.maxLiveTime = values.getFloat("maxLiveTime", this.maxLiveTime);
+        this.liveTime = values.getFloat("liveTime", this.liveTime);
+    }
+
+    @Override
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder.put("maxLiveTime", new CatFloat(this.maxLiveTime));
+        holder.put("liveTime", new CatFloat(this.liveTime));
+    }
 
     @Override
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
-        setPosition(x + getSpeed() * delta * velX, y + getSpeed() * delta * velY);
+        //setPosition(x + getSpeed() * delta * velX, y + getSpeed() * delta * velY);
+        positionChange(delta);
+
         super.update(delta);
     }
 
@@ -104,9 +125,13 @@ public abstract class Bullet extends Entity<Bullet> {
         this.liveTime = liveTime;
     }
 
-    public void setDirection(float xDirection, float yDirection) {
-        this.velX = xDirection;
-        this.velY = yDirection;
+    /**
+     * 设置子弹的速度
+     * @param direction 速度方向
+     * @param speed 速度大小
+     * */
+    public void setVelocity (Direction direction, float speed) {
+        setVelocity(direction.getX() * speed, direction.getY() * speed);
         this.setDegrees();
     }
 
@@ -114,11 +139,10 @@ public abstract class Bullet extends Entity<Bullet> {
      * 设置旋转角度，需要已知速度方向
      */
     private void setDegrees() {
-        // 调整旋转原点
-        setOrigin(getWidth() / 2, getHeight() / 2);
+        setOrigin(this.getWidth() / 2f, this.getHeight() / 2f);
         // 计算旋转角度
         Vector2 velocity = getVelocity();
-        setRotation(MathUtils.atan2Deg(velY, velX));
+        setRotation(MathUtils.atan2Deg(velocity.y, velocity.x));
     }
 
     @Override

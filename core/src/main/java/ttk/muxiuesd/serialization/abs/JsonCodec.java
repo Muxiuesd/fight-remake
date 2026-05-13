@@ -2,7 +2,7 @@ package ttk.muxiuesd.serialization.abs;
 
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 
 import java.util.Optional;
 

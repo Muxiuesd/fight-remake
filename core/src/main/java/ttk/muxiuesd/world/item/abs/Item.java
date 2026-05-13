@@ -1,12 +1,12 @@
 package ttk.muxiuesd.world.item.abs;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
@@ -17,9 +17,10 @@ import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -31,16 +32,10 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
 public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, ItemShapeRenderable {
-    public static final JsonPropertiesMap ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-        .add(PropertyTypes.ITEM_MAX_COUNT, 64)
-        .add(PropertyTypes.ITEM_ON_USING, false)
-        .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getId());
-
     private String id;
-    public Type type;
-    //物品最原始的属性，原则上不直接对这个原始数据进行操作
-    public Property property;
-    public TextureRegion textureRegion;
+    public Type type;                   //物品的类型
+    public Property property;           //物品最原始的属性，原则上不直接对这个原始数据进行操作
+    public TextureRegion textureRegion; //物品的贴图材质
 
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
@@ -48,7 +43,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public Item (Type type, Property property, String textureId, String texturePath) {
         this.type = type;
         this.property = property;
-        this.loadTextureRegion(textureId, texturePath);
+        this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -59,18 +54,21 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
 
         Direction direction = holder.getDirection();
-        float rotation = MathUtils.atan2Deg360(direction.getyDirection(), direction.getxDirection());
+        float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
         float rotationOffset = holder.getSwingHandDegreeOffset();
+        Vector2 holderScale = holder.getScale();
         if (rotation > 90f && rotation <= 270f) {
-            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion,
+                holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                 0, 0,
-                holder.width, holder.height,
-                - holder.scaleX, holder.scaleY, rotation + 225f + rotationOffset);
+                holder.getWidth(), holder.getHeight(),
+                - holderScale.x, holderScale.y, rotation + 225f + rotationOffset);
         } else {
-            batch.draw(this.textureRegion, holder.x + holder.getWidth() / 2, holder.y + holder.getHeight() / 2,
+            batch.draw(this.textureRegion,
+                holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
                 0, 0,
-                holder.width, holder.height,
-                holder.scaleX, holder.scaleY, rotation - 45f + rotationOffset);
+                holder.getWidth(), holder.getHeight(),
+                holderScale.x, holderScale.y, rotation - 45f + rotationOffset);
         }
     }
 
@@ -81,10 +79,16 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     @Override
     public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
         if (this.textureRegion != null) {
-            batch.draw(this.textureRegion, itemEntity.x, itemEntity.y + itemEntity.getPositionOffset().y,
-                itemEntity.originX, itemEntity.originY,
-                itemEntity.width, itemEntity.height,
-                itemEntity.scaleX, itemEntity.scaleY, itemEntity.rotation);
+            Vector2 origin = itemEntity.getOrigin();
+            Vector2 scale = itemEntity.getScale();
+            batch.draw(this.textureRegion,
+                itemEntity.getX() - itemEntity.getWidth() / 2f,
+                itemEntity.getY() - itemEntity.getHeight() / 2f + itemEntity.getPositionOffset().y,
+                origin.x, origin.y,
+                itemEntity.getWidth(), itemEntity.getHeight(),
+                scale.x, scale.y,
+                itemEntity.getRotation()
+            );
         }
     }
 
@@ -104,16 +108,15 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         return array;
     }
 
-
     /**
      * 使用此物品
      * @return 是否使用成功
      * */
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放物品使用音效
-        String useSoundId = this.property.getUseSoundId();
-        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-        ses.newSpatialSound(useSoundId, user);
+        AudioHolder useSound = this.property.getUseSound();
+        SoundSystem ses = world.getSystem(SoundSystem.class);
+        ses.playSpatialSound(useSound, user);
 
         return true;
     }
@@ -131,27 +134,8 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     }
 
     /**
-     * 获取材质
-     * <p>
-     * 有返回值，以便于有多个材质的物品使用
-     * @param texturePath 当此为null时默认之前加载过
+     * 获取物品的属性
      * */
-    public TextureRegion getTextureRegion (String id, String texturePath) {
-        if (texturePath == null) {
-            texturePath = AssetsLoader.getInstance().getPath(id);
-        }
-
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
-        return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
-    }
-
-    /**
-     * 直接把物品的texture加载并赋值
-     * */
-    public void loadTextureRegion (String id, String texturePath) {
-        this.textureRegion = this.getTextureRegion(id, texturePath);
-    }
-
     public Property getProperty () {
         return this.property;
     }
@@ -161,20 +145,24 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         return this;
     }
 
-    /**
-     * 获取这个物品的行为
-     * */
-    public abstract IItemStackBehaviour getBehaviour ();
-
     @Override
     public String getID () {
         return this.id;
     }
+
     @Override
     public Item setID (String id) {
         this.id = id;
         return this;
     }
+
+    /**
+     * 必须实现的类：获取这个物品的行为。
+     * <p>
+     * 没有物品行为的物品将不能正常被使用
+     * */
+    public abstract IItemStackBehaviour getBehaviour ();
+
 
     /**
      * 物品的类型
@@ -194,10 +182,14 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         private PropertiesDataMap<?, ?, ?> propertiesMap;
 
         /**
-         * 实例化后默认属性
+         * 实例化默认属性
          * */
         public Property () {
-            this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
+            this.setPropertiesMap(new JsonPropertiesMap()
+                .add(PropertyTypes.ITEM_MAX_COUNT, 64)
+                .add(PropertyTypes.ITEM_ON_USING, false)
+                .add(PropertyTypes.ITEM_USE_SOUND, Sounds.ITEM_CLICK)
+            );
         }
 
         /**
@@ -231,12 +223,12 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             throw new IllegalArgumentException ("最大堆叠数必须大于0！！！");
         }
 
-        public String getUseSoundId () {
-            return get(PropertyTypes.ITEM_USE_SOUND_ID);
+        public AudioHolder getUseSound () {
+            return get(PropertyTypes.ITEM_USE_SOUND);
         }
 
-        public Property setUseSoundId (String useSoundId) {
-            add(PropertyTypes.ITEM_USE_SOUND_ID, useSoundId);
+        public Property setUseSound (AudioHolder audioHolder) {
+            add(PropertyTypes.ITEM_USE_SOUND, audioHolder);
             return this;
         }
 
@@ -253,7 +245,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
          * 获取物品耐久
          * */
         public int getDuration () {
-            return this.get(PropertyTypes.ITEM_DURATION);
+            return this.get(PropertyTypes.ITEM_DURATION, 0);
         }
 
         public Property setDuration (int duration) {
@@ -262,7 +254,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         }
 
         public float getUseSpan () {
-            return this.get(PropertyTypes.WEAPON_USE_SAPN);
+            return this.get(PropertyTypes.WEAPON_USE_SAPN, 0f);
         }
 
         public Property setUseSpan (float useSpan) {
@@ -270,6 +262,9 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             return this;
         }
 
+        /**
+         * 检查是否有这个属性
+         * */
         public boolean contain (PropertyType<?> type) {
             return this.getPropertiesMap().contain(type);
         }

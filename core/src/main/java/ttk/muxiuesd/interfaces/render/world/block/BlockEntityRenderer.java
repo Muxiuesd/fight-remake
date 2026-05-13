@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
-import ttk.muxiuesd.world.interact.Slot;
+import ttk.muxiuesd.world.interact.InteractSlot;
 
 /**
  * 方块实体的渲染器接口
@@ -37,7 +37,7 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
 
         public float
             x , y,
-            width = Block.BlockWidth, height = Block.BlockHeight,
+            width = Block.WIDTH, height = Block.HEIGHT,
             originX = 0f, originY = 0f,
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
@@ -52,8 +52,8 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
         public void reset () {
             this.x = 0f;
             this.y = 0f;
-            this.width = Block.BlockWidth;
-            this.height = Block.BlockHeight;
+            this.width = Block.WIDTH;
+            this.height = Block.HEIGHT;
             this.originX = 0f;
             this.originY = 0f;
             this.scaleX = 1f;
@@ -66,19 +66,25 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
      * 普通标准的方块实体渲染器
      * */
     class StandardRenderer<T extends BlockEntity> implements BlockEntityRenderer<T>{
+
         @Override
         public void render (Batch batch, T blockEntity, Context context) {
             //槽位不为空就渲染
-            if (!blockEntity.getSlots().isEmpty()) this.drawAllSlots(batch, blockEntity, context.x, context.y);
+            if (!blockEntity.getSlots().isEmpty()) {
+                this.drawAllSlots(batch, blockEntity,
+                    context.x + BlockRenderer.StandardRenderer.OFFSET_X,
+                    context.y + BlockRenderer.StandardRenderer.OFFSET_Y
+                );
+            }
         }
 
         /**
          * 绘制所有槽位
          * */
         public void drawAllSlots (Batch batch, T blockEntity, float x, float y) {
-            for (Slot slot: blockEntity.getSlots()) {
-                if (slot.getItemStack() != null) {
-                    drawSlot(batch, blockEntity, slot, x, y);
+            for (InteractSlot interactSlot : blockEntity.getSlots()) {
+                if (interactSlot.getItemStack() != null) {
+                    drawSlot(batch, blockEntity, interactSlot, x, y);
                 }
             }
         }
@@ -86,16 +92,16 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
         /**
          * 绘制指定的槽位
          * */
-        public void drawSlot (Batch batch, T blockEntity, Slot slot, float x, float y) {
+        public void drawSlot (Batch batch, T blockEntity, InteractSlot interactSlot, float x, float y) {
             GridPoint2 interactGridSize = blockEntity.getInteractGridSize();
-            GridPoint2 startPos = slot.getStartPos();
-            GridPoint2 size = slot.getSize();
+            GridPoint2 startPos = interactSlot.getStartPos();
+            GridPoint2 size = interactSlot.getSize();
 
             float slotX = x + (float) startPos.x / interactGridSize.x;
             float slotY = y + (float) startPos.y / interactGridSize.y;
             float slotWidth  = (float) size.x / interactGridSize.x;
             float slotHeight = (float) size.y / interactGridSize.y;
-            batch.draw(slot.getItemStack().getItem().textureRegion, slotX, slotY, slotWidth, slotHeight);
+            batch.draw(interactSlot.getItemStack().getItem().textureRegion, slotX, slotY, slotWidth, slotHeight);
         }
     }
 }

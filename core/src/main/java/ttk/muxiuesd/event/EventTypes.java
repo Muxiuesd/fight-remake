@@ -1,8 +1,8 @@
 package ttk.muxiuesd.event;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.event.abs.*;
 import ttk.muxiuesd.event.poster.*;
-import ttk.muxiuesd.util.Log;
 
 /**
  * 所有类型的事件

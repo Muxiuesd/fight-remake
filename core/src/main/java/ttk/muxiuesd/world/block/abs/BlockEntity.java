@@ -3,25 +3,27 @@ package ttk.muxiuesd.world.block.abs;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.ICAT;
+import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.interfaces.Tickable;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.interact.Slot;
+import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -30,15 +32,15 @@ import java.util.List;
 /**
  * 方块实体
  * */
-public abstract class BlockEntity implements Updateable, Tickable, ICAT {
+public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     private BlockEntityProvider<? extends BlockEntity> provider;
-    private World world;                    //方块实体所属的世界
-    private BlockWithEntity block;          //方块
-    private BlockPos blockPos;              //方块实体的位置
-    private GridPoint2 interactGridSize;    //方块实体的交互网格大小
-    private Inventory inventory;            //方块实体所拥有的容器
-    private List<Slot> slots;               //交互槽位
-
+    private World world;                                //方块实体所属的世界
+    private BlockWithEntity block;                      //方块
+    private BlockPos blockPos;                          //方块实体的位置
+    private GridPoint2 interactGridSize;                //方块实体的交互网格大小
+    private Inventory inventory;                        //方块实体所拥有的容器
+    private List<InteractSlot> interactSlots;           //交互槽位
+    private SpatialAudioSource sounder;                 //方块实体的发声源
 
     public BlockEntity (BlockEntityProvider<?> blockEntityProvider, BlockPos blockPos) {
         this(blockPos);
@@ -46,23 +48,23 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     }
     private BlockEntity (BlockPos blockPos) {
         this.blockPos = blockPos;
-
         this.setInteractGridSize(new GridPoint2(16, 16));
-        this.slots = new ArrayList<>();
+        this.interactSlots = new ArrayList<>();
+        this.sounder = () -> new Vector3(blockPos, 0f);
     }
 
     /**
-     * 由所属方块调用的写入
+     * 这里面可以写一些要保存的值，由所属方块调用的cat写入
      * */
     @Override
-    public void writeCAT (CAT cat) {
+    public void writeCatData (CatsHolder holder) {
     }
 
     /**
-     * 由所属方块调用的读取
+     * 由所属方块调用的cat读取
      * */
     @Override
-    public void readCAT (JsonValue values) {
+    public void readCatData (JsonValue values) {
     }
 
     /**
@@ -125,35 +127,35 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
     /**
      * 添加slot
      * */
-    public Slot addSlot (int index, int x, int y, int width, int height) {
-        return this.addSlot(new Slot(new GridPoint2(x, y), new GridPoint2(width, height), index));
+    public InteractSlot addSlot (int index, int x, int y, int width, int height) {
+        return this.addSlot(new InteractSlot(new GridPoint2(x, y), new GridPoint2(width, height), index));
     }
 
     /**
      * 添加一个slot
      * */
-    public Slot addSlot (Slot slot) {
-        if (!this.slots.contains(slot)) {
-            this.slots.add(slot);
-            slot.setInventory(this.inventory);
+    public InteractSlot addSlot (InteractSlot interactSlot) {
+        if (!this.interactSlots.contains(interactSlot)) {
+            this.interactSlots.add(interactSlot);
+            interactSlot.setInventory(this.inventory);
         }
-        return slot;
+        return interactSlot;
     }
 
     /**
      * 移除slot
      * */
-    public BlockEntity removeSlot (Slot slot) {
-        this.slots.remove(slot);
+    public BlockEntity removeSlot (InteractSlot interactSlot) {
+        this.interactSlots.remove(interactSlot);
         return this;
     }
 
     /**
      * 获取slot
      * */
-    public Slot getSlot (GridPoint2 interactGridPos) {
-        for (Slot slot : this.slots) {
-            if (slot.touch(interactGridPos)) return slot;
+    public InteractSlot getSlot (GridPoint2 interactGridPos) {
+        for (InteractSlot interactSlot : this.interactSlots) {
+            if (interactSlot.touch(interactGridPos)) return interactSlot;
         }
         return null;
     }
@@ -231,12 +233,21 @@ public abstract class BlockEntity implements Updateable, Tickable, ICAT {
         return this;
     }
 
-    public List<Slot> getSlots () {
-        return this.slots;
+    public List<InteractSlot> getSlots () {
+        return this.interactSlots;
     }
 
-    public BlockEntity setSlots (List<Slot> slots) {
-        this.slots = slots;
+    public BlockEntity setSlots (List<InteractSlot> interactSlots) {
+        this.interactSlots = interactSlots;
+        return this;
+    }
+
+    public SpatialAudioSource getSounder () {
+        return this.sounder;
+    }
+
+    public BlockEntity setSounder (SpatialAudioSource sounder) {
+        this.sounder = sounder;
         return this;
     }
 }

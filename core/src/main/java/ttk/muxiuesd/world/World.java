@@ -1,22 +1,31 @@
 package ttk.muxiuesd.world;
 
 import com.badlogic.gdx.utils.Disposable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.util.Log;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
-import ttk.muxiuesd.interfaces.Updateable;
+import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
-import ttk.muxiuesd.util.Log;
+import ttk.muxiuesd.util.FileUtil;
 
-/**世界的基类
+import java.util.Optional;
+
+/**
+ * 世界的基类
  * */
 public abstract class World implements Updateable, Disposable {
     private final MainGameScreen screen;
     private WorldSystemsManager worldSystemsManager;
 
+
     public World(MainGameScreen screen) {
         this.screen = screen;
+        this.readWorldInfo();
     }
 
     /**
@@ -34,7 +43,6 @@ public abstract class World implements Updateable, Disposable {
         return this.getSystemManager().getSystem(systemClass);
     }
 
-
     @Override
     public void update(float delta) {
         if (this.worldSystemsManager != null) {
@@ -48,16 +56,56 @@ public abstract class World implements Updateable, Disposable {
             this.getSystemManager().dispose();
         }
 
+        //写入世界名称
+        WorldInfoTypes.STRING.putIfNull(Fight.WORLD_NAME);
         //编写信息文件
         this.writeWorldInfo();
     }
 
+    /**
+     * 设置世界的名称
+     * */
+    public static void setWorldName(String worldName) {
+        if (worldName == null || !worldName.isBlank()) {
+            Log.error(Fight.class.getName(), "设定的世界名称：" + worldName + " 不合法！！！");
+        }else {
+            Fight.WORLD_NAME.setValue(worldName);
+        }
+    }
+    /**
+     * 获取世界名称
+     * */
+    public String getWorldName() {
+        return Fight.WORLD_NAME.getValue();
+    }
+
+    /**
+     * 读取世界信息
+     * */
+    public void readWorldInfo() {
+        //检查世界信息文件是否存在
+        if(FileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
+            //存在就读取
+            String file = FileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
+            Optional<WorldInfo> optional = WorldInfo.CODEC.parse(new JsonDataReader(file));
+            //让这个实例存在
+            optional.ifPresent(worldInfo -> WorldInfo.INSTANCE = worldInfo);
+        }else {
+            //如果不存在，就新建一个
+            WorldInfo.INSTANCE = new WorldInfo();
+        }
+    }
+
+    /**
+     * 写入世界信息
+     * */
     private void writeWorldInfo () {
         try {
             JsonDataWriter dataWriter = new JsonDataWriter();
             dataWriter.objStart();
             WorldInfo.CODEC.encode(WorldInfo.INSTANCE, dataWriter);
             dataWriter.objEnd();
+            //输出
             new WorldInfoDataOutput().output(dataWriter);
         }catch (Exception e) {
             Log.error(TAG(), "世界信息写入失败！！！原因：", e);
@@ -81,6 +129,9 @@ public abstract class World implements Updateable, Disposable {
         return this.screen;
     }
 
+    /**
+     * 用于debug的信息
+    * */
     public String TAG () {
         return this.getClass().getName();
     }

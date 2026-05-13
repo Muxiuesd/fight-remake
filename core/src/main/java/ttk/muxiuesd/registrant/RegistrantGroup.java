@@ -1,8 +1,8 @@
 package ttk.muxiuesd.registrant;
 
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.ID;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;

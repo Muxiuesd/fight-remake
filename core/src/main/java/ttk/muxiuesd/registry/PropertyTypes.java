@@ -1,11 +1,12 @@
 package ttk.muxiuesd.registry;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.property.*;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.world.block.BlockSoundsID;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.block.BlockSounds;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -17,14 +18,14 @@ public final class PropertyTypes {
     public static void init () {
     }
 
-    public static final PropertyType<CAT> CAT = register("cat", new PropertyCAT());
-
+    public static final PropertyType<CatsHolder> CATS = register("cats", new PropertyCats());
     /// 物品基础属性
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<Integer> ITEM_DURATION = register("item_duration", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
     public static final PropertyType<Boolean> FISHING_POLE_USING = register("fishing_pole_using", new PropertyFishingPoleUsing());
-    public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
+    //public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
+    public static final PropertyType<AudioHolder> ITEM_USE_SOUND = register("item_use_sound", new PropertyItemUseSound());
     public static final PropertyType<Entity<?>> ITEM_WITH_ENTITY = register("item_with_entity", new PropertyItemWithEntity());
 
     /// 武器属性
@@ -37,7 +38,7 @@ public final class PropertyTypes {
 
     /// 方块属性
     public static final PropertyType<Float> BLOCK_FRICTON = register("block_friction", new DefaultFloatPropertyType());
-    public static final PropertyType<BlockSoundsID> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSoundsID());
+    public static final PropertyType<BlockSounds> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSounds());
 
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {

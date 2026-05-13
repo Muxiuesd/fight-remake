@@ -2,11 +2,11 @@ package ttk.muxiuesd.world.entity.state.instance;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.ChunkSystem;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
@@ -48,7 +48,7 @@ public class PufferFishRestState extends StatePufferFish{
      * */
     public void randomWalkPath (World world, PufferFish entity) {
         ChunkSystem cs = world.getSystem(ChunkSystem.class);
-        Vector2 position = entity.getCenter();
+        Vector2 position = entity.getCenterPos();
         float dx = 0;
         float dy = 0;
 

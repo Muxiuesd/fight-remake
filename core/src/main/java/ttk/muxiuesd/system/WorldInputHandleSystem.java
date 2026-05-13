@@ -1,13 +1,14 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
@@ -22,7 +23,6 @@ import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.util.BlockPosition;
 import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
@@ -30,6 +30,7 @@ import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
+import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
@@ -38,7 +39,8 @@ import ttk.muxiuesd.world.wall.Wall;
 
 /**
  * 世界输入处理系统
- * 按键状态的更新都在这里面
+ * <p>
+ * 鼠标对于世界各种元素的触摸、交互操作，键盘输入操作等等
  * */
 public class WorldInputHandleSystem extends WorldSystem implements InputProcessor, IWorldChunkRender {
     public final String TAG = this.getClass().getName();
@@ -57,21 +59,24 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         InputHandleSystem.getInstance().addProcessor(this);
     }
 
-
+    /**
+     * 需要每帧更新的操作
+     * */
     @Override
     public void update(float delta) {
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Player player = playerSystem.getPlayer();
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
         //更新鼠标指向的世界坐标
         this.mouseBlockPosition = this.getMouseBlockPosition();
 
-        if (KeyBindings.ExitGame.wasJustPressed()) {
-            //如果是玩家HUD屏幕就是退出游戏
+        if (KeyBindings.Exit.wasJustPressed()) {
+            //如果是玩家HUD屏幕就是退出游戏世界，回到主菜单
             if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN) {
                 Log.print(TAG(), "游戏退出！");
-                Gdx.app.exit();
+                FightCore.getInstance().setScreen(FightCore.getInstance().startMenuScreen);
+                FightCore.getInstance().mainGameScreen.dispose();
             }else {
                 //否则就把当前的屏幕调整回玩家HUD屏幕
                 GUISystem.getInstance().setCurScreen(PlayerSystem.PLAYER_HUD_SCREEN);
@@ -104,39 +109,56 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
 
         //需要玩家的鼠标不指向UI组件才能与世界交互
         if (!GUISystem.getInstance().mouseOverUI()) {
-            this.playerInteract(player, cs);
+            this.playerInteractWithWorld(player, cs);
         }
     }
 
     /**
      * 玩家与世界的交互
      * */
-    private void playerInteract (Player player, ChunkSystem cs) {
+    private void playerInteractWithWorld (Player player, ChunkSystem cs) {
         Vector2 mouseWorldPosition = Util.getMouseWorldPosition();
         Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+        ItemStack handItemStack = player.getHandItemStack();
 
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            Block mb = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
-            Log.print(TAG, "鼠标选中的方块为：" + mb.getClass().getName());
+            //空手左键，且玩家并不是刚用完物品，就是破坏
+            if (handItemStack == null && !player.isUsingItem()) {
+                Botany botany = cs.getBotany(mouseWorldPosition);
+                if (botany != null) {
+                    //有植物就优先破坏植物
+                    cs.destroyBotany(mouseWorldPosition);
+                    Log.print(TAG, "鼠标破坏的植物为：" + botany.getClass().getName());
+                }else if (mouseBlock != Blocks.ARI) {
+                    //如果不是空气方块就破坏它
+                    //破坏方块（也就是把对应坐标的方块替换成空气方块）
+                    Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
+                    this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, replacedBlock, 1);
+                    Log.print(TAG, "鼠标破坏的方块为：" + mouseBlock.getClass().getName());
+                }
+            }
+            //TODO 手持物品左键
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
-            ItemStack handItemStack = player.getHandItemStack();
-            //方块实体交互
+
+            /// 与方块实体交互
             if (mouseBlock instanceof BlockWithEntity blockWithEntity) {
                 BlockEntity blockEntity = cs.getBlockEntities().get(blockWithEntity);
                 //计算交互区域网格坐标
                 BlockPos blockPos = blockEntity.getBlockPos();
                 GridPoint2 gridSize = blockEntity.getInteractGridSize();
-                int xn = (int) ((mouseWorldPosition.x - blockPos.x) * gridSize.x);
-                int yn = (int) ((mouseWorldPosition.y - blockPos.y) * gridSize.y);
-                GridPoint2 interactGrid = new GridPoint2(xn, yn);
+                float xn = ((mouseWorldPosition.x - blockPos.x - Block.HITBOX_START_X_OFFSET) * gridSize.x);
+                float yn = ((mouseWorldPosition.y - blockPos.y - Block.HITBOX_START_Y_OFFSET) * gridSize.y);
+                GridPoint2 interactGrid = new GridPoint2((int) Util.fastRound(xn), (int) Util.fastRound(yn));
 
-                System.out.println(interactGrid);
+                //System.out.println(interactGrid);
 
+                //玩家空手与方块实体交互
                 if (handItemStack == null) {
                     InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);
                     //TODO 空手交互事件
                 } else {
+                    //玩家手持物品与方块实体交互
                     InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid);
                     if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
                         //使用成功就检测手持物品是否用完，用完就清除
@@ -144,20 +166,23 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                     }
                     //TODO 手持物品交互事件
                 }
-            }else {
-                //目前需要空手破坏
+            } else {
+                /// 玩家与非方块实体的东西交互
+                //玩家空手交互
                 if (handItemStack == null) {
                     //先检查这个坐标上面有无墙体
                     if (cs.getWall(mouseWorldPosition) != null) {
                         //有墙体就破坏墙体
                         Wall<?> wall = cs.destroyWall(mouseWorldPosition);
                         this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, wall, 1);
-                    } else if (mouseBlock != Blocks.ARI) {
-                        //破坏方块
+                    }
+                    /* else if (mouseBlock != Blocks.ARI) {
+                        //破坏方块（也就是把对应坐标的方块替换成空气方块）
                         Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
                         this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, replacedBlock, 1);
-                    }
+                    }*/
                 }
+                //TODO 玩家手持物品交互
             }
         }
     }
@@ -248,7 +273,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
      */
     public BlockPosition getPlayerBlockPosition() {
         BlockPosition bp = new BlockPosition();
-        Vector2 playerCenter = playerSystem.getPlayer().getCenter();
+        Vector2 playerCenter = playerSystem.getPlayer().getCenterPos();
         bp.setX((int) Util.fastRound(playerCenter.x));
         bp.setY((int) Util.fastRound(playerCenter.y));
         return bp;
@@ -259,7 +284,8 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
      * */
     public BlockPosition getMouseBlockPosition() {
         Vector2 wp = Util.getMouseWorldPosition();
-        return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
+        //return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
+        return new BlockPosition((int) Util.fastRound(wp.x), (int) Util.fastRound(wp.y));
     }
 
     /**
@@ -269,14 +295,11 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         if (this.mouseBlockPosition != null) {
             batch.setColor(Color.BLACK);
             batch.rect(
-                this.mouseBlockPosition.getX() + 0.1f,
-                this.mouseBlockPosition.getY() + 0.1f,
+                this.mouseBlockPosition.getX() + Block.HITBOX_START_X_OFFSET + 0.1f,
+                this.mouseBlockPosition.getY() + Block.HITBOX_START_Y_OFFSET + 0.1f,
                 0.8f,
                 0.8f);
             batch.setColor(Color.WHITE);
-            //没有这个flush()就会渲染线条后渲染其他贴图而发生错误
-            //已在渲染管线flush
-            //batch.flush();
         }
     }
 

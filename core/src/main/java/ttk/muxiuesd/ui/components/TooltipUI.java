@@ -3,21 +3,25 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.font.FontHolder;
+import game.muxiuesd.bedrockcore.util.TextureUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
-import ttk.muxiuesd.ui.abs.UIComponent;
-import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
 import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.util.TextUtil;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 物品词条UI组件
+ * <p>
+ * 显示物品的名称、各种属性、耐久等等信息
  * */
 public class TooltipUI extends UIComponent {
     public static final int FONT_SIZE = 16; //字体大小，最好是8的整数倍，不然中文字体会糊
@@ -41,15 +45,24 @@ public class TooltipUI extends UIComponent {
         if (instance != null) INSTANCE = instance;
     }
 
+    //当前uiScreen
+    public UIScreen curScreen;
+    public SlotUI curSlotUI;
+
     /**
      * 激活词条UI
+     * @param screen 需要基于哪个UI屏幕来激活，坐标会相对于那个面板
      * */
-    public static TooltipUI activate () {
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+    public static TooltipUI activate (UIScreen screen, SlotUI slotUI) {
+
         TooltipUI instance = getInstance();
         //由鼠标坐标来给出基础坐标
         instance.setPosition(Util.getMouseUIPosition().add(1, 1));
-        inventoryUIPanel.addComponent(instance);
+        instance.curScreen = screen;
+        screen.addComponent(instance);
+
+        instance.curSlotUI = slotUI;
+        instance.setCurItemStack(slotUI.getItemStack());
 
         return INSTANCE;
     }
@@ -58,9 +71,23 @@ public class TooltipUI extends UIComponent {
      * 使词条UI失活
      * */
     public static TooltipUI deactivate () {
+        return deactivate(getInstance().curSlotUI);
+    }
+
+    /**
+     * 使词条UI失活，需要检查是不是对应物品槽位
+     * */
+    public static TooltipUI deactivate (SlotUI slotUI) {
         TooltipUI instance = getInstance();
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
-        inventoryUIPanel.removeComponent(instance);
+        //在当前显示的UI屏幕上移除词条组件
+        if (instance.curScreen != null) {
+            instance.curScreen.removeComponent(instance);
+            instance.curScreen = null;
+        }
+        if (instance.curSlotUI == slotUI) {
+            instance.curSlotUI = null;
+            instance.setCurItemStack(null);
+        }
 
         return instance;
     }
@@ -68,56 +95,64 @@ public class TooltipUI extends UIComponent {
     private NinePatch backgroundNinePatch;
     private NinePatch frameNinePatch;
     private ItemStack curItemStack;
+    private FontHolder fontHolder;
+
 
     public TooltipUI () {
         super(1145f, 1145f, 100, 100, new GridPoint2(10, 10));
-        this.backgroundNinePatch = this.createNinePatch(Util.loadTextureRegion(
+        this.backgroundNinePatch = TextureUtil.createNinePatch(Util.loadTextureRegion(
                 Fight.ID("tooltip_background"),
                 Fight.UITexturePath("tooltip_background.png")
             ),
             LEFT, RIGHT, TOP, BOTTOM
         );
-        this.frameNinePatch = this.createNinePatch(Util.loadTextureRegion(
+        this.frameNinePatch = TextureUtil.createNinePatch(Util.loadTextureRegion(
                 Fight.ID("tooltip_frame"),
                 Fight.UITexturePath("tooltip_frame.png")
             ),
             LEFT, RIGHT, TOP, BOTTOM
         );
-
+        this.fontHolder = Fonts.MC;
         setEnabled(false);
+        setZIndex(1000000);
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        int trueSize = (int) (FONT_SIZE * FONT_SCALE);
-
         ItemStack itemStack = this.getCurItemStack();
+        if (itemStack == null) return;
+
+        int trueSize = (int) (FONT_SIZE * FONT_SCALE);
         //基础坐标由激活时给出
         int renderX = (int) getX();
         int renderY = (int) getY();
 
         //计算词条总的宽度和高度
-        int renderWidth = LEFT + RIGHT;
-        int renderHeight = TOP + BOTTOM;
+        float renderWidth = LEFT + RIGHT;
+        float renderHeight = TOP + BOTTOM;
         Array<Text> textArray = itemStack.getTooltips();
         if (textArray.size > 0) {
             renderHeight += (trueSize + 3) * textArray.size;
 
-            int maxLength = 0;
+            float maxLength = 0;
             //查找最大
             for (Text text : textArray) {
-                maxLength = Math.max(maxLength, text.getLength());
+                maxLength = Math.max(
+                    maxLength,
+                    TextUtil.getTextRenderWidth(this.getFontHolder(), FONT_SIZE, TextUtil.getPlainText(text.getString()))
+                );
             }
-            renderWidth += maxLength * trueSize + 4;
+            //确定背景要渲染的最大宽度
+            renderWidth += maxLength + 4;
         }
-
+        setSize(renderWidth, renderHeight);
         //绘制背景和框架
         this.backgroundNinePatch.draw(batch, renderX, renderY, renderWidth, renderHeight);
         this.frameNinePatch.draw(batch, renderX + 1, renderY + 1, renderWidth - 2, renderHeight - 2);
 
-        BitmapFont font = Fonts.MC.getFont(FONT_SIZE);
+        BitmapFont font = this.getFontHolder().getFont(FONT_SIZE);
         font.getData().setScale(FONT_SCALE);
-        //词条
+        //绘制词条文本
         this.drawTooltips(batch,
             new Vector2(renderX, renderY + renderHeight),
             textArray,
@@ -134,12 +169,12 @@ public class TooltipUI extends UIComponent {
         int leftEdge = LEFT * 2;
         int topEdge = TOP * 2;
 
+        float renderX = position.x + leftEdge;
         for (int index = 0; index < textArray.size; index++) {
-            float renderX = position.x + leftEdge;
             float renderY = position.y - topEdge - index * (fontSize + 2);
 
             Text text = textArray.get(index);
-            bitmapFont.draw(batch, text.getText(), renderX, renderY);
+            TextUtil.draw(batch, bitmapFont, text.getString(), renderX, renderY);
         }
     }
 
@@ -152,10 +187,12 @@ public class TooltipUI extends UIComponent {
         return this;
     }
 
-    /**
-     * 创建点九
-     * */
-    private NinePatch createNinePatch(TextureRegion textureRegion, int left, int right, int top, int bottom) {
-        return new NinePatch(textureRegion, left, right, top, bottom);
+    public FontHolder getFontHolder () {
+        return this.fontHolder;
+    }
+
+    public TooltipUI setFontHolder (FontHolder fontHolder) {
+        this.fontHolder = fontHolder;
+        return this;
     }
 }

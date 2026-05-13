@@ -6,10 +6,11 @@ import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
- * 消费品模板（用一次数量消耗一个）
+ * 消费品的模板物品类（用一次数量消耗一个）
  * */
 public class ConsumptionItem extends Item {
-    public ConsumptionItem(String name) {
+
+    public ConsumptionItem (String name) {
         super(Type.CONSUMPTION, new Property(), Fight.ID(name), Fight.ItemTexturePath(name + ".png"));
     }
     public ConsumptionItem (Property property, String textureId) {

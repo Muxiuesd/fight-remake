@@ -2,11 +2,11 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.EnemyGenFactory;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Player;
@@ -72,7 +72,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void run () {
         EntitySystem es = getEntitySystem();
         Player player = getPlayerSystem().getPlayer();
-        Vector2 playerCenter = player.getCenter();
+        Vector2 playerCenter = player.getCenterPos();
 
         //对每一个生成工厂执行一次生成，具体生成取决于工厂接口的实现
         for (EnemyGenFactory<?> factory : getGenFactories().values()) {

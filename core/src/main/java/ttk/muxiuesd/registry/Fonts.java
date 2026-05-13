@@ -1,9 +1,9 @@
 package ttk.muxiuesd.registry;
 
 import com.badlogic.gdx.Gdx;
+import game.muxiuesd.bedrockcore.font.FontHolder;
+import game.muxiuesd.bedrockcore.font.FontManager;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.ui.text.FontHolder;
-import ttk.muxiuesd.ui.text.FontManager;
 
 /**
  * 字体注册

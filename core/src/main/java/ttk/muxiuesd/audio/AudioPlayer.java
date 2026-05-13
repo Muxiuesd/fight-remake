@@ -2,7 +2,7 @@ package ttk.muxiuesd.audio;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import ttk.muxiuesd.util.Log;
+import game.muxiuesd.bedrockcore.util.Log;
 
 import java.util.LinkedHashMap;
 
@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
  * <p>
  * 没有特殊音效方面的需求的话可以直接调用此类播放，mod也调用此类
  * */
+@Deprecated
 public class AudioPlayer {
     public final String TAG = this.getClass().getName();
 
@@ -22,11 +23,11 @@ public class AudioPlayer {
         return AudioPlayer.Holder.INSTANCE;
     }
 
-    public Sound playSound (Audio audio) {
-        return playSound(audio.getId());
+    public Sound playSound (AudioHolder audioHolder) {
+        return playSound(audioHolder.getID());
     }
-    public Sound playSound (Audio audio, float volume) {
-        return playSound(audio.getId(), volume);
+    public Sound playSound (AudioHolder audioHolder, float volume) {
+        return playSound(audioHolder.getID(), volume);
     }
 
     public Sound playSound(String id) {
@@ -57,8 +58,8 @@ public class AudioPlayer {
         return null;
     }
 
-    public void playMusic (Audio audio) {
-        this.playMusic(audio.getId());
+    public void playMusic (AudioHolder audioHolder) {
+        this.playMusic(audioHolder.getID());
     }
     /**
      * 播放音乐，若已经在播放则中途停下来再重头播放

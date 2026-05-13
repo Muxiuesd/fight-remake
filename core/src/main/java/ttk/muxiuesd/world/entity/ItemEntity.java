@@ -4,14 +4,16 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Pool;
-import ttk.muxiuesd.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatBoolean;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -36,11 +38,12 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         super(world, EntityTypes.ITEM_ENTITY);
         this.positionOffset = new Vector2();
         setSize(DEFAULT_SIZE);
+        fastAddBodyHitBox();
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
         this.cycle = values.getFloat("cycle", 0f);
         this.livingTime = values.getFloat("living_time", 0f);
 
@@ -57,15 +60,17 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("cycle", this.cycle);
-        cat.set("living_time", this.livingTime);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder
+            .put("cycle", new CatFloat(this.cycle))
+            .put("livingTime", new CatFloat(this.livingTime));
 
         if (this.onAirTimer != null) {
-            cat.set("on_air", true);
-            cat.set("on_air_max_span", this.onAirTimer.getMaxSpan());
-            cat.set("on_air_cur_span", this.onAirTimer.getCurSpan());
+            holder
+                .put("on_air", new CatBoolean(true))
+                .put("on_air_max_span", new CatFloat(this.onAirTimer.getMaxSpan()))
+                .put("on_air_cur_span", new CatFloat(this.onAirTimer.getCurSpan()));
         }
     }
 
@@ -82,8 +87,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         if (cycle > 1f) cycle %= 1f;
         this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.3f);
 
-        x += delta * getCurSpeed() * velX;
-        y += delta * getCurSpeed() * velY;
+        positionChange(delta);
 
         super.update(delta);
     }

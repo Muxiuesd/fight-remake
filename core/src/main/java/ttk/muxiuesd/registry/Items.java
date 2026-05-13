@@ -3,18 +3,19 @@ package ttk.muxiuesd.registry;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.item.FishPoleRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.Botany;
+import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.CommonItem;
+import ttk.muxiuesd.world.item.common.ItemFishPole;
 import ttk.muxiuesd.world.item.common.ItemStick;
-import ttk.muxiuesd.world.item.consumption.BlockItem;
-import ttk.muxiuesd.world.item.consumption.ItemBait;
-import ttk.muxiuesd.world.item.consumption.ItemFishPole;
-import ttk.muxiuesd.world.item.consumption.WallItem;
+import ttk.muxiuesd.world.item.consumption.*;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
@@ -55,29 +56,71 @@ public final class Items {
     public static final Item DIAMOND_LEGGINGS = register("diamond_leggings", EquipmentDiamondLeggings::new);
     public static final Item DIAMOND_BOOTS = register("diamond_boots", EquipmentDiamondBoots::new);
 
+    /// 刷怪蛋物品
+    //怪物刷怪蛋
+    public static final Item SPAWN_EGG_SLIME = register("spawn_egg_slime", Entities.SLIME);
+    //生物刷怪蛋
+    public static final Item SPAWN_EGG_PUFFER_FISH = register("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
+
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
     public static final Item GRASS = register(Blocks.GRASS);
+    public static final Item FARMLAND_DRY = register(Blocks.FARMLAND_DRY);
     public static final Item STONE = register(Blocks.STONE);
     public static final Item SAND = register(Blocks.SAND);
     public static final Item WATER = register(Blocks.WATER);
     public static final Item GLASS = register(Blocks.GLASS);
     public static final Item COAL_ORE = register(Blocks.COAL_ORE);
+    //颜色方块物品
+    public static final Item WOOL_BLACK = register(Blocks.WOOL_BLACK);
+    public static final Item WOOL_BLUE = register(Blocks.WOOL_BLUE);
+    public static final Item WOOL_BROWN = register(Blocks.WOOL_BROWN);
+    public static final Item WOOL_CYAN = register(Blocks.WOOL_CYAN);
+    public static final Item WOOL_GRAY = register(Blocks.WOOL_GRAY);
+    public static final Item WOOL_GREEN = register(Blocks.WOOL_GREEN);
+    public static final Item WOOL_LIGHT_BLUE = register(Blocks.WOOL_LIGHT_BLUE);
+    public static final Item WOOL_LIME = register(Blocks.WOOL_LIME);
+    public static final Item WOOL_MAGENTA = register(Blocks.WOOL_MAGENTA);
+    public static final Item WOOL_ORANGE = register(Blocks.WOOL_ORANGE);
+    public static final Item WOOL_PINK = register(Blocks.WOOL_PINK);
+    public static final Item WOOL_PURPLE = register(Blocks.WOOL_PURPLE);
+    public static final Item WOOL_RED = register(Blocks.WOOL_RED);
+    public static final Item WOOL_SILVER = register(Blocks.WOOL_SILVER);
+    public static final Item WOOL_WHITE = register(Blocks.WOOL_WHITE);
+    public static final Item WOOL_YELLOW = register(Blocks.WOOL_YELLOW);
 
     /// 带有方块实体的方块物品
     public static final Item CRAFTING_TABLE = register(Blocks.CRAFTING_TABLE);
     public static final Item FURNACE = register(Blocks.FURNACE);
 
+    /// 农作物物品
+    public static final Item POTATO = register("potato", Blocks.POTATO);
+
     /// 墙体物品
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
 
+    /**
+     * 注册农作物物品
+     * */
+    public static CropItem register (String name, Botany crop) {
+        CropItem cropItem = register(name, () -> new CropItem(name, crop));
+        crop.setDroppedItem(cropItem);
+        return cropItem;
+    }
 
     /**
      * 普通物品的注册
      * */
     public static Item register (String name) {
         return register(name, () -> new CommonItem(name));
+    }
+
+    /**
+     * 刷怪蛋物品的注册
+     * */
+    public static <T extends Entity<T>> Item register (String name, EntityProvider<T> entityProvider) {
+        return register(name, () -> new SpawnEggItem<>(name, entityProvider));
     }
 
     /**

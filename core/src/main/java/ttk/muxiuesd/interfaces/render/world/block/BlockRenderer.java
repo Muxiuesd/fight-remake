@@ -9,6 +9,9 @@ import ttk.muxiuesd.world.block.abs.Block;
  * 方块的渲染器接口
  * */
 public interface BlockRenderer<T extends Block> {
+    /**
+     * 待实现的渲染方法
+     * */
     void render(Batch batch, T block, Context context);
 
     default Context getContext () {
@@ -33,7 +36,7 @@ public interface BlockRenderer<T extends Block> {
 
         public float
             x , y,
-            width = Block.BlockWidth, height = Block.BlockHeight,
+            width = Block.WIDTH, height = Block.HEIGHT,
             originX = 0f, originY = 0f,
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
@@ -48,8 +51,8 @@ public interface BlockRenderer<T extends Block> {
         public void reset () {
             this.x = 0f;
             this.y = 0f;
-            this.width = Block.BlockWidth;
-            this.height = Block.BlockHeight;
+            this.width = Block.WIDTH;
+            this.height = Block.HEIGHT;
             this.originX = 0f;
             this.originY = 0f;
             this.scaleX = 1f;
@@ -62,11 +65,15 @@ public interface BlockRenderer<T extends Block> {
      * 普通标准的方块渲染器
      * */
     class StandardRenderer<T extends Block> implements BlockRenderer<T>{
+        /// 渲染向左下角偏移半个方块距离
+        public static final float OFFSET_X = - Block.WIDTH / 2;
+        public static final float OFFSET_Y = - Block.HEIGHT / 2;
+
         @Override
         public void render (Batch batch, T block, Context context) {
             if (block.textureIsValid()) {
                 batch.draw(block.getTextureRegion(),
-                    context.x, context.y,
+                    context.x + OFFSET_X, context.y + OFFSET_Y,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,

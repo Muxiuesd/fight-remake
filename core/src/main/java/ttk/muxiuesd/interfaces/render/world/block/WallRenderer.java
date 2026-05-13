@@ -34,7 +34,7 @@ public interface WallRenderer<T extends Wall<?>> {
 
         public float
             x , y,
-            width = Block.BlockWidth, height = Block.BlockHeight,
+            width = Block.WIDTH, height = Block.HEIGHT,
             originX = 0f, originY = 0f,
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
@@ -49,8 +49,8 @@ public interface WallRenderer<T extends Wall<?>> {
         public void reset () {
             this.x = 0f;
             this.y = 0f;
-            this.width = Block.BlockWidth;
-            this.height = Block.BlockHeight;
+            this.width = Block.WIDTH;
+            this.height = Block.HEIGHT;
             this.originX = 0f;
             this.originY = 0f;
             this.scaleX = 1f;
@@ -67,7 +67,8 @@ public interface WallRenderer<T extends Wall<?>> {
         public void render (Batch batch, T wall, Context context) {
             if (wall.textureIsValid()) {
                 batch.draw(wall.getTextureRegion(),
-                    context.x, context.y,
+                    context.x + BlockRenderer.StandardRenderer.OFFSET_X,
+                    context.y + BlockRenderer.StandardRenderer.OFFSET_Y,
                     context.originX, context.originY,
                     context.width, context.height,
                     context.scaleX, context.scaleY,

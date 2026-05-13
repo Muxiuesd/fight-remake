@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
@@ -19,10 +19,13 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.registry.WorldInformationType;
+import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.*;
+import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
@@ -31,6 +34,8 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.hitbox.Hitbox;
+import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.item.ItemPickUpState;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -41,6 +46,7 @@ import java.util.concurrent.*;
  * 实体的管理系统，负责实体的储存以及更新，但不负责渲染
  * */
 public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender, Tickable {
+    public static final float MIN_SPEED = 0.0000001f;
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -64,10 +70,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     public EntitySystem (World world) {
         super(world);
-        WorldInformationType.FLOAT.putIfNull(Fight.ENTITY_UPDATE_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.ENTITY_RENDER_RANGE);
-        WorldInformationType.FLOAT.putIfNull(Fight.ITEM_ENTITY_PICKUP_SPAN);
-        WorldInformationType.FLOAT.putIfNull(Fight.MAX_ITEM_ENTITY_LIVING_TIME);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.ENTITY_UPDATE_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.ENTITY_RENDER_RANGE);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.ITEM_ENTITY_PICKUP_SPAN);
+        WorldInfoTypes.FLOAT.putIfNull(Fight.MAX_ITEM_ENTITY_LIVING_TIME);
     }
 
     @Override
@@ -141,7 +147,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             this.renderableEntities.get(entity.getRenderLayer()).add(entity);
         //防止没有指定实体系统
         entity.setEntitySystem(this);
-        entity.initialize();
+        entity.lazyInitialize();
     }
 
     /**
@@ -189,7 +195,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 //对于非物品实体进行当前速度更新
                 this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
             }
-            entity.update(delta);
             //细化实体更新
             //对于活物实体
             if (entity instanceof LivingEntity livingEntity) {
@@ -199,6 +204,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             else if (entity instanceof ItemEntity itemEntity) {
                 this.updateItemEntity(itemEntity, delta);
             }
+
+            entity.update(delta);
         }
 
 
@@ -236,12 +243,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN.getValue()) {
             //当物品实体与玩家的碰撞箱相碰就是捡起
-            if (itemEntity.hitbox.overlaps(player.hitbox)) {
+            if (itemEntity.getBodyHitbox().checkCollision(player.getBodyHitbox())) {
                 ItemStack itemStack = itemEntity.getItemStack();
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
+                    //AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
+                    getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, player);
                     //整个捡起来就没必要执行下面的代码了
                     return;
                 }else if (state == ItemPickUpState.PARTIAL) {
@@ -256,8 +264,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
                 && !player.getBackpack().isFull(itemEntity.getItemStack())) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
-                Direction direction = new Direction(itemEntity.getCenter(), player.getCenter());
-                itemEntity.setVelocity(direction);
+                Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
+                itemEntity.setVelocity(direction.getX(), direction.getY());
                 itemEntity.setSpeed(7.7f);
             }
         }
@@ -270,17 +278,17 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0) return;
+        if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
 
         //计算脚下方块摩擦对速度的影响
-        Vector2 center = entity.getCenter();
+        Vector2 center = entity.getCenterPos();
         Block block = cs.getBlock(center.x, center.y);
         if (block == null) return;
+
         float friction = block.getProperty().getFriction();
         float curSpeed = entity.getSpeed() * friction;
         //速度过小直接为0
-        if (curSpeed < 0.0000001) {
-            entity.setSpeed(0);
+        if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
             return;
         }
@@ -298,19 +306,18 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //实体在地面上
         if (entity.isOnGround()) {
             //计算脚下方块摩擦对速度的影响
-            Vector2 center = entity.getCenter();
+            Vector2 center = entity.getCenterPos();
             Block block = cs.getBlock(center.x, center.y);
             if (block == null) return;
             curSpeed *= block.getProperty().getFriction();
         }
         //速度过小直接为0
-        if (curSpeed < 0.0000001) {
-            entity.setSpeed(0);
+        if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
             return;
         }
         entity.setCurSpeed(curSpeed);
-        //entity.setSpeed(entity.getSpeed() - curSpeed * delta * 0.8f);
+        //物品实体的基准速度逐渐下降
         entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
@@ -409,7 +416,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Array<Entity<?>> unload = new Array<>();    //需要被卸载的实体组
 
         for (Entity<?> entity: copy) {
-            ChunkPosition chunkPosition = cs.getChunkPosition(entity.getCenter());
+            ChunkPosition chunkPosition = cs.getChunkPos(entity.getCenterPos());
             EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
             //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
             if (chunkPosition.equals(chunk.getChunkPosition())
@@ -441,8 +448,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
             if (!entityProvider.canBeSaved) continue;
 
-            Vector2 position = entity.getCenter();
-            ChunkPosition chunkPosition = chunkSystem.getChunkPosition(position.x, position.y);
+            Vector2 position = entity.getCenterPos();
+            ChunkPosition chunkPosition = chunkSystem.getChunkPos(position.x, position.y);
             String name = chunkPosition.toString();
             //没有就新建一个
             if (!chunkPos.containsKey(name)) {
@@ -467,7 +474,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void loadEntities (ChunkSystem cs, Chunk chunk) {
         ChunkPosition chunkPosition = chunk.getChunkPosition();
         //文件不存在就是区块上没有实体，直接跳过
-        if (! FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, chunkPosition.toString() + ".json")) {
+        if (! FileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
             return;
         }
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
@@ -481,13 +488,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void initLoadEntities (ChunkPosition chunkPosition) {
         String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (!FileUtil.fileExists(Fight.PATH_SAVE_ENTITIES, fileName)) return;
+        if (!FileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
 
-        FileUtil.deleteFile(Fight.PATH_SAVE_ENTITIES, fileName);
+        FileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
     }
 
     @Override
@@ -503,11 +510,14 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void renderShape (ShapeRenderer batch) {
         if (this.renderHitbox) {
             for (Entity entity : this.entities) {
-                Rectangle hitbox = entity.getHitbox();
-                batch.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
-                Vector2 entityCenter = entity.getCenter();
+                Hitbox hitbox = entity.getBodyHitbox();
+                if (hitbox instanceof RectHitbox rectHitbox){
+                    Rectangle box = rectHitbox.getRectangle();
+                    batch.rect(box.x, box.y, box.width, box.height);
+                }
+                Vector2 entityCenter = entity.getCenterPos();
                 if (entity instanceof LivingEntity livingEntity) {
-                    batch.line(entityCenter, new Vector2(entityCenter).add(livingEntity.getDirection().scl(1)));
+                    batch.line(entityCenter, new Vector2(entityCenter).add(livingEntity.getDirection().toVector2()));
                 }else {
                     batch.line(entityCenter, new Vector2(entityCenter).add(entity.getVelocity().scl(1)));
                 }
@@ -560,7 +570,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 获取实体类型相应的管理组
      * */
-    public <T extends Entity<?>> Array<T> getEntityArray (EntityType<T> type) {
+    public <T extends Entity<?>> Array<T> getEntityArray (EntityType<? extends T> type) {
         return (Array<T>) this.entityTypes.get(type);
     }
 
@@ -568,11 +578,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return this.getEntityArray(EntityTypes.ENEMY);
     }
 
-    public Array<Bullet> getPlayerBulletEntity () {
+    public Array<Bullet<?>> getPlayerBulletEntity () {
         return this.getEntityArray(EntityTypes.PLAYER_BULLET);
     }
 
-    public Array<Bullet> getEnemyBulletEntity () {
+    public Array<Bullet<?>> getEnemyBulletEntity () {
         return this.getEntityArray(EntityTypes.ENEMY_BULLET);
     }
 

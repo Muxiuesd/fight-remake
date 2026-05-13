@@ -21,8 +21,13 @@ public class CAT {
         return (T) this.getMap().get(key);
     }
 
+    /**
+     * 向json中写入cat数据
+     * */
     public void write (JsonDataWriter writer) {
-        this.getMap().forEach((key, value) -> writer.getWriter().writeValue(key, value));
+        this.getMap().forEach((key, value) -> {
+            writer.getWriter().writeValue(key, value);
+        });
     }
 
     /**

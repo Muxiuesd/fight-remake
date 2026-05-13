@@ -8,7 +8,8 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatInt;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -37,31 +38,33 @@ public class Slime extends Enemy<Slime> {
         super(world, entityType, 10, 10, 10 ,10 , 1, 1.5f);
 
         this.generation = generation;
-        loadBodyTextureRegion(Fight.ID("slime"), "enemy/slime.png");
+        setBodyTextureRegion(getTextureRegion(Fight.ID("slime"), "enemy/slime.png"));
         getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
         renderHandItem = false;
 
         addState(STATE_REST, new SlimeRestState());
         addState(STATE_RANDOM_WALK, new SlimeRandomWalkState());
         addState(STATE_ATTACK_TARGET, new SlimeAttackTargetState());
+
+        fastAddBodyHitBox();
     }
 
     @Override
-    public void initialize () {
+    public void lazyInitialize () {
         //最开始是休息状态
         setState(STATE_REST);
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
         this.generation = values.getInt("generation", 1);
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("generation", this.generation);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder.put("generation", new CatInt(this.generation));
     }
 
     /**
@@ -73,11 +76,13 @@ public class Slime extends Enemy<Slime> {
         bullet.setType(EntityTypes.ENEMY_BULLET);
         bullet.setOwner(owner);
         bullet.setSize(
-            (float) (bullet.width * Math.pow(this.factor, this.generation)),
-            (float) (bullet.height * Math.pow(this.factor, this.generation)));
-        bullet.setPosition(x + (width - bullet.width)/2, y + (height - bullet.height)/2);
-        bullet.setDirection(direction.getxDirection(), direction.getyDirection());
-        bullet.setCullingArea(bullet.x, bullet.y, bullet.width, bullet.height);
+            (float) (bullet.getWidth() * Math.pow(this.factor, this.generation)),
+            (float) (bullet.getHeight() * Math.pow(this.factor, this.generation))
+        );
+        bullet.setPosition(getX() - bullet.getWidth() / 2f, getY() - bullet.getHeight() / 2f);
+        bullet.setVelocity(direction, bullet.getSpeed());
+
+        bullet.fastAddBodyHitBox();
         return bullet;
     }
 }

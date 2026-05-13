@@ -4,6 +4,9 @@ import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.util.Info;
 
+/**
+ * 世界信息的哈希表
+ * */
 public abstract class WorldInfoHashMap<T, V> extends HashMapCodec<T, String, V, JsonDataWriter, JsonDataReader>{
     private String id;
 

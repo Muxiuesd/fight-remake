@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.particle.abs;
 
 import com.badlogic.gdx.graphics.Color;
-import ttk.muxiuesd.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import ttk.muxiuesd.world.light.PointLight;
 
 /**

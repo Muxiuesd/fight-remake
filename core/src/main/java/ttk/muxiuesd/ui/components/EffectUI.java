@@ -4,10 +4,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import game.muxiuesd.bedrockcore.font.FontHolder;
+import game.muxiuesd.bedrockcore.util.TextureUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.ui.abs.UIComponent;
 import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.util.TextUtil;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 
@@ -31,20 +35,28 @@ public class EffectUI extends UIComponent {
     public static final float ICON_HEIGHT = 18f;
 
     private NinePatch background;
-
+    private FontHolder fontHolder;
     private StatusEffect statusEffect;
     private StatusEffect.Data statusEffectData;
     private Text effectText;
     private Text effectDurationText = Text.ofText(Fight.ID("effect_duration"));
 
+
     public EffectUI () {
-        this.background = new NinePatch(
-            Util.loadTextureRegion(
-                Fight.ID("effect_background"),
-                Fight.UITexturePath("effect_background.png")
+        this(
+            TextureUtil.createNinePatch(
+                Util.loadTextureRegion(
+                    Fight.ID("effect_background"),
+                    Fight.UITexturePath("effect_background.png")
+                ),
+                LEFT, RIGHT, TOP, BOTTOM
             ),
-            LEFT, RIGHT, TOP, BOTTOM
+            Fonts.MC
         );
+    }
+    public EffectUI (NinePatch background, FontHolder fontHolder) {
+        this.background = background;
+        this.fontHolder = fontHolder;
     }
 
     @Override
@@ -54,14 +66,15 @@ public class EffectUI extends UIComponent {
         this.getEffectText().set(0, this.getEffectData().getLevel());
 
         //计算背景的总宽度和高度
-        int renderWidth = this.background.getTexture().getWidth();
+        int renderWidth = this.background.getTexture().getWidth() + LEFT + RIGHT;
         int renderHeight = this.background.getTexture().getHeight();
 
         if (this.effectText != null) {
-            renderWidth += (int) Math.max(
-                (this.effectText.getLength() * TRUE_FONT_SIZE),
-                (this.effectDurationText.getLength() * TRUE_FONT_SIZE)
-            );
+            BitmapFont bitmapFont = this.getFontHolder().getFont((int) TRUE_FONT_SIZE);
+            float effectTextWidth = TextUtil.getTextRenderWidth(bitmapFont, this.effectText.getString());
+            float effectDurationTextWidth = TextUtil.getTextRenderWidth(bitmapFont, this.effectDurationText.getString());
+
+            renderWidth += (int) Math.max(effectTextWidth, effectDurationTextWidth);
         }
 
         setSize(renderWidth, renderHeight);
@@ -69,19 +82,19 @@ public class EffectUI extends UIComponent {
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        float renderX = getX();
-        float renderY = getY();
-        if (parent != null) {
+        float renderX = getAbsX();
+        float renderY = getAbsY();
+        /*if (parent != null) {
+            //默认渲染在面板的右上角
             renderX += parent.getWidth();
             renderY += parent.getHeight();
-        }
+        }*/
         StatusEffect effect = this.getStatusEffect();
 
         //绘制背景
         this.background.draw(batch, renderX, renderY, getWidth(), getHeight());
 
         TextureRegion uiTexture = effect.getIcon();
-
 
         float iconRenderX = renderX + LEFT;
         float iconRenderY = renderY + BOTTOM;
@@ -96,13 +109,13 @@ public class EffectUI extends UIComponent {
         float textRenderY = iconRenderY + 2;
 
         //绘制状态效果名称
-        font.draw(batch, this.getEffectText().getText(),
+        TextUtil.draw(batch, font, this.getEffectText().getString(),
             textRenderX + ICON_WIDTH,
             textRenderY + TRUE_FONT_SIZE * 2
         );
 
         //绘制剩余时间
-        font.draw(batch, this.getEffectDurationText().getText(),
+        TextUtil.draw(batch, font, this.getEffectDurationText().getString(),
             textRenderX + ICON_WIDTH,
             textRenderY + TRUE_FONT_SIZE - 2
         );
@@ -114,6 +127,15 @@ public class EffectUI extends UIComponent {
 
     public EffectUI setBackground (NinePatch background) {
         this.background = background;
+        return this;
+    }
+
+    public FontHolder getFontHolder () {
+        return this.fontHolder;
+    }
+
+    public EffectUI setFontHolder (FontHolder fontHolder) {
+        this.fontHolder = fontHolder;
         return this;
     }
 

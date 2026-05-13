@@ -2,10 +2,10 @@ package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.mod.api.ModLibLoader;
 import ttk.muxiuesd.mod.api.ModRegistrant;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
-import ttk.muxiuesd.util.Log;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;

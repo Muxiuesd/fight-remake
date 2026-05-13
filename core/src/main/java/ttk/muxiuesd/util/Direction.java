@@ -1,47 +1,66 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.math.Vec2;
 
 /**
- * 方向
- * 单位向量
+ * 方向矢量
+ * <p>
+ * 确保是单位向量
  */
-public class Direction extends Vector2 {
+public class Direction {
+    private float x;
+    private float y;
     /**
      * 默认方向：当前游戏窗口中心到鼠标的方向
      */
     public Direction () {
-        Vector2 mouse = Util.getMousePosition();
-        float mouseX = mouse.x;
-        float mouseY = mouse.y;
-        float length = (float) Math.sqrt(Math.pow((mouseX), 2) + Math.pow((mouseY), 2));
-        x = (mouseX) / length;
-        y = (mouseY) / length;
+        Vector2 mouse = Util.getMouseWindowPos();
+        float length = (float) Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
+        this.x = mouse.x / length;
+        this.y = mouse.y / length;
     }
 
     public Direction (Vector2 from, Vector2 to) {
         this(to.x - from.x, to.y - from.y);
     }
-
+    public Direction (Vec2 from, Vec2 to) {
+        this(to.getX() - from.getX(), to.getY() - from.getY());
+    }
+    public Direction (Vec2 direction) {
+        this(direction.getX(), direction.getY());
+    }
     public Direction (float xDirection, float yDirection) {
-        float length = (float) Math.sqrt(Math.pow(xDirection, 2) + Math.pow(yDirection, 2));
-        x = xDirection / length;
-        y = yDirection / length;
+        this.x = xDirection;
+        this.y = yDirection;
+        nor();
     }
 
-    public float getxDirection() {
-        return x;
+    public Vector2 toVector2 () {
+        return new Vector2(this.x, this.y);
     }
 
-    public void setxDirection(float x) {
+    public float getX () {
+        return this.x;
+    }
+
+    public void setX (float x) {
         this.x = x;
+        nor();
     }
 
-    public float getyDirection() {
+    public float getY () {
         return this.y;
     }
 
-    public void setyDirection(float y) {
+    public void setY (float y) {
         this.y = y;
+        nor();
+    }
+
+    public void nor () {
+        float length = (float) Math.sqrt(this.x * this.x + this.y * this.y);
+        this.x = this.x / length;
+        this.y = this.y / length;
     }
 }

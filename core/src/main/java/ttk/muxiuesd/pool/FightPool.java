@@ -1,34 +1,19 @@
 package ttk.muxiuesd.pool;
 
+import com.badlogic.gdx.utils.DefaultPool;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
+import game.muxiuesd.bedrockcore.util.ConvPool;
 
 /**
  * 游戏内用于注册的对象池
  */
-public class FightPool<T> {
-    private final Class<T> clazz;
+public class FightPool<T> extends ConvPool<T> {
 
     public <P extends Pool<T>> FightPool (Class<T> clazz, P pool) {
-        this.clazz = clazz;
-        Pools.set(clazz, pool);
+        super(clazz, pool);
     }
 
-    public FightPool (Class<T> clazz) {
-        this.clazz = clazz;
-        Pools.obtain(clazz);
-    }
-
-    public T obtain () {
-        return Pools.obtain(this.clazz);
-    }
-
-    public void free (T object) {
-        if (object == null) return;
-        Pools.free(object);
-    }
-
-    public int size () {
-        return Pools.get(this.clazz).getFree();
+    public <P extends Pool<T>> FightPool (DefaultPool.PoolSupplier supplier) {
+        super(supplier);
     }
 }

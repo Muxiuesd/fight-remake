@@ -2,11 +2,11 @@ package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -47,16 +47,13 @@ public class CameraFollowSystem extends WorldSystem {
 
         // 使相机跟随鼠标移动
         Direction direction = Util.getDirection();
-        Vector2 vector2 = Util.getMousePosition();
-        float xOffset = Math.abs(vector2.x) * direction.getxDirection() / 300;
-        float yOffset = Math.abs(vector2.y) * direction.getyDirection() / 300;
-        PlayerCamera.INSTANCE.setPosition(follower.x + follower.width / 2 + xOffset,
-            follower.y + follower.height / 2 + yOffset);
-
-        /*GUICamera.INSTANCE.setPosition(
-            follower.x + follower.width / 2,
-            follower.y + follower.height / 2
-        );*/
+        Vector2 vector2 = Util.getMouseWindowPos();
+        float xOffset = Math.abs(vector2.x) * direction.getX() / 300;
+        float yOffset = Math.abs(vector2.y) * direction.getY() / 300;
+        PlayerCamera.INSTANCE.setPosition(
+            follower.getX() + xOffset,
+            follower.getY() + yOffset
+        );
 
     }
 

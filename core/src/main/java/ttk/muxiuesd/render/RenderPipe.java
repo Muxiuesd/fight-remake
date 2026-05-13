@@ -1,12 +1,12 @@
 package ttk.muxiuesd.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import game.muxiuesd.bedrockcore.fix.GL32CMacIssueHandler;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.render.camera.CameraController;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
-import ttk.muxiuesd.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,20 +17,29 @@ import java.util.Set;
 public class RenderPipe {
     public static String TAG = RenderPipe.class.getName();
 
-    private RenderPipe() {
-        this.addCameraController(PlayerCamera.INSTANCE);
-        this.addCameraController(GUICamera.INSTANCE);
-    }
     //必须单例模式
     private static RenderPipe INSTANCE;
 
     //所有的相机控制器，管理着需要被自动更新的相机
     private final Set<CameraController> cameraControllers = new HashSet<>();
+    private final Batch batch ;
+    private final ShapeRenderer shapeRenderer;
 
-    private final Batch batch = new SpriteBatch();
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer() {{
-        setAutoShapeType(true);
-    }};
+    private RenderPipe() {
+        this(
+            GL32CMacIssueHandler.createSpriteBatch(),
+            GL32CMacIssueHandler.createShapeRenderer()
+        );
+    }
+    /// 支持注入
+    private RenderPipe (Batch batch, ShapeRenderer shapeRenderer) {
+        this.batch = batch;
+        this.shapeRenderer = shapeRenderer;
+        this.shapeRenderer.setAutoShapeType(true);
+
+        this.addCameraController(PlayerCamera.INSTANCE);
+        this.addCameraController(GUICamera.INSTANCE);
+    }
 
     /**
      * 初始化渲染管线
@@ -55,15 +64,18 @@ public class RenderPipe {
         //更新相机
         this.cameraControllers.forEach(controller-> controller.getCamera().update());
 
-        RenderProcessorManager.sort();
+        RenderProcessorManager.swap();
 
-        this.batch.begin();
+        /*this.batch.begin();
         RenderProcessorManager.batchRender(batch);
         this.batch.end();
 
         this.shapeRenderer.begin();
         RenderProcessorManager.shapeRender(this.shapeRenderer);
-        this.shapeRenderer.end();
+        this.shapeRenderer.end();*/
+
+
+        RenderProcessorManager.handleRender(this.batch, this.shapeRenderer);
     }
 
     /**

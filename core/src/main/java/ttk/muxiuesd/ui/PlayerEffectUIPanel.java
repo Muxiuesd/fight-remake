@@ -2,9 +2,9 @@ package ttk.muxiuesd.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.EffectUI;
-import ttk.muxiuesd.ui.components.UIPanel;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 
@@ -25,6 +25,7 @@ public class PlayerEffectUIPanel extends UIPanel {
                                 GridPoint2 interactGridSize,
                                 PlayerSystem playerSystem) {
         super(x, y, width, height, interactGridSize);
+
         this.playerSystem = playerSystem;
         this.effectUIs = new LinkedHashMap<>();
     }
@@ -44,7 +45,7 @@ public class PlayerEffectUIPanel extends UIPanel {
             if (this.effectUIs.containsKey(effect)) {
                 EffectUI effectUI = this.effectUIs.get(effect);
                 effectUI
-                    .setPosition(getX(), getY() - index * effectUI.getHeight())
+                    .setPosition(getWidth(), getHeight() - index * effectUI.getHeight())
                     .update(delta);
             }else {
                 //如果不存在这个状态的UI，就新建一个并且加入
@@ -52,7 +53,7 @@ public class PlayerEffectUIPanel extends UIPanel {
                     .setStatusEffect(effect)
                     .setEffectData(playerEffects.get(effect));
 
-                effectUI.setPosition(getX(), getY() - index * effectUI.getHeight());
+                effectUI.setPosition(getWidth(), getHeight() - index * effectUI.getHeight());
 
                 this.effectUIs.put(effect, effectUI);
             }

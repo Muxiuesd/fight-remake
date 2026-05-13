@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * 世界信息类，存储一些需要跟随存档读写的数据
+ * 世界信息类
+ * <p>
+ * 存储一些需要跟随存档读写的数据
  * */
 public class WorldInfo {
     public static final Codec CODEC = new Codec();
@@ -24,7 +26,7 @@ public class WorldInfo {
         this.information = new HashMap<>();
         //将注册表里的信息类型map全部加进来
         Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
-            this.information.put(key.getId(), value);
+            this.information.put(key.getID(), value);
         });
     }
 

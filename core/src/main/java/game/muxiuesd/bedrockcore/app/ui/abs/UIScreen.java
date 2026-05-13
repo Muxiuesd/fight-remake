@@ -1,0 +1,302 @@
+package game.muxiuesd.bedrockcore.app.ui.abs;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
+import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
+import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIResize;
+import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
+import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.render.camera.GUICamera;
+import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.pool.PoolableRectangle;
+
+import java.util.LinkedHashSet;
+
+/**
+ * UI屏幕，UI组件都绘制在这个Screen里面
+ * <p>
+ * 需要自己实现 {@link UIComponentsHolder#getComponents()}
+ * <p>
+ * 如果要处理全局的键盘和鼠标的输入，就把实例加入gdx的input处理
+ * */
+public abstract class UIScreen
+    implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder, InputProcessor{
+
+    private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();
+    private final LinkedHashSet<UIComponent> delayAddComponents = new LinkedHashSet<>();
+    private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
+
+    private boolean mouseOver = false;  ///当鼠标指针在任意的可交互的组件上就标记为true，否则为false
+    private UIComponent focusComponent; ///焦点组件，当有焦点组件时，键盘输入只在焦点组件里生效
+
+
+    public UIScreen () {
+    }
+
+    @Override
+    public void addComponent (UIComponent component) {
+        this.delayAddComponents.add(component);
+    }
+
+    @Override
+    public void removeComponent (UIComponent component) {
+        this.delayRemoveComponents.add(component);
+    }
+
+    /**
+     * 被展示出来时调用
+     * */
+    public void show () {
+        //调整大小
+        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
+        resize(camera.viewportWidth, camera.viewportHeight);
+    }
+
+    /**
+     * 被隐藏时调用
+     * */
+    public void hide () {
+    }
+
+    @Override
+    public void update (float delta) {
+        //检查延迟添加和延迟删除
+        this.handleDelayEvents();
+
+        //清理标记
+        setMouseOver(false);
+        //没东西就直接返回
+        if (getComponents().isEmpty()) return;
+
+        Vector2 mouseUIPosition = Util.getMouseUIPosition();
+        //重复利用的矩形区域
+        PoolableRectangle rectangle = Pools.RECT.obtain();
+
+        for (UIComponent uiComponent : getComponents()) {
+            //更新组件
+            uiComponent.update(delta);
+            //不可交互状态的组件就直接跳过交互计算
+            if (!uiComponent.isEnabled()) continue;
+
+            //记录这个ui上一个状态是否被鼠标覆盖
+            boolean uiComponentMouseOver = uiComponent.isMouseOver();
+            rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
+            //鼠标坐标在ui的区域上
+            if (rectangle.contains(mouseUIPosition)) {
+                //计算交互区域坐标
+                GridPoint2 interactGrid = uiComponent.getInteractGridSize();
+                Vector2 position = uiComponent.getPosition();
+                //计算鼠标相对于UI组件的坐标
+                Vector2 relativePos = new Vector2((mouseUIPosition.x - position.x), (mouseUIPosition.y - position.y));
+                Vector2 size = uiComponent.getSize();
+                int xn = (int) (relativePos.x / size.x * interactGrid.x);
+                int yn = (int) (relativePos.y / size.y * interactGrid.y);
+                GridPoint2 grid = new GridPoint2(xn, yn);
+                uiComponent.setMouseOver(true);
+                uiComponent.mouseOver(grid);
+
+                //如果鼠标在组件的交互区域上并且点击了鼠标左键，就是点击了组件
+                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                    uiComponent
+                        .setClicked(true)
+                        .click(grid);
+                }else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                    //如果是按住鼠标左键，就是拖拽
+                    uiComponent.mouseDrag(relativePos.x, relativePos.y);
+                }
+                //这个ui屏幕的状态变成被鼠标覆盖
+                this.setMouseOver(true);
+            }else {
+                uiComponent
+                    .setClicked(false)
+                    .setMouseOver(false);
+            }
+            //鼠标上一个状态是被鼠标覆盖的，但是此时的状态不是，就调用方法
+            if (uiComponentMouseOver && !uiComponent.isMouseOver()) {
+                uiComponent.mouseDown();
+            }
+        }
+        Pools.RECT.free(rectangle);
+    }
+
+    /**
+     * 处理延迟添加和删除
+     * */
+    private void handleDelayEvents () {
+        if (!this.delayAddComponents.isEmpty()) {
+            this.delayAddComponents.forEach(delayAddComponent -> {
+                delayAddComponent.setScreen(this);
+                this.components.add(delayAddComponent);
+            });
+            this.delayAddComponents.clear();
+            //添加完新的组件后调用一次排序
+            sortComponents();
+        }
+        if (!this.delayRemoveComponents.isEmpty()) {
+            this.delayRemoveComponents.forEach(delayRemoveComponent -> {
+                delayRemoveComponent.setScreen(null);
+                this.components.remove(delayRemoveComponent);
+            });
+            this.delayRemoveComponents.clear();
+        }
+    }
+
+    @Override
+    public void draw (Batch batch) {
+        if (getComponents().isEmpty()) return;
+        getComponents().forEach(uiComponent -> uiComponent.draw(batch, null));
+    }
+
+    @Override
+    public void renderShape (ShapeRenderer batch) {
+        if (!Fight.UI_DEBUG_BOX_RENDER.getValue() || getComponents().isEmpty()) return;
+        getComponents().forEach(uiComponent -> uiComponent.renderShape(batch));
+    }
+
+    /**
+     * 当相机视口大小更改时调用
+     * */
+    @Override
+    public void resize (float width, float height) {
+        if (getComponents().isEmpty()) return;
+        getComponents().forEach(uiComponent -> uiComponent.resize(width, height));
+    }
+
+    @Override
+    public boolean keyDown (int keycode) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.keyDown(keycode);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyDown(keycode));
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean keyUp (int keycode) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.keyUp(keycode);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyUp(keycode));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped (char character) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.keyTyped(character);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.keyTyped(character));
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchDown(screenX, screenY, pointer, button);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchDown(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchUp(screenX, screenY, pointer, button);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchUp(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchCancelled(screenX, screenY, pointer, button);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchCancelled(screenX, screenY, pointer, button));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged (int screenX, int screenY, int pointer) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.touchDragged(screenX, screenY, pointer);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.touchDragged(screenX, screenY, pointer));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved (int screenX, int screenY) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.mouseMoved(screenX, screenY);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.mouseMoved(screenX, screenY));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean scrolled (float amountX, float amountY) {
+        UIComponent focus = this.getFocusComponent();
+        if (focus != null) {
+            focus.scrolled(amountX, amountY);
+        }else if (!getComponents().isEmpty()) {
+            getComponents().forEach(uiComponent -> uiComponent.scrolled(amountX, amountY));
+        }
+        return false;
+    }
+
+    public boolean isMouseOver () {
+        return this.mouseOver;
+    }
+
+    public void setMouseOver (boolean mouseOver) {
+        this.mouseOver = mouseOver;
+    }
+
+    /**
+     * 获取焦点组件
+     * */
+    public UIComponent getFocusComponent () {
+        return this.focusComponent;
+    }
+
+    /**
+     * 设置焦点组件
+     * */
+    public UIScreen setFocusComponent (UIComponent focusComponent) {
+        this.focusComponent = focusComponent;
+        return this;
+    }
+
+    @Override
+    public LinkedHashSet<UIComponent> getComponents () {
+        return this.components;
+    }
+}

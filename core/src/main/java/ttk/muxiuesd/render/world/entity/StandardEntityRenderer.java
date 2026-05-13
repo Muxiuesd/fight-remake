@@ -14,10 +14,12 @@ public class StandardEntityRenderer<T extends Entity<?>> implements EntityRender
         //最基础的绘制
         if (entity.textureRegion != null) {
             batch.draw(entity.textureRegion,
-                context.x, context.y,
+                context.x - context.width / 2, context.y - context.height / 2,
                 context.originX, context.originY,
                 context.width, context.height,
-                context.scaleX, context.scaleY, context.rotation);
+                context.scaleX, context.scaleY,
+                context.rotation
+            );
         }
     }
 

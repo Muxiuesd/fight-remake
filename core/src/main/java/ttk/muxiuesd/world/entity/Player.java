@@ -3,16 +3,15 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
-import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.serialization.Codec;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.StatusEffects;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Log;
-import ttk.muxiuesd.util.TaskTimer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -23,14 +22,16 @@ import ttk.muxiuesd.world.item.ItemStack;
  */
 public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
-    public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, 0.2f, 0.2f);
+    //碰撞箱起点（前两个值）和终点（后两个值）的偏移
+    public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, -0.1f, -0.1f);
 
 
     public TextureRegion shield;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器
     public boolean isDefend = false;
-    public float defenseRadius = 1.23f; //防御半径
+    private float defenseRadius = 1.23f; //防御半径
+    private boolean isUsingItem = false;
 
     public Player (World world, EntityType<? super Player> entityType) {
         this(world, entityType, 20, 20);
@@ -38,9 +39,9 @@ public class Player extends LivingEntity<Player> {
     public Player(World world, EntityType<? super Player> entityType, float maxHealth, float curHealth) {
         super(world, entityType, maxHealth, curHealth, BACKPACK_SIZE);
         renderHandItem = true;
-        speed = 3.3f;
-        curSpeed = speed;
-        textureRegion = getTextureRegion(Fight.ID("player"), "player/player.png");
+        setSpeed(3.3f);
+        setCurSpeed(getSpeed());
+        setBodyTextureRegion(getTextureRegion(Fight.ID("player"), "player/player.png"));
         this.shield = getTextureRegion(Fight.ID("player_shield"), "player/shield.png");
 
         this.defendCDTimer = Pools.TASK_TIMER.obtain().setMaxSpan(2f).setCurSpan(0f)
@@ -50,7 +51,7 @@ public class Player extends LivingEntity<Player> {
                 //到时间了就取消防御状态
                 this.isDefend = false;
             });
-
+        fastAddBodyHitBox();
 
         backpack.setItemStack(0, new ItemStack(Items.IRON_SWORD));
         backpack.setItemStack(1, new ItemStack(Items.TEST_WEAPON));
@@ -72,24 +73,10 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(33, new ItemStack(Items.DIAMOND_BOOTS));
         backpack.setItemStack(35, new ItemStack(Items.TORCH));
 
-        setEffect(StatusEffects.HEALING, 10f, 2);
-        setEffect(StatusEffects.POISON, 5f, 1);
+        setEffect(StatusEffects.HEALING, 500f, 2);
+        setEffect(StatusEffects.POISON, 500f, 1);
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
-    }
-
-    @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-
-        //更新hitbox
-        Vector2 position = getPosition();
-        setCullingArea(
-            position.x + HITBOX_OFFSET.x,
-            position.y + HITBOX_OFFSET.y,
-            getWidth() - HITBOX_OFFSET.z,
-            getHeight() - HITBOX_OFFSET.w
-        );
     }
 
     @Override
@@ -108,13 +95,6 @@ public class Player extends LivingEntity<Player> {
             }
         }
 
-        Vector2 position = getPosition();
-        setCullingArea(
-            position.x + HITBOX_OFFSET.x,
-            position.y + HITBOX_OFFSET.y,
-            getWidth() - HITBOX_OFFSET.z,
-            getHeight() - HITBOX_OFFSET.w
-        );
         //setCullingArea(x, y, width, height);
     }
 
@@ -124,11 +104,11 @@ public class Player extends LivingEntity<Player> {
         ItemEntity itemEntity = super.dropItem(index, amount);
         if (itemEntity != null) {
             Vector2 mwp = Util.getMouseWorldPosition();
-            float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+            float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
             float v = Math.min(distance, 4f);
             itemEntity.setSpeed(v);
             itemEntity.setCurSpeed(v);
-            itemEntity.setVelocity(getDirection());
+            itemEntity.setVelocity(getDirection().toVector2());
         }
 
         return itemEntity;
@@ -140,13 +120,32 @@ public class Player extends LivingEntity<Player> {
      * */
     public ItemEntity dropItem (ItemStack stack) {
         Vector2 mwp = Util.getMouseWorldPosition();
-        float distance = Util.getDistance(x, y, mwp.x, mwp.y);
+        float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
         float v = Math.min(distance, 4f);
 
         return spawnItemEntity(stack)
             .setSpeed(v)
             .setCurSpeed(v)
-            .setVelocity(getDirection());
+            .setVelocity(getDirection().toVector2());
+    }
+
+    /**
+     * 玩家的快速添加身体碰撞箱方法
+     * */
+    @Override
+    public Player fastAddBodyHitBox () {
+        float halfWidth = this.getWidth() / 2f;
+        float halfHeight = this.getHeight() / 2f;
+        //加上偏移量
+        this.addRectHitBox(
+            HITBOX_BODY,
+            - halfWidth + HITBOX_OFFSET.x,
+            - halfHeight + HITBOX_OFFSET.y,
+            halfWidth + HITBOX_OFFSET.z,
+            halfHeight + HITBOX_OFFSET.w
+        );
+
+        return this;
     }
 
     @Override
@@ -157,5 +156,14 @@ public class Player extends LivingEntity<Player> {
     @Override
     public Codec getCodec () {
         return Codecs.PLAYER;
+    }
+
+    public boolean isUsingItem () {
+        return this.isUsingItem;
+    }
+
+    public Player setUsingItem (boolean usingItem) {
+        this.isUsingItem = usingItem;
+        return this;
     }
 }

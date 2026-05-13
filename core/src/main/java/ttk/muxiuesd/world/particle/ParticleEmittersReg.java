@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.particle;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.world.particle.abs.Particle;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.emitters.EmitterEnemyShootParticle;

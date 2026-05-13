@@ -1,66 +1,95 @@
 package ttk.muxiuesd.world.entity.abs;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codecable;
+import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
-import ttk.muxiuesd.interfaces.ICAT;
+import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Tickable;
-import ttk.muxiuesd.interfaces.Updateable;
-import ttk.muxiuesd.interfaces.serialization.Codec;
-import ttk.muxiuesd.interfaces.serialization.Codecable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.SoundSystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatBoolean;
+import ttk.muxiuesd.world.cat.CatFloat;
+import ttk.muxiuesd.world.cat.CatsHolder;
+import ttk.muxiuesd.world.entity.EntitySounder;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.hitbox.Hitbox;
+import ttk.muxiuesd.world.hitbox.HitboxHolder;
+import ttk.muxiuesd.world.hitbox.RectHitbox;
 
 /**
  * 游戏的基础实体
  * <p>
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
-public abstract class Entity<T extends Entity<?>>
-    implements ID<T>, ICAT, Disposable, Updateable, Tickable, Codecable {
+public abstract class Entity<T extends Entity<T>>
+    implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
 
-    private String id;
+    /**
+     * 加载纹理区域
+     * @param textureId 纹理材质id
+     * @param entityTexturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
+     * */
+    public static TextureRegion getTextureRegion (String textureId, String entityTexturePath) {
+        if (entityTexturePath == null) return Util.loadTextureRegion(textureId, entityTexturePath);
+        return Util.loadTextureRegion(textureId, Fight.EntityTexturePath(entityTexturePath));
+    }
 
-    public float speed, curSpeed;
-    public float x, y;
-    public float velX, velY;
-    public float width, height;
-    public float originX, originY;
-    public float scaleX = 1, scaleY = 1;
-    public float rotation;
-    private boolean onGround = true;    //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
+
+    /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
+    public static final String HITBOX_BODY = Fight.ID("entity_body");
+
+    private String id;  //实体的id
+    /// 以下都是实体的基础数据（物理参数、渲染参数等）
+    private float speed;
+    private float x, y;                     //实体的世界坐标
+    private float velX, velY;               //实体的速度
+    private float width, height;            //实体的宽高（世界渲染）
+    private float originX = 0f, originY = 0f;
+    private float scaleX = 1f, scaleY = 1f;
+    private float rotation;                 //实体的旋转角度（世界渲染）
+
+    private boolean onGround = true;        //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
     public TextureRegion textureRegion;
-    public Rectangle hitbox = new Rectangle();  //碰撞箱
 
-    private EntitySystem es;    //此实体所属的实体系统
-    private EntityType<?> type;
-    private Property property;  //实体的属性
+    private EntitySystem es;                        //此实体所属的实体系统
+    private EntityType<?> type;                     //实体的类型
+    private Property property;                      //实体的属性
+    private HitboxHolder<Entity<T>> hitboxHolder;   //实体的碰撞箱持有者
+    private EntitySounder sounder;                  //实体的音频发声者
 
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
-        this.property = new Property();
+        this.property       = new Property();
+        this.hitboxHolder   = new HitboxHolder<>(this);
+        this.sounder        = new EntitySounder(this);
     }
 
+    /**
+     * 读取自定义属性标签数据
+     * */
     @Override
-    public void readCAT (JsonValue values) {
+    public void readCatData (JsonValue values) {
         this.speed = values.getFloat("speed", 1.145f);
-        this.curSpeed = values.getFloat("curSpeed", 1.145f);
+        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
         this.x = values.getFloat("x", 1.145f);
         this.y = values.getFloat("y", 1.145f);
         this.velX = values.getFloat("velX", 0);
@@ -74,45 +103,57 @@ public abstract class Entity<T extends Entity<?>>
         this.rotation = values.getFloat("rotation", 0);
         this.onGround = values.getBoolean("onGround", true);
 
-        //更新hitbox
-        Vector2 position = getPosition();
-        setCullingArea(
-            position.x,
-            position.y,
-            getWidth(),
-            getHeight()
-        );
+        this.updateHitboxCenterPos(this.x, this.y);
     }
 
+    /**
+     * 写入自定义属性标签数据
+     * */
     @Override
-    public void writeCAT (CAT cat) {
-        cat.set("speed", this.speed);
-        cat.set("curSpeed", this.curSpeed);
-        cat.set("x", this.x);
-        cat.set("y", this.y);
-        cat.set("velX", this.velX);
-        cat.set("velY", this.velY);
-        cat.set("width", this.width);
-        cat.set("height", this.height);
-        cat.set("originX", this.originX);
-        cat.set("originY", this.originY);
-        cat.set("scaleX", this.scaleX);
-        cat.set("scaleY", this.scaleY);
-        cat.set("rotation", this.rotation);
-        cat.set("onGround", this.onGround);
+    public void writeCatData (CatsHolder holder) {
+        holder
+            .put("speed", new CatFloat(this.speed))
+            .put("curSpeed", new CatFloat(this.getCurSpeed()))
+            .put("x", new CatFloat(this.x))
+            .put("y", new CatFloat(this.y))
+            .put("velX", new CatFloat(this.velX))
+            .put("velY", new CatFloat(this.velY))
+            .put("width", new CatFloat(this.width))
+            .put("height", new CatFloat(this.height))
+            .put("originX", new CatFloat(this.originX))
+            .put("originY", new CatFloat(this.originY))
+            .put("scaleX", new CatFloat(this.scaleX))
+            .put("scaleY", new CatFloat(this.scaleY))
+            .put("rotation", new CatFloat(this.rotation))
+            .put("onGround", new CatBoolean(this.onGround));
     }
 
     /**
      * 延迟初始化，在实体添加到实体系统后才会执行
      * */
-    public void initialize() {
-    }
+    public void lazyInitialize () {}
 
+    /**
+     * 这里面调用每帧需要更新的东西，对性能影响较大，不涉及实体坐标的更新
+     * */
     @Override
     public void update(float delta) {
-        this.setCullingArea(this.x, this.y, this.getWidth(), this.getHeight());
+        //更新持有的hitbox的中心点坐标
+        this.updateHitboxCenterPos(this.x, this.y);
     }
 
+    /**
+     * 更新碰撞箱中心坐标，默认是跟实体坐标（默认也是中心坐标）重合的
+     * */
+    public void updateHitboxCenterPos (float x, float y) {
+        this.getHitboxHolder().getBoxes().forEach((id, box) -> {
+            box.setCenterPos(this.x, this.y);
+        });
+    }
+
+    /**
+     * 实体每tick调用方法
+     * */
     @Override
     public void tick (World world, float delta) {
     }
@@ -124,12 +165,96 @@ public abstract class Entity<T extends Entity<?>>
         }
     }
 
-
-    public T setCullingArea(float x, float y, float width, float height) {
-        this.hitbox.set(x, y, width, height);
+    /**
+     * 快速添加一个实体身体的碰撞箱，起点和终点相对于中心的偏移值都是实体的宽高的一半
+     * */
+    public T fastAddBodyHitBox () {
+        float halfWidth = this.getWidth() / 2f;
+        float halfHeight = this.getHeight() / 2f;
+        Hitbox bodyHitbox = this.getBodyHitbox();
+        if (bodyHitbox == HitboxHolder.VOID_HITBOX) {
+            this.addRectHitBox(HITBOX_BODY, - halfWidth, - halfHeight, halfWidth, halfHeight);
+        }else if (bodyHitbox instanceof RectHitbox rectBodyHitbox) {
+            rectBodyHitbox.setStartPos(- halfWidth, - halfHeight).setEndPos(halfWidth, halfHeight);
+        }
+        return (T) this;
+    }
+    /**
+     * 根据起点和终点相对于中心点的偏移来添加一个矩形碰撞箱
+     * */
+    public T addRectHitBox (String id, float startX, float startY, float endX, float endY) {
+        this.getHitboxHolder().addBox(
+            id,
+            new RectHitbox().setStartPos(startX, startY).setEndPos(endX, endY).setCenterPos(this.x, this.y)
+        );
         return (T) this;
     }
 
+    /**
+     * 让这个实体发出某个音效
+     * */
+    public SpatialAudio playSound (AudioHolder sound) {
+        return this.getEntitySystem()
+            .getWorld()
+            .getSystem(SoundSystem.class)
+            .playSpatialSound(sound, this);
+    }
+
+
+    public T setPosition(Vector2 vector2) {
+        this.setPosition(vector2.x, vector2.y);
+        return (T) this;
+    }
+    public T setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        this.updateHitboxCenterPos(x, y);
+        return (T) this;
+    }
+
+    public T setSize (Vector2 size) {
+        this.setSize(size.x, size.y);
+        return (T) this;
+    }
+    public T setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
+        return (T) this;
+    }
+
+    public T setBounds(float x, float y, float width, float height) {
+        this.setPosition(x, y);
+        this.setSize(width, height);
+        return (T) this;
+    }
+
+    /**
+     * 获取实体坐标
+     * */
+    public Vector2 getPosition() {
+        return new Vector2(this.x, this.y);
+    }
+
+    /**
+     * 在当前的坐标基础上做出改变
+     * */
+    public T positionChange (Vector2 deltaPos) {
+        this.setPosition(this.x + deltaPos.x, this.y + deltaPos.y);
+        return (T) this;
+    }
+
+    /**
+     * 坐标根据时间间隔与速度矢量发生变化
+     * @param delta 更新间隔时间
+     * */
+    public T positionChange (float delta) {
+        this.setPosition(this.x + this.velX * delta, this.y + this.velY * delta);
+        return (T) this;
+    }
+
+    /**
+     * 获取实体的基准速度（比如移动速度）
+     * */
     public float getSpeed () {
         return this.speed;
     }
@@ -141,15 +266,109 @@ public abstract class Entity<T extends Entity<?>>
         return (T) this;
     }
 
+    /**
+     * 获取当前速率
+     * */
     public float getCurSpeed () {
-        return curSpeed;
+        return Vec2.len(this.getVelX(), this.getVelY());
     }
 
+    /**
+     * 设置当前速率
+     * */
     public T setCurSpeed (float curSpeed) {
-        this.curSpeed = curSpeed;
+        curSpeed = Math.abs(curSpeed);
+        float len = Vec2.len(this.getVelX(), this.getVelY());
+        if (len < EntitySystem.MIN_SPEED) {
+            //当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
+            this.setVelocity(0, 0);
+            return (T) this;
+        }
+        this.setVelocity((this.getVelX() / len) * curSpeed, (this.getVelY() / len) * curSpeed);
         return (T) this;
     }
 
+    public float getX () {
+        return this.x;
+    }
+
+    public T setX (float x) {
+        this.x = x;
+        //及时更新碰撞箱中心坐标
+        this.updateHitboxCenterPos(this.x, this.y);
+        return (T) this;
+    }
+
+    public float getY () {
+        return this.y;
+    }
+
+    public T setY (float y) {
+        this.y = y;
+        //及时更新碰撞箱中心坐标
+        this.updateHitboxCenterPos(this.x, this.y);
+        return (T) this;
+    }
+
+    /**
+     * 获取速度矢量
+     * */
+    public Vector2 getVelocity () {
+        return new Vector2(this.getVelX(), this.getVelY());
+    }
+
+    /**
+     * 设置速度矢量
+     * */
+    public T setVelocity(Vector2 velocity) {
+        this.setVelocity(velocity.x, velocity.y);
+        return (T) this;
+    }
+    public T setVelocity(float xVel, float yVel) {
+        this.setVelX(xVel);
+        this.setVelY(yVel);
+        return (T) this;
+    }
+
+    public float getVelX () {
+        return this.velX;
+    }
+
+    public T setVelX (float velX) {
+        this.velX = velX;
+        return (T) this;
+    }
+
+    public float getVelY () {
+        return this.velY;
+    }
+
+    public T setVelY (float velY) {
+        this.velY = velY;
+        return (T) this;
+    }
+
+    public Vector2 getSize () {
+        return new Vector2(this.width, this.height);
+    }
+
+    /**
+     * 设置实体宽度（世界渲染）
+     * */
+    public float getWidth() {
+        return this.width;
+    }
+
+    /**
+     * 设置实体高度（世界渲染）
+     * */
+    public float getHeight() {
+        return this.height;
+    }
+
+    /**
+     * 设置旋转中心，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
     public T setOrigin(float originX, float originY) {
         this.originX = originX;
         this.originY = originY;
@@ -160,112 +379,66 @@ public abstract class Entity<T extends Entity<?>>
         return new Vector2(this.originX, this.originY);
     }
 
-    public T setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
-        return (T) this;
-    }
-
-    public T setSize(float width, float height) {
-        this.width = width;
-        this.height = height;
-        return (T) this;
-    }
-
-    public T setSize (Vector2 size) {
-        this.setSize(size.x, size.y);
-        return (T) this;
-    }
-
-    public T setBounds(float x, float y, float width, float height) {
-        this.setPosition(x, y);
-        this.setSize(width, height);
-        return (T) this;
-    }
-
-    public Vector2 getPosition() {
-        return new Vector2(this.x, this.y);
-    }
-
-    public T setPosition(Vector2 vector2) {
-        this.x = vector2.x;
-        this.y = vector2.y;
-        return (T) this;
-    }
-
-    /**
-     * 在当前的坐标基础上做出改变
-     * */
-    public T positionChange(Vector2 deltaPos) {
-        this.x += deltaPos.x;
-        this.y += deltaPos.y;
-        return (T) this;
-    }
-
-    /**
-     * 坐标根据时间间隔与速度矢量发生变化
-     * @param delta 更新间隔时间
-     * */
-    public T positionChange(float delta) {
-        this.x += this.velX * delta;
-        this.y += this.velY * delta;
-        return (T) this;
-    }
-
-    /**
-     * 获取速度矢量
-     * */
-    public Vector2 getVelocity() {
-        return new Vector2(this.velX, this.velY);
-    }
-
-    public T setVelocity(Vector2 velocity) {
-        this.setVelocity(velocity.x, velocity.y);
-        return (T) this;
-    }
-
-    public T setVelocity(float x, float y) {
-        this.velX = x;
-        this.velY = y;
-        return (T) this;
-    }
-
-    public Vector2 getSize () {
-        return new Vector2(this.width, this.height);
-    }
-
-    public float getWidth() {
-        return this.width;
-    }
-
-    public float getHeight() {
-        return this.height;
-    }
-
-    public Vector2 getCenter() {
-        return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
-    }
-
     public Vector2 getScale () {
         return new Vector2(this.scaleX, this.scaleY);
     }
 
+    /**
+     * 获取旋转角度（世界渲染）
+     * */
     public float getRotation () {
-        return rotation;
+        return this.rotation;
     }
 
+    /**
+     * 设置旋转角度（世界渲染）
+     * */
     public T setRotation (float rotation) {
         this.rotation = rotation;
         return (T) this;
     }
 
-    public Rectangle getHitbox() {
-        return this.hitbox;
+    /**
+     * 获取实体的中心点的坐标（与世界坐标是两个概念），会影响实体的某些渲染坐标
+     * <p>
+     * 默认是实体的世界坐标
+     * */
+    public Vector2 getCenterPos () {
+        return new Vector2(this.x, this.y);
     }
 
-    public T setHitbox (Rectangle hitbox) {
-        this.hitbox = hitbox;
+    /**
+     * 获取实体的身体碰撞箱
+     * */
+    public Hitbox getBodyHitbox () {
+        return this.getHitboxHolder().getBox(HITBOX_BODY);
+    }
+
+    /**
+     * 获取实体的碰撞箱持有类
+     * */
+    public HitboxHolder<Entity<T>> getHitboxHolder () {
+        return this.hitboxHolder;
+    }
+
+    /**
+     * 设置实体碰撞箱持有类
+     * */
+    public T setHitboxHolder (HitboxHolder<Entity<T>> hitboxHolder) {
+        if (hitboxHolder != null) this.hitboxHolder = hitboxHolder;
         return (T) this;
+    }
+
+    /**
+     * 获取这个实体的发声源
+     * */
+    public EntitySounder getSounder () {
+        return this.sounder;
+    }
+
+    public Entity<T> setSounder (EntitySounder sounder) {
+        this.sounder = sounder;
+        return this;
     }
 
     public T setEntitySystem(EntitySystem es) {
@@ -277,6 +450,9 @@ public abstract class Entity<T extends Entity<?>>
         return this.es;
     }
 
+    /**
+     * 获取实体类型
+     * */
     public EntityType<?> getType () {
         return this.type;
     }
@@ -296,34 +472,22 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     /**
-     * 加载身体材质
+     * 设置实体身体渲染材质
      * */
-    public void loadBodyTextureRegion (String textureId, String texturePath) {
-        textureRegion = this.getTextureRegion(textureId, texturePath);
-    }
-
-    /**
-     * 加载纹理区域
-     * @param textureId 纹理材质id
-     * @param texturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
-     * */
-    public TextureRegion getTextureRegion (String textureId, String texturePath) {
-        if (texturePath == null) {
-            return new TextureRegion(AssetsLoader.getInstance().getById(textureId, Texture.class));
-        }
-
-        AssetsLoader.getInstance().loadAsync(textureId, Fight.EntityTexturePath(texturePath), Texture.class, null);
-        Texture texture = AssetsLoader.getInstance().getById(textureId, Texture.class);
-        return new TextureRegion(texture);
+    public void setBodyTextureRegion (TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
     }
 
     /**
      * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦
      * */
     public boolean isOnGround () {
-        return onGround;
+        return this.onGround;
     }
 
+    /**
+     * 设置当前的状态是否贴地
+     * */
     public T setOnGround (boolean onGround) {
         this.onGround = onGround;
         return (T) this;
@@ -353,7 +517,7 @@ public abstract class Entity<T extends Entity<?>>
     }
 
     /**
-     * 实体的属性
+     * 实体的属性类
      * */
     public static class Property {
         //属性映射
@@ -362,25 +526,21 @@ public abstract class Entity<T extends Entity<?>>
         public Property () {
             setPropertiesMap(
                 new JsonPropertiesMap()
-                    .add(PropertyTypes.CAT, new CAT())
+                    .add(PropertyTypes.CATS, new CatsHolder())
             );
         }
 
         public <T> T get (PropertyType<T> propertyType) {
-            return getPropertiesMap().get(propertyType);
+            return this.getPropertiesMap().get(propertyType);
         }
 
         public <T> Entity.Property add (PropertyType<T> propertyType, T value) {
-            getPropertiesMap().add(propertyType, value);
+            this.getPropertiesMap().add(propertyType, value);
             return this;
         }
 
-        public CAT getCAT () {
-            return this.get(PropertyTypes.CAT);
-        }
-
-        public Entity.Property setCAT (CAT cat) {
-            return this.add(PropertyTypes.CAT, cat);
+        public CatsHolder getCatsHolder () {
+            return this.get(PropertyTypes.CATS);
         }
 
         public PropertiesDataMap<?, ?, ?> getPropertiesMap () {

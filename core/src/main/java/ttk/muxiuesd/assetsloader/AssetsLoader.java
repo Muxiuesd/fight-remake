@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.util.Log;
 import ttk.muxiuesd.util.Util;
 
 import java.util.HashMap;
@@ -13,16 +13,17 @@ import java.util.Objects;
 
 /**
  * 游戏资源加载管理器
- * 通过唯一的id获取对应的资源
+ * <p>
+ * 每一个资源的文件路径都会对应一个id
  * */
 public class AssetsLoader implements Disposable {
-    public final String TAG = this.getClass().getSimpleName();
+    public final String TAG = this.getClass().getName();
 
     private final AssetManager gameAssetManager = new AssetManager();
     private final HashMap<String, AssetManager> modAssetManagers = new HashMap<>();  //每一个mod分配一个资源管理器
     private final AsyncExecutor asyncExecutor = new AsyncExecutor(10);
 
-    private final HashMap<String, String> idToPath; //id映射路径，规范id例子： fight:grass_block
+    private final HashMap<String, String> idToPath; ///id映射路径，规范id例子： fight:grass_block
 
     private AssetsLoader () {
         this.idToPath = new HashMap<>();
@@ -113,7 +114,7 @@ public class AssetsLoader implements Disposable {
      * @param <T> 资源类型
      * @return 已加载的资源
      */
-    public <T> T getById(String id, Class<T> type) {
+    public <T> T getById (String id, Class<T> type) {
         if (!this.containsId(id)) {
             Log.error(TAG, "Id为：" + id + "的资源路径根本不存在！！！");
             throw new IllegalStateException("无效Id：" + id);
@@ -121,7 +122,7 @@ public class AssetsLoader implements Disposable {
         String[] split = id.split(":");
         if (Objects.equals(split[0], Fight.NAMESPACE)) {
             //先从游戏内部资源探查
-            return this.get(this.idToPath.get(id), type);
+            return this.getByPath(this.idToPath.get(id), type);
         }else {
             //mod资源
             AssetManager modAssetManager = this.getModAssetManager(split[0]);
@@ -136,7 +137,7 @@ public class AssetsLoader implements Disposable {
      * @param <T> 资源类型
      * @return 已加载的资源
      */
-    private <T> T get(String filePath, Class<T> type) {
+    public  <T> T getByPath (String filePath, Class<T> type) {
         if (!this.gameAssetManager.isLoaded(filePath, type)) {
             throw new IllegalStateException("类型为："+ type.getName() + " 的资源未加载: " + filePath);
         }
@@ -173,6 +174,9 @@ public class AssetsLoader implements Disposable {
         this.idToPath.put(id, path);
     }
 
+    /**
+     * 通过id获取文件路径
+     * */
     public String getPath (String id) {
         return this.idToPath.get(id);
     }

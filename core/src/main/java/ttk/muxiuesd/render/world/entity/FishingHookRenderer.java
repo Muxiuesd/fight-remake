@@ -13,7 +13,7 @@ public class FishingHookRenderer implements EntityRenderer<EntityFishingHook> {
     public void draw (Batch batch, EntityFishingHook entity, Context context) {
         if (entity.textureRegion != null) {
             batch.draw(entity.textureRegion,
-                context.x, context.y + entity.getPositionOffset().y,
+                context.x - context.width / 2f, context.y - context.height /2f + entity.getPositionOffset().y,
                 context.originX, context.originY,
                 context.width, context.height,
                 context.scaleX, context.scaleY,

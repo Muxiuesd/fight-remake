@@ -3,14 +3,16 @@ package ttk.muxiuesd.audio;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.Updateable;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 空间音效实例
+ * <p>
  * 为了控制音效播放以及检测播放状态，迫不得已改为 {@link Music}
  * */
+@Deprecated
 public class SpatialSoundInstance extends MusicInstance implements Updateable {
     private final Entity<?> sounder;   //发声者
     private final Entity<?> receiver;  //接收者
@@ -43,7 +45,7 @@ public class SpatialSoundInstance extends MusicInstance implements Updateable {
      * 计算音量
      * 距离越近自然音量越大
      * */
-    public float calculateVolume() {
+    public float calculateVolume () {
         float distance = receiver.getPosition().dst(sounder.getPosition());
         Float hearingRange = Fight.PLAYER_HEARING_RANGE.getValue();
         if (distance > hearingRange) {

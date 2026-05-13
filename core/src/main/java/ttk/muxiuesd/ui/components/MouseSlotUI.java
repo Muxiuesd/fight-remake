@@ -1,10 +1,9 @@
 package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.ui.PlayerInventoryUIPanel;
-import ttk.muxiuesd.ui.screen.PlayerInventoryScreen;
+import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -12,7 +11,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 /**
  * 鼠标物品槽UI
  * */
-public class MouseSlotUI extends SlotUI {
+public class MouseSlotUI extends PlayerSlotUI {
     //单例模式
     private static MouseSlotUI INSTANCE;
 
@@ -28,20 +27,24 @@ public class MouseSlotUI extends SlotUI {
     }
 
     private ItemStack itemStack;
+    //public UIPanel curPanel;
+    public UIScreen curScreen; //当前鼠标物品槽UI所属的UIScreen
 
-    private MouseSlotUI() {
-        super(10000f, 10000f, SLOT_WIDTH, SLOT_HEIGHT, new GridPoint2(16, 16));
+    private MouseSlotUI () {
+        super(10000f, 10000f, SLOT_WIDTH, SLOT_HEIGHT);
         setEnabled(false);
+        setZIndex(10000);
     }
 
     /**
      * 激活鼠标物品槽
+     * @param screen 在哪个UIScreen上激活物品槽
      * */
-    public static MouseSlotUI activate () {
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
+    public static MouseSlotUI activate (UIScreen screen) {
         MouseSlotUI instance = getInstance();
         instance.setPosition(Util.getMouseUIPosition());
-        inventoryUIPanel.addComponent(instance);
+        instance.curScreen = screen;
+        screen.addComponent(instance);
 
         return INSTANCE;
     }
@@ -51,9 +54,11 @@ public class MouseSlotUI extends SlotUI {
      * */
     public static MouseSlotUI deactivate () {
         MouseSlotUI instance = getInstance();
-        PlayerInventoryUIPanel inventoryUIPanel = PlayerInventoryScreen.getInventoryUIPanel();
-        inventoryUIPanel.removeComponent(instance);
-
+        if (instance.curScreen != null) {
+            instance.curScreen.removeComponent(instance);
+            instance.curScreen = null;
+        }
+        instance.clearItem();
         return instance;
     }
 
@@ -86,9 +91,16 @@ public class MouseSlotUI extends SlotUI {
         Item item = stack.getItem();
         float renderX = mouseUIPosition.x - getWidth() / 2;
         float renderY = mouseUIPosition.y - getHeight() / 2;
-        batch.draw(item.textureRegion, renderX, renderY, getWidth(), getHeight());
+        batch.draw(item.textureRegion, (int) renderX, (int) renderY, getWidth(), getHeight());
 
         int amount = stack.getAmount();
-        drawAmount(batch, parent, renderX, renderY, amount);
+        if (amount > 1) drawAmount(batch, parent, (int) renderX, (int) renderY, amount);
+    }
+
+    /**
+     * 检查这个鼠标物品槽位UI是否活跃，也就是检查它是否有在uiScreen上
+     * */
+    public boolean isActive () {
+        return this.curScreen != null;
     }
 }

@@ -3,37 +3,18 @@ package ttk.muxiuesd.world.block.instance;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
-import ttk.muxiuesd.world.cat.CAT;
+import ttk.muxiuesd.world.cat.CatBoolean;
+import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
  * 熔炉方块
  * */
 public class BlockFurnace extends BlockWithEntity {
-    public static final BlockRenderer<BlockFurnace> RENDERER = (batch, block, context) -> {
-        if (!block.isWorking) {
-            batch.draw(block.getTextureRegion(),
-                context.x, context.y,
-                context.originX, context.originY,
-                context.width, context.height,
-                context.scaleX, context.scaleY,
-                context.rotation);
-        }else{
-            batch.draw(block.workingTexture,
-                context.x, context.y,
-                context.originX, context.originY,
-                context.width, context.height,
-                context.scaleX, context.scaleY,
-                context.rotation);
-        }
-    };
-
-
     private TextureRegion workingTexture;
     private boolean isWorking = false;
 
@@ -43,15 +24,15 @@ public class BlockFurnace extends BlockWithEntity {
     }
 
     @Override
-    public void writeCAT (CAT cat) {
-        super.writeCAT(cat);
-        cat.set("is_working", this.isWorking);
+    public void writeCatData (CatsHolder holder) {
+        super.writeCatData(holder);
+        holder.put("is_working", new CatBoolean(this.isWorking));
     }
 
     @Override
-    public void readCAT (JsonValue values) {
-        super.readCAT(values);
-        this.isWorking = values.getBoolean("is_working");
+    public void readCatData (JsonValue values) {
+        super.readCatData(values);
+        this.isWorking = values.getBoolean("is_working", false);
     }
 
     @Override
