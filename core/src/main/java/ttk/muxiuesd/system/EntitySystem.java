@@ -22,9 +22,9 @@ import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.FileUtil;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -474,7 +474,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void loadEntities (ChunkSystem cs, Chunk chunk) {
         ChunkPosition chunkPosition = chunk.getChunkPosition();
         //文件不存在就是区块上没有实体，直接跳过
-        if (! FileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
+        if (! AbsFileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
             return;
         }
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
@@ -488,13 +488,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void initLoadEntities (ChunkPosition chunkPosition) {
         String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (!FileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
+        if (! AbsFileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
 
-        FileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
+        AbsFileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
     }
 
     @Override

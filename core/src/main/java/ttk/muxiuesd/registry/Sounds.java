@@ -5,11 +5,13 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.InternalFileUtil;
 import ttk.muxiuesd.world.block.BlockSounds;
 
 /**
  * 音效的注册
+ * <p>
+ * 目前只能注册打包进jar的音效文件！
  * */
 public final class Sounds {
     public static void init () {
@@ -79,67 +81,13 @@ public final class Sounds {
         return registerSound(name, "block/" + filePath);
     }
 
-    /*public static BlockSoundsID registerBlockSounds (String name, String soundFileName) {
-        String walk = name + "_walk";
-        String put = name + "_put";
-        String destroy = name + "_destroy";
-        BlockSoundsID ids = new BlockSoundsID(
-            Fight.ID(walk),
-            Fight.ID(put),
-            Fight.ID(destroy)
-        );
-        registerBlockSoundAsMusic(walk, "walk/" + soundFileName);
-        registerBlockSoundAsMusic(put, "put/" + soundFileName);
-        registerBlockSoundAsMusic(destroy, "destroy/" + soundFileName);
-
-        return Registries.BLOCK_SOUNDS.register(new Identifier(Fight.NAMESPACE, name), ids);
-    }
-
-    *//**
-     * 把方块sound加载成music
-     * *//*
-    public static AudioHolder registerBlockSoundAsMusic (String name, String path) {
-        return registerSoundAsMusic(name, "block/" + path);
-    }
-
-    *//**
-     * 注册方块sound
-     * *//*
-    public static AudioHolder registerBlockSound (String name, String path) {
-        return registerSound(name, "block/" + path);
-    }
-
-    *//**
-     * 把sound加载成music
-     * *//*
-    public static AudioHolder registerSoundAsMusic (String name, String path) {
-        String id = LOADER.loadMusic(Fight.ID(name), "sound/" + path);
-        return register(id);
-    }*/
-
-
-    /**
-     * 最基础的sound注册
-     *
-    public static AudioHolder registerSound (String name, String path) {
-        String id = LOADER.loadSound(Fight.ID(name), "sound/" + path);
-        return register(id);
-    }
-
-    *//**
-     * 最基础的music注册
-     * *//*
-    public static AudioHolder registerMusic (String name, String path) {
-        String id = LOADER.loadMusic(Fight.ID(name), "music/" + path);
-        return register(id);
-    }*/
-
     /**
      * 注册游戏的音乐
      * @param filePath 基于audio/music/文件夹下的文件路径
      * */
     public static AudioHolder registerMusic (String name, String filePath) {
-        return register(Fight.ID(name), FileUtil.getFileHandle(Fight.MusicPath(filePath)));
+        //return register(Fight.ID(name), AbsFileUtil.getFileHandle(Fight.MusicPath(filePath)));
+        return register(Fight.ID(name), InternalFileUtil.getInstance().getFileHandle(Fight.MusicPath(filePath)));
     }
 
     /**
@@ -147,7 +95,8 @@ public final class Sounds {
      * @param filePath 基于audio/sound/文件夹下的文件路径
      * */
     public static AudioHolder registerSound (String name, String filePath) {
-        return register(Fight.ID(name), FileUtil.getFileHandle(Fight.SoundPath(filePath)));
+        //return register(Fight.ID(name), AbsFileUtil.getFileHandle(Fight.SoundPath(filePath)));
+        return register(Fight.ID(name), InternalFileUtil.getInstance().getFileHandle(Fight.SoundPath(filePath)));
     }
 
     /**

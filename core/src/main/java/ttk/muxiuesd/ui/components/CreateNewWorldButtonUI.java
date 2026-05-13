@@ -3,7 +3,7 @@ package ttk.muxiuesd.ui.components;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.ui.screen.WorldsMenuUIScreen;
 import ttk.muxiuesd.ui.text.Text;
-import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.world.WorldInfo;
 
 import java.util.UUID;
@@ -21,8 +21,8 @@ public class CreateNewWorldButtonUI extends FightUITextButton {
                 //点击就新建一个世界
                 String worldName = UUID.randomUUID().toString();
                 String worldDirPath = Fight.PATH_SAVE + worldName + "/" + Fight.PATH_SAVE_WORLD;
-                FileUtil.createDir(worldDirPath);
-                FileUtil.createFile(worldDirPath, WorldInfo.FILE_NAME).writeString(
+                AbsFileUtil.createDir(worldDirPath);
+                AbsFileUtil.createFile(worldDirPath, WorldInfo.FILE_NAME).writeString(
                     "{\n" +
                          "\t\"fight:string\": {\n" +
                          "\t\t\"world_name\": \"" + worldName +"\"\n" +

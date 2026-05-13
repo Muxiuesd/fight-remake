@@ -11,7 +11,7 @@ import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
 import ttk.muxiuesd.ui.components.SavesListUI;
 import ttk.muxiuesd.ui.components.WorldSaveButtonUI;
 import ttk.muxiuesd.ui.text.Text;
-import ttk.muxiuesd.util.FileUtil;
+import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.world.WorldInfo;
 
 import java.util.Arrays;
@@ -57,13 +57,13 @@ public class WorldsMenuUIScreen extends UIScreen {
      * 读取存档目录
      * */
     public void readSavesDir () {
-        boolean saveDirIsExist = FileUtil.dirExists(Fight.PATH_SAVE);
+        boolean saveDirIsExist = AbsFileUtil.dirExists(Fight.PATH_SAVE);
         if (!saveDirIsExist) {
             Log.error(this.getClass().getName(), "没有存档文件夹， 已自动创建！！！");
         }
 
         //读取存档文件夹下所有的存档文件目录
-        FileHandle savesDirFileHandle = FileUtil.getFileHandle(Fight.PATH_SAVE);
+        FileHandle savesDirFileHandle = AbsFileUtil.getFileHandle(Fight.PATH_SAVE);
         FileHandle[] saveDirs = savesDirFileHandle.list();
         Arrays.stream(saveDirs).forEach((dir) -> {
             System.out.println(dir.name());
@@ -72,9 +72,9 @@ public class WorldsMenuUIScreen extends UIScreen {
         //读取目录中的世界信息
         for (FileHandle saveDir : saveDirs) {
             //如果不存在世界信息文件就跳过这个目录
-            if (!FileUtil.fileExists(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME)) continue;
+            if (! AbsFileUtil.fileExists(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME)) continue;
             //有世界信息文件就读取
-            JsonValue worldInfoJsonFile = FileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
+            JsonValue worldInfoJsonFile = AbsFileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
             JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
             JsonValue objValue = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
             String worldName = objValue.getString(Fight.WORLD_NAME.getKey());
