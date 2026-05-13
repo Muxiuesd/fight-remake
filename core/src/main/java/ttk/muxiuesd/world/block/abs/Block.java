@@ -11,7 +11,7 @@ import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.BlockSoundsID;
+import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
@@ -127,11 +127,11 @@ public abstract class Block implements ID<Block>, Disposable {
             return this;
         }
 
-        public BlockSoundsID getSounds() {
+        public BlockSounds getSounds() {
             return this.get(PropertyTypes.BLOCK_SOUNDS_ID);
         }
 
-        public Property setSounds(BlockSoundsID sounds) {
+        public Property setSounds(BlockSounds sounds) {
             return this.set(PropertyTypes.BLOCK_SOUNDS_ID, sounds);
         }
 

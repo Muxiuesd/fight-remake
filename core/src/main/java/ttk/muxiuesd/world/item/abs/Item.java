@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.ID;
@@ -16,7 +17,7 @@ import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -113,9 +114,9 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * */
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放物品使用音效
-        String useSoundId = this.property.getUseSoundId();
-        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-        ses.newSpatialSound(useSoundId, user);
+        AudioHolder useSound = this.property.getUseSound();
+        SoundSystem ses = world.getSystem(SoundSystem.class);
+        ses.playSpatialSound(useSound, user);
 
         return true;
     }
@@ -177,11 +178,6 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
      * 物品的属性
      * */
     public static class Property {
-        public static final JsonPropertiesMap ITEM_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-            .add(PropertyTypes.ITEM_MAX_COUNT, 64)
-            .add(PropertyTypes.ITEM_ON_USING, false)
-            .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getID());
-
         //属性映射
         private PropertiesDataMap<?, ?, ?> propertiesMap;
 
@@ -192,9 +188,8 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             this.setPropertiesMap(new JsonPropertiesMap()
                 .add(PropertyTypes.ITEM_MAX_COUNT, 64)
                 .add(PropertyTypes.ITEM_ON_USING, false)
-                .add(PropertyTypes.ITEM_USE_SOUND_ID, Sounds.ITEM_CLICK.getID())
+                .add(PropertyTypes.ITEM_USE_SOUND, Sounds.ITEM_CLICK)
             );
-            //this.setPropertiesMap(ITEM_DEFAULT_PROPERTIES_DATA_MAP.copy());
         }
 
         /**
@@ -228,12 +223,12 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             throw new IllegalArgumentException ("最大堆叠数必须大于0！！！");
         }
 
-        public String getUseSoundId () {
-            return get(PropertyTypes.ITEM_USE_SOUND_ID);
+        public AudioHolder getUseSound () {
+            return get(PropertyTypes.ITEM_USE_SOUND);
         }
 
-        public Property setUseSoundId (String useSoundId) {
-            add(PropertyTypes.ITEM_USE_SOUND_ID, useSoundId);
+        public Property setUseSound (AudioHolder audioHolder) {
+            add(PropertyTypes.ITEM_USE_SOUND, audioHolder);
             return this;
         }
 
@@ -250,7 +245,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
          * 获取物品耐久
          * */
         public int getDuration () {
-            return this.get(PropertyTypes.ITEM_DURATION);
+            return this.get(PropertyTypes.ITEM_DURATION, 0);
         }
 
         public Property setDuration (int duration) {
@@ -259,7 +254,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         }
 
         public float getUseSpan () {
-            return this.get(PropertyTypes.WEAPON_USE_SAPN);
+            return this.get(PropertyTypes.WEAPON_USE_SAPN, 0f);
         }
 
         public Property setUseSpan (float useSpan) {
@@ -267,6 +262,9 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
             return this;
         }
 
+        /**
+         * 检查是否有这个属性
+         * */
         public boolean contain (PropertyType<?> type) {
             return this.getPropertiesMap().contain(type);
         }

@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.font.FontHolder;
 import game.muxiuesd.bedrockcore.util.TextureUtil;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.TextUtil;
 
@@ -70,11 +68,6 @@ public class UITextButton extends UIButton {
 
             TextUtil.draw(batch, bitmapFont, this.getText().getString(), renderX, y + renderSize + DEFAULT_EDGE);
         }
-    }
-
-    @Override
-    public void playClickSound () {
-        AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
     }
 
     public Text getText () {

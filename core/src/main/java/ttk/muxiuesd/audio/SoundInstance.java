@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 /**
  * 正在播放的音效的实例
  * */
+@Deprecated
 public class SoundInstance {
     //定义sound播放模式
     public static final int PLAY    = 0;

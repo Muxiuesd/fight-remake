@@ -1,8 +1,9 @@
 package ttk.muxiuesd.world.item.food;
 
 import com.badlogic.gdx.math.MathUtils;
-import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.audio.AudioHolder;
+import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -17,7 +18,8 @@ public class FoodItem extends ConsumptionItem {
      * 默认属性，默认的吃食物的音效
      * */
     public static Property createDefaultProperty() {
-        return new Property().setMaxCount(64).setUseSoundId(Fight.ID("eat_"));
+        return new Property()
+            .setMaxCount(64);
     }
 
 
@@ -31,11 +33,21 @@ public class FoodItem extends ConsumptionItem {
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        //Log.print(this.toString(), user.getID() + " 在吃食物");
         //随机吃食物音效
-        String useSoundId = itemStack.getProperty().getUseSoundId() + MathUtils.random(1, 3);
-        SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-        ses.newSpatialSound(useSoundId, user);
+        AudioHolder eatSound = Sounds.ENTITY_EAT_1;
+        int random = MathUtils.random(1, 3);
+        switch (random) {
+            case 2: {
+                eatSound = Sounds.ENTITY_EAT_2;
+                break;
+            }
+            case 3: {
+                eatSound = Sounds.ENTITY_EAT_3;
+                break;
+            }
+        }
+        SoundSystem ses = world.getSystem(SoundSystem.class);
+        ses.playSpatialSound(eatSound, user);
         return true;
     }
 }

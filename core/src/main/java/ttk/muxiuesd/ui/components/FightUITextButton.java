@@ -1,7 +1,10 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.math.Vector3;
 import game.muxiuesd.bedrockcore.app.ui.components.UITextButton;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 
@@ -31,5 +34,13 @@ public class FightUITextButton extends UITextButton {
                 Fight.UITexturePath("button_mouse_over.png")
             ),
             text, clickEvent, VOID_MOUSE_OVER_EVENT);
+    }
+
+    @Override
+    public void playClickSound () {
+        SpatialAudioSystem.getInstance().playUIAudio(
+            Sounds.ITEM_CLICK,
+            () -> new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0)
+        );
     }
 }

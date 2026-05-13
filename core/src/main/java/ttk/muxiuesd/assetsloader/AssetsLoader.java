@@ -114,7 +114,7 @@ public class AssetsLoader implements Disposable {
      * @param <T> 资源类型
      * @return 已加载的资源
      */
-    public <T> T getById(String id, Class<T> type) {
+    public <T> T getById (String id, Class<T> type) {
         if (!this.containsId(id)) {
             Log.error(TAG, "Id为：" + id + "的资源路径根本不存在！！！");
             throw new IllegalStateException("无效Id：" + id);
@@ -122,7 +122,7 @@ public class AssetsLoader implements Disposable {
         String[] split = id.split(":");
         if (Objects.equals(split[0], Fight.NAMESPACE)) {
             //先从游戏内部资源探查
-            return this.get(this.idToPath.get(id), type);
+            return this.getByPath(this.idToPath.get(id), type);
         }else {
             //mod资源
             AssetManager modAssetManager = this.getModAssetManager(split[0]);
@@ -137,7 +137,7 @@ public class AssetsLoader implements Disposable {
      * @param <T> 资源类型
      * @return 已加载的资源
      */
-    private <T> T get(String filePath, Class<T> type) {
+    public  <T> T getByPath (String filePath, Class<T> type) {
         if (!this.gameAssetManager.isLoaded(filePath, type)) {
             throw new IllegalStateException("类型为："+ type.getName() + " 的资源未加载: " + filePath);
         }
@@ -174,6 +174,9 @@ public class AssetsLoader implements Disposable {
         this.idToPath.put(id, path);
     }
 
+    /**
+     * 通过id获取文件路径
+     * */
     public String getPath (String id) {
         return this.idToPath.get(id);
     }

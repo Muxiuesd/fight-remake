@@ -1,9 +1,10 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.math.Vector3;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.util.Util;
 
 /**
@@ -35,6 +36,9 @@ public class FightUIButton extends UIButton {
 
     @Override
     public void playClickSound () {
-        AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
+        SpatialAudioSystem.getInstance().playUIAudio(
+            Sounds.ITEM_CLICK,
+            () -> new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0)
+        );
     }
 }

@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterEntityDeath;
@@ -249,7 +248,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
+                    //AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
+                    getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, player);
                     //整个捡起来就没必要执行下面的代码了
                     return;
                 }else if (state == ItemPickUpState.PARTIAL) {

@@ -6,7 +6,7 @@ import ttk.muxiuesd.event.abs.BulletShootEvent;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.ParticleSystem;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -18,8 +18,8 @@ public class EventPlayerShootBullet extends BulletShootEvent {
     @Override
     public void handle (World world, Entity<?> shooter, Bullet bullet) {
         if (shooter.getType() == EntityTypes.PLAYER) {
-            SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-            ses.newSpatialSound(Sounds.ENTITY_SHOOT, bullet);
+            SoundSystem ses = world.getSystem(SoundSystem.class);
+            ses.playSpatialSound(Sounds.ENTITY_SHOOT, bullet);
 
             ParticleSystem pts = world.getSystem(ParticleSystem.class);
 

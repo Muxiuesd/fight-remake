@@ -5,7 +5,7 @@ import ttk.muxiuesd.event.abs.LivingEntityDeathEvent;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.system.SoundEffectSystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.util.Info;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -39,8 +39,8 @@ public class EventSlimeDead extends LivingEntityDeathEvent {
                 child.fastAddBodyHitBox();
                 es.add(child);
             }
-            SoundEffectSystem ses = world.getSystem(SoundEffectSystem.class);
-            ses.newSpatialSound(Sounds.ENTITY_SLIME_SMALL, entity);
+            SoundSystem ses = world.getSystem(SoundSystem.class);
+            ses.playSpatialSound(Sounds.ENTITY_SLIME_SMALL, entity);
         }
     }
 }

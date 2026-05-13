@@ -38,7 +38,7 @@ public final class EntityTypes {
 
     public static <T extends Entity<?>> EntityType<T> register (String name, EntityType<T> entityType) {
         Identifier identifier = new Identifier(Fight.ID(name));
-        Registries.ENTITY_TYPE.register(identifier, entityType.setId(identifier.getId()));
+        Registries.ENTITY_TYPE.register(identifier, entityType.setId(identifier.getID()));
         return entityType;
     }
 }

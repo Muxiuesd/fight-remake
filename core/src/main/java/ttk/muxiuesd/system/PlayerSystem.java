@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.audio.AudioPlayer;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.PlayerDataOutput;
@@ -22,6 +21,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.ui.screen.PlayerHUDUIScreen;
 import ttk.muxiuesd.ui.screen.PlayerUIScreen;
 import ttk.muxiuesd.util.Direction;
@@ -114,6 +114,9 @@ public class PlayerSystem extends WorldSystem {
         }
 
         this.handleInput(delta);
+
+        //实时更新立体音效的接听者坐标为玩家的坐标
+        SpatialAudioSystem.getInstance().getAudioListener().setPos(this.player.getX(), this.player.getY(), 0f);
     }
 
     /**
@@ -210,7 +213,8 @@ public class PlayerSystem extends WorldSystem {
         CameraFollowSystem cfs = getManager().getSystem(CameraFollowSystem.class);
         cfs.setFollower(this.player);
 
-        AudioPlayer.getInstance().playMusic(Sounds.PLAYER_RESURRECTION);
+        //播放复活音频
+        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
     }
 
     @Override

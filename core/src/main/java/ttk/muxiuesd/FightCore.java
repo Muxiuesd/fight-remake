@@ -2,7 +2,6 @@ package ttk.muxiuesd;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import game.muxiuesd.bedrockcore.app.GameCore;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.lang.FI18N;
@@ -20,12 +19,13 @@ import ttk.muxiuesd.screen.StartMenuScreen;
 import ttk.muxiuesd.screen.WorldsMenuScreen;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.system.manager.GameSystemManager;
 import ttk.muxiuesd.util.Perf;
 import ttk.muxiuesd.world.World;
 
 /**
- *  游戏的核心类
+ * 游戏的核心类
  * */
 public class FightCore extends GameCore {
     /**
@@ -40,7 +40,6 @@ public class FightCore extends GameCore {
     }
     private FightCore () {}
 
-    private Screen nextScreen;
     public StartMenuScreen startMenuScreen;
     public WorldsMenuScreen worldsMenuScreen;
     public MainGameScreen mainGameScreen;
@@ -64,9 +63,12 @@ public class FightCore extends GameCore {
         this.worldsMenuScreen = new WorldsMenuScreen();
         this.mainGameScreen = new MainGameScreen();
 
-        GameSystemManager.getInstance().addSystem("InputHandleSystem", InputHandleSystem.getInstance());
-        GameSystemManager.getInstance().addSystem("GUISystem", GUISystem.getInstance());
-        //初始化游戏底层系统
+        GameSystemManager.getInstance()
+            .addSystem("InputHandleSystem", InputHandleSystem.getInstance())
+            .addSystem("GUISystem", GUISystem.getInstance())
+            .addSystem("SpatialAudioSystem", SpatialAudioSystem.getInstance())
+        ;
+        //延迟初始化游戏底层系统
         GameSystemManager.getInstance().initAllSystems();
 
         //setScreen(this.mainGameScreen);
