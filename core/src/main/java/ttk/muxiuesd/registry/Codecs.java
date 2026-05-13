@@ -31,7 +31,7 @@ public final class Codecs {
     public static final JsonCodec<BlockEntity> BLOCK_ENTITY = register("block_entity", new BlockEntityCodec());
     public static final JsonCodec<Block.Property> BLOCK_PROPERTY = register("block_property", new BlockPropertyCodec());
     public static final JsonCodec<Wall<?>> WALL = register("wall", new WallCodec());
-    public static final JsonCodec<Botany> BOTANY = register("wall", new BotanyCodec());
+    public static final JsonCodec<Botany> BOTANY = register("botany", new BotanyCodec());
     public static final JsonCodec<Chunk> CHUNK = register("chunk", new ChunkCodec());
 
     /// 物品相关的编解码器
