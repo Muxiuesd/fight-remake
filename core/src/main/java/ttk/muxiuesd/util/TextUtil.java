@@ -12,6 +12,7 @@ import ttk.muxiuesd.ui.text.Text;
  * */
 public class TextUtil {
     public static final GlyphLayout staticGlyphLayout = new GlyphLayout();
+
     public static float getTextRenderWidth (FontHolder fontHolder, int fontSize, String text) {
         return getTextRenderWidth(fontHolder.getFont(fontSize), text);
     }
@@ -23,6 +24,19 @@ public class TextUtil {
         TextUtil.staticGlyphLayout.setText(bitmapFont, getPlainText(text));
         return staticGlyphLayout.width;
     }
+
+    public static float getTextRenderHeight (FontHolder fontHolder, int fontSize, String text) {
+        return getTextRenderHeight(fontHolder.getFont(fontSize), text);
+    }
+    /**
+     * 获取文本字体渲染的总高度
+     * @param text 传入的文本Sting，会自动转换成去掉颜色标记的纯文本
+     * */
+    public static float getTextRenderHeight (BitmapFont bitmapFont, String text) {
+        TextUtil.staticGlyphLayout.setText(bitmapFont, getPlainText(text));
+        return staticGlyphLayout.height;
+    }
+
     /**
      * 渲染带颜色标记的文本
      * @param batch Batch 对象

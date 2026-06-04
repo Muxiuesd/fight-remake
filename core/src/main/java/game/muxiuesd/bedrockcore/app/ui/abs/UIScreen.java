@@ -16,6 +16,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.render.camera.GUICamera;
+import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.pool.PoolableRectangle;
 
@@ -59,12 +60,15 @@ public abstract class UIScreen
         //调整大小
         OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
         resize(camera.viewportWidth, camera.viewportHeight);
+
+        InputHandleSystem.getInstance().addProcessor(this);
     }
 
     /**
      * 被隐藏时调用
      * */
     public void hide () {
+        InputHandleSystem.getInstance().removeProcessor(this);
     }
 
     @Override

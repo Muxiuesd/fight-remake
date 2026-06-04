@@ -3,9 +3,11 @@ package ttk.muxiuesd.ui.screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
+import game.muxiuesd.bedrockcore.app.ui.components.UITextField;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
+import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
 import ttk.muxiuesd.ui.components.SavesListUI;
@@ -25,6 +27,7 @@ public class WorldsMenuUIScreen extends UIScreen {
     //存档的UI列表面板
     private SavesListUI savesList;
     private CreateNewWorldButtonUI createNewWorldButton;
+    private UITextField worldNameTextField;
 
     public WorldsMenuUIScreen() {
         this.savesList = new SavesListUI();
@@ -40,8 +43,15 @@ public class WorldsMenuUIScreen extends UIScreen {
             this.savesList.getY() - this.createNewWorldButton.getHeight()
         );
 
+        this.worldNameTextField = new UITextField(this.savesList.getWidth(), this.createNewWorldButton.getHeight(), Fonts.MC);
+        this.worldNameTextField.setPosition(
+            - this.worldNameTextField.getWidth() / 2f,
+            this.createNewWorldButton.getY() - this.worldNameTextField.getHeight()
+        );
+
         addComponent(this.savesList);
         addComponent(this.createNewWorldButton);
+        addComponent(this.worldNameTextField);
     }
 
     /**
