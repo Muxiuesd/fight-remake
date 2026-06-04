@@ -4,7 +4,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -25,7 +24,7 @@ public class UITextField extends UIComponent {
     private String placeholder;             //占位文本
     private FontHolder fontHolder;          //字体持有
     private int fontSize;                   //字体的字号大小
-    private Color fontColor;            //字体的渲染颜色
+    private Color fontColor;                //字体的渲染颜色
 
     /// 字体渲染的左右内边距（单位：米，相对于组件左下角）
     private float paddingLeft, paddingRight;
@@ -37,9 +36,7 @@ public class UITextField extends UIComponent {
     private int cursorIndex         = 0;    //光标位置（0 ~ text.length()）
 
     private int selectionStart = -1;        //-1表示无选中，否则为起始索引（可小于/大于cursorIndex）
-    private boolean focused = false;        //状态
-
-    private final GlyphLayout glyphLayout = TextUtil.staticGlyphLayout;     //辅助度量（避免频繁new）
+    //private boolean focused = false;        //状态
 
     private NinePatch backgroundPatch;
     private NinePatch cursorPatch;
@@ -75,7 +72,7 @@ public class UITextField extends UIComponent {
     public void update(float delta) {
         super.update(delta);
         //被选中的状态下，文本框的光标闪烁
-        if (this.focused && isEnabled()) {
+        if (isFocused() && isEnabled()) {
             this.cursorBlinkTimer += delta;
             if (this.cursorBlinkTimer >= this.cursorBlinkTime) {
                 this.cursorBlinkTimer = 0;
@@ -119,7 +116,7 @@ public class UITextField extends UIComponent {
         TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY, this.getFontColor());
 
         /// 绘制光标（仅聚焦且可见）
-        if (this.focused && this.cursorVisible) {
+        if (isFocused() && this.cursorVisible) {
             float cursorX = renderX + getTextWidthBeforeIndex(this.cursorIndex);
             float cursorY = hasBackground ? y + this.backgroundPatch.getPadBottom() : y;
             float width   = 2f;
@@ -196,7 +193,6 @@ public class UITextField extends UIComponent {
         //让ui屏幕设置这个组件是焦点
         getScreen().setFocusComponent(this);
 
-        this.focused = true;
         this.cursorBlinkTimer = 0;
         this.cursorVisible = true;
 
@@ -218,7 +214,7 @@ public class UITextField extends UIComponent {
      * 根据相对于组件左边界的距离设置光标索引
      * @param relativeX 距离组件左边缘的距离（0 ~ width）
      */
-    private void setCursorFromRelativeX(float relativeX) {
+    private void setCursorFromRelativeX (float relativeX) {
         float clickX = relativeX - paddingLeft;
         if (clickX <= 0) {
             cursorIndex = 0;
@@ -237,22 +233,19 @@ public class UITextField extends UIComponent {
         cursorIndex = textStringBuilder.length(); // 点击在末尾
     }
 
-    // -------------------------------------------------------------------------
-    // 键盘事件（需由外层焦点管理器调用）
-    // -------------------------------------------------------------------------
     /**
      * 输入字符（最终提交）—— 完美支持中文、英文等
      */
     @Override
     public boolean keyTyped(char character) {
-        if (!this.focused || !isEnabled()) return false;
-        // 控制字符由 keyDown 处理
+        if (!isFocused() || !isEnabled()) return false;
+        //控制字符由 keyDown 处理
         if (character == '\b' || character == '\t' || character == '\n' ||
             character == '\r' || character == 127) return false;
 
         if (this.textStringBuilder.length() >= this.maxLength) return false;
 
-        // 若存在选中，先删除选中文本
+        //若存在选中，先删除选中文本
         if (this.selectionStart != -1 &&    this.selectionStart != this.cursorIndex) {
             deleteSelection();
         }
@@ -263,10 +256,12 @@ public class UITextField extends UIComponent {
         return false;
     }
 
-    /** 按键处理（方向键、退格、删除、Home/End、回车、ESC） */
+    /**
+     * 按键处理（方向键、退格、删除、Home/End、回车、ESC）
+     * */
     @Override
     public boolean keyDown(int keycode) {
-        if (!this.focused || !isEnabled()) return false;
+        if (!isFocused() || !isEnabled()) return false;
 
         switch (keycode) {
             case Input.Keys.BACKSPACE:
@@ -308,7 +303,7 @@ public class UITextField extends UIComponent {
             case Input.Keys.ENTER:
             case Input.Keys.ESCAPE:
                 //失焦
-                this.focused = false;
+                getScreen().setFocusComponent(null);
                 break;
 
             default:

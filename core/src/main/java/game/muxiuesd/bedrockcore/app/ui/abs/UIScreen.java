@@ -80,7 +80,7 @@ public abstract class UIScreen
         setMouseOver(false);
         //没东西就直接返回
         if (getComponents().isEmpty()) return;
-
+        boolean clickFlag = false;  //没有点到任何ui组件时就是false
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
         //重复利用的矩形区域
         PoolableRectangle rectangle = Pools.RECT.obtain();
@@ -113,13 +113,24 @@ public abstract class UIScreen
                     uiComponent
                         .setClicked(true)
                         .click(grid);
+                    clickFlag = true;
+                    //检查鼠标点击的组件是否是目前的焦点组件，不是就清空焦点
+                    if (this.getFocusComponent() != null && this.getFocusComponent() != uiComponent) {
+                        this.setFocusComponent(null);
+                    }
                 }else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     //如果是按住鼠标左键，就是拖拽
                     uiComponent.mouseDrag(relativePos.x, relativePos.y);
+                    clickFlag = true;
+                    //检查鼠标点击的组件是否是目前的焦点组件，不是就清空焦点
+                    if (this.getFocusComponent() != null && this.getFocusComponent() != uiComponent) {
+                        this.setFocusComponent(null);
+                    }
                 }
                 //这个ui屏幕的状态变成被鼠标覆盖
                 this.setMouseOver(true);
             }else {
+                //鼠标不在ui的区域上
                 uiComponent
                     .setClicked(false)
                     .setMouseOver(false);
@@ -129,6 +140,14 @@ public abstract class UIScreen
                 uiComponent.mouseDown();
             }
         }
+
+        if (!clickFlag
+            && (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.LEFT))
+        ) {
+            //这时候点击鼠标，就会失去已有的焦点
+            this.setFocusComponent(null);
+        }
+
         Pools.RECT.free(rectangle);
     }
 

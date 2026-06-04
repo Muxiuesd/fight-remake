@@ -309,5 +309,11 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
         return this;
     }
 
-
+    /**
+     * 检查组件是否是焦点
+     * */
+    public boolean isFocused () {
+        if (this.getScreen() == null) return false;
+        return this.getScreen().getFocusComponent() == this;
+    }
 }
