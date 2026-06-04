@@ -169,16 +169,35 @@ public class UITextField extends UIComponent {
             return;
         }
 
-        float accumulated = 0f;
+        /*float accumulated = 0f;
+        BitmapFont font = this.getFont();
+        font.getData().setScale(FontHolder.FONT_SCALE); //缩放的大小也要来考虑进去，否则字符宽度计算错误
         for (int i = 0; i < this.textStringBuilder.length(); i++) {
-            float charWidth = TextUtil.getTextRenderWidth(this.getFont(), String.valueOf(this.textStringBuilder.charAt(i)));
+            float charWidth = TextUtil.getTextRenderWidth(font, String.valueOf(this.textStringBuilder.charAt(i)));
             if (accumulated + (charWidth / 2f) >= clickX) {
                 this.cursorIndex = i;
                 return;
             }
             accumulated += charWidth;
         }
-        this.cursorIndex = this.textStringBuilder.length(); // 点击在末尾
+        this.cursorIndex = this.textStringBuilder.length(); // 点击在末尾*/
+
+        final int length = this.textStringBuilder.length();
+        BitmapFont font = this.getFont();
+        font.getData().setScale(FontHolder.FONT_SCALE);
+
+        float prevPrefixWidth = 0f;
+        for (int i = 0; i < length; i++) {
+            String prefix = this.textStringBuilder.substring(0, i + 1);
+            float prefixWidth = TextUtil.getTextRenderWidth(font, prefix);
+            float charWidth = prefixWidth - prevPrefixWidth;
+            if (prevPrefixWidth + (charWidth / 2f) >= clickX) {
+                this.cursorIndex = i;
+                return;
+            }
+            prevPrefixWidth = prefixWidth;
+        }
+        this.cursorIndex = length;
     }
 
     /**
