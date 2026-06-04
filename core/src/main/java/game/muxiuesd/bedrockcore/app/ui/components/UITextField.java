@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
@@ -24,18 +25,10 @@ public class UITextField extends UIComponent {
     private String placeholder;             //占位文本
     private FontHolder fontHolder;          //字体持有
     private int fontSize;                   //字体的字号大小
-
-    /// 颜色样式
     private Color fontColor;            //字体的渲染颜色
-    private Color backgroundColor;      //背景颜色
-    private Color borderColor;
-    private Color focusedBorderColor;
-    private Color hoverBorderColor;
-    private Color disabledColor;
-    private Color selectionColor;
 
-    /// 内边距（单位：米，相对于组件左下角）
-    private float paddingLeft, paddingRight, paddingTop, paddingBottom;
+    /// 字体渲染的左右内边距（单位：米，相对于组件左下角）
+    private float paddingLeft, paddingRight;
 
     /// 光标
     private float cursorBlinkTime   = 0.5f; //闪烁周期（秒）
@@ -46,35 +39,36 @@ public class UITextField extends UIComponent {
     private int selectionStart = -1;        //-1表示无选中，否则为起始索引（可小于/大于cursorIndex）
     private boolean focused = false;        //状态
 
-    private final GlyphLayout glyphLayout = new GlyphLayout();     //辅助度量（避免频繁new）
+    private final GlyphLayout glyphLayout = TextUtil.staticGlyphLayout;     //辅助度量（避免频繁new）
 
-    public UITextField (float x, float y, float width, float height, FontHolder fontHolder) {
-        super(x, y, width, height, new GridPoint2(1, 1)); // 默认交互网格 1x1
+    private NinePatch backgroundPatch;
+    private NinePatch cursorPatch;
+
+
+    public UITextField (float width, float height,
+                        FontHolder fontHolder,
+                        NinePatch backgroundPatch, NinePatch cursorPatch) {
+        this(0, 0, width, height, fontHolder, backgroundPatch, cursorPatch);
+    }
+    public UITextField (float x, float y, float width, float height,
+                        FontHolder fontHolder,
+                        NinePatch backgroundPatch, NinePatch cursorPatch) {
+        super(x, y, width, height, new GridPoint2((int) width, (int) height));
+
         this.fontHolder = fontHolder;
+        this.fontSize = FontHolder.FONT_SIZE;
         this.textStringBuilder = new StringBuilder();
         this.maxLength = 100;
         this.placeholder = "";
-
-        //默认的配色
-        this.fontColor = Color.BLACK;
-        this.backgroundColor = Color.WHITE;
-        this.borderColor = Color.GRAY;
-        this.focusedBorderColor = Color.BLUE;
-        this.hoverBorderColor = Color.LIGHT_GRAY;
-        this.disabledColor = Color.DARK_GRAY;
-        this.selectionColor = new Color(0.7f, 0.7f, 1f, 0.5f);
-
+        this.fontColor = Color.WHITE;
         // 默认内边距（组件内文本区域）
         this.paddingLeft = 4f;
         this.paddingRight = 4f;
-        this.paddingTop = 2f;
-        this.paddingBottom = 2f;
 
-        this.fontSize = FontHolder.FONT_SIZE;
+        this.backgroundPatch = backgroundPatch;
+        this.cursorPatch = cursorPatch;
     }
-    public UITextField (float width, float height, FontHolder fontHolder) {
-        this(0, 0, width, height, fontHolder);
-    }
+
 
 
     @Override
@@ -96,33 +90,44 @@ public class UITextField extends UIComponent {
     public void draw(Batch batch, UIPanel parent) {
         if (!isVisible()) return;
 
+        float x = getX(parent);
+        float y = getY(parent);
+
+        boolean hasBackground = this.backgroundPatch != null;
+        /// 绘制背景
+        if (hasBackground) {
+            this.backgroundPatch.draw(batch, x, y, getWidth(), getHeight());
+        }
+
         /// 文本的绘制
         //最终显示出来的文本
         String displayText = this.textStringBuilder.isEmpty() ? this.placeholder : this.textStringBuilder.toString();
+        BitmapFont bitmapFont = this.getFont();
+        bitmapFont.getData().setScale(FontHolder.FONT_SCALE);
+        float renderHeight = TextUtil.getTextRenderHeight(bitmapFont, displayText);
+        float renderX = x + this.paddingLeft;   //基于左边
+        float renderY = y + renderHeight;
+        if (hasBackground) renderY += this.backgroundPatch.getPadBottom();
 
-        // 设置颜色：占位符灰色，正常文本用字体颜色，禁用时用禁用色
-        /*if (text.isEmpty() && ! placeholder.isEmpty()) {
-            font.setColor(Color.GRAY);
-        } else {
-            font.setColor(isEnabled() ? fontColor : disabledColor);
-        }*/
+        //裁剪字体渲染避免超出区域
+        ScissorUtil.beginScissor(
+            batch, GUICamera.INSTANCE.getCamera(),
+            x + this.paddingLeft, y,
+            getWidth() - this.paddingLeft - this.paddingRight, getHeight()
+        );
 
-        //渲染字体
-        if (! this.textStringBuilder.isEmpty()) {
-            BitmapFont bitmapFont = this.getFont();
-            bitmapFont.getData().setScale(FontHolder.FONT_SCALE);
+        TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY, this.getFontColor());
 
-            float x = getX(parent);
-            float y = getY(parent);
-            float renderHeight = TextUtil.getTextRenderHeight(bitmapFont, displayText);
-            float renderX = x + this.paddingLeft;   //基于左边
-            float renderY = y + renderHeight + this.paddingBottom;
-
-            //裁剪字体渲染避免超出区域
-            ScissorUtil.beginScissor(batch, GUICamera.INSTANCE.getCamera(), x, y, getWidth(), getHeight());
-            TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY);
-            ScissorUtil.endScissor(batch);
+        /// 绘制光标（仅聚焦且可见）
+        if (this.focused && this.cursorVisible) {
+            float cursorX = renderX + getTextWidthBeforeIndex(this.cursorIndex);
+            float cursorY = hasBackground ? y + this.backgroundPatch.getPadBottom() : y;
+            float width   = 2f;
+            float height  = renderHeight + 2f;
+            this.cursorPatch.draw(batch, cursorX, cursorY, width, height);
         }
+        //结束裁剪
+        ScissorUtil.endScissor(batch);
     }
 
     /**
@@ -183,9 +188,7 @@ public class UITextField extends UIComponent {
         shapeRenderer.rect(this.getAbsX(), this.getAbsY(), this.getWidth(), this.getHeight());
     }
 
-    // -------------------------------------------------------------------------
     // 鼠标点击：获得焦点，定位光标（交互网格左下角为原点）
-    // -------------------------------------------------------------------------
     @Override
     public boolean click(GridPoint2 interactPos) {
         if (!isEnabled() || !isVisible()) return false;
@@ -223,8 +226,8 @@ public class UITextField extends UIComponent {
         }
         float accumulated = 0f;
         for (int i = 0; i < textStringBuilder.length(); i++) {
-            glyphLayout.setText(this.getFont(), String.valueOf(textStringBuilder.charAt(i)));
-            float charWidth = glyphLayout.width;
+            TextUtil.staticGlyphLayout.setText(this.getFont(), String.valueOf(textStringBuilder.charAt(i)));
+            float charWidth = TextUtil.staticGlyphLayout.width;
             if (accumulated + charWidth / 2f >= clickX) {
                 cursorIndex = i;
                 return;
@@ -325,12 +328,14 @@ public class UITextField extends UIComponent {
         selectionStart = -1;
     }
 
-    /** 获取指定索引前的文本宽度（用于光标定位） */
+    /**
+     * 获取指定索引前的文本宽度（用于光标定位）
+     * */
     private float getTextWidthBeforeIndex (int index) {
         if (index <= 0) return 0f;
+
         String before = textStringBuilder.substring(0, index);
-        glyphLayout.setText(this.getFont(), before);
-        return glyphLayout.width;
+        return TextUtil.getTextRenderWidth(this.getFont(), before);
     }
 
     public void setTextStringBuilder (String newText) {
@@ -353,11 +358,9 @@ public class UITextField extends UIComponent {
     }
 
     // 样式设置方法（链式调用）
-    public UITextField setPadding(float left, float right, float top, float bottom) {
+    public UITextField setPadding (float left, float right) {
         this.paddingLeft = left;
         this.paddingRight = right;
-        this.paddingTop = top;
-        this.paddingBottom = bottom;
         return this;
     }
 
@@ -366,34 +369,8 @@ public class UITextField extends UIComponent {
         return this;
     }
 
-    public UITextField setBackgroundColor(Color color) {
-        this.backgroundColor = color;
-        return this;
-    }
-
-    public UITextField setBorderColor(Color color) {
-        this.borderColor = color;
-        return this;
-    }
-
-    public UITextField setFocusedBorderColor(Color color) {
-        this.focusedBorderColor = color;
-        return this;
-    }
-
-    public UITextField setHoverBorderColor(Color color) {
-        this.hoverBorderColor = color;
-        return this;
-    }
-
-    public UITextField setDisabledColor(Color color) {
-        this.disabledColor = color;
-        return this;
-    }
-
-    public UITextField setSelectionColor(Color color) {
-        this.selectionColor = color;
-        return this;
+    public Color getFontColor () {
+        return this.fontColor;
     }
 
     public FontHolder getFontHolder () {

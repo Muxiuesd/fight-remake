@@ -10,6 +10,7 @@ import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
+import ttk.muxiuesd.ui.components.FightUITextField;
 import ttk.muxiuesd.ui.components.SavesListUI;
 import ttk.muxiuesd.ui.components.WorldSaveButtonUI;
 import ttk.muxiuesd.ui.text.Text;
@@ -43,7 +44,9 @@ public class WorldsMenuUIScreen extends UIScreen {
             this.savesList.getY() - this.createNewWorldButton.getHeight()
         );
 
-        this.worldNameTextField = new UITextField(this.savesList.getWidth(), this.createNewWorldButton.getHeight(), Fonts.MC);
+        this.worldNameTextField = new FightUITextField(
+            this.savesList.getWidth(), this.createNewWorldButton.getHeight(), Fonts.MC
+        );
         this.worldNameTextField.setPosition(
             - this.worldNameTextField.getWidth() / 2f,
             this.createNewWorldButton.getY() - this.worldNameTextField.getHeight()
