@@ -32,7 +32,7 @@ public class WorldsMenuUIScreen extends UIScreen {
 
     public WorldsMenuUIScreen() {
         this.savesList = new SavesListUI();
-        this.savesList.setSize(150f, 230f);
+        this.savesList.setSize(150f, 190f);
         this.savesList.setPosition(
             - this.savesList.getWidth() / 2f,
             - this.savesList.getHeight() / 2f

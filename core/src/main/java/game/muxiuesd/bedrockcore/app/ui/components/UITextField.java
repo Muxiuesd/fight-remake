@@ -5,13 +5,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.font.FontHolder;
 import game.muxiuesd.bedrockcore.util.ScissorUtil;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.util.TextUtil;
+import ttk.muxiuesd.util.Util;
 
 /**
  * 文本框
@@ -117,7 +118,7 @@ public class UITextField extends UIComponent {
 
         /// 绘制光标（仅聚焦且可见）
         if (isFocused() && this.cursorVisible) {
-            float cursorX = renderX + getTextWidthBeforeIndex(this.cursorIndex);
+            float cursorX = renderX + this.getTextWidthBeforeIndex(this.cursorIndex);
             float cursorY = hasBackground ? y + this.backgroundPatch.getPadBottom() : y;
             float width   = 2f;
             float height  = renderHeight + 2f;
@@ -128,64 +129,8 @@ public class UITextField extends UIComponent {
     }
 
     /**
-     * 绘制形状：背景、边框、选中背景、光标
+     * 鼠标点击：获得焦点，定位光标（交互网格左下角为原点）
      * */
-    @Override
-    public void renderShape(ShapeRenderer shapeRenderer) {
-        if (!isVisible()) return;
-
-        float absX = getAbsX();
-        float absY = getAbsY();
-        float w = getWidth();
-        float h = getHeight();
-        //背景（填充整个组件
-        /*shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(isEnabled() ? backgroundColor : disabledColor);
-        shapeRenderer.rect(absX, absY, w, h);*/
-        /*//边框（沿组件边缘）
-        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-        if (focused) {
-            shapeRenderer.setColor(focusedBorderColor);
-        } else if (isMouseOver() && isEnabled()) {
-            shapeRenderer.setColor(hoverBorderColor);
-        } else {
-            shapeRenderer.setColor(borderColor);
-        }
-        shapeRenderer.rect(absX, absY, w, h);
-
-        //选中背景（仅当有选中且聚焦时，绘制在内边距区域内）
-        if (focused && selectionStart != -1 && selectionStart != cursorIndex) {
-            int start = Math.min(selectionStart, cursorIndex);
-            int end   = Math.max(selectionStart, cursorIndex);
-            String selectedStr = textStringBuilder.substring(start, end);
-            glyphLayout.setText(this.getFont(), selectedStr);
-            float selWidth = glyphLayout.width;
-
-            float selX = absX + paddingLeft + getTextWidthBeforeIndex(start);
-            float selY = absY + paddingBottom; // 内边距底部开始
-            float selHeight = h - paddingTop - paddingBottom;
-
-            shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(selectionColor);
-            shapeRenderer.rect(selX, selY, selWidth, selHeight);
-        }*/
-
-        //光标（仅聚焦且可见）
-        /*if (this.focused && this.cursorVisible) {
-            float cursorX = absX + this.paddingLeft + getTextWidthBeforeIndex(this.cursorIndex);
-            float cursorY = absY + this.paddingBottom; // 底部内边距
-            float cursorHeight = h - this.paddingTop - this.paddingBottom; // 内边距区域内高度
-            shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(this.fontColor);
-            shapeRenderer.rect(cursorX, cursorY, 1f, cursorHeight);
-            shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-        }*/
-
-
-        shapeRenderer.rect(this.getAbsX(), this.getAbsY(), this.getWidth(), this.getHeight());
-    }
-
-    // 鼠标点击：获得焦点，定位光标（交互网格左下角为原点）
     @Override
     public boolean click(GridPoint2 interactPos) {
         if (!isEnabled() || !isVisible()) return false;
@@ -196,15 +141,17 @@ public class UITextField extends UIComponent {
         this.cursorBlinkTimer = 0;
         this.cursorVisible = true;
 
-        //将网格索引转换为组件内坐标（左下角为原点）
+        /*//将网格索引转换为组件内坐标（左下角为原点）
         GridPoint2 gridSize = getInteractGridSize();
         float cellW = getWidth()  / gridSize.x;
-        float cellH = getHeight() / gridSize.y;
         //取网格中心点作为点击位置
         float relativeX = (interactPos.x + 0.5f) * cellW;
-        //Y坐标对于光标定位无直接影响，此处未使用
+        //Y坐标对于光标定位无直接影响，此处未使用*/
 
+        Vector2 mouseUIPosition = Util.getMouseUIPosition();
+        float relativeX = mouseUIPosition.x - getAbsX();
         setCursorFromRelativeX(relativeX);
+
         this.selectionStart = -1; // 点击清除选中
 
         return false;
@@ -215,22 +162,23 @@ public class UITextField extends UIComponent {
      * @param relativeX 距离组件左边缘的距离（0 ~ width）
      */
     private void setCursorFromRelativeX (float relativeX) {
-        float clickX = relativeX - paddingLeft;
+        //TODO 修复鼠标点击后光标识别位置错误问题
+        float clickX = relativeX - this.paddingLeft;
         if (clickX <= 0) {
-            cursorIndex = 0;
+            this.cursorIndex = 0;
             return;
         }
+
         float accumulated = 0f;
-        for (int i = 0; i < textStringBuilder.length(); i++) {
-            TextUtil.staticGlyphLayout.setText(this.getFont(), String.valueOf(textStringBuilder.charAt(i)));
-            float charWidth = TextUtil.staticGlyphLayout.width;
-            if (accumulated + charWidth / 2f >= clickX) {
-                cursorIndex = i;
+        for (int i = 0; i < this.textStringBuilder.length(); i++) {
+            float charWidth = TextUtil.getTextRenderWidth(this.getFont(), String.valueOf(this.textStringBuilder.charAt(i)));
+            if (accumulated + (charWidth / 2f) >= clickX) {
+                this.cursorIndex = i;
                 return;
             }
             accumulated += charWidth;
         }
-        cursorIndex = textStringBuilder.length(); // 点击在末尾
+        this.cursorIndex = this.textStringBuilder.length(); // 点击在末尾
     }
 
     /**
