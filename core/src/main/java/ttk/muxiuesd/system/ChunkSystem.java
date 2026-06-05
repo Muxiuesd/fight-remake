@@ -59,7 +59,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     private Player player;
     private Vector2 playerLastPosition;
-    private WorldMapNoise noise;
+    private WorldMapNoise worldNoise;
     private Timer<?> chunkLoadTimer = new Timer<>(0.5f, 0.5f);
 
     //方块实例，不带有方块实体的同一种方块在world里只有一个实例，带有方块实体的方块都是单独一个实例
@@ -85,8 +85,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     @Override
     public void initialize () {
-        //this.noise = new WorldMapNoise((int) (Math.random() * 10000));
-        this.noise = new WorldMapNoise(WorldInfoTypes.INT.get("seed"));
+        Long seed = WorldInfoTypes.LONG.get(Fight.WORLD_SEED);
+        this.worldNoise = new WorldMapNoise(seed);
 
         PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
@@ -924,8 +924,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
     }
 
-    public WorldMapNoise getNoise() {
-        return this.noise;
+    public WorldMapNoise getWorldNoise () {
+        return this.worldNoise;
     }
 
     /**

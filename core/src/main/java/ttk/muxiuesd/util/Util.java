@@ -218,5 +218,14 @@ public class Util {
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
 
-
+    /**
+     * 将字符串转换为长整型哈希值
+     * */
+    public static long stringToLongHash (String str) {
+        if (str == null) return 0;
+        //将两个int合并成一个long（避免丢失信息）
+        int h1 = str.hashCode();
+        int h2 = str.hashCode() ^ 0x55555555; //简单扰动
+        return ((long) h1 << 32) | (h2 & 0xFFFFFFFFL);
+    }
 }
