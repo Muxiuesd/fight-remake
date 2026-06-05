@@ -55,9 +55,6 @@ public class MainGameScreen implements Screen {
 
         //执行mod代码
         //TODO Mod系统重做
-        /*ModLibManager.getInstance().loadCoreLib();
-        ModLoader.getInstance().loadAllMods();
-        ModLoader.getInstance().runAllMods();*/
 
         //初始化世界系统
         this.getWorld().getSystemManager().initAllSystems();

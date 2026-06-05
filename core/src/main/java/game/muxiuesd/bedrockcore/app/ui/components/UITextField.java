@@ -20,24 +20,24 @@ import ttk.muxiuesd.util.Util;
  * 大部分逻辑由AI编写
  * */
 public class UITextField extends UIComponent {
-    private StringBuilder textStringBuilder;//当前的文本构建
+    private StringBuilder textStringBuilder;//当前的文本构建者
     private int maxLength;                  //最大字符数
-    private String placeholder;             //占位文本
+    private String tipText;                 //提示文本
     private FontHolder fontHolder;          //字体持有
-    private int fontSize;                   //字体的字号大小
-    private Color fontColor;                //字体的渲染颜色
+    private int fontSize;                   //字体的字号大小（并不是最终的渲染大小）
+    private Color textColor;                //输入文本字体的渲染颜色
+    private Color tipTextColor;             //提示文本字体的渲染颜色
 
     /// 字体渲染的左右内边距（单位：米，相对于组件左下角）
     private float paddingLeft, paddingRight;
 
-    /// 光标
+    /// 光标的一些属性
     private float cursorBlinkTime   = 0.5f; //闪烁周期（秒）
     private float cursorBlinkTimer  = 0f;
     private boolean cursorVisible   = true;
     private int cursorIndex         = 0;    //光标位置（0 ~ text.length()）
 
     private int selectionStart = -1;        //-1表示无选中，否则为起始索引（可小于/大于cursorIndex）
-    //private boolean focused = false;        //状态
 
     private NinePatch backgroundPatch;
     private NinePatch cursorPatch;
@@ -57,8 +57,10 @@ public class UITextField extends UIComponent {
         this.fontSize = FontHolder.FONT_SIZE;
         this.textStringBuilder = new StringBuilder();
         this.maxLength = 100;
-        this.placeholder = "";
-        this.fontColor = Color.WHITE;
+        this.tipText = "请输入文本";
+        this.textColor = Color.WHITE;
+        this.tipTextColor = Color.YELLOW;
+
         // 默认内边距（组件内文本区域）
         this.paddingLeft = 4f;
         this.paddingRight = 4f;
@@ -84,28 +86,38 @@ public class UITextField extends UIComponent {
         }
     }
 
+    /**
+     * 文本框UI组件的核心渲染方法
+     * */
     @Override
     public void draw(Batch batch, UIPanel parent) {
         if (!isVisible()) return;
 
         float x = getX(parent);
         float y = getY(parent);
-
-        boolean hasBackground = this.backgroundPatch != null;
+        NinePatch background = this.getBackgroundPatch();
+        boolean hasBackground = background != null;
         /// 绘制背景
         if (hasBackground) {
-            this.backgroundPatch.draw(batch, x, y, getWidth(), getHeight());
+            background.draw(batch, x, y, getWidth(), getHeight());
         }
 
         /// 文本的绘制
-        //最终显示出来的文本
-        String displayText = this.textStringBuilder.isEmpty() ? this.placeholder : this.textStringBuilder.toString();
+        //最终显示出来的文本以及颜色
+        String displayText = this.textStringBuilder.toString();
+        Color displayColor = this.textColor;
+        if (this.textStringBuilder.isEmpty()) {
+            displayText = this.tipText;
+            displayColor = this.tipTextColor;
+        }
+
         BitmapFont bitmapFont = this.getFont();
         bitmapFont.getData().setScale(FontHolder.FONT_SCALE);
         float renderHeight = TextUtil.getTextRenderHeight(bitmapFont, displayText);
         float renderX = x + this.paddingLeft;   //基于左边
         float renderY = y + renderHeight;
-        if (hasBackground) renderY += this.backgroundPatch.getPadBottom();
+        //如果有背景贴图要渲染，就让字体渲染的起始高度再往上偏移一个背景的下边界高度
+        if (hasBackground) renderY += background.getPadBottom();
 
         //裁剪字体渲染避免超出区域
         ScissorUtil.beginScissor(
@@ -114,16 +126,17 @@ public class UITextField extends UIComponent {
             getWidth() - this.paddingLeft - this.paddingRight, getHeight()
         );
 
-        TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY, this.getFontColor());
+        TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY, displayColor);
 
         /// 绘制光标（仅聚焦且可见）
         if (isFocused() && this.cursorVisible) {
-            float cursorX = renderX + this.getTextWidthBeforeIndex(this.cursorIndex);
-            float cursorY = hasBackground ? y + this.backgroundPatch.getPadBottom() : y;
+            float cursorX = renderX + this.getTextWidthBeforeIndex(this.cursorIndex) + 0.5f;
+            float cursorY = hasBackground ? y + background.getPadBottom() : y;
             float width   = 2f;
             float height  = renderHeight + 2f;
             this.cursorPatch.draw(batch, cursorX, cursorY, width, height);
         }
+
         //结束裁剪
         ScissorUtil.endScissor(batch);
     }
@@ -141,13 +154,6 @@ public class UITextField extends UIComponent {
         this.cursorBlinkTimer = 0;
         this.cursorVisible = true;
 
-        /*//将网格索引转换为组件内坐标（左下角为原点）
-        GridPoint2 gridSize = getInteractGridSize();
-        float cellW = getWidth()  / gridSize.x;
-        //取网格中心点作为点击位置
-        float relativeX = (interactPos.x + 0.5f) * cellW;
-        //Y坐标对于光标定位无直接影响，此处未使用*/
-
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
         float relativeX = mouseUIPosition.x - getAbsX();
         setCursorFromRelativeX(relativeX);
@@ -162,30 +168,16 @@ public class UITextField extends UIComponent {
      * @param relativeX 距离组件左边缘的距离（0 ~ width）
      */
     private void setCursorFromRelativeX (float relativeX) {
-        //TODO 修复鼠标点击后光标识别位置错误问题
         float clickX = relativeX - this.paddingLeft;
         if (clickX <= 0) {
             this.cursorIndex = 0;
             return;
         }
 
-        /*float accumulated = 0f;
-        BitmapFont font = this.getFont();
-        font.getData().setScale(FontHolder.FONT_SCALE); //缩放的大小也要来考虑进去，否则字符宽度计算错误
-        for (int i = 0; i < this.textStringBuilder.length(); i++) {
-            float charWidth = TextUtil.getTextRenderWidth(font, String.valueOf(this.textStringBuilder.charAt(i)));
-            if (accumulated + (charWidth / 2f) >= clickX) {
-                this.cursorIndex = i;
-                return;
-            }
-            accumulated += charWidth;
-        }
-        this.cursorIndex = this.textStringBuilder.length(); // 点击在末尾*/
-
         final int length = this.textStringBuilder.length();
         BitmapFont font = this.getFont();
         font.getData().setScale(FontHolder.FONT_SCALE);
-
+        //字符之间的组合可能会导致宽度计算有差异，这个算法才是对的，非必要勿动
         float prevPrefixWidth = 0f;
         for (int i = 0; i < length; i++) {
             String prefix = this.textStringBuilder.substring(0, i + 1);
@@ -300,23 +292,45 @@ public class UITextField extends UIComponent {
         return TextUtil.getTextRenderWidth(this.getFont(), before);
     }
 
-    public void setTextStringBuilder (String newText) {
+    /**
+     * 获取BitmapFont
+     * */
+    public BitmapFont getFont () {
+        return this.getFontHolder().getFont(this.getFontSize());
+    }
+
+    /**
+     * 获取文本
+     * */
+    public String getText () {
+        return this.textStringBuilder.toString();
+    }
+
+    public UITextField setText (String newText) {
         this.textStringBuilder.setLength(0);
         this.textStringBuilder.append(newText);
         this.cursorIndex = textStringBuilder.length();
         this.selectionStart = -1;
+        return this;
     }
 
-    public String getTextStringBuilder () {
-        return this.textStringBuilder.toString();
+    public StringBuilder getTextStringBuilder () {
+        return this.textStringBuilder;
     }
 
-    public void setMaxLength(int maxLength) {
+    public UITextField setTextStringBuilder (StringBuilder newStringBuilder) {
+        this.textStringBuilder = newStringBuilder;
+        return this;
+    }
+
+    public UITextField setMaxLength(int maxLength) {
         this.maxLength = maxLength;
+        return this;
     }
 
-    public void setPlaceholder(String placeholder) {
-        this.placeholder = placeholder;
+    public UITextField setTipText (String tipText) {
+        this.tipText = tipText;
+        return this;
     }
 
     // 样式设置方法（链式调用）
@@ -326,13 +340,30 @@ public class UITextField extends UIComponent {
         return this;
     }
 
-    public UITextField setFontColor(Color color) {
-        this.fontColor = color;
+    public UITextField setTextColor (Color color) {
+        this.textColor = color;
         return this;
     }
 
-    public Color getFontColor () {
-        return this.fontColor;
+    public Color getTextColor () {
+        return this.textColor;
+    }
+
+    public String getTipText () {
+        return this.tipText;
+    }
+
+    public Color getTipTextColor () {
+        return this.tipTextColor;
+    }
+
+    public UITextField setTipTextColor (Color tipTextColor) {
+        this.tipTextColor = tipTextColor;
+        return this;
+    }
+
+    public int getMaxLength () {
+        return this.maxLength;
     }
 
     public FontHolder getFontHolder () {
@@ -353,10 +384,21 @@ public class UITextField extends UIComponent {
         return this;
     }
 
-    /**
-     * 获取BitmapFont
-     * */
-    public BitmapFont getFont () {
-        return this.getFontHolder().getFont(this.getFontSize());
+    public NinePatch getBackgroundPatch () {
+        return this.backgroundPatch;
+    }
+
+    public UITextField setBackgroundPatch (NinePatch backgroundPatch) {
+        this.backgroundPatch = backgroundPatch;
+        return this;
+    }
+
+    public NinePatch getCursorPatch () {
+        return this.cursorPatch;
+    }
+
+    public UITextField setCursorPatch (NinePatch cursorPatch) {
+        this.cursorPatch = cursorPatch;
+        return this;
     }
 }

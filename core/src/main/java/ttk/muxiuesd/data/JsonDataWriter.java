@@ -125,6 +125,13 @@ public class JsonDataWriter implements DataWriter<Json> {
         return this;
     }
 
+    /**
+     * 获取结果
+     * */
+    public String getResult () {
+        return this.writer.getWriter().getWriter().toString();
+    }
+
     @Override
     public Json getWriter () {
         return this.writer;

@@ -18,6 +18,7 @@ public class Fight {
 
     //世界的名称，也会作为存档文件夹的名称
     public static final Info<String> WORLD_NAME = Info.create("world_name", "null_world");
+    public static final Info<Long> WORLD_SEED = Info.create("world_seed", 114514L);
     //UI的调试框是否渲染
     public static final Info<Boolean> UI_DEBUG_BOX_RENDER = Info.create("ui_debug_box_render", false);
     //玩家的听觉范围，单位：世界中的1米

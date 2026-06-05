@@ -20,22 +20,6 @@ public final class WorldInfoTypes {
     public static final WorldInfoHashMap<FloatHashMapCodec, Float> FLOAT = register("float", new FloatHashMapCodec());
     public static final WorldInfoHashMap<StringHashMapCodec, String> STRING = register("string", new StringHashMapCodec());
 
-    /*static {
-        //检查世界信息文件是否存在
-        if(FileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
-            //存在就读取
-            String file = FileUtil.readFileAsString(Fight.PATH_SAVE, WorldInfo.FILE_NAME);
-            Optional<WorldInfo> optional = WorldInfo.CODEC.parse(new JsonDataReader(file));
-            if (optional.isPresent()) {
-                //让这个实例存在
-                WorldInfo.INSTANCE = optional.get();
-            }
-        }else {
-            //新建一个
-            WorldInfo.INSTANCE = new WorldInfo();
-        }
-    }*/
-
     /**
      * 注册一种信息类型的hashmap
      * */
