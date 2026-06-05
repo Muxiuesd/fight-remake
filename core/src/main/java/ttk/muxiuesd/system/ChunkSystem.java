@@ -80,7 +80,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public ChunkSystem(World world) {
         super(world);
-        WorldInfoTypes.INT.putIfAbsent("seed", 114514);
     }
 
     @Override
