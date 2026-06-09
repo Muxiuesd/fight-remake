@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 
 /**
  * 文件工具
@@ -19,7 +20,7 @@ public class AbsFileUtil {
      * 创建文件
      * */
     public static FileHandle createFile (String path, String fileName) {
-        if (!fileName.contains(".")) {
+        /*if (!fileName.contains(".")) {
             Log.error(TAG, "不太合适的文件名称：" + fileName + " ！！！");
         }
         try {
@@ -32,7 +33,9 @@ public class AbsFileUtil {
         } catch (GdxRuntimeException e) {
             Log.error(TAG, "创建文件失败：" + path + "/" + fileName, e);
             return null;
-        }
+        }*/
+
+        return UnifiedFileUtil.createFile(UnifiedFileUtil.ABSOLUTE_MARK + path, fileName);
     }
 
     /**

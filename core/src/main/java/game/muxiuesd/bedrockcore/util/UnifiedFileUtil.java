@@ -6,13 +6,14 @@ import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * 统一文件工具
- * <p>;
- * “I:@”表示游戏内部路径的文件，“A:@”表示绝对路径文件，“E:@”表示游戏外部路径文件
+ * <p>
+ * 路径开头有：“I:@”表示游戏内部路径的文件， “A:@”表示绝对路径文件， “E:@”表示游戏外部路径文件
  * */
 public class UnifiedFileUtil {
     public static final String INTERNAL_MARK = "I:@";
     public static final String ABSOLUTE_MARK = "A:@";
     public static final String EXTERNAL_MARK = "E:@";
+
     public static final FileUtil INTERNAL_FILE_UTIL = new FileUtil() {
         @Override
         public String getRootPath () {
@@ -29,7 +30,6 @@ public class UnifiedFileUtil {
             return Gdx.files.internal(path);
         }
     };
-
     public static final FileUtil ABSOLUTE_FILE_UTIL = new FileUtil() {
         @Override
         public String getRootPath () {
@@ -46,7 +46,6 @@ public class UnifiedFileUtil {
             return Gdx.files.absolute(path);
         }
     };
-
     public static final FileUtil EXTERNAL_FILE_UTIL = new FileUtil() {
         @Override
         public String getRootPath () {
@@ -63,6 +62,7 @@ public class UnifiedFileUtil {
             return Gdx.files.external(path);
         }
     };
+
 
     /**
      * 创建文件
@@ -155,7 +155,7 @@ public class UnifiedFileUtil {
      * 根据开头来获取对应的文件工具
      * */
     public static FileUtil getFileUtil (String path, String fileName) {
-        return getFileUtil(path + "/" + fileName);
+        return getFileUtil(path);
     }
     /**
      * 根据开头来获取对应的文件工具
@@ -170,8 +170,8 @@ public class UnifiedFileUtil {
         if (path.startsWith(EXTERNAL_MARK)) {
             return EXTERNAL_FILE_UTIL;
         }
-        //没有对应的开头就默认是内部路径
-        return INTERNAL_FILE_UTIL;
+        //没有对应的开头就默认是游戏文件外部路径
+        return EXTERNAL_FILE_UTIL;
     }
 
     /**
