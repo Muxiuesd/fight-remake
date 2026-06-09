@@ -18,7 +18,7 @@ public class AbsFileUtil {
     /**
      * 创建文件
      * */
-    public static FileHandle createFile(String path, String fileName) {
+    public static FileHandle createFile (String path, String fileName) {
         if (!fileName.contains(".")) {
             Log.error(TAG, "不太合适的文件名称：" + fileName + " ！！！");
         }
