@@ -4,6 +4,7 @@ import ttk.muxiuesd.util.Info;
 
 public class Fight {
     public static final String NAMESPACE = "fight";
+    /// 游戏内部文件的根路径
     public static final String AUDIO_ROOT = "audio/";
     public static final String MUSIC_ROOT = AUDIO_ROOT + "music/";
     public static final String SOUND_ROOT = AUDIO_ROOT + "sound/";

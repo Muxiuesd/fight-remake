@@ -206,7 +206,7 @@ public class Util {
 
     /**
      * 加载纹理区域
-     * @param id 纹理ID
+     * @param id 纹理的ID
      * @param texturePath 纹理路径，为null时默认之前加载过就会直接根据id来获取
      * */
     public static TextureRegion loadTextureRegion (String id, String texturePath) {

@@ -3,7 +3,6 @@ package ttk.muxiuesd.assetsloader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.util.Util;
@@ -19,14 +18,13 @@ import java.util.Objects;
 public class AssetsLoader implements Disposable {
     public final String TAG = this.getClass().getName();
 
-    private final AssetManager gameAssetManager = new AssetManager();
+    private final AssetManager gameAssetManager;
     private final HashMap<String, AssetManager> modAssetManagers = new HashMap<>();  //每一个mod分配一个资源管理器
-    private final AsyncExecutor asyncExecutor = new AsyncExecutor(10);
-
-    private final HashMap<String, String> idToPath; ///id映射路径，规范id例子： fight:grass_block
+    private final HashMap<String, String> idToPath = new HashMap<>();; /// id映射路径，规范id例子： fight:grass_block
 
     private AssetsLoader () {
-        this.idToPath = new HashMap<>();
+        //使用自定义的resolver
+        this.gameAssetManager = new AssetManager(new FightFileHandleResolver());
     }
 
     private static final class Holder {
@@ -57,6 +55,7 @@ public class AssetsLoader implements Disposable {
         AssetManager curManager = this.gameAssetManager;
         String[] split = Util.splitID(id);
         if (!Objects.equals(split[0], Fight.NAMESPACE)){
+            //查找mod的资源管理器
             curManager = this.modAssetManagers.get(split[0]);
         }
 
@@ -76,35 +75,6 @@ public class AssetsLoader implements Disposable {
             callback.run();
         }
         this.idToPath.put(id, filePath);
-    }
-
-    private <T> void loadAsync(String filePath, Class<T> type, Runnable callback) {
-        if (!this.gameAssetManager.isLoaded(filePath, type)) {
-            this.gameAssetManager.load(filePath, type);
-
-            // 使用Gdx.app.postRunnable，确保在主线程中处理
-            Gdx.app.postRunnable(() -> {
-                try {
-                    // 在主线程中等待加载完成
-                    this.gameAssetManager.finishLoading();
-                    // 检查资源加载是否成功
-                    if (this.gameAssetManager.isLoaded(filePath, type)) {
-                        if (callback != null) {
-                            callback.run();
-                        }// 资源加载完成，执行回调
-                    } else {
-                        throw new IllegalStateException("资源加载失败: " + filePath);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace(); // 捕获异常并打印
-                }
-            });
-        } else {
-            // 如果已经加载，直接在主线程中执行回调
-            if (callback != null) {
-                Gdx.app.postRunnable(callback);
-            }
-        }
     }
 
     /**
@@ -188,7 +158,6 @@ public class AssetsLoader implements Disposable {
             assetManager.dispose();
         });
         this.modAssetManagers.clear();
-        this.asyncExecutor.dispose();
     }
 
 }
