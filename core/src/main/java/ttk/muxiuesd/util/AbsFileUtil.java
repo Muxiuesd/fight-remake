@@ -10,6 +10,7 @@ import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 
 /**
  * 文件工具
+ * TODO 废弃使用这个
  * <p>
  * 规定：path都是基于游戏文件的路径（基准路径）起始的路径，也就是说这个文件工具是外部文件工具
  * */
