@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.pool.particle.ParticlePool;
+import ttk.muxiuesd.resource.AssetsLoader;
 import ttk.muxiuesd.world.particle.motion.ParticleMotionComp;
 
 /**

@@ -5,9 +5,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.mod.Mod;
 import ttk.muxiuesd.mod.ModContainer;
+import ttk.muxiuesd.resource.AssetsLoader;
 
 import java.util.HashMap;
 

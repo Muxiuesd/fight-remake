@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.particle;
 
 import com.badlogic.gdx.graphics.Texture;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.resource.AssetsLoader;
 
 /**
  * 粒子贴图资产注册

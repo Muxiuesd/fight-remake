@@ -1,4 +1,4 @@
-package ttk.muxiuesd.assetsloader;
+package ttk.muxiuesd.resource;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -20,11 +20,11 @@ public class AssetsLoader implements Disposable {
 
     private final AssetManager gameAssetManager;
     private final HashMap<String, AssetManager> modAssetManagers = new HashMap<>();  //每一个mod分配一个资源管理器
-    private final HashMap<String, String> idToPath = new HashMap<>();; /// id映射路径，规范id例子： fight:grass_block
+    private final HashMap<String, String> idToPath = new HashMap<>();  /// id映射路径，规范id例子： fight:grass_block
 
     private AssetsLoader () {
         //使用自定义的resolver
-        this.gameAssetManager = new AssetManager(new FightFileHandleResolver());
+        this.gameAssetManager = new FightAssetManager();
     }
 
     private static final class Holder {

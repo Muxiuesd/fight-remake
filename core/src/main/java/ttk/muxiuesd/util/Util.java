@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.CameraUtil;
 import game.muxiuesd.bedrockcore.util.CoordinateUtil;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
+import ttk.muxiuesd.resource.AssetsLoader;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**

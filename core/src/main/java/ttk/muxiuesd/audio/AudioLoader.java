@@ -6,8 +6,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.mod.api.ModFileLoader;
+import ttk.muxiuesd.resource.AssetsLoader;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;

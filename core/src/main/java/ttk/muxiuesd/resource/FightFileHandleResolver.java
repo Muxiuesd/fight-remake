@@ -1,4 +1,4 @@
-package ttk.muxiuesd.assetsloader;
+package ttk.muxiuesd.resource;
 
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
@@ -11,13 +11,17 @@ public class FightFileHandleResolver implements FileHandleResolver {
     @Override
     public FileHandle resolve (String fileName) {
         if (fileName.startsWith(UnifiedFileUtil.INTERNAL_MARK)) {
-            return UnifiedFileUtil.INTERNAL_FILE_UTIL.getFileHandle(fileName);
+            //一定要处理标记
+            String path = UnifiedFileUtil.removePathStarts(fileName);
+            return UnifiedFileUtil.INTERNAL_FILE_UTIL.getFileHandle(path);
         }
         if (fileName.startsWith(UnifiedFileUtil.ABSOLUTE_MARK)) {
-            return UnifiedFileUtil.ABSOLUTE_FILE_UTIL.getFileHandle(fileName);
+            String path = UnifiedFileUtil.removePathStarts(fileName);
+            return UnifiedFileUtil.ABSOLUTE_FILE_UTIL.getFileHandle(path);
         }
         if (fileName.startsWith(UnifiedFileUtil.EXTERNAL_MARK)) {
-            return UnifiedFileUtil.EXTERNAL_FILE_UTIL.getFileHandle(fileName);
+            String path = UnifiedFileUtil.removePathStarts(fileName);
+            return UnifiedFileUtil.EXTERNAL_FILE_UTIL.getFileHandle(path);
         }
         //没有对应的开头就默认是游戏内部文件
         return UnifiedFileUtil.INTERNAL_FILE_UTIL.getFileHandle(fileName);
