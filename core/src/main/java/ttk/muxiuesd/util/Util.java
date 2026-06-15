@@ -211,10 +211,10 @@ public class Util {
      * */
     public static TextureRegion loadTextureRegion (String id, String texturePath) {
         if (texturePath == null) {
-            texturePath = AssetsLoader.getInstance().getPath(id);
+            texturePath = AssetsLoader.getInstance().getPath(Texture.class, id);
         }
 
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
+        AssetsLoader.getInstance().load(id, texturePath, Texture.class, null);
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
 

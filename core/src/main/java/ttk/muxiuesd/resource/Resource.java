@@ -23,7 +23,7 @@ public class Resource<T> {
      * */
     public static <T> Resource<T> of (String id, String originalPath, Class<T> clazz) {
         Identifier.checkAndThrow(id);
-        AssetsLoader.getInstance().loadAsync(id, originalPath, clazz, null);
+        AssetsLoader.getInstance().load(id, originalPath, clazz, null);
         return new Resource<>(id, originalPath, AssetsLoader.getInstance().getById(id, clazz));
     }
 

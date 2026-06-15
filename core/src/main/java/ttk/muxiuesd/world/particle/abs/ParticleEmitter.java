@@ -159,7 +159,7 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
     }
 
     public void setTextureRegion (String id) {
-        if (AssetsLoader.getInstance().containsId(id)) {
+        if (AssetsLoader.getInstance().containsId(Texture.class, id)) {
             this.textureRegion = new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
         }
     }

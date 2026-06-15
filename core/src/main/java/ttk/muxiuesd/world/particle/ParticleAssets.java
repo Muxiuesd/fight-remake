@@ -22,7 +22,7 @@ public class ParticleAssets {
      * */
     public static String loadTexture (String name, String path) {
         String id = Fight.ID(name);
-        AssetsLoader.getInstance().loadAsync(id, path, Texture.class, () -> {});
+        AssetsLoader.getInstance().load(id, path, Texture.class, () -> {});
         return id;
     }
 }

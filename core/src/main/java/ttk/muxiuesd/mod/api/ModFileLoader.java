@@ -67,7 +67,7 @@ public class ModFileLoader {
             modAssetManager.finishLoading();
             // 检查资源加载是否成功
             if (modAssetManager.isLoaded(filePath, type)) {
-                AssetsLoader.getInstance().idMap(id, filePath);
+                AssetsLoader.getInstance().addIdMapPath(type, id, filePath);
                 Log.print(TAG, "类型为：" + type.getName() + " 的资源：" + id + " 添加成功");
 
                 if (callback != null) {
@@ -97,7 +97,7 @@ public class ModFileLoader {
             modAssetManager.finishLoading();
             // 检查资源加载是否成功
             if (modAssetManager.isLoaded(filePath, type)) {
-                AssetsLoader.getInstance().idMap(id, filePath);
+                AssetsLoader.getInstance().addIdMapPath(type, id, filePath);
                 Log.print(TAG, "类型为：" + type.getName() + " 的资源：" + id + " 添加成功");
 
                 if (callback != null) {

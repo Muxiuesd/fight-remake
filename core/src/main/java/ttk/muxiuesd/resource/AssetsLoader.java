@@ -1,6 +1,5 @@
 package ttk.muxiuesd.resource;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.util.Log;
@@ -20,7 +19,8 @@ public class AssetsLoader implements Disposable {
 
     private final AssetManager gameAssetManager;
     private final HashMap<String, AssetManager> modAssetManagers = new HashMap<>();  //每一个mod分配一个资源管理器
-    private final HashMap<String, String> idToPath = new HashMap<>();  /// id映射路径，规范id例子： fight:grass_block
+    /// 根据资源类型和资源的id来映射路径
+    private final HashMap<Class<?>, HashMap<String, String>> typeToIdPathMap = new HashMap<>();
 
     private AssetsLoader () {
         //使用自定义的resolver
@@ -36,45 +36,61 @@ public class AssetsLoader implements Disposable {
     }
 
     /**
-     * 异步加载资源
+     * 加载资源
      * @param id 路径映射id
      * @param filePath 资源文件的路径
      * @param type 资源类型
      * @param callback 加载完成后的回调函数，可以为null
      * @param <T> 资源类型
      */
-    public <T> void loadAsync(String id, String filePath, Class<T> type, Runnable callback) {
-        if (this.containsId(id)) {
-            if (callback != null) {
-                //已存在则直接执行回调中的加载
-                Gdx.app.postRunnable(callback);
-            }
-            return;
-        }
+    public <T> void load (String id, String filePath, Class<T> type, Runnable callback) {
+        //如果之前加载过这个id的相同路径的资源，就直接跳过，不重复加载
+        if (Objects.equals(this.getPath(type, id), filePath)) return;
 
-        AssetManager curManager = this.gameAssetManager;
-        String[] split = Util.splitID(id);
-        if (!Objects.equals(split[0], Fight.NAMESPACE)){
-            //查找mod的资源管理器
-            curManager = this.modAssetManagers.get(split[0]);
-        }
+        AssetManager curManager = this.choiceAssetManager(id);
 
         if (!curManager.isLoaded(filePath, type)) {
-            curManager.load(filePath, type);
-            curManager.finishLoading();
-
-            if (curManager.isLoaded(filePath, type)) {
-                this.idToPath.put(id, filePath);
-                if (callback != null) callback.run();
-                return;
-            } else {
-                throw new IllegalStateException("资源加载失败: " + filePath);
-            }
-        } else if (callback != null){
-            //如果已经加载，直接执行回调
+            //没有加载就让他加载一遍
+            this.singleLoad(curManager, filePath, type);
+        }
+        if (callback != null){
             callback.run();
         }
-        this.idToPath.put(id, filePath);
+
+        //最后不管怎么样都映射一遍
+        this.addIdMapPath(type, id, filePath);
+    }
+
+    /**
+     * 单次加载资源
+     * */
+    private <T> void singleLoad (AssetManager assetManager, String filePath, Class<T> type) {
+        assetManager.load(filePath, type);
+        assetManager.finishLoading();
+
+        //检查一遍资源加载是否完成
+        if (!assetManager.isLoaded(filePath, type)) {
+            throw new IllegalStateException("资源加载失败: " + filePath);
+        }
+    }
+
+    /**
+     * 卸载资源
+     * @param id 资源的id
+     * @param type 资源类型
+     * */
+    public <T> void unload (String id, Class<T> type) {
+        //检查是否有这个资源
+        if (!this.containsId(type, id)) {
+            Log.error(TAG, "资源类型：" + type + "中，没有加载过ID为：" + id + "的资源！！！");
+            throw new IllegalStateException("无效ID：" + id);
+        }
+
+        AssetManager curManager = this.choiceAssetManager(id);
+        String fileName = this.removeIdMapPath(type, id);
+        curManager.unload(fileName);
+
+        Log.print(TAG, "卸载类型：" + type + "中ID为：" + id + "的资源：" + fileName);
     }
 
     /**
@@ -85,19 +101,23 @@ public class AssetsLoader implements Disposable {
      * @return 已加载的资源
      */
     public <T> T getById (String id, Class<T> type) {
-        if (!this.containsId(id)) {
+        if (!this.containsId(type, id)) {
             Log.error(TAG, "Id为：" + id + "的资源路径根本不存在！！！");
             throw new IllegalStateException("无效Id：" + id);
         }
-        String[] split = id.split(":");
+
+        /*String[] split = id.split(":");
         if (Objects.equals(split[0], Fight.NAMESPACE)) {
             //先从游戏内部资源探查
-            return this.getByPath(this.idToPath.get(id), type);
+            return this.getByPath(this.typeToIdPathMap.get(type).get(id), type);
         }else {
             //mod资源
             AssetManager modAssetManager = this.getModAssetManager(split[0]);
-            return modAssetManager.get(this.idToPath.get(id), type);
-        }
+            return modAssetManager.get(this.typeToIdPathMap.get(type).get(id), type);
+        }*/
+
+        AssetManager curManager = this.choiceAssetManager(id);
+        return curManager.get(this.getPath(type,  id), type);
     }
 
     /**
@@ -117,9 +137,9 @@ public class AssetsLoader implements Disposable {
     /**
      * 添加mod的资源管理，在mod最开始加载的时候添加
      * */
-    public void addModAssetManager(String namespace) {
+    public void addModAssetManager (String namespace) {
         if (!this.modAssetManagers.containsKey(namespace)) {
-            this.modAssetManagers.put(namespace, new AssetManager());
+            this.modAssetManagers.put(namespace, new FightAssetManager());
         }else {
             throw new RuntimeException("命名空间为：" + namespace + " 的资源管理器不可重复添加！！！");
         }
@@ -128,27 +148,58 @@ public class AssetsLoader implements Disposable {
     /**
      * 获取mod自己的资源管理器
      * */
-    public AssetManager getModAssetManager(String namespace) {
+    public AssetManager getModAssetManager (String namespace) {
         return this.modAssetManagers.get(namespace);
     }
 
-    public boolean containsId(String id) {
-        return this.idToPath.containsKey(id);
+    /**
+     * 根据id的命名空间来选择资源管理器
+     * */
+    public AssetManager choiceAssetManager (String id) {
+        String[] split = Util.splitID(id);
+        String namespace = split[0];
+        if (Objects.equals(namespace, Fight.NAMESPACE)) {
+            return this.gameAssetManager;
+        }else {
+            return this.getModAssetManager(namespace);
+        }
     }
 
     /**
-     * 内部的为assets里的路径
-     * mod的为mod文件加里的路径
+     * 根据判断指定的资源类型中是否有加载指定id的资源
      * */
-    public void idMap (String id, String path) {
-        this.idToPath.put(id, path);
+    public <T> boolean containsId (Class<T> type, String id) {
+        return this.typeToIdPathMap.get(type).containsKey(id);
     }
 
     /**
-     * 通过id获取文件路径
+     * 添加id与资源路径的映射
+     * <p>
+     * 内部的为assets/里的路径
+     * mod的为mod文件夹里的路径
      * */
-    public String getPath (String id) {
-        return this.idToPath.get(id);
+    public <T> void addIdMapPath (Class<T> type, String id, String path) {
+        //没有这个类型的map就添加一个
+        if (!this.typeToIdPathMap.containsKey(type)) {
+            this.typeToIdPathMap.put(type, new HashMap<>());
+        }
+        this.typeToIdPathMap.get(type).put(id, path);
+    }
+
+    /**
+     * 移除id与资源路径的映射
+     * */
+    private <T> String removeIdMapPath (Class<T> type, String id) {
+        return this.typeToIdPathMap.get(type).remove(id);
+    }
+
+    /**
+     * 通过资源类型和资源的id获取文件路径
+     * */
+    public <T> String getPath (Class<T> type, String id) {
+        if (!this.typeToIdPathMap.containsKey(type)) return "";
+
+        return this.typeToIdPathMap.get(type).get(id);
     }
 
     @Override
