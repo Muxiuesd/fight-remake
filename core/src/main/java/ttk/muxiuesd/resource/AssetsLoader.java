@@ -36,6 +36,17 @@ public class AssetsLoader implements Disposable {
     }
 
     /**
+     * 加载资源（无回调）
+     * @param id 路径映射id
+     * @param filePath 资源文件的路径
+     * @param type 资源类型
+     * @param <T> 资源类型
+     */
+    public <T> void load (String id, String filePath, Class<T> type) {
+        this.load(id, filePath, type, null);
+    }
+
+    /**
      * 加载资源
      * @param id 路径映射id
      * @param filePath 资源文件的路径
@@ -45,7 +56,10 @@ public class AssetsLoader implements Disposable {
      */
     public <T> void load (String id, String filePath, Class<T> type, Runnable callback) {
         //如果之前加载过这个id的相同路径的资源，就直接跳过，不重复加载
-        if (Objects.equals(this.getPath(type, id), filePath)) return;
+        if (Objects.equals(this.getPath(type, id), filePath)) {
+            if (callback != null) callback.run();
+            return;
+        }
 
         AssetManager curManager = this.choiceAssetManager(id);
 
@@ -53,9 +67,7 @@ public class AssetsLoader implements Disposable {
             //没有加载就让他加载一遍
             this.singleLoad(curManager, filePath, type);
         }
-        if (callback != null){
-            callback.run();
-        }
+        if (callback != null) callback.run();
 
         //最后不管怎么样都映射一遍
         this.addIdMapPath(type, id, filePath);

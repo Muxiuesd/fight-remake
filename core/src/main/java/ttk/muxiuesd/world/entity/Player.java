@@ -11,6 +11,7 @@ import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.StatusEffects;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -26,7 +27,7 @@ public class Player extends LivingEntity<Player> {
     public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, -0.1f, -0.1f);
 
 
-    public TextureRegion shield;
+    private Resource<TextureRegion> shieldTextureRegionResource;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器
     public boolean isDefend = false;
@@ -41,12 +42,16 @@ public class Player extends LivingEntity<Player> {
         renderHandItem = true;
         setSpeed(3.3f);
         setCurSpeed(getSpeed());
-        setBodyTextureRegion(getTextureRegion(Fight.ID("player"), "player/player.png"));
-        this.shield = getTextureRegion(Fight.ID("player_shield"), "player/shield.png");
+        setBodyTextureRegionResource(Fight.ID("player"), "player/player.png");
+        setShieldTextureRegionResource(Fight.ID("player_shield"), "player/shield.png");
 
-        this.defendCDTimer = Pools.TASK_TIMER.obtain().setMaxSpan(2f).setCurSpan(0f)
+        this.defendCDTimer = Pools.TASK_TIMER.obtain()
+            .setMaxSpan(2f)
+            .setCurSpan(0f)
             .setTask(() -> this.isDefend = true);
-        this.defendDurationTimer = Pools.TASK_TIMER.obtain().setMaxSpan(0.3f).setCurSpan(0f)
+        this.defendDurationTimer = Pools.TASK_TIMER.obtain()
+            .setMaxSpan(0.3f)
+            .setCurSpan(0f)
             .setTask(() ->  {
                 //到时间了就取消防御状态
                 this.isDefend = false;
@@ -165,5 +170,20 @@ public class Player extends LivingEntity<Player> {
     public Player setUsingItem (boolean usingItem) {
         this.isUsingItem = usingItem;
         return this;
+    }
+
+    /**
+     * 快捷设置玩家护盾的贴图资源
+     * */
+    public void setShieldTextureRegionResource (String id, String path) {
+        this.setShieldTextureRegionResource(Resource.ofTextureRegion(id, Fight.EntityTexturePath(path)));
+    }
+
+    public void setShieldTextureRegionResource (Resource<TextureRegion> resource) {
+        this.shieldTextureRegionResource = resource;
+    }
+
+    public TextureRegion getShieldTextureRegion () {
+        return this.shieldTextureRegionResource.get();
     }
 }

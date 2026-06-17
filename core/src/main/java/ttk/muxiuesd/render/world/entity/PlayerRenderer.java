@@ -1,6 +1,7 @@
 package ttk.muxiuesd.render.world.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.world.entity.Player;
 
@@ -11,10 +12,10 @@ public class PlayerRenderer extends LivingEntityRenderer<Player> {
     @Override
     public void draw (Batch batch, Player player, Context context) {
         super.draw(batch, player, context);
-
+        TextureRegion shieldTextureRegion = player.getShieldTextureRegion();
         //绘制护盾
-        if (player.isDefend && player.shield != null) {
-            batch.draw(player.shield,
+        if (player.isDefend && shieldTextureRegion != null) {
+            batch.draw(shieldTextureRegion,
                 context.x - context.width / 2f, context.y - context.height / 2f,
                 context.originX, context.originY,
                 context.width, context.height,
