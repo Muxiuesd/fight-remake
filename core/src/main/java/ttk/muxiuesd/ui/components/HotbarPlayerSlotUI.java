@@ -57,7 +57,8 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
             Backpack backpack = player.getBackpack();
             ItemStack itemStack = backpack.getItemStack(getIndex());
             if (itemStack != null) {
-                batch.draw(itemStack.getItem().textureRegion, renderX + 2, renderY + 3, 16f, 16f);
+                //TODO 调用物品的渲染器
+                batch.draw(itemStack.getItem().getTextureRegion(), renderX + 2, renderY + 3, 16f, 16f);
                 int amount = itemStack.getAmount();
                 if (amount > 1) drawAmount(batch, parent, renderX, renderY, amount);
             }

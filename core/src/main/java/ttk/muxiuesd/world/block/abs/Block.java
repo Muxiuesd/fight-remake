@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -32,12 +33,10 @@ public abstract class Block implements ID<Block>, Disposable {
         return Property.create();
     }
 
-    private String id;
-    //public TextureRegion textureRegion;
+    private Identifier identifier;
     private Resource<TextureRegion> textureResource;
-
-
     private Property property;
+
 
     public Block (Property property) {
         this.setProperty(property);
@@ -76,18 +75,22 @@ public abstract class Block implements ID<Block>, Disposable {
         return this.textureResource.get();
     }
 
-    /*public Block setTextureRegion (TextureRegion textureRegion) {
-        this.textureRegion = textureRegion;
-        return this;
-    }*/
-
     @Override
     public String getID () {
-        return this.id;
+        return this.getIdentifier().getID();
     }
     @Override
     public Block setID (String id) {
-        this.id = id;
+        this.getIdentifier().setID(id);
+        return this;
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public Block setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
         return this;
     }
 

@@ -1,13 +1,6 @@
 package ttk.muxiuesd.world.item.consumption;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 鱼饵
@@ -21,7 +14,7 @@ public class ItemBait extends ConsumptionItem {
             Fight.ItemTexturePath("bait.png"));
     }
 
-    @Override
+    /*@Override
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
         if (textureRegion != null) {
             Direction direction = Util.getDirection();
@@ -35,5 +28,5 @@ public class ItemBait extends ConsumptionItem {
                 rotation
             );
         }
-    }
+    }*/
 }

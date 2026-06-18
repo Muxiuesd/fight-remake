@@ -35,7 +35,7 @@ public class Identifier {
 
 
 
-    private final String id;
+    private String id;
 
     public Identifier (String namespace, String name) {
         this(namespace + ":" + name);
@@ -48,5 +48,9 @@ public class Identifier {
 
     public String getID () {
         return this.id;
+    }
+
+    public void setID (String id) {
+        if (check(id)) this.id = id;
     }
 }

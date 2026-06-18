@@ -101,7 +101,8 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
             float slotY = y + (float) startPos.y / interactGridSize.y;
             float slotWidth  = (float) size.x / interactGridSize.x;
             float slotHeight = (float) size.y / interactGridSize.y;
-            batch.draw(interactSlot.getItemStack().getItem().textureRegion, slotX, slotY, slotWidth, slotHeight);
+            //TODO 调用物品的渲染器
+            batch.draw(interactSlot.getItemStack().getItem().getTextureRegion(), slotX, slotY, slotWidth, slotHeight);
         }
     }
 }

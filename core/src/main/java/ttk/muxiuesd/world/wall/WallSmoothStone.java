@@ -14,7 +14,7 @@ public class WallSmoothStone extends Wall<WallSmoothStone> {
     public WallSmoothStone createSelf (Vector2 position) {
         WallSmoothStone wallSmoothStone = new WallSmoothStone();
         wallSmoothStone.setPos(position.x, position.y);
-        wallSmoothStone.setID(getID());
+        wallSmoothStone.setIdentifier(getIdentifier());
         return wallSmoothStone;
     }
 }

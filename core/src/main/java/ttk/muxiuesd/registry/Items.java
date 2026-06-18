@@ -129,7 +129,7 @@ public final class Items {
      * 使用普通标准渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory) {
-        return register(factory, new ItemRenderer.StandardRenderer<>(), Fight.ID(name));
+        return register(factory, new ItemRenderer.StandardRenderer<>(), Identifier.of(Fight.ID(name)));
     }
 
 
@@ -139,7 +139,7 @@ public final class Items {
      * 使用自定义的渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, Supplier<ItemRenderer<T>> rendererFactory) {
-        return register(factory, rendererFactory.get(), Fight.ID(name));
+        return register(factory, rendererFactory.get(), Identifier.of(Fight.ID(name)));
     }
 
     /**
@@ -148,15 +148,20 @@ public final class Items {
      * 使用自定义的渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<T> renderer) {
-        return register(factory, renderer, Fight.ID(name));
+        return register(factory, renderer, Identifier.of(Fight.ID(name)));
     }
 
     /**
      * 注册方块的方块物品
+     * @param block 已经注册过的方块
      * */
     public static Item register (Block block) {
         String id = block.getID();
-        return register(() -> new BlockItem(block, id), new ItemRenderer.StandardRenderer<>(), id);
+        return register(
+            () -> new BlockItem(block, id), //方块的id默认作为方块物品的贴图材质id
+            new ItemRenderer.StandardRenderer<>(),
+            block.getIdentifier()   //方块的identifier与方块物品的identifier相同
+        );
     }
 
     /**
@@ -164,20 +169,23 @@ public final class Items {
      * */
     public static <T extends Wall<T>> Item register (Wall<T> wall) {
         String id = wall.getID();
-        return register(() -> new WallItem(wall, id), new ItemRenderer.StandardRenderer<>(), id);
+        //墙体的id默认是墙体物品的贴图材质id
+        return register(
+            () -> new WallItem(wall, id),
+            new ItemRenderer.StandardRenderer<>(),
+            wall.getIdentifier()    //墙体的identifier与墙体物品的identifier相同
+        );
     }
 
     /**
      * 物品注册的基本方法
-     *
      * @param factory 物品的构造工厂
      * @param renderer 物品的渲染器
-     * @param id 物品的id
+     * @param identifier 物品的id标识
      * */
-    public static <T extends Item> T register (Supplier<T> factory, ItemRenderer<T> renderer, String id) {
-        Identifier identifier = new Identifier(id);
+    public static <T extends Item> T register (Supplier<T> factory, ItemRenderer<T> renderer, Identifier identifier) {
         T item = factory.get();
-        item.setID(id);
+        item.setIdentifier(identifier);
         Registries.ITEM.register(identifier, item);
         ItemRendererRegistry.register(item, renderer);
         return item;

@@ -1,9 +1,6 @@
 package ttk.muxiuesd.world.item.common;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
@@ -15,7 +12,6 @@ import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.ParticleSystem;
-import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -177,86 +173,6 @@ public class ItemFishPole extends Item {
      * */
     public boolean onUsing (ItemStack itemStack) {
         return itemStack.getProperty().get(PropertyTypes.FISHING_POLE_USING);
-    }
-
-    @Override
-    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
-        if (! this.onUsing(itemStack)) {
-            if (this.textureRegion == null) return;
-            //没抛竿渲染
-            Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
-            Vector2 holderScale = holder.getScale();
-            if (rotation > 90f && rotation <= 270f) {
-                batch.draw(this.textureRegion,
-                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
-                    0, 0,
-                    holder.getWidth(), holder.getHeight(),
-                    - holderScale.x, holderScale.y, rotation + 180);
-            } else {
-                batch.draw(this.textureRegion,
-                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
-                    0, 0,
-                    holder.getWidth(), holder.getHeight(),
-                    holderScale.x, holderScale.y, rotation);
-            }
-        }else {
-            if (this.castTexture == null) return;
-            //抛竿渲染
-            Direction direction = holder.getDirection();
-            float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
-            Vector2 holderScale = holder.getScale();
-            if (rotation > 90f && rotation <= 270f) {
-                batch.draw(this.castTexture,
-                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
-                    0, 0,
-                    holder.getWidth(), holder.getHeight(),
-                    - holderScale.x, holderScale.y, rotation + 225f);
-            } else {
-                batch.draw(this.castTexture,
-                    holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
-                    0, 0,
-                    holder.getWidth(), holder.getHeight(),
-                    holderScale.x, holderScale.y, rotation - 45f);
-            }
-        }
-    }
-
-    @Override
-    public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
-        if (this.textureRegion != null) {
-            Vector2 itemEntityOrigin = itemEntity.getOrigin();
-            Vector2 itemEntityScale = itemEntity.getScale();
-            batch.draw(this.textureRegion,
-                itemEntity.getX(), itemEntity.getY() + itemEntity.getPositionOffset().y,
-                itemEntityOrigin.x, itemEntityOrigin.y,
-                itemEntity.getWidth(), itemEntity.getHeight(),
-                itemEntityScale.x, itemEntityScale.y,
-                itemEntity.getRotation()
-            );
-        }
-    }
-
-    @Override
-    public void renderShape (ShapeRenderer batch, ItemStack itemStack) {
-        if (!this.onUsing(itemStack)) return;
-
-        EntityFishingHook hook = (EntityFishingHook) itemStack.getProperty().get(PropertyTypes.ITEM_WITH_ENTITY);
-        Direction direction = Util.getDirection();
-        float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
-        //绘制鱼线
-        LivingEntity<?> hookOwner = hook.getOwner();
-        Vector2 ownerPos = hookOwner.getCenterPos();
-        float xOffset = hookOwner.getWidth() * 1.314f * MathUtils.cosDeg(rotation);
-        float yOffset = hookOwner.getHeight()* 1.314f * MathUtils.sinDeg(rotation);
-        ownerPos.add(xOffset, yOffset);
-
-        Vector2 hookPos = hook.getCenterPos();
-        //让鱼线绘制在钩子上方
-        hookPos.add(0, hook.getHeight() / 2 - 0.07f + hook.getPositionOffset().y);
-        //控制鱼线绘制方向
-        if (ownerPos.x <= hookPos.x) CurveDrawer.drawCurve(batch, ownerPos, hookPos, -0.5f);
-        else CurveDrawer.drawCurve(batch, hookPos, ownerPos, -0.5f);
     }
 
     @Override

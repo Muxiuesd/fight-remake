@@ -101,7 +101,7 @@ public final class Blocks {
         String id = Fight.ID(name);
         Identifier identifier = new Identifier(id);
         T block = factory.get();
-        block.setID(id);
+        block.setIdentifier(identifier);
         Registries.BLOCK.register(identifier, block);
 
         registerBlockRenderer(block, renderer);

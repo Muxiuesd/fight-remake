@@ -20,7 +20,7 @@ public class BlockCraftingTable extends BlockWithEntity {
     @Override
     public BlockCraftingTable createSelf () {
         BlockCraftingTable block = new BlockCraftingTable();
-        block.setID(getID());
+        block.setIdentifier(getIdentifier());
         return block;
     }
 

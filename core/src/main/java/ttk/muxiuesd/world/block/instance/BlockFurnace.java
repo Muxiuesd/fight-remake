@@ -38,7 +38,7 @@ public class BlockFurnace extends BlockWithEntity {
     @Override
     public BlockFurnace createSelf () {
         BlockFurnace blockFurnace = new BlockFurnace();
-        blockFurnace.setID(getID());
+        blockFurnace.setIdentifier(getIdentifier());
         return blockFurnace;
     }
 
