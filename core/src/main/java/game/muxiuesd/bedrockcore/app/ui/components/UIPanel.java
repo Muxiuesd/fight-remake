@@ -36,6 +36,9 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     public UIPanel (float x, float y, GridPoint2 interactGridSize) {
         this(x, y, 0, 0, interactGridSize);
     }
+    public UIPanel (float x, float y, float width, float height) {
+        this(x, y, width, height, new GridPoint2());
+    }
     public UIPanel (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
         this.components = new LinkedHashSet<>();

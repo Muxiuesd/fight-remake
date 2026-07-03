@@ -14,6 +14,8 @@ import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
  * */
 public class PlayerHUDUIScreen extends UIScreen {
     private PlayerSystem playerSystem;
+    private HotbarUIPanel hotbarUIPanel;
+
 
     public PlayerHUDUIScreen (PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
@@ -22,6 +24,10 @@ public class PlayerHUDUIScreen extends UIScreen {
         float viewportHeight = camera.viewportHeight;
         float width = HotbarPlayerSlotUI.HOTBAR_WIDTH * 9;
 
-        addComponent(new HotbarUIPanel(playerSystem, - width / 2, - viewportHeight / 2).auto());
+        this.hotbarUIPanel = new HotbarUIPanel(playerSystem, - width / 2, - viewportHeight / 2);
+        addComponent(this.hotbarUIPanel.auto());
+
+
+        //addComponent(this.playerHealthBar);
     }
 }
