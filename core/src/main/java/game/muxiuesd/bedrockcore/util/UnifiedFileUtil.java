@@ -170,8 +170,8 @@ public class UnifiedFileUtil {
         if (path.startsWith(EXTERNAL_MARK)) {
             return EXTERNAL_FILE_UTIL;
         }
-        //没有对应的开头就默认是游戏文件外部路径
-        return EXTERNAL_FILE_UTIL;
+        //没有对应的开头就默认是相对于游戏文件的路径
+        return ABSOLUTE_FILE_UTIL;
     }
 
     /**
