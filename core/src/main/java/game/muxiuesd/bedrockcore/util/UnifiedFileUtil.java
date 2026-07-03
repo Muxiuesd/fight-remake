@@ -7,12 +7,15 @@ import com.badlogic.gdx.utils.JsonValue;
 /**
  * 统一文件工具
  * <p>
- * 路径开头有：“I:@”表示游戏内部路径的文件， “A:@”表示绝对路径文件， “E:@”表示游戏外部路径文件
+ * 路径开头有：“I:@”表示游戏内部路径的文件， “A:@”表示绝对路径文件， “E:@”表示游戏外部路径文件，“L:@”表示以游戏文件所在目录为起始路径
+ * <p>
+ * 不带标记默认是 {@link UnifiedFileUtil#LOCAL_FILE_UTIL }
  * */
 public class UnifiedFileUtil {
-    public static final String INTERNAL_MARK = "I:@";
-    public static final String ABSOLUTE_MARK = "A:@";
-    public static final String EXTERNAL_MARK = "E:@";
+    public static final String INTERNAL_MARK = "I:@";   //这个路径是游戏文件内部的路径（assets/为起始路径）
+    public static final String ABSOLUTE_MARK = "A:@";   //这个路径在桌面端相当于以游戏文件所在的目录为起始路径
+    public static final String EXTERNAL_MARK = "E:@";   //这个路径在桌面端相当于以系统用户目录为起始路径
+    public static final String LOCAL_MARK    = "L:@";
 
     public static final FileUtil INTERNAL_FILE_UTIL = new FileUtil() {
         @Override
@@ -60,6 +63,22 @@ public class UnifiedFileUtil {
         @Override
         public FileHandle getFileHandle (String path) {
             return Gdx.files.external(path);
+        }
+    };
+    public static final FileUtil LOCAL_FILE_UTIL    = new FileUtil() {
+        @Override
+        public String getRootPath () {
+            return "";
+        }
+
+        @Override
+        public FileHandle getFileHandle (String path, String name) {
+            return this.getFileHandle(path + "/" + name);
+        }
+
+        @Override
+        public FileHandle getFileHandle (String path) {
+            return Gdx.files.local(path);
         }
     };
 
@@ -161,17 +180,12 @@ public class UnifiedFileUtil {
      * 根据开头来获取对应的文件工具
      * */
     public static FileUtil getFileUtil (String path) {
-        if (path.startsWith(INTERNAL_MARK)) {
-            return INTERNAL_FILE_UTIL;
-        }
-        if (path.startsWith(ABSOLUTE_MARK)) {
-            return ABSOLUTE_FILE_UTIL;
-        }
-        if (path.startsWith(EXTERNAL_MARK)) {
-            return EXTERNAL_FILE_UTIL;
-        }
-        //没有对应的开头就默认是相对于游戏文件的路径
-        return ABSOLUTE_FILE_UTIL;
+        if (path.startsWith(LOCAL_MARK))    return LOCAL_FILE_UTIL;
+        if (path.startsWith(INTERNAL_MARK)) return INTERNAL_FILE_UTIL;
+        if (path.startsWith(ABSOLUTE_MARK)) return ABSOLUTE_FILE_UTIL;
+        if (path.startsWith(EXTERNAL_MARK)) return EXTERNAL_FILE_UTIL;
+        //没有对应的开头就默认是local
+        return LOCAL_FILE_UTIL;
     }
 
     /**
@@ -185,6 +199,9 @@ public class UnifiedFileUtil {
             return path.substring(3);
         }
         if (path.startsWith(EXTERNAL_MARK)) {
+            return path.substring(3);
+        }
+        if (path.startsWith(LOCAL_MARK)) {
             return path.substring(3);
         }
         return path;

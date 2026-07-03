@@ -23,6 +23,11 @@ public class FightFileHandleResolver implements FileHandleResolver {
             String path = UnifiedFileUtil.removePathStarts(fileName);
             return UnifiedFileUtil.EXTERNAL_FILE_UTIL.getFileHandle(path);
         }
+        if (fileName.startsWith(UnifiedFileUtil.LOCAL_MARK)) {
+            String path = UnifiedFileUtil.removePathStarts(fileName);
+            return UnifiedFileUtil.LOCAL_FILE_UTIL.getFileHandle(path);
+        }
+
         //没有对应的开头就默认是游戏内部文件
         return UnifiedFileUtil.INTERNAL_FILE_UTIL.getFileHandle(fileName);
     }
