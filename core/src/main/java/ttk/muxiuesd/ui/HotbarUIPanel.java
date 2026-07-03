@@ -62,8 +62,9 @@ public class HotbarUIPanel extends UIPanel {
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
+        super.draw(batch, parent);
         //绘制快捷栏槽位
-        this.hotbarUIComponents.forEach(hotbarSlotUI -> hotbarSlotUI.draw(batch, this));
+        //this.hotbarUIComponents.forEach(hotbarSlotUI -> hotbarSlotUI.draw(batch, this));
 
         //绘制快捷栏选中框
         Player player = this.playerSystem.getPlayer();
@@ -78,6 +79,6 @@ public class HotbarUIPanel extends UIPanel {
             }
         }
 
-        super.draw(batch, parent);
+
     }
 }
