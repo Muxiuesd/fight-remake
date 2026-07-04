@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.ui.HotbarUIPanel;
+import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
 
 /**
@@ -14,7 +14,7 @@ import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
  * */
 public class PlayerHUDUIScreen extends UIScreen {
     private PlayerSystem playerSystem;
-    private HotbarUIPanel hotbarUIPanel;
+    private PlayerHotbarUIPanel playerHotbarUIPanel;
 
 
     public PlayerHUDUIScreen (PlayerSystem playerSystem) {
@@ -24,8 +24,8 @@ public class PlayerHUDUIScreen extends UIScreen {
         float viewportHeight = camera.viewportHeight;
         float width = HotbarPlayerSlotUI.HOTBAR_WIDTH * 9;
 
-        this.hotbarUIPanel = new HotbarUIPanel(playerSystem, - width / 2, - viewportHeight / 2);
-        addComponent(this.hotbarUIPanel.auto());
+        this.playerHotbarUIPanel = new PlayerHotbarUIPanel(playerSystem, - width / 2, - viewportHeight / 2);
+        addComponent(this.playerHotbarUIPanel.auto());
 
 
         //addComponent(this.playerHealthBar);

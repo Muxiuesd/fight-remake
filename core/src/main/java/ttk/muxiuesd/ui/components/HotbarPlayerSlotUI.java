@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.ui.HotbarUIPanel;
+import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
@@ -46,7 +46,7 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
             float renderX = getX();
             float renderY = getY();
             //检查是否在UI面板上
-            if (parent instanceof HotbarUIPanel panel) {
+            if (parent instanceof PlayerHotbarUIPanel panel) {
                 renderX += panel.getX();
                 renderY += panel.getY();
             }
