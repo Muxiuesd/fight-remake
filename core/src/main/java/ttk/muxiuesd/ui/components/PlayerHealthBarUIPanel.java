@@ -13,13 +13,13 @@ import ttk.muxiuesd.world.entity.Player;
 /**
  * UI面板：玩家血条
  * */
-public class PlayerHealthBar extends UIPanel {
+public class PlayerHealthBarUIPanel extends UIPanel {
     private PlayerSystem playerSystem;
     private NinePatchResource backgroundNinePatchResource;
     private NinePatchResource bloodNinePatchResource;
 
 
-    public PlayerHealthBar (PlayerSystem playerSystem, float x, float y) {
+    public PlayerHealthBarUIPanel (PlayerSystem playerSystem, float x, float y) {
         super(x, y, 90, 16);
         this.playerSystem = playerSystem;
 

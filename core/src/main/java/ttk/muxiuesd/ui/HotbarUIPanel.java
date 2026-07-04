@@ -8,7 +8,7 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
-import ttk.muxiuesd.ui.components.PlayerHealthBar;
+import ttk.muxiuesd.ui.components.PlayerHealthBarUIPanel;
 import ttk.muxiuesd.ui.components.SlotUI;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Player;
@@ -19,7 +19,7 @@ import ttk.muxiuesd.world.entity.Player;
  * */
 public class HotbarUIPanel extends UIPanel {
     private PlayerSystem playerSystem;
-    private PlayerHealthBar playerHealthBar;    //玩家血条面板
+    private PlayerHealthBarUIPanel playerHealthBarUIPanel;    //玩家血条面板
     private final Array<HotbarPlayerSlotUI> hotbarUIComponents = new Array<>();
     private TextureRegion selectedHotbarTextureRegion;  //快捷栏选中框贴图
 
@@ -35,11 +35,11 @@ public class HotbarUIPanel extends UIPanel {
 
         this.initHotbarSlots();
 
-        this.playerHealthBar = new PlayerHealthBar(playerSystem,
+        this.playerHealthBarUIPanel = new PlayerHealthBarUIPanel(playerSystem,
             0,
             SlotUI.SLOT_UI_HEIGHT + 4
         );
-        addComponent(this.playerHealthBar);
+        addComponent(this.playerHealthBarUIPanel);
     }
 
     private void initHotbarSlots () {
@@ -78,7 +78,9 @@ public class HotbarUIPanel extends UIPanel {
                 break;
             }
         }
+    }
 
-
+    public PlayerHealthBarUIPanel getPlayerHealthBarPanel () {
+        return this.playerHealthBarUIPanel;
     }
 }
