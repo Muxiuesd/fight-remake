@@ -6,14 +6,21 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 工作台配方
  * */
-public class CraftingTableRecipe {
+public abstract class CraftingTableRecipe {
     private Identifier identifier;
     private ItemStack[] inputs;
     private ItemStack output;
 
+    public CraftingTableRecipe(Identifier identifier, ItemStack[] inputs ,ItemStack output) {
+        this.identifier = identifier;
+        this.inputs = inputs;
+        this.output = output;
+    }
 
-
-
+    /**
+     * 抽象方法：配方适配
+     * */
+    public abstract boolean matches (ItemStack[] inputs);
 
 
     public Identifier getIdentifier () {
@@ -25,13 +32,12 @@ public class CraftingTableRecipe {
         return this;
     }
 
-    public ItemStack[] getInputs () {
+    public ItemStack[] getInputs() {
         return this.inputs;
     }
 
-    public CraftingTableRecipe setInputs (ItemStack[] inputs) {
+    public void setInputs(ItemStack[] inputs) {
         this.inputs = inputs;
-        return this;
     }
 
     public ItemStack getOutput () {
