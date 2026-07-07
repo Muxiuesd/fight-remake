@@ -11,6 +11,7 @@ import ttk.muxiuesd.lang.LangPack;
 import ttk.muxiuesd.pool.FightPool;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.recipe.CookingRecipe;
+import ttk.muxiuesd.recipe.CraftingTableRecipe;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.world.block.BlockSounds;
@@ -54,6 +55,7 @@ public class RegistryKeys {
     public static final RegistryKey<BlockEntityRenderer<? extends BlockEntity>> BLOCK_ENTITY_RENDERER = new RegistryKey<>();
     public static final RegistryKey<EntityRenderer<? extends Entity<?>>> ENTITY_RENDERER = new RegistryKey<>();
 
+    public static final RegistryKey<CraftingTableRecipe> CRAFTING_RECIPE_REGISTRY_KEY = new RegistryKey<>();
 
     public static final RegistryKey<FightPool<?>> POOL = new RegistryKey<>();
     public static final RegistryKey<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = new RegistryKey<>();
