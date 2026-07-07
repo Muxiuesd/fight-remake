@@ -6,6 +6,7 @@ import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import game.muxiuesd.bedrockcore.app.ui.components.UITextField;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
@@ -20,6 +21,7 @@ import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.WorldInfo;
 
+import javax.swing.text.html.HTML;
 import java.util.Arrays;
 
 /**
@@ -28,6 +30,7 @@ import java.util.Arrays;
  * 列出读取到的所有世界的存档数据，以列表的形式展现
  * */
 public class WorldsMenuUIScreen extends UIScreen {
+    public static final String TAG = WorldsMenuUIScreen.class.getName();
     //存档的UI列表面板
     private SavesListUI savesList;
     private CreateNewWorldButtonUI createNewWorldButton;
@@ -41,7 +44,7 @@ public class WorldsMenuUIScreen extends UIScreen {
         //两者都不得为空或者空白字符
         if (worldName.isEmpty() || worldSeed.isEmpty()
             || worldName.isBlank() || worldSeed.isBlank()) return false;
-
+        //编写基础的世界json数据
         JsonDataWriter worldJsonDataWriter = new JsonDataWriter();
         worldJsonDataWriter
             .objStart()
@@ -52,10 +55,10 @@ public class WorldsMenuUIScreen extends UIScreen {
                     .writeLong(Fight.WORLD_SEED.getKey(), Util.stringToLongHash(worldSeed))
                 .objEnd()
             .objEnd();
-
+        //写入文件
         String worldDirPath = Fight.PATH_SAVE + worldName + "/" + Fight.PATH_SAVE_WORLD;
-        AbsFileUtil.createDir(worldDirPath);
-        AbsFileUtil.createFile(worldDirPath, WorldInfo.FILE_NAME)
+        UnifiedFileUtil.createDir(worldDirPath);
+        UnifiedFileUtil.createFile(worldDirPath, WorldInfo.FILE_NAME)
             .writeString(worldJsonDataWriter.getResult(),false);
         //刷新列表
         this.flashSaveList();
@@ -126,9 +129,18 @@ public class WorldsMenuUIScreen extends UIScreen {
         //读取存档文件夹下所有的存档文件目录
         FileHandle savesDirFileHandle = AbsFileUtil.getFileHandle(Fight.PATH_SAVE);
         FileHandle[] saveDirs = savesDirFileHandle.list();
-        Arrays.stream(saveDirs).forEach((dir) -> {
-            System.out.println(dir.name());
-        });
+        Log.print(TAG, "探查到存档目录：");
+
+        for (int i = 0; i < saveDirs.length; i++) {
+            FileHandle dir = saveDirs[i];
+            System.out.print(dir.name());
+            if (i == saveDirs.length - 1) {
+                System.out.println();
+            }else {
+                System.out.print(" | ");
+            }
+        }
+
 
         //读取目录中的世界信息
         for (FileHandle saveDir : saveDirs) {
@@ -140,10 +152,18 @@ public class WorldsMenuUIScreen extends UIScreen {
             JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
 
             JsonValue stringValues = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
+            JsonValue longValues = jsonDataReader.readObj(WorldInfoTypes.LONG.getId());
+            if (!stringValues.has(Fight.WORLD_NAME.getKey())) {
+                Log.error(TAG, "世界存档信息缺失世界名称，跳过读取！！！");
+                continue;
+            }
+            if (!longValues.has(Fight.WORLD_SEED.getKey())) {
+                Log.error(TAG, "世界存档信息缺失世界种子，跳过读取！！！");
+                continue;
+            }
+
             //读取世界名称
             String worldName = stringValues.getString(Fight.WORLD_NAME.getKey());
-
-            JsonValue longValues = jsonDataReader.readObj(WorldInfoTypes.LONG.getId());
             //读取世界种子
             long worldSeed = longValues.getLong(Fight.WORLD_SEED.getKey());
 
