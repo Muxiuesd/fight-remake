@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registry;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
@@ -33,7 +34,9 @@ import java.util.function.Supplier;
  * 所有的物品注册
  * */
 public final class Items {
-    public static void init () {}
+    public static void init () {
+        Log.print(Items.class.getName(), "所有物品注册完成");
+    }
 
     /// 常规物品
     public static final Item STICK = register("stick", ItemStick::new);

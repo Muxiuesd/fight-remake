@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registry;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
@@ -21,7 +22,9 @@ import java.util.function.Supplier;
  * 游戏内所有的方块的注册
  * */
 public final class Blocks {
-    public static void init () {}
+    public static void init () {
+        Log.print(Blocks.class.getName(), "所有方块注册完成");
+    }
 
     /// 普通方块
     public static final BlockAir ARI = register("air", BlockAir::new, BlockAir.RENDERER);

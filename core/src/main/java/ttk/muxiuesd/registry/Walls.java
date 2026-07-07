@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registry;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
@@ -11,7 +12,9 @@ import ttk.muxiuesd.world.wall.WallSmoothStone;
 import java.util.function.Supplier;
 
 public final class Walls {
-    public static void init() {}
+    public static void init() {
+        Log.print(Walls.class.getName(), "所有墙体注册完成");
+    }
 
     public static final WallSmoothStone SMOOTH_STONE = register("smooth_stone", WallSmoothStone::new);
 
