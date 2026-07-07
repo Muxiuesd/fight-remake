@@ -15,15 +15,12 @@ public class ShapedCraftingTableRecipe extends CraftingTableRecipe {
     private final Set<String> encodedPatterns;
 
     /**
-     * @param identifier        配方id标识
      * @param inputs            输入的物品
      * @param output            合成结果
      * @param encodedPatterns   形状的编码（配方有的会左右镜像皆可）
      */
-    public ShapedCraftingTableRecipe (Identifier identifier,
-                                      ItemStack[] inputs, ItemStack output,
-                                      Set<String> encodedPatterns) {
-        super(identifier, inputs, output);
+    public ShapedCraftingTableRecipe (ItemStack[] inputs, ItemStack output, Set<String> encodedPatterns) {
+        super(inputs, output);
 
         this.encodedPatterns = Collections.unmodifiableSet(encodedPatterns);
     }

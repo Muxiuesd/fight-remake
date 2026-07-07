@@ -17,17 +17,32 @@ import java.util.Set;
  * */
 public class RecipeParser {
     public static final String TAG = RecipeParser.class.getName();
+
     /**
-     * 根据形状定义与符号映射创建有序合成配方。
-     *
-     * @param identifier 配方的id标识符
+     * 根据形状定义与符号映射创建有序合成配方
      * @param pattern    形状模板，例如 ["WWW","W W","WWW"]
-     * @param key        符号 -> 物品ID 映射
+     * @param key        符号->物品  映射
      * @param output     合成产物
-     * @return 可直接用于注册的 ShapedCraftingRecipe 实例
+     * @return 可直接用于注册的ShapedCraftingRecipe实例
      */
-    public static ShapedCraftingTableRecipe parseShaped (Identifier identifier,
-                                                         String[] pattern,
+    public static ShapedCraftingTableRecipe parseShaped (String[] pattern,
+                                                         HashMap<Character, Item> key,
+                                                         ItemStack output) {
+        HashMap<Character, String> map = new HashMap<>();
+        for (Map.Entry<Character, Item> entry : key.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().getID());
+        }
+        return parseShaped(pattern, map, output);
+    }
+
+    /**
+     * 根据形状定义与符号映射创建有序合成配方
+     * @param pattern    形状模板，例如 ["WWW","W W","WWW"]
+     * @param key        符号->物品的ID 映射
+     * @param output     合成产物
+     * @return 可直接用于注册的ShapedCraftingRecipe实例
+     */
+    public static ShapedCraftingTableRecipe parseShaped (String[] pattern,
                                                          Map<Character, String> key,
                                                          ItemStack output) {
         //构建3×3的Identifier网格
@@ -73,6 +88,6 @@ public class RecipeParser {
             }
         }
 
-        return new ShapedCraftingTableRecipe(identifier, displayInputs, output, patterns);
+        return new ShapedCraftingTableRecipe(displayInputs, output, patterns);
     }
 }
