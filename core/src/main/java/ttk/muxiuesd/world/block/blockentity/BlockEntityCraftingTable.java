@@ -1,23 +1,19 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.math.GridPoint2;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.recipe.CraftingTableRecipe;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -25,16 +21,22 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 工作台方块实体
  * */
 public class BlockEntityCraftingTable extends BlockEntity {
+    public static final int OUTPUT_SLOT_INDEX = 9;
+
     public BlockEntityCraftingTable (BlockPos blockPos) {
         super(BlockEntities.CRAFTING_TABLE, blockPos);
 
-        setInventory(new Backpack(9));
-        setInteractGridSize(new GridPoint2(9, 9));
+        setInventory(new Backpack(10));
+        setInteractGridSize(new GridPoint2(16, 16));
+        int startX = 4;
+        int startY = 6;
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
-                addSlot(x + y * 3, x * 3, y * 3, 3, 3);
+                addSlot(x + y * 3, startX + x * 3, startY + y * 3, 2, 2);
             }
         }
+
+        addSlot(9, 7, 1, 2, 2);
     }
 
     @Override
@@ -47,13 +49,26 @@ public class BlockEntityCraftingTable extends BlockEntity {
         //没有物品就跳过
         if (interactSlot.getItemStack() == null) return InteractResult.FAILURE;
 
-        ItemStack slotItemStack = interactSlot.getItemStack();
-        //按住左Shift就是把这个物品全数取出
-        int outAmount = KeyBindings.PlayerShift.wasPressed() ? slotItemStack.getAmount() : 1;
-        ItemStack outStack = slotItemStack.split(outAmount);
-        user.setHandItemStack(outStack);
-        inventory.clear();
+        //输入槽位的交互
+        if (interactSlot.getIndex() != OUTPUT_SLOT_INDEX) {
+            ItemStack slotItemStack = interactSlot.getItemStack();
+            //按住左Shift就是把这个物品全数取出
+            int outAmount = KeyBindings.PlayerShift.wasPressed() ? slotItemStack.getAmount() : 1;
+            ItemStack outStack = slotItemStack.split(outAmount);
+            user.setHandItemStack(outStack);
+        } else {
+            //如果取出的是输出槽位的东西，就让输入槽位的东西都减一
+            for (int i = 0; i < inventory.getSize(); i++) {
+                ItemStack itemStack = inventory.getItemStack(i);
+                if (itemStack == null) continue;
+                itemStack.amountDecrease(1);
+            }
+            user.setHandItemStack(new ItemStack(interactSlot.getItemStack().getItem(), 1));
+        }
 
+        inventory.clear();
+        //每次交互完之后更新一下输出槽位该有什么东西
+        this.updateOutput();
         world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, getSounder());
         return InteractResult.SUCCESS;
     }
@@ -62,6 +77,9 @@ public class BlockEntityCraftingTable extends BlockEntity {
     public InteractResult interactWithItem (World world, LivingEntity<?> user, ItemStack handItemStack, GridPoint2 interactGridPos) {
         //手持物品放入
         InteractSlot interactSlot = this.getSlot(interactGridPos);
+        //输出槽位不放东西
+        if (interactSlot == null || interactSlot.getIndex() == OUTPUT_SLOT_INDEX) return InteractResult.FAILURE;
+
         ItemStack slotItemStack = interactSlot.getItemStack();
         if (slotItemStack == null) {
             //交互的槽位上本来没有物品
@@ -83,10 +101,24 @@ public class BlockEntityCraftingTable extends BlockEntity {
         }
         //记得清理
         user.getBackpack().clear();
-
         world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_PUT, getSounder());
 
-        //暂时这么写测试一下
+        this.updateOutput();
+
+        return InteractResult.SUCCESS;
+    }
+
+    @Override
+    public void tick (World world, float delta) {
+        this.updateOutput();
+        super.tick(world, delta);
+    }
+
+    /**
+     * 更新输出槽位。根据输入槽位的物品来查找配方表
+     * */
+    public void updateOutput () {
+        //暂时这么写，用于测试
         Inventory inventory = getInventory();
         //工作台的左下角槽位为0号
         ItemStack[] itemStacks = {
@@ -97,16 +129,9 @@ public class BlockEntityCraftingTable extends BlockEntity {
         CraftingTableRecipe recipe = Registries.CRAFTING_RECIPE_REGISTRY.findRecipe(itemStacks);
         if (recipe != null) {
             ItemStack output = recipe.getOutput();
-            ItemEntity itemEntity = ItemEntityGetter.get(world.getSystem(EntitySystem.class), getBlockPos(), output);
-            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-            for (int i = 0; i < inventory.getSize(); i++) {
-                inventory.dropItem(i, 1);
-            }
-            inventory.clear();
+            //在输出槽位放对应的输出物品
+            getSlots().get(OUTPUT_SLOT_INDEX).setItemStack(output);
         }
-
-
-        return InteractResult.SUCCESS;
     }
 
     private void printInventory (Inventory inventory) {

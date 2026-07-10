@@ -20,7 +20,7 @@ public class CraftingRecipes {
         Log.print(CraftingTableRecipe.class.getName(), "注册工作台合成表！");
     }
 
-    public static final CraftingTableRecipe A = registerShaped("a", new ItemStack(Items.COAL),
+    public static final CraftingTableRecipe A = registerShaped("a", new ItemStack(Items.COAL, 1),
         "GGG",
         "GGG",
         "SSS",
@@ -28,7 +28,7 @@ public class CraftingRecipes {
         PatternPair.of('S', Items.STONE)
         );
 
-    public static final CraftingTableRecipe B = registerShaped("a", new ItemStack(Items.COAL),
+    public static final CraftingTableRecipe B = registerShaped("a", new ItemStack(Items.IRON_SWORD, 1),
         "  G",
         " G ",
         "S  ",
