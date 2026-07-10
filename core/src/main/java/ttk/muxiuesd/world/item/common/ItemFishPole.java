@@ -149,6 +149,7 @@ public class ItemFishPole extends Item {
         }else {
             //TODO 其他生物抛竿的抛竿方向，速度方向
             fishingHook.setSpeed(this.castSpeed);
+
         }
 
         //添加鱼钩实体

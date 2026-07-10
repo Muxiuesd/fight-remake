@@ -97,7 +97,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
      * 抛钩移动
      * */
     private void throwMovement (float delta) {
-        setVelocity(getCurSpeed() * throwDirection.getX(), getCurSpeed() * throwDirection.getY());
+        setVelocity(this.throwDirection.getX(), this.throwDirection.getY());
+        setCurSpeed(getSpeed());
         positionChange(delta);
     }
 
