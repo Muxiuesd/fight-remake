@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.recipe.CraftingTableRecipe;
@@ -97,7 +98,7 @@ public class BlockEntityCraftingTable extends BlockEntity {
         if (recipe != null) {
             ItemStack output = recipe.getOutput();
             ItemEntity itemEntity = ItemEntityGetter.get(world.getSystem(EntitySystem.class), getBlockPos(), output);
-
+            itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
             for (int i = 0; i < inventory.getSize(); i++) {
                 inventory.dropItem(i, 1);
             }

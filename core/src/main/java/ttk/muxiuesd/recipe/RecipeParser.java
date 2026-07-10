@@ -6,7 +6,6 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
-import javax.swing.text.html.HTML;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,15 +51,15 @@ public class RecipeParser {
             for (int c = 0; c < 3; c++) {
                 char ch = row.charAt(c);
                 String id = key.get(ch);
-                //检查这个id的物品是否存在
-                Registries.DefaultRegistry<Item> itemsReg = (Registries.DefaultRegistry<Item>) Registries.ITEM;
-                if (!itemsReg.contains(id)) {
-                    Log.error(TAG, "配方表解析失败，id为：" + id + " 的物品并未注册！！！");
-                    throw new IllegalArgumentException(id);
-                }
                 if (ch == ' ') {
                     fullGrid[r][c] = null;
                 } else {
+                    //检查这个id的物品是否存在
+                    Registries.DefaultRegistry<Item> itemsReg = (Registries.DefaultRegistry<Item>) Registries.ITEM;
+                    if (!itemsReg.contains(id)) {
+                        Log.error(TAG, "配方表解析失败，id为：" + id + " 的物品并未注册！！！");
+                        throw new IllegalArgumentException(id);
+                    }
                     //根据id字符串查找id标识符
                     HashMap<String, Identifier> idCast = itemsReg.getIDCast();
                     Identifier itemIdentifier = idCast.get(id);

@@ -11,7 +11,6 @@ import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 所有工作台配方表的注册
@@ -28,6 +27,14 @@ public class CraftingRecipes {
         PatternPair.of('G', Items.GRASS),
         PatternPair.of('S', Items.STONE)
         );
+
+    public static final CraftingTableRecipe B = registerShaped("a", new ItemStack(Items.COAL),
+        "  G",
+        " G ",
+        "S  ",
+        PatternPair.of('G', Items.GRASS),
+        PatternPair.of('S', Items.STONE)
+    );
 
     /**
      * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
