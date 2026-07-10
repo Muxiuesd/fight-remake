@@ -3,15 +3,20 @@ package ttk.muxiuesd.world.block.blockentity;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.recipe.CraftingTableRecipe;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.entity.Backpack;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -79,6 +84,27 @@ public class BlockEntityCraftingTable extends BlockEntity {
         user.getBackpack().clear();
 
         world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_PUT, getSounder());
+
+        //暂时这么写测试一下
+        Inventory inventory = getInventory();
+        //工作台的左下角槽位为0号
+        ItemStack[] itemStacks = {
+            inventory.getItemStack(6), inventory.getItemStack(7), inventory.getItemStack(8),
+            inventory.getItemStack(3), inventory.getItemStack(4), inventory.getItemStack(5),
+            inventory.getItemStack(0), inventory.getItemStack(1), inventory.getItemStack(2),
+        };
+        CraftingTableRecipe recipe = Registries.CRAFTING_RECIPE_REGISTRY.findRecipe(itemStacks);
+        if (recipe != null) {
+            ItemStack output = recipe.getOutput();
+            ItemEntity itemEntity = ItemEntityGetter.get(world.getSystem(EntitySystem.class), getBlockPos(), output);
+
+            for (int i = 0; i < inventory.getSize(); i++) {
+                inventory.dropItem(i, 1);
+            }
+            inventory.clear();
+        }
+
+
         return InteractResult.SUCCESS;
     }
 
