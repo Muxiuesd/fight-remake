@@ -60,15 +60,7 @@ public class PlayerUIScreen extends UIScreen {
         );
 
         /// 玩家创造背包
-        TextureRegion playerCreateTabBackground = Util.loadTextureRegion(
-            Fight.ID("player_create_tab"),
-            Fight.UITexturePath("tab_items.png")
-        );
-        setCreateTabUIPanel(new PlayerCreateTabUIPanel(
-            playerSystem, playerCreateTabBackground,
-            playerCreateTabBackground.getRegionWidth(), playerCreateTabBackground.getRegionHeight()
-            )
-        );
+        setCreateTabUIPanel(new PlayerCreateTabUIPanel(playerSystem));
 
         //默认先显示玩家背包面板
         this.setCurrentTopPanel(getInventoryUIPanel());

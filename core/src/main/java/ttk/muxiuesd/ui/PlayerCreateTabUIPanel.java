@@ -6,7 +6,9 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import game.muxiuesd.bedrockcore.app.ui.components.UIScrollBar;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.ItemGroups;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
 import ttk.muxiuesd.ui.components.CreateSlotUI;
@@ -18,19 +20,30 @@ import ttk.muxiuesd.world.item.ItemGroup;
  * 玩家创造背包面板
  * */
 public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
-    private TextureRegion background;
+    public static final int TAB_BACKGROUND_WIDTH = 195;
+    public static final int TAB_BACKGROUND_HEIGHT = 136;
+
+    private Resource<TextureRegion> tabBackgroundTextureRegionResource;
+    private Resource<TextureRegion> tabAboveLeftTextureRegionResource;
+    private Resource<TextureRegion> tabAboveLeftSelectedTextureRegionResource;
+    private Resource<TextureRegion> tabAboveMiddleTextureRegionResource;
+    private Resource<TextureRegion> tabAboveMiddleSelectedTextureRegionResource;
+    private Resource<TextureRegion> tabAboveRightTextureRegionResource;
+    private Resource<TextureRegion> tabAboveRightSelectedTextureRegionResource;
+
     private Array<CreateSlotUI> createSlots;
     private ItemGroup curItemGroup;
     private UIScrollBar scrollBar;
     private int firstCreateSlotIndex = 0;
 
-    public PlayerCreateTabUIPanel (PlayerSystem playerSystem, TextureRegion background, float width, float height) {
-        super(playerSystem, - width / 2, - height / 2, width, height,
-            new GridPoint2(background.getRegionWidth(), background.getRegionHeight())
+    public PlayerCreateTabUIPanel (PlayerSystem playerSystem) {
+        super(playerSystem,
+            - (float)TAB_BACKGROUND_WIDTH / 2,  - (float)TAB_BACKGROUND_HEIGHT / 2,
+            TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT,
+            new GridPoint2(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT)
         );
-        this.background = background;
+        this.initResource();
         this.createSlots = new Array<>();
-
         this.initSlots();
 
         this.scrollBar = new UIScrollBar();
@@ -42,6 +55,37 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             .setPosition(175f, 8f);
 
         addComponent(this.scrollBar);
+    }
+
+    private void initResource () {
+        this.tabBackgroundTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab"),
+            Fight.UITexturePath("tab/tab_items.png")
+        );
+        this.tabAboveLeftTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_left"),
+            Fight.UITexturePath("tab/tab_above_left.png")
+        );
+        this.tabAboveLeftSelectedTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_left_selected"),
+            Fight.UITexturePath("tab/tab_above_left_selected.png")
+        );
+        this.tabAboveMiddleTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_middle"),
+            Fight.UITexturePath("tab/tab_above_middle.png")
+        );
+        this.tabAboveMiddleSelectedTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_middle_selected"),
+            Fight.UITexturePath("tab/tab_above_middle_selected.png")
+        );
+        this.tabAboveRightTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_right"),
+            Fight.UITexturePath("tab/tab_above_right.png")
+        );
+        this.tabAboveRightSelectedTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_right_selected"),
+            Fight.UITexturePath("tab/tab_above_right_selected.png")
+        );
     }
 
     private void initSlots () {
@@ -108,7 +152,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         //绘制背景贴图
-        batch.draw(this.background, getX(), getY(), getWidth(), getHeight());
+        batch.draw(this.getTabBackground(), getX(), getY(), getWidth(), getHeight());
 
         super.draw(batch, parent);
     }
@@ -133,5 +177,13 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
 
     public UIScrollBar getScrollBar () {
         return this.scrollBar;
+    }
+
+    public TextureRegion getTabBackground () {
+        return this.getTabBackgroundTextureRegionResource().get();
+    }
+
+    public Resource<TextureRegion> getTabBackgroundTextureRegionResource () {
+        return this.tabBackgroundTextureRegionResource;
     }
 }
