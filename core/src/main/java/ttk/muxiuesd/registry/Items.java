@@ -39,14 +39,22 @@ public final class Items {
     }
 
     /// 常规物品
+    //材料类
     public static final Item STICK = register("stick", ItemStick::new);
-    public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new, FishPoleRenderer::new);
+    public static final Item SLIME_BALL = register("slime_ball");
+    public static final Item IRON_INGOT = register("iron_ingot");
+    public static final Item GOLD_INGOT = register("gold_ingot");
+    public static final Item COAL = register("coal");
+
     public static final Item BAIT = register("bait", ItemBait::new);
+    //食物类
     public static final Item FISH = register("fish", ItemFish::new);
     public static final Item PUFFER_FISH = register("puffer_fish", ItemPufferFish::new);
+    //杂物类
     public static final Item RUBBISH = register("rubbish");
-    public static final Item COAL = register("coal");
-    public static final Item SLIME_BALL = register("slime_ball");
+
+    /// 工具类物品
+    public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new, FishPoleRenderer::new);
 
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);

@@ -57,18 +57,21 @@ public class BlockEntityCraftingTable extends BlockEntity {
             ItemStack outStack = slotItemStack.split(outAmount);
             user.setHandItemStack(outStack);
         } else {
-            //如果取出的是输出槽位的东西，就让输入槽位的东西都减一
+            //取出输出槽位的东西
+            //将输出槽位的物品复制一份到玩家手中
+            user.setHandItemStack(interactSlot.getItemStack().copy(1));
+
+            //就让输入槽位的东西都减一
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack itemStack = inventory.getItemStack(i);
                 if (itemStack == null) continue;
                 itemStack.amountDecrease(1);
             }
-            user.setHandItemStack(new ItemStack(interactSlot.getItemStack().getItem(), 1));
         }
 
-        inventory.clear();
-        //每次交互完之后更新一下输出槽位该有什么东西
+        //每次交互完之后更新一下输出槽位该有什么物品
         this.updateOutput();
+
         world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, getSounder());
         return InteractResult.SUCCESS;
     }
@@ -101,15 +104,16 @@ public class BlockEntityCraftingTable extends BlockEntity {
         }
         //记得清理
         user.getBackpack().clear();
+
         world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_PUT, getSounder());
 
         this.updateOutput();
-
         return InteractResult.SUCCESS;
     }
 
     @Override
     public void tick (World world, float delta) {
+        //后续不该这么写
         this.updateOutput();
         super.tick(world, delta);
     }
@@ -130,8 +134,20 @@ public class BlockEntityCraftingTable extends BlockEntity {
         if (recipe != null) {
             ItemStack output = recipe.getOutput();
             //在输出槽位放对应的输出物品
-            getSlots().get(OUTPUT_SLOT_INDEX).setItemStack(output);
+            this.setOutputItemStack(output);
+        }else {
+            //没有对应的配方，就清空输出槽位
+            this.setOutputItemStack(null);
         }
+        //清理一下容器
+        inventory.clear();
+    }
+
+    /**
+     * 设置输出槽位的物品堆栈
+     * */
+    public void setOutputItemStack (ItemStack itemStack) {
+        getSlots().get(OUTPUT_SLOT_INDEX).setItemStack(itemStack);
     }
 
     private void printInventory (Inventory inventory) {
