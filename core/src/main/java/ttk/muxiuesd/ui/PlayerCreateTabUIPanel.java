@@ -14,6 +14,7 @@ import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
 import ttk.muxiuesd.ui.components.CreateSlotUI;
 import ttk.muxiuesd.ui.components.PlayerSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
+import ttk.muxiuesd.ui.components.TabButtonUI;
 import ttk.muxiuesd.world.item.ItemGroup;
 
 /**
@@ -24,8 +25,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     public static final int TAB_BACKGROUND_HEIGHT = 136;
 
     private Resource<TextureRegion> tabBackgroundTextureRegionResource;
-    private Resource<TextureRegion> tabAboveLeftTextureRegionResource;
-    private Resource<TextureRegion> tabAboveLeftSelectedTextureRegionResource;
+    private TabButtonUI tabLeftButtonUI;
     private Resource<TextureRegion> tabAboveMiddleTextureRegionResource;
     private Resource<TextureRegion> tabAboveMiddleSelectedTextureRegionResource;
     private Resource<TextureRegion> tabAboveRightTextureRegionResource;
@@ -35,6 +35,8 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     private ItemGroup curItemGroup;
     private UIScrollBar scrollBar;
     private int firstCreateSlotIndex = 0;
+    private int firstTabButtonIndex = 0;    //上下两个位置各有五个物品组页面按钮，三个中间，两边各一个
+
 
     public PlayerCreateTabUIPanel (PlayerSystem playerSystem) {
         super(playerSystem,
@@ -42,7 +44,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT,
             new GridPoint2(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT)
         );
-        this.initResource();
+        this.initTabButtons();
         this.createSlots = new Array<>();
         this.initSlots();
 
@@ -57,19 +59,23 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         addComponent(this.scrollBar);
     }
 
-    private void initResource () {
+    private void initTabButtons () {
+        this.tabLeftButtonUI = new TabButtonUI(
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_left"),
+                Fight.UITexturePath("tab/tab_above_left.png")
+            ),
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_left_selected"),
+                Fight.UITexturePath("tab/tab_above_left_selected.png")
+            )
+        );
+
         this.tabBackgroundTextureRegionResource = Resource.ofTextureRegion(
             Fight.ID("player_create_tab"),
             Fight.UITexturePath("tab/tab_items.png")
         );
-        this.tabAboveLeftTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab_above_left"),
-            Fight.UITexturePath("tab/tab_above_left.png")
-        );
-        this.tabAboveLeftSelectedTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab_above_left_selected"),
-            Fight.UITexturePath("tab/tab_above_left_selected.png")
-        );
+
         this.tabAboveMiddleTextureRegionResource = Resource.ofTextureRegion(
             Fight.ID("player_create_tab_above_middle"),
             Fight.UITexturePath("tab/tab_above_middle.png")
@@ -172,6 +178,15 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
 
     public PlayerCreateTabUIPanel setFirstCreateSlotIndex (int index) {
         this.firstCreateSlotIndex = Math.max(index, 0);
+        return this;
+    }
+
+    public int getFirstTabButtonIndex () {
+        return this.firstTabButtonIndex;
+    }
+
+    public PlayerCreateTabUIPanel setFirstTabButtonIndex (int firstTabButtonIndex) {
+        this.firstTabButtonIndex = firstTabButtonIndex;
         return this;
     }
 

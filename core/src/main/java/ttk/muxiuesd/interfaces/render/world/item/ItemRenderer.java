@@ -31,6 +31,19 @@ public interface ItemRenderer<T extends Item> {
     void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity);
 
     /**
+     * 单纯的根据渲染上下文参数绘制物品
+     * */
+    default void draw (Batch batch, Context context, ItemStack itemStack) {
+        if (itemStack == ItemStack.VOID) return;
+        batch.draw(itemStack.getItem().getTextureRegion(),
+            context.x, context.y,
+            context.originX, context.originY,
+            context.width, context.height,
+            context.scaleX, context.scaleY,
+            context.rotation);
+    };
+
+    /**
      * 在实体手持形式下的形状绘制
      * @param holder 所属的实体
      * @param itemStack 物品堆叠
