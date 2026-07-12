@@ -29,7 +29,9 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
 
     private LinkedHashSet<UIComponent> components;
 
-    public UIPanel() {}
+    public UIPanel() {
+        this(0, 0);
+    }
     public UIPanel (float x, float y) {
         this(x, y, 0, 0, new GridPoint2());
     }

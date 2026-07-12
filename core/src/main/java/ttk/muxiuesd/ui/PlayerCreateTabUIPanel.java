@@ -2,7 +2,6 @@ package ttk.muxiuesd.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import game.muxiuesd.bedrockcore.app.ui.components.UIScrollBar;
@@ -25,14 +24,16 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     public static final int TAB_BACKGROUND_HEIGHT = 136;
 
     private Resource<TextureRegion> tabBackgroundTextureRegionResource;
+    private UIPanel tabAboveButtonsUIPanel;     //上面的物品组页面按钮
     private Array<TabButtonUI> tabButtons;
+    private Array<CreateSlotUI> createSlots;
+
     private TabButtonUI tabLeftButtonUI;
     private TabButtonUI tabMiddleButtonUI1;
     private TabButtonUI tabMiddleButtonUI2;
     private TabButtonUI tabMiddleButtonUI3;
     private TabButtonUI tabRightButtonUI;
 
-    private Array<CreateSlotUI> createSlots;
     private ItemGroup curItemGroup;
     private UIScrollBar scrollBar;
     private int firstCreateSlotIndex = 0;
@@ -40,20 +41,29 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
 
 
     public PlayerCreateTabUIPanel (PlayerSystem playerSystem) {
-        super(playerSystem,
-            - (float)TAB_BACKGROUND_WIDTH / 2,  - (float)TAB_BACKGROUND_HEIGHT / 2,
-            TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT,
-            new GridPoint2(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT)
-        );
-        this.tabButtons = new Array<>();
+        super(playerSystem);
+        setSize(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT + TabButtonUI.BUTTON_HEIGHT - 4);
+        setPosition(- getWidth()/ 2f,  - getHeight() / 2f);
+        autoInteractGridSize();
+
         this.tabBackgroundTextureRegionResource = Resource.ofTextureRegion(
             Fight.ID("player_create_tab"),
             Fight.UITexturePath("tab/tab_items.png")
         );
 
+        this.tabAboveButtonsUIPanel = new UIPanel();
+        //物品组页面按钮UI面板的位置在物品页面的上面
+        this.tabAboveButtonsUIPanel
+            .setPosition(0, TAB_BACKGROUND_HEIGHT - 4f)
+            .setSize(TAB_BACKGROUND_WIDTH, TabButtonUI.BUTTON_HEIGHT);
+        this.tabAboveButtonsUIPanel.autoInteractGridSize();
+        addComponent(this.tabAboveButtonsUIPanel);
+
         this.initTabButtons();
-        this.createSlots = new Array<>();
         this.initSlots();
+
+        //默认选中最左边的
+        this.setSelectedTabButton(this.tabLeftButtonUI);
 
         this.scrollBar = new UIScrollBar();
         this.scrollBar
@@ -70,6 +80,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
      * 初始化所有物品组页面按钮
      * */
     private void initTabButtons () {
+        this.tabButtons = new Array<>();
         this.tabLeftButtonUI = new TabButtonUI(this,
             Resource.ofTextureRegion(
                 Fight.ID("player_create_tab_above_left"),
@@ -79,59 +90,45 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
                 Fight.ID("player_create_tab_above_left_selected"),
                 Fight.UITexturePath("tab/tab_above_left_selected.png")
             ));
-        this.tabMiddleButtonUI1 = new TabButtonUI(this,
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_middle"),
-                Fight.UITexturePath("tab/tab_above_middle.png")
-            ),
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_middle_selected"),
-                Fight.UITexturePath("tab/tab_above_middle_selected.png")
-            ));
-        this.tabMiddleButtonUI2 = new TabButtonUI(this,
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_middle"),
-                Fight.UITexturePath("tab/tab_above_middle.png")
-            ),
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_middle_selected"),
-                Fight.UITexturePath("tab/tab_above_middle_selected.png")
-            ));
-        this.tabMiddleButtonUI3 = new TabButtonUI(this,
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_middle"),
-                Fight.UITexturePath("tab/tab_above_middle.png")
-            ),
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_middle_selected"),
-                Fight.UITexturePath("tab/tab_above_middle_selected.png")
-            ));
-        this.tabRightButtonUI = new TabButtonUI(this,
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_right"),
-                Fight.UITexturePath("tab/tab_above_right.png")
-            ),
-            Resource.ofTextureRegion(
-                Fight.ID("player_create_tab_above_right_selected"),
-                Fight.UITexturePath("tab/tab_above_right_selected.png")
-            ));
 
-        this.tabLeftButtonUI.setPosition(0, TAB_BACKGROUND_HEIGHT);
+        //中间的按钮的贴图是公用的
+        Resource<TextureRegion> tabAboveMiddleResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_middle"),
+            Fight.UITexturePath("tab/tab_above_middle.png")
+        );
+        Resource<TextureRegion> tabAboveMiddleSelectedResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab_above_middle_selected"),
+            Fight.UITexturePath("tab/tab_above_middle_selected.png")
+        );
+        this.tabMiddleButtonUI1 = new TabButtonUI(this,
+            tabAboveMiddleResource,
+            tabAboveMiddleSelectedResource);
+        this.tabMiddleButtonUI2 = new TabButtonUI(this,
+            tabAboveMiddleResource,
+            tabAboveMiddleSelectedResource);
+        this.tabMiddleButtonUI3 = new TabButtonUI(this,
+            tabAboveMiddleResource,
+            tabAboveMiddleSelectedResource);
+        this.tabRightButtonUI = new TabButtonUI(this,
+            tabAboveMiddleResource,
+            tabAboveMiddleSelectedResource);
+
+        this.tabLeftButtonUI.setPosition(0f, 0f);
         this.tabMiddleButtonUI1.setPosition(
             this.tabLeftButtonUI.getWidth() + 1f,
-            TAB_BACKGROUND_HEIGHT
+            0f
         );
         this.tabMiddleButtonUI2.setPosition(
             this.tabMiddleButtonUI1.getX() + this.tabMiddleButtonUI1.getWidth() + 1f,
-            TAB_BACKGROUND_HEIGHT
+            0f
         );
         this.tabMiddleButtonUI3.setPosition(
             this.tabMiddleButtonUI2.getX() + this.tabMiddleButtonUI2.getWidth() + 1f,
-            TAB_BACKGROUND_HEIGHT
+            0f
         );
         this.tabRightButtonUI.setPosition(
             this.tabMiddleButtonUI3.getX() + this.tabMiddleButtonUI3.getWidth() + 1f,
-            TAB_BACKGROUND_HEIGHT
+            0f
         );
 
         //把这些页面按钮加进去
@@ -147,20 +144,19 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         this.tabMiddleButtonUI2.setDisplayItemGroup(ItemGroups.EQUIPMENT_ITEM);
         this.tabMiddleButtonUI3.setDisplayItemGroup(ItemGroups.WEAPON_ITEM);
         this.tabRightButtonUI.setDisplayItemGroup(ItemGroups.MATERIAL_ITEM);
-
-        //默认选中最左边的
-        this.setSelectedTabButton(this.tabLeftButtonUI);
     }
 
     /**
      * 添加物品组页面按钮
      * */
     public void addTabButton (TabButtonUI tabButtonUI) {
-        addComponent(tabButtonUI);
+        this.getTabAboveButtonsUIPanel().addComponent(tabButtonUI);
         this.getTabButtons().add(tabButtonUI);
     }
 
     private void initSlots () {
+        this.createSlots = new Array<>();
+
         float trueHeight = SlotUI.SLOT_HEIGHT + 2;
         float trueWidth = SlotUI.SLOT_WIDTH + 2;
         //快捷栏槽位
@@ -179,8 +175,6 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
                 slotIndex++;
             }
         }
-        /// 测试：显示common物品组
-        this.setTabItemGroup(ItemGroups.COMMON_ITEM);
     }
 
     /**
@@ -233,10 +227,19 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         //绘制背景贴图
-        batch.draw(this.getTabBackground(), getX(), getY(), getWidth(), getHeight());
+        batch.draw(this.getTabBackground(), getX(), getY(), TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT);
 
         //绘制其他子组件
         super.draw(batch, parent);
+    }
+
+    public UIPanel getTabAboveButtonsUIPanel () {
+        return this.tabAboveButtonsUIPanel;
+    }
+
+    public PlayerCreateTabUIPanel setTabAboveButtonsUIPanel (UIPanel tabAboveButtonsUIPanel) {
+        this.tabAboveButtonsUIPanel = tabAboveButtonsUIPanel;
+        return this;
     }
 
     public Array<TabButtonUI> getTabButtons () {

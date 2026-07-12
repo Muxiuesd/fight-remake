@@ -11,6 +11,7 @@ public abstract class PlayerItemSlotsUIPanel extends UIPanel {
     private PlayerSystem playerSystem;
 
     public PlayerItemSlotsUIPanel (PlayerSystem playerSystem) {
+        super();
         this.playerSystem = playerSystem;
     }
     public PlayerItemSlotsUIPanel (PlayerSystem playerSystem,

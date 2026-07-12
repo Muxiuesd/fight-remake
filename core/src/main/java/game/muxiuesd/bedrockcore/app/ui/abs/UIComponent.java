@@ -201,14 +201,20 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
      * 获取绝对的X坐标（相对于相机）
      * */
     public float getAbsX () {
-        return this.x + this.parentPanel.getX();
+        if (this.parentPanel == UIPanel.VOID_INSTANCE || this.parentPanel == null) {
+            return this.x;
+        }
+        return this.x + this.parentPanel.getAbsX();
     }
 
     /**
      * 获取绝对的X坐标（相对于相机）
      * */
     public float getAbsY () {
-        return this.y + this.parentPanel.getY();
+        if (this.parentPanel == UIPanel.VOID_INSTANCE || this.parentPanel == null) {
+            return this.y;
+        }
+        return this.y + this.parentPanel.getAbsY();
     }
 
     /**
@@ -228,12 +234,21 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     public Vector2 getSize() {
         return new Vector2(this.width, this.height);
     }
-    public float getWidth() { return this.width; }
-    public float getHeight() { return this.height; }
+    public float getWidth() {
+        return this.width;
+    }
 
-    public boolean isVisible() { return this.visible; }
+    public float getHeight() {
+        return this.height;
+    }
 
-    public boolean isEnabled() { return this.enabled; }
+    public boolean isVisible() {
+        return this.visible;
+    }
+
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 
     public int getZIndex() {
         return this.zIndex;

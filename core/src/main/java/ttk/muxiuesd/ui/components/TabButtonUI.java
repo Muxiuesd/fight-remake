@@ -3,12 +3,15 @@ package ttk.muxiuesd.ui.components;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector3;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.ui.PlayerCreateTabUIPanel;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -44,6 +47,10 @@ public class TabButtonUI extends UIComponent {
         //设置这个物品组页面按钮是被选中的
         this.createTabUIPanel.setSelectedTabButton(this);
 
+        SpatialAudioSystem.getInstance().playUIAudio(
+            Sounds.ITEM_CLICK,
+            () -> new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0)
+        );
         return super.click(interactPos);
     }
 
