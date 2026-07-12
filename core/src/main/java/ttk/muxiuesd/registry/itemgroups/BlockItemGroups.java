@@ -18,15 +18,7 @@ public class BlockItemGroups {
                 .add(Items.FARMLAND_DRY)
                 .add(Items.STONE)
                 .add(Items.SAND)
-            ;
-        });
 
-    public static final ItemGroup COLOR_GROUP = new ItemGroup.Builder()
-        .setIdentifier(Fight.ID("color_block_item_group"))
-        .setIconItemStack(Items.WOOL_GREEN)
-        .build()
-        .selfAction((group) -> {
-            group
                 .add(Items.WOOL_BLACK)
                 .add(Items.WOOL_BLUE)
                 .add(Items.WOOL_BROWN)

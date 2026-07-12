@@ -25,11 +25,12 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     public static final int TAB_BACKGROUND_HEIGHT = 136;
 
     private Resource<TextureRegion> tabBackgroundTextureRegionResource;
+    private Array<TabButtonUI> tabButtons;
     private TabButtonUI tabLeftButtonUI;
-    private Resource<TextureRegion> tabAboveMiddleTextureRegionResource;
-    private Resource<TextureRegion> tabAboveMiddleSelectedTextureRegionResource;
-    private Resource<TextureRegion> tabAboveRightTextureRegionResource;
-    private Resource<TextureRegion> tabAboveRightSelectedTextureRegionResource;
+    private TabButtonUI tabMiddleButtonUI1;
+    private TabButtonUI tabMiddleButtonUI2;
+    private TabButtonUI tabMiddleButtonUI3;
+    private TabButtonUI tabRightButtonUI;
 
     private Array<CreateSlotUI> createSlots;
     private ItemGroup curItemGroup;
@@ -44,6 +45,12 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT,
             new GridPoint2(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT)
         );
+        this.tabButtons = new Array<>();
+        this.tabBackgroundTextureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("player_create_tab"),
+            Fight.UITexturePath("tab/tab_items.png")
+        );
+
         this.initTabButtons();
         this.createSlots = new Array<>();
         this.initSlots();
@@ -59,8 +66,11 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         addComponent(this.scrollBar);
     }
 
+    /**
+     * 初始化所有物品组页面按钮
+     * */
     private void initTabButtons () {
-        this.tabLeftButtonUI = new TabButtonUI(
+        this.tabLeftButtonUI = new TabButtonUI(this,
             Resource.ofTextureRegion(
                 Fight.ID("player_create_tab_above_left"),
                 Fight.UITexturePath("tab/tab_above_left.png")
@@ -68,30 +78,86 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             Resource.ofTextureRegion(
                 Fight.ID("player_create_tab_above_left_selected"),
                 Fight.UITexturePath("tab/tab_above_left_selected.png")
-            )
+            ));
+        this.tabMiddleButtonUI1 = new TabButtonUI(this,
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_middle"),
+                Fight.UITexturePath("tab/tab_above_middle.png")
+            ),
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_middle_selected"),
+                Fight.UITexturePath("tab/tab_above_middle_selected.png")
+            ));
+        this.tabMiddleButtonUI2 = new TabButtonUI(this,
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_middle"),
+                Fight.UITexturePath("tab/tab_above_middle.png")
+            ),
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_middle_selected"),
+                Fight.UITexturePath("tab/tab_above_middle_selected.png")
+            ));
+        this.tabMiddleButtonUI3 = new TabButtonUI(this,
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_middle"),
+                Fight.UITexturePath("tab/tab_above_middle.png")
+            ),
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_middle_selected"),
+                Fight.UITexturePath("tab/tab_above_middle_selected.png")
+            ));
+        this.tabRightButtonUI = new TabButtonUI(this,
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_right"),
+                Fight.UITexturePath("tab/tab_above_right.png")
+            ),
+            Resource.ofTextureRegion(
+                Fight.ID("player_create_tab_above_right_selected"),
+                Fight.UITexturePath("tab/tab_above_right_selected.png")
+            ));
+
+        this.tabLeftButtonUI.setPosition(0, TAB_BACKGROUND_HEIGHT);
+        this.tabMiddleButtonUI1.setPosition(
+            this.tabLeftButtonUI.getWidth() + 1f,
+            TAB_BACKGROUND_HEIGHT
+        );
+        this.tabMiddleButtonUI2.setPosition(
+            this.tabMiddleButtonUI1.getX() + this.tabMiddleButtonUI1.getWidth() + 1f,
+            TAB_BACKGROUND_HEIGHT
+        );
+        this.tabMiddleButtonUI3.setPosition(
+            this.tabMiddleButtonUI2.getX() + this.tabMiddleButtonUI2.getWidth() + 1f,
+            TAB_BACKGROUND_HEIGHT
+        );
+        this.tabRightButtonUI.setPosition(
+            this.tabMiddleButtonUI3.getX() + this.tabMiddleButtonUI3.getWidth() + 1f,
+            TAB_BACKGROUND_HEIGHT
         );
 
-        this.tabBackgroundTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab"),
-            Fight.UITexturePath("tab/tab_items.png")
-        );
+        //把这些页面按钮加进去
+        this.addTabButton(this.tabLeftButtonUI);
+        this.addTabButton(this.tabMiddleButtonUI1);
+        this.addTabButton(this.tabMiddleButtonUI2);
+        this.addTabButton(this.tabMiddleButtonUI3);
+        this.addTabButton(this.tabRightButtonUI);
 
-        this.tabAboveMiddleTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab_above_middle"),
-            Fight.UITexturePath("tab/tab_above_middle.png")
-        );
-        this.tabAboveMiddleSelectedTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab_above_middle_selected"),
-            Fight.UITexturePath("tab/tab_above_middle_selected.png")
-        );
-        this.tabAboveRightTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab_above_right"),
-            Fight.UITexturePath("tab/tab_above_right.png")
-        );
-        this.tabAboveRightSelectedTextureRegionResource = Resource.ofTextureRegion(
-            Fight.ID("player_create_tab_above_right_selected"),
-            Fight.UITexturePath("tab/tab_above_right_selected.png")
-        );
+        //设置每一个物品组页面对应的物品组
+        this.tabLeftButtonUI.setDisplayItemGroup(ItemGroups.NATURE_BLOCK_ITEM);
+        this.tabMiddleButtonUI1.setDisplayItemGroup(ItemGroups.TOOL_BLOCK_ITEM);
+        this.tabMiddleButtonUI2.setDisplayItemGroup(ItemGroups.EQUIPMENT_ITEM);
+        this.tabMiddleButtonUI3.setDisplayItemGroup(ItemGroups.WEAPON_ITEM);
+        this.tabRightButtonUI.setDisplayItemGroup(ItemGroups.MATERIAL_ITEM);
+
+        //默认选中最左边的
+        this.setSelectedTabButton(this.tabLeftButtonUI);
+    }
+
+    /**
+     * 添加物品组页面按钮
+     * */
+    public void addTabButton (TabButtonUI tabButtonUI) {
+        addComponent(tabButtonUI);
+        this.getTabButtons().add(tabButtonUI);
     }
 
     private void initSlots () {
@@ -128,6 +194,15 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     }
 
     /**
+     * 设置被选中的物品组页面
+     * */
+    public void setSelectedTabButton (TabButtonUI tabButtonUI) {
+        this.getTabButtons().forEach(tabButtonUI1 -> tabButtonUI1.setSelected(false));
+        tabButtonUI.setSelected(true);
+        this.setTabItemGroup(tabButtonUI.getDisplayItemGroup());
+    }
+
+    /**
      * 设置当前面板要显示的物品组
      * */
     public void setTabItemGroup (ItemGroup itemGroup) {
@@ -160,7 +235,17 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         //绘制背景贴图
         batch.draw(this.getTabBackground(), getX(), getY(), getWidth(), getHeight());
 
+        //绘制其他子组件
         super.draw(batch, parent);
+    }
+
+    public Array<TabButtonUI> getTabButtons () {
+        return this.tabButtons;
+    }
+
+    public PlayerCreateTabUIPanel setTabButtons (Array<TabButtonUI> tabButtons) {
+        this.tabButtons = tabButtons;
+        return this;
     }
 
     public ItemGroup getCurItemGroup () {

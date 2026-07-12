@@ -2,36 +2,49 @@ package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.ui.PlayerCreateTabUIPanel;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
- * 创造背包页面的左上页面按钮UI
+ * 创造背包页面的物品组页面按钮UI（没直接用UIButton）
  * */
 public class TabButtonUI extends UIComponent {
     public static final float BUTTON_WIDTH = 28f, BUTTON_HEIGHT = 32f;
     public static final float ICON_WIDTH = 16f, ICON_HEIGHT = 16f;
     public static final Vec2 ICON_RENDER_OFFSET = new Vec2((BUTTON_WIDTH - ICON_WIDTH) / 2f, (BUTTON_HEIGHT - ICON_HEIGHT) / 2f);
 
-
+    private PlayerCreateTabUIPanel createTabUIPanel;
     private Resource<TextureRegion> tabTextureRegionResource;           //没被选中状态的贴图
     private Resource<TextureRegion> tabSelectedTextureRegionResource;   //被选中状态的贴图
     private ItemGroup displayItemGroup; //当前按钮所对应的物品组
     private boolean isSelected;         //当前页面是否被选中
 
 
-    public TabButtonUI (Resource<TextureRegion> tabTextureRegionResource,
+    public TabButtonUI (PlayerCreateTabUIPanel createTabUIPanel,
+                        Resource<TextureRegion> tabTextureRegionResource,
                         Resource<TextureRegion> tabSelectedTextureRegionResource) {
+        this.createTabUIPanel = createTabUIPanel;
         this.tabTextureRegionResource = tabTextureRegionResource;
         this.tabSelectedTextureRegionResource = tabSelectedTextureRegionResource;
         setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+        setInteractGridSize(new GridPoint2((int) BUTTON_WIDTH, (int) BUTTON_HEIGHT));
+    }
+
+    @Override
+    public boolean click (GridPoint2 interactPos) {
+        //设置这个物品组页面按钮是被选中的
+        this.createTabUIPanel.setSelectedTabButton(this);
+
+        return super.click(interactPos);
     }
 
     @Override
@@ -52,6 +65,9 @@ public class TabButtonUI extends UIComponent {
         renderer.draw(batch, rendererContext, iconItemStack);
     }
 
+    /**
+     * 获取被显示的物品组
+     * */
     public ItemGroup getDisplayItemGroup () {
         return this.displayItemGroup;
     }
