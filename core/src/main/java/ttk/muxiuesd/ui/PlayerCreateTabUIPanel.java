@@ -20,8 +20,8 @@ import ttk.muxiuesd.world.item.ItemGroup;
  * 玩家创造背包面板
  * */
 public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
-    public static final int TAB_BACKGROUND_WIDTH = 195;
-    public static final int TAB_BACKGROUND_HEIGHT = 136;
+    public static final float TAB_BACKGROUND_WIDTH = 195f;
+    public static final float TAB_BACKGROUND_HEIGHT = 136f;
 
     private Resource<TextureRegion> tabBackgroundTextureRegionResource;
     private UIPanel tabAboveButtonsUIPanel;     //上面的物品组页面按钮
@@ -36,7 +36,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
 
     private ItemGroup curItemGroup;
     private UIScrollBar scrollBar;
-    private int firstCreateSlotIndex = 0;
+    private int firstCreateSlotIndex = 0;   //创造物品槽位的起始索引
     private int firstTabButtonIndex = 0;    //上下两个位置各有五个物品组页面按钮，三个中间，两边各一个
 
 
@@ -288,5 +288,69 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
 
     public Resource<TextureRegion> getTabBackgroundTextureRegionResource () {
         return this.tabBackgroundTextureRegionResource;
+    }
+
+    public PlayerCreateTabUIPanel setTabBackgroundTextureRegionResource (Resource<TextureRegion> tabBackgroundTextureRegionResource) {
+        this.tabBackgroundTextureRegionResource = tabBackgroundTextureRegionResource;
+        return this;
+    }
+
+    public Array<CreateSlotUI> getCreateSlots () {
+        return createSlots;
+    }
+
+    public PlayerCreateTabUIPanel setCreateSlots (Array<CreateSlotUI> createSlots) {
+        this.createSlots = createSlots;
+        return this;
+    }
+
+    public TabButtonUI getTabLeftButtonUI () {
+        return tabLeftButtonUI;
+    }
+
+    public PlayerCreateTabUIPanel setTabLeftButtonUI (TabButtonUI tabLeftButtonUI) {
+        this.tabLeftButtonUI = tabLeftButtonUI;
+        return this;
+    }
+
+    public TabButtonUI getTabMiddleButtonUI1 () {
+        return tabMiddleButtonUI1;
+    }
+
+    public PlayerCreateTabUIPanel setTabMiddleButtonUI1 (TabButtonUI tabMiddleButtonUI1) {
+        this.tabMiddleButtonUI1 = tabMiddleButtonUI1;
+        return this;
+    }
+
+    public TabButtonUI getTabMiddleButtonUI2 () {
+        return tabMiddleButtonUI2;
+    }
+
+    public PlayerCreateTabUIPanel setTabMiddleButtonUI2 (TabButtonUI tabMiddleButtonUI2) {
+        this.tabMiddleButtonUI2 = tabMiddleButtonUI2;
+        return this;
+    }
+
+    public TabButtonUI getTabMiddleButtonUI3 () {
+        return tabMiddleButtonUI3;
+    }
+
+    public PlayerCreateTabUIPanel setTabMiddleButtonUI3 (TabButtonUI tabMiddleButtonUI3) {
+        this.tabMiddleButtonUI3 = tabMiddleButtonUI3;
+        return this;
+    }
+
+    public TabButtonUI getTabRightButtonUI () {
+        return tabRightButtonUI;
+    }
+
+    public PlayerCreateTabUIPanel setTabRightButtonUI (TabButtonUI tabRightButtonUI) {
+        this.tabRightButtonUI = tabRightButtonUI;
+        return this;
+    }
+
+    public PlayerCreateTabUIPanel setScrollBar (UIScrollBar scrollBar) {
+        this.scrollBar = scrollBar;
+        return this;
     }
 }
