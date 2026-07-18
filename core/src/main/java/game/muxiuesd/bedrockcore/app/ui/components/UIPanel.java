@@ -110,7 +110,8 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
      * 根据宽高自动设置交互网格尺寸
      * */
     public UIPanel autoInteractGridSize () {
-        this.setInteractGridSize(new GridPoint2((int) getWidth(), (int) getHeight()));
+        //this.setInteractGridSize(new GridPoint2((int) getWidth(), (int) getHeight()));
+        this.setInteractGridSize(new GridPoint2((int) Util.fastRound(getWidth()), (int) Util.fastRound(getHeight())));
         return this;
     }
 

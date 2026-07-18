@@ -18,7 +18,15 @@ public class BlockItemGroups {
                 .add(Items.FARMLAND_DRY)
                 .add(Items.STONE)
                 .add(Items.SAND)
+            ;
+        });
 
+    public static final ItemGroup COLOR_GROUP = new ItemGroup.Builder()
+        .setIdentifier(Fight.ID("color_block_item_group"))
+        .setIconItemStack(Items.WOOL_GREEN)
+        .build()
+        .selfAction((group) -> {
+            group
                 .add(Items.WOOL_BLACK)
                 .add(Items.WOOL_BLUE)
                 .add(Items.WOOL_BROWN)
@@ -34,12 +42,13 @@ public class BlockItemGroups {
                 .add(Items.WOOL_RED)
                 .add(Items.WOOL_SILVER)
                 .add(Items.WOOL_WHITE)
-                .add(Items.WOOL_YELLOW);
+                .add(Items.WOOL_YELLOW)
+            ;
         });
 
     public static final ItemGroup TOOL_GROUP = new ItemGroup.Builder()
         .setIdentifier(Fight.ID("tool_block_item_group"))
-        .setIconItemStack(Items.TEST_BLOCK)
+        .setIconItemStack(Items.CRAFTING_TABLE)
         .build()
         .selfAction((group) -> {
             group

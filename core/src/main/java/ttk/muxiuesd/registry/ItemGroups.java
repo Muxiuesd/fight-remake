@@ -19,6 +19,7 @@ public final class ItemGroups {
     public static final ItemGroup EQUIPMENT_ITEM = register(EquipmentItemGroup.GROUP);
 
     public static final ItemGroup NATURE_BLOCK_ITEM = register(BlockItemGroups.NATURE_GROUP);
+    public static final ItemGroup COLOR_BLOCK_ITEM = register(BlockItemGroups.COLOR_GROUP);
     public static final ItemGroup TOOL_BLOCK_ITEM = register(BlockItemGroups.TOOL_GROUP);
 
 

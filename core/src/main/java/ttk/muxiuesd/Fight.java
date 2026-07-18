@@ -21,7 +21,7 @@ public class Fight {
     public static final Info<String> WORLD_NAME = Info.create("world_name", "null_world");
     public static final Info<Long> WORLD_SEED = Info.create("world_seed", 114514L);
     //UI的调试框是否渲染
-    public static final Info<Boolean> UI_DEBUG_BOX_RENDER = Info.create("ui_debug_box_render", false);
+    public static final Info<Boolean> UI_DEBUG_BOX_RENDER = Info.create("ui_debug_box_render", true);
     //玩家的听觉范围，单位：世界中的1米
     public static final Info<Float> PLAYER_HEARING_RANGE = Info.create("player_hearing_range", 16f);
     //物品实体最大存活时间，单位：秒

@@ -79,6 +79,9 @@ public class TabButtonUI extends UIComponent {
         return this.displayItemGroup;
     }
 
+    /**
+     * 设置被显示的物品组
+     * */
     public TabButtonUI setDisplayItemGroup (ItemGroup displayItemGroup) {
         this.displayItemGroup = displayItemGroup;
         return this;
