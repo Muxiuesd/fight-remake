@@ -24,17 +24,24 @@ public class TabButtonUI extends UIComponent {
     public static final float BUTTON_WIDTH = 28f, BUTTON_HEIGHT = 32f;
     public static final float ICON_WIDTH = 16f, ICON_HEIGHT = 16f;
     public static final Vec2 ICON_RENDER_OFFSET = new Vec2((BUTTON_WIDTH - ICON_WIDTH) / 2f, (BUTTON_HEIGHT - ICON_HEIGHT) / 2f);
+    public static final float RENDER_DELTA_Y = 4f, ICON_RENDER_DELTA_Y = 7f, SELECTED_ICON_RENDER_DELTA_Y = 4f;
+
+    public enum Type {
+        ABOVE,  //上部
+        BELOW;  //底部
+    }
 
     private PlayerCreateTabUIPanel createTabUIPanel;
     private Resource<TextureRegion> tabTextureRegionResource;           //没被选中状态的贴图
     private Resource<TextureRegion> tabSelectedTextureRegionResource;   //被选中状态的贴图
     private ItemGroup displayItemGroup; //当前按钮所对应的物品组
     private boolean isSelected;         //当前页面是否被选中
+    private Type type;
 
-
-    public TabButtonUI (PlayerCreateTabUIPanel createTabUIPanel,
+    public TabButtonUI (Type type, PlayerCreateTabUIPanel createTabUIPanel,
                         Resource<TextureRegion> tabTextureRegionResource,
                         Resource<TextureRegion> tabSelectedTextureRegionResource) {
+        this.type = type;
         this.createTabUIPanel = createTabUIPanel;
         this.tabTextureRegionResource = tabTextureRegionResource;
         this.tabSelectedTextureRegionResource = tabSelectedTextureRegionResource;
@@ -60,7 +67,11 @@ public class TabButtonUI extends UIComponent {
         float renderY = getAbsY();
 
         //绘制背景
-        batch.draw(this.getDisplayTextureRegion(), renderX, renderY, getWidth(), getHeight());
+        if (this.getType() == Type.ABOVE) {
+            batch.draw(this.getDisplayTextureRegion(), renderX, renderY - RENDER_DELTA_Y, getWidth(), getHeight());
+        }else {
+            batch.draw(this.getDisplayTextureRegion(), renderX, renderY + RENDER_DELTA_Y, getWidth(), getHeight());
+        }
 
         //绘制当前展示物品组的图标，使用物品自己的渲染器
         ItemStack iconItemStack = this.displayItemGroup.getIconItemStack();
@@ -69,6 +80,19 @@ public class TabButtonUI extends UIComponent {
             renderX + ICON_RENDER_OFFSET.getX(), renderY + ICON_RENDER_OFFSET.getY(),
             ICON_WIDTH, ICON_HEIGHT
         );
+        //根据类型判断上下偏移
+        if (this.getType() == Type.ABOVE) {
+            rendererContext.y -= ICON_RENDER_DELTA_Y;
+        }else {
+            rendererContext.y += ICON_RENDER_DELTA_Y;
+        }
+        //如果被选中，图标的渲染位置要偏移
+        if (this.isSelected()) {
+            //上面的按钮的图标要向上偏移
+            if (this.getType() == Type.ABOVE) rendererContext.y += SELECTED_ICON_RENDER_DELTA_Y;
+            //下面的按钮的图标要向下偏移
+            else rendererContext.y -= SELECTED_ICON_RENDER_DELTA_Y;
+        }
         renderer.draw(batch, rendererContext, iconItemStack);
     }
 
@@ -121,6 +145,15 @@ public class TabButtonUI extends UIComponent {
 
     public TabButtonUI setTabSelectedTextureRegionResource (Resource<TextureRegion> tabSelectedTextureRegionResource) {
         this.tabSelectedTextureRegionResource = tabSelectedTextureRegionResource;
+        return this;
+    }
+
+    public Type getType () {
+        return this.type;
+    }
+
+    public TabButtonUI setType (Type type) {
+        this.type = type;
         return this;
     }
 }

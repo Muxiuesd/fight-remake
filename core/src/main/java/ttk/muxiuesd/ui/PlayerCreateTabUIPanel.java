@@ -49,7 +49,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
 
     public PlayerCreateTabUIPanel (PlayerSystem playerSystem) {
         super(playerSystem);
-        setSize(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT + (TabButtonUI.BUTTON_HEIGHT - 4f) * 2f);
+        setSize(TAB_BACKGROUND_WIDTH, TAB_BACKGROUND_HEIGHT + TabButtonUI.BUTTON_HEIGHT * 2f);
         setPosition(- getWidth()/ 2f,  - getHeight() / 2f);
         autoInteractGridSize();
 
@@ -61,7 +61,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
         this.tabAboveButtonsUIPanel = new UIPanel();
         //物品组页面按钮UI面板的位置在物品页面的上面
         this.tabAboveButtonsUIPanel
-            .setPosition(0, getHeight() - TabButtonUI.BUTTON_HEIGHT - 4f)
+            .setPosition(0, getHeight() - TabButtonUI.BUTTON_HEIGHT)
             .setSize(TAB_BACKGROUND_WIDTH, TabButtonUI.BUTTON_HEIGHT);
         this.tabAboveButtonsUIPanel.autoInteractGridSize();
 
@@ -115,7 +115,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             Fight.UITexturePath("tab/tab_below_middle_selected.png")
         );
 
-        this.tabAboveLeftButtonUI = new TabButtonUI(this,
+        this.tabAboveLeftButtonUI = new TabButtonUI(TabButtonUI.Type.ABOVE, this,
             Resource.ofTextureRegion(
                 Fight.ID("player_create_tab_above_left"),
                 Fight.UITexturePath("tab/tab_above_left.png")
@@ -125,16 +125,16 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
                 Fight.UITexturePath("tab/tab_above_left_selected.png")
             )
         );
-        this.tabAboveMiddleButtonUI1 = new TabButtonUI(this,
+        this.tabAboveMiddleButtonUI1 = new TabButtonUI(TabButtonUI.Type.ABOVE, this,
             tabAboveMiddleResource,
             tabAboveMiddleSelectedResource);
-        this.tabAboveMiddleButtonUI2 = new TabButtonUI(this,
+        this.tabAboveMiddleButtonUI2 = new TabButtonUI(TabButtonUI.Type.ABOVE, this,
             tabAboveMiddleResource,
             tabAboveMiddleSelectedResource);
-        this.tabAboveMiddleButtonUI3 = new TabButtonUI(this,
+        this.tabAboveMiddleButtonUI3 = new TabButtonUI(TabButtonUI.Type.ABOVE, this,
             tabAboveMiddleResource,
             tabAboveMiddleSelectedResource);
-        this.tabAboveRightButtonUI = new TabButtonUI(this,
+        this.tabAboveRightButtonUI = new TabButtonUI(TabButtonUI.Type.ABOVE, this,
             tabAboveMiddleResource,
             tabAboveMiddleSelectedResource);
 
@@ -150,7 +150,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             this.tabAboveMiddleButtonUI3.getX() + this.tabAboveMiddleButtonUI3.getWidth() + 1f, 0f
         );
 
-        this.tabBelowLeftButtonUI = new TabButtonUI(this,
+        this.tabBelowLeftButtonUI = new TabButtonUI(TabButtonUI.Type.BELOW, this,
             Resource.ofTextureRegion(
                 Fight.ID("player_create_tab_below_left"),
                 Fight.UITexturePath("tab/tab_below_left.png")
@@ -160,16 +160,16 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
                 Fight.UITexturePath("tab/tab_below_left_selected.png")
             )
         );
-        this.tabBelowMiddleButtonUI1 = new TabButtonUI(this,
+        this.tabBelowMiddleButtonUI1 = new TabButtonUI(TabButtonUI.Type.BELOW, this,
             tabBelowMiddleResource,
             tabBelowMiddleSelectedResource);
-        this.tabBelowMiddleButtonUI2 = new TabButtonUI(this,
+        this.tabBelowMiddleButtonUI2 = new TabButtonUI(TabButtonUI.Type.BELOW, this,
             tabBelowMiddleResource,
             tabBelowMiddleSelectedResource);
-        this.tabBelowMiddleButtonUI3 = new TabButtonUI(this,
+        this.tabBelowMiddleButtonUI3 = new TabButtonUI(TabButtonUI.Type.BELOW, this,
             tabBelowMiddleResource,
             tabBelowMiddleSelectedResource);
-        this.tabBelowRightButtonUI = new TabButtonUI(this,
+        this.tabBelowRightButtonUI = new TabButtonUI(TabButtonUI.Type.BELOW, this,
             tabBelowMiddleResource,
             tabBelowMiddleSelectedResource);
 
@@ -307,7 +307,7 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
      * 获取背景图片渲染的Y坐标偏移
      * */
     public float getItemTabBackgroundRenderDeltaY () {
-        return TabButtonUI.BUTTON_HEIGHT - 4f;
+        return TabButtonUI.BUTTON_HEIGHT;
     }
 
     public UIPanel getTabAboveButtonsUIPanel () {
