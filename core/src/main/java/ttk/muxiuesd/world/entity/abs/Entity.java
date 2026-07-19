@@ -21,6 +21,7 @@ import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.util.Util;
@@ -69,6 +70,7 @@ public abstract class Entity<T extends Entity<T>>
     private boolean onGround = true;        //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
     public TextureRegion textureRegion;
+    private Resource<TextureRegion> bodyTextureRegionResource;
 
     private EntitySystem es;                        //此实体所属的实体系统
     private EntityType<?> type;                     //实体的类型
@@ -471,11 +473,26 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
+
     /**
-     * 设置实体身体渲染材质
+     * 快捷设置实体身体贴图材质资源
+     * @param path 以实体材质文件夹为基准的路径
      * */
-    public void setBodyTextureRegion (TextureRegion textureRegion) {
-        this.textureRegion = textureRegion;
+    public void setBodyTextureRegionResource (String id, String path) {
+        this.setBodyTextureRegionResource(Resource.ofTextureRegion(id, Fight.EntityTexturePath(path)));
+    }
+    /**
+     * 设置实体身体贴图材质资源
+     * */
+    public void setBodyTextureRegionResource (Resource<TextureRegion> resource) {
+        this.bodyTextureRegionResource = resource;
+    }
+
+    /**
+     * 获取身体的贴图材质
+     * */
+    public TextureRegion getBodyTextureRegion () {
+        return this.bodyTextureRegionResource.get();
     }
 
     /**

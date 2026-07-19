@@ -52,6 +52,10 @@ public class Registries {
     public static final Registry<BlockSounds> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
+    public static final CraftingRecipeRegistry CRAFTING_RECIPE_REGISTRY = create(RegistryKeys.CRAFTING_RECIPE_REGISTRY_KEY, new CraftingRecipeRegistry());
+
+
+
     public static final BlockRendererRegistry BLOCK_RENDERER = create(
         RegistryKeys.BLOCK_RENDERER,
         BlockRendererRegistry.getInstance()

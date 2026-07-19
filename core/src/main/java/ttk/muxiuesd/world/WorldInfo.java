@@ -24,6 +24,7 @@ public class WorldInfo {
 
     public WorldInfo () {
         this.information = new HashMap<>();
+
         //将注册表里的信息类型map全部加进来
         Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
             this.information.put(key.getID(), value);
@@ -78,7 +79,7 @@ public class WorldInfo {
     public static class Codec extends JsonCodec<WorldInfo> {
         @Override
         public void encode (WorldInfo obj, JsonDataWriter dataWriter) {
-            for (WorldInfoHashMap mapCodec : obj.information.values()) {
+            for (WorldInfoHashMap<?, ?> mapCodec : obj.information.values()) {
                 dataWriter.objStart(mapCodec.getId());
                 mapCodec.encode(dataWriter);
                 dataWriter.objEnd();

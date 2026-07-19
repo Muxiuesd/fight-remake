@@ -5,11 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -32,20 +33,21 @@ public abstract class Block implements ID<Block>, Disposable {
         return Property.create();
     }
 
-    private String id;
-    public TextureRegion textureRegion;
-
+    private Identifier identifier;
+    private Resource<TextureRegion> textureResource;
     private Property property;
 
-    public Block(Property property) {
+
+    public Block (Property property) {
         this.setProperty(property);
     }
     public Block (Property property, String textureId) {
         this(property, textureId, null);
     }
-    public Block(Property property, String textureId, String texturePath) {
+    public Block (Property property, String textureId, String texturePath) {
         this.setProperty(property);
-        this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
+        //this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
+        this.textureResource = Resource.ofTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -70,29 +72,33 @@ public abstract class Block implements ID<Block>, Disposable {
     }
 
     public TextureRegion getTextureRegion () {
-        return this.textureRegion;
-    }
-
-    public Block setTextureRegion (TextureRegion textureRegion) {
-        this.textureRegion = textureRegion;
-        return this;
+        return this.textureResource.get();
     }
 
     @Override
     public String getID () {
-        return this.id;
+        return this.getIdentifier().getID();
     }
     @Override
     public Block setID (String id) {
-        this.id = id;
+        this.getIdentifier().setID(id);
+        return this;
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public Block setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
         return this;
     }
 
     @Override
     public void dispose() {
-        if (this.textureRegion != null) {
+        /*if (this.textureRegion != null) {
             this.textureRegion = null;
-        }
+        }*/
     }
 
     /**方块属性

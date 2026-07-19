@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.chunk.abs;
 
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.SimplexNoise2D;
 import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.chunk.Chunk;
 
@@ -36,9 +35,9 @@ public abstract class ChunkGenerator {
      * @return 返回地形高度
      */
     protected int generateTerrain(float wx, float wy) {
-        WorldMapNoise noise = this.chunkSystem.getNoise();
+        WorldMapNoise noise = this.chunkSystem.getWorldNoise();
         double v = noise.noise(wx/ ChunkSystem.Slope, wy/ ChunkSystem.Slope);
-        return (int) SimplexNoise2D.map(v, -1f, 1f, Chunk.LowestHeight, Chunk.HighestHeight);
+        return (int) WorldMapNoise.map(v, -1f, 1f, Chunk.LowestHeight, Chunk.HighestHeight);
     }
 
 

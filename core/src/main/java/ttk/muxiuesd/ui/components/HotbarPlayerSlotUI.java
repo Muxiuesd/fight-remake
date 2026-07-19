@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.ui.HotbarUIPanel;
+import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
@@ -46,7 +46,7 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
             float renderX = getX();
             float renderY = getY();
             //检查是否在UI面板上
-            if (parent instanceof HotbarUIPanel panel) {
+            if (parent instanceof PlayerHotbarUIPanel panel) {
                 renderX += panel.getX();
                 renderY += panel.getY();
             }
@@ -57,7 +57,8 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
             Backpack backpack = player.getBackpack();
             ItemStack itemStack = backpack.getItemStack(getIndex());
             if (itemStack != null) {
-                batch.draw(itemStack.getItem().textureRegion, renderX + 2, renderY + 3, 16f, 16f);
+                //TODO 调用物品的渲染器
+                batch.draw(itemStack.getItem().getTextureRegion(), renderX + 2, renderY + 3, 16f, 16f);
                 int amount = itemStack.getAmount();
                 if (amount > 1) drawAmount(batch, parent, renderX, renderY, amount);
             }

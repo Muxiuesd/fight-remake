@@ -1,17 +1,8 @@
 package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.system.LightSystem;
-import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.light.PointLight;
 
 /**
  * 火把物品
@@ -27,7 +18,7 @@ public class ItemTorch extends Sword {
             Fight.ItemTexturePath("torch.png"));
     }
 
-    @Override
+    /*@Override
     public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
         super.drawOnHand(batch, holder, itemStack);
         //计算光源的正确位置
@@ -45,5 +36,5 @@ public class ItemTorch extends Sword {
             1f
         );
         lightSystem.useLight(light);
-    }
+    }*/
 }

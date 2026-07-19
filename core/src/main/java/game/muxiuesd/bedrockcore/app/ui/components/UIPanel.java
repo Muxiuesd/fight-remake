@@ -29,12 +29,17 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
 
     private LinkedHashSet<UIComponent> components;
 
-    public UIPanel() {}
+    public UIPanel() {
+        this(0, 0);
+    }
     public UIPanel (float x, float y) {
         this(x, y, 0, 0, new GridPoint2());
     }
     public UIPanel (float x, float y, GridPoint2 interactGridSize) {
         this(x, y, 0, 0, interactGridSize);
+    }
+    public UIPanel (float x, float y, float width, float height) {
+        this(x, y, width, height, new GridPoint2());
     }
     public UIPanel (float x, float y, float width, float height, GridPoint2 interactGridSize) {
         super(x, y, width, height, interactGridSize);
@@ -105,7 +110,8 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
      * 根据宽高自动设置交互网格尺寸
      * */
     public UIPanel autoInteractGridSize () {
-        this.setInteractGridSize(new GridPoint2((int) getWidth(), (int) getHeight()));
+        //this.setInteractGridSize(new GridPoint2((int) getWidth(), (int) getHeight()));
+        this.setInteractGridSize(new GridPoint2((int) Util.fastRound(getWidth()), (int) Util.fastRound(getHeight())));
         return this;
     }
 

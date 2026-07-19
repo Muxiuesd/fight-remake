@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registry;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
@@ -33,17 +34,27 @@ import java.util.function.Supplier;
  * 所有的物品注册
  * */
 public final class Items {
-    public static void init () {}
+    public static void init () {
+        Log.print(Items.class.getName(), "所有物品注册完成");
+    }
 
     /// 常规物品
+    //材料类
     public static final Item STICK = register("stick", ItemStick::new);
-    public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new, FishPoleRenderer::new);
+    public static final Item SLIME_BALL = register("slime_ball");
+    public static final Item IRON_INGOT = register("iron_ingot");
+    public static final Item GOLD_INGOT = register("gold_ingot");
+    public static final Item COAL = register("coal");
+
     public static final Item BAIT = register("bait", ItemBait::new);
+    //食物类
     public static final Item FISH = register("fish", ItemFish::new);
     public static final Item PUFFER_FISH = register("puffer_fish", ItemPufferFish::new);
+    //杂物类
     public static final Item RUBBISH = register("rubbish");
-    public static final Item COAL = register("coal");
-    public static final Item SLIME_BALL = register("slime_ball");
+
+    /// 工具类物品
+    public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new, FishPoleRenderer::new);
 
     /// 武器类的物品
     public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
@@ -129,7 +140,7 @@ public final class Items {
      * 使用普通标准渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory) {
-        return register(factory, new ItemRenderer.StandardRenderer<>(), Fight.ID(name));
+        return register(factory, new ItemRenderer.StandardRenderer<>(), Identifier.of(Fight.ID(name)));
     }
 
 
@@ -139,7 +150,7 @@ public final class Items {
      * 使用自定义的渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, Supplier<ItemRenderer<T>> rendererFactory) {
-        return register(factory, rendererFactory.get(), Fight.ID(name));
+        return register(factory, rendererFactory.get(), Identifier.of(Fight.ID(name)));
     }
 
     /**
@@ -148,15 +159,20 @@ public final class Items {
      * 使用自定义的渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<T> renderer) {
-        return register(factory, renderer, Fight.ID(name));
+        return register(factory, renderer, Identifier.of(Fight.ID(name)));
     }
 
     /**
      * 注册方块的方块物品
+     * @param block 已经注册过的方块
      * */
     public static Item register (Block block) {
         String id = block.getID();
-        return register(() -> new BlockItem(block, id), new ItemRenderer.StandardRenderer<>(), id);
+        return register(
+            () -> new BlockItem(block, id), //方块的id默认作为方块物品的贴图材质id
+            new ItemRenderer.StandardRenderer<>(),
+            block.getIdentifier()   //方块的identifier与方块物品的identifier相同
+        );
     }
 
     /**
@@ -164,20 +180,23 @@ public final class Items {
      * */
     public static <T extends Wall<T>> Item register (Wall<T> wall) {
         String id = wall.getID();
-        return register(() -> new WallItem(wall, id), new ItemRenderer.StandardRenderer<>(), id);
+        //墙体的id默认是墙体物品的贴图材质id
+        return register(
+            () -> new WallItem(wall, id),
+            new ItemRenderer.StandardRenderer<>(),
+            wall.getIdentifier()    //墙体的identifier与墙体物品的identifier相同
+        );
     }
 
     /**
      * 物品注册的基本方法
-     *
      * @param factory 物品的构造工厂
      * @param renderer 物品的渲染器
-     * @param id 物品的id
+     * @param identifier 物品的id标识
      * */
-    public static <T extends Item> T register (Supplier<T> factory, ItemRenderer<T> renderer, String id) {
-        Identifier identifier = new Identifier(id);
+    public static <T extends Item> T register (Supplier<T> factory, ItemRenderer<T> renderer, Identifier identifier) {
         T item = factory.get();
-        item.setID(id);
+        item.setIdentifier(identifier);
         Registries.ITEM.register(identifier, item);
         ItemRendererRegistry.register(item, renderer);
         return item;

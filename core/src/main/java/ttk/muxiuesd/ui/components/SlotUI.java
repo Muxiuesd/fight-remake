@@ -59,7 +59,8 @@ public class SlotUI extends UIComponent {
         //空物品槽位不绘制
         if (!this.isNullSlot()){
             ItemStack itemStack = this.getItemStack();
-            batch.draw(itemStack.getItem().textureRegion, renderX, renderY, getWidth(), getHeight());
+            //TODO 调用物品的渲染器
+            batch.draw(itemStack.getItem().getTextureRegion(), renderX, renderY, getWidth(), getHeight());
 
             //数量大于1才绘制
             int amount = itemStack.getAmount();

@@ -33,19 +33,20 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void show() {
-        //手动初始化注册游戏世界内的元素
+        //初始化注册游戏世界内的元素
         Pools.init();
         EventTypes.init();
         Sounds.init();
-        Items.init();
         BlockEntities.init();
         Blocks.init();
         Walls.init();
+        Items.init();
         EntityTypes.init();
         Entities.init();
         StatusEffects.init();
         WorldInfoTypes.init();
         ItemGroups.init();
+        CraftingRecipes.init();
 
         MainWorld mainWorld = new MainWorld(this);
         //游戏世界的渲染处理器注册
@@ -55,9 +56,6 @@ public class MainGameScreen implements Screen {
 
         //执行mod代码
         //TODO Mod系统重做
-        /*ModLibManager.getInstance().loadCoreLib();
-        ModLoader.getInstance().loadAllMods();
-        ModLoader.getInstance().runAllMods();*/
 
         //初始化世界系统
         this.getWorld().getSystemManager().initAllSystems();

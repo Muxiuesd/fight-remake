@@ -6,8 +6,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.mod.api.ModFileLoader;
+import ttk.muxiuesd.resource.AssetsLoader;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -54,7 +54,7 @@ public class AudioLoader {
         if (this.inGame(id)) {
             //游戏内部的音频加载
             AssetsLoader loader = AssetsLoader.getInstance();
-            loader.loadAsync(id, soundPath, soundClass, () -> {
+            loader.load(id, soundPath, soundClass, () -> {
                 Sound sound = loader.getById(id, soundClass);
                 getInstance().getSoundCache().put(id, sound);
             });
@@ -88,7 +88,7 @@ public class AudioLoader {
             //游戏内部的音频加载
             AssetsLoader loader = AssetsLoader.getInstance();
 
-            loader.loadAsync(id, musicPath, musicClass, () -> {
+            loader.load(id, musicPath, musicClass, () -> {
                 Music music = loader.getById(id, musicClass);
                 getInstance().getMusicCache().put(id, music);
             });

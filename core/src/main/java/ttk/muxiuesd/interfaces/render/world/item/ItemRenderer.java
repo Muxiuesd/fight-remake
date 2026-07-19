@@ -31,6 +31,19 @@ public interface ItemRenderer<T extends Item> {
     void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity);
 
     /**
+     * 单纯的根据渲染上下文参数绘制物品
+     * */
+    default void draw (Batch batch, Context context, ItemStack itemStack) {
+        if (itemStack == ItemStack.VOID) return;
+        batch.draw(itemStack.getItem().getTextureRegion(),
+            context.x, context.y,
+            context.originX, context.originY,
+            context.width, context.height,
+            context.scaleX, context.scaleY,
+            context.rotation);
+    };
+
+    /**
      * 在实体手持形式下的形状绘制
      * @param holder 所属的实体
      * @param itemStack 物品堆叠
@@ -176,14 +189,14 @@ public interface ItemRenderer<T extends Item> {
             float rotationOffset = holder.getSwingHandDegreeOffset();
 
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(item.textureRegion,
+                batch.draw(item.getTextureRegion(),
                     context.x - context.width / 2, context.y - context.height / 2,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     context.rotation + 225f + rotationOffset);
             } else {
-                batch.draw(item.textureRegion,
+                batch.draw(item.getTextureRegion(),
                     context.x - context.width / 2, context.y - context.height / 2,
                     context.originX, context.originY,
                     context.width, context.height,
@@ -195,14 +208,12 @@ public interface ItemRenderer<T extends Item> {
         @Override
         public void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity) {
             Item item = itemEntity.getItemStack().getItem();
-            if (item.textureRegion != null) {
-                batch.draw(item.textureRegion,
-                    context.x, context.y + itemEntity.getPositionOffset().y,
-                    context.originX, context.originY,
-                    context.width, context.height,
-                    context.scaleX, context.scaleY,
-                    context.rotation);
-            }
+            batch.draw(item.getTextureRegion(),
+                context.x, context.y + itemEntity.getPositionOffset().y,
+                context.originX, context.originY,
+                context.width, context.height,
+                context.scaleX, context.scaleY,
+                context.rotation);
         }
 
         @Override

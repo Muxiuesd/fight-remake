@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registry;
 
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
@@ -11,7 +12,9 @@ import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
  * 所有方块实体的注册
  * */
 public final class BlockEntities {
-    public static void init () {}
+    public static void init () {
+        Log.print(BlockEntities.class.getName(), "所有方块实体注册完成");
+    }
 
 
     public static final BlockEntityProvider<BlockEntityFurnace> FURNACE = register(

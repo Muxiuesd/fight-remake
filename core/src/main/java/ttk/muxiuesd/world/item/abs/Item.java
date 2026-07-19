@@ -1,28 +1,21 @@
 package ttk.muxiuesd.world.item.abs;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
-import ttk.muxiuesd.interfaces.world.item.ItemRenderable;
-import ttk.muxiuesd.interfaces.world.item.ItemShapeRenderable;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
-import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -31,11 +24,11 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
-public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, ItemShapeRenderable {
-    private String id;
-    public Type type;                   //物品的类型
-    public Property property;           //物品最原始的属性，原则上不直接对这个原始数据进行操作
-    public TextureRegion textureRegion; //物品的贴图材质
+public abstract class Item implements ID<Item>, ItemUpdateable {
+    private Identifier identifier;                          //物品的id标识
+    public Type type;                                       //物品的类型
+    public Property property;                               //物品最原始的属性，原则上不直接对这个原始数据进行操作
+    private Resource<TextureRegion> textureRegionResource;  //物品的贴图材质资源
 
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
@@ -43,61 +36,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     public Item (Type type, Property property, String textureId, String texturePath) {
         this.type = type;
         this.property = property;
-        this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
-    }
-
-    /**
-     * 在持有者手上持有时的绘制方法
-     * TODO 不同类型的物品不同的绘制方式
-     * */
-    @Override
-    public void drawOnHand (Batch batch, LivingEntity<?> holder, ItemStack itemStack) {
-
-        Direction direction = holder.getDirection();
-        float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
-        float rotationOffset = holder.getSwingHandDegreeOffset();
-        Vector2 holderScale = holder.getScale();
-        if (rotation > 90f && rotation <= 270f) {
-            batch.draw(this.textureRegion,
-                holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
-                0, 0,
-                holder.getWidth(), holder.getHeight(),
-                - holderScale.x, holderScale.y, rotation + 225f + rotationOffset);
-        } else {
-            batch.draw(this.textureRegion,
-                holder.getX() + holder.getWidth() / 2, holder.getY() + holder.getHeight() / 2,
-                0, 0,
-                holder.getWidth(), holder.getHeight(),
-                holderScale.x, holderScale.y, rotation - 45f + rotationOffset);
-        }
-    }
-
-    /**
-     * 在掉落物形式下的绘制方法
-     * @param itemEntity 所属的物品实体
-     * */
-    @Override
-    public void drawOnWorld (Batch batch, ItemEntity itemEntity) {
-        if (this.textureRegion != null) {
-            Vector2 origin = itemEntity.getOrigin();
-            Vector2 scale = itemEntity.getScale();
-            batch.draw(this.textureRegion,
-                itemEntity.getX() - itemEntity.getWidth() / 2f,
-                itemEntity.getY() - itemEntity.getHeight() / 2f + itemEntity.getPositionOffset().y,
-                origin.x, origin.y,
-                itemEntity.getWidth(), itemEntity.getHeight(),
-                scale.x, scale.y,
-                itemEntity.getRotation()
-            );
-        }
+        this.setTextureRegionResource(Resource.ofTextureRegion(textureId, texturePath));
     }
 
     @Override
     public void update (float delta, ItemStack itemStack) {
-    }
-
-    @Override
-    public void renderShape (ShapeRenderer batch, ItemStack itemStack) {
     }
 
     /**
@@ -134,6 +77,13 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     }
 
     /**
+     * 必须实现的类：获取这个物品的行为。
+     * <p>
+     * 没有物品行为的物品将不能正常被使用
+     * */
+    public abstract IItemStackBehaviour getBehaviour ();
+
+    /**
      * 获取物品的属性
      * */
     public Property getProperty () {
@@ -145,27 +95,53 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
         return this;
     }
 
+    public Type getType () {
+        return this.type;
+    }
+
+    public Item setType (Type type) {
+        this.type = type;
+        return this;
+    }
+
     @Override
     public String getID () {
-        return this.id;
+        return this.getIdentifier().getID();
     }
 
     @Override
     public Item setID (String id) {
-        this.id = id;
+        this.getIdentifier().setID(id);
+        return this;
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public Item setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
         return this;
     }
 
     /**
-     * 必须实现的类：获取这个物品的行为。
-     * <p>
-     * 没有物品行为的物品将不能正常被使用
+     * 获取物品贴图材质
      * */
-    public abstract IItemStackBehaviour getBehaviour ();
+    public TextureRegion getTextureRegion () {
+        return this.getTextureRegionResource().get();
+    }
 
+    public Resource<TextureRegion> getTextureRegionResource () {
+        return this.textureRegionResource;
+    }
+
+    public Item setTextureRegionResource (Resource<TextureRegion> textureRegionResource) {
+        this.textureRegionResource = textureRegionResource;
+        return this;
+    }
 
     /**
-     * 物品的类型
+     * 枚举：物品的类型
      * */
     public enum Type {
         COMMON,         //普通物品
@@ -175,7 +151,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable, ItemRenderable, 
     }
 
     /**
-     * 物品的属性
+     * 物品的属性类
      * */
     public static class Property {
         //属性映射

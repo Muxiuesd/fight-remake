@@ -21,7 +21,7 @@ public class PlayerInventoryUIPanel extends PlayerItemSlotsUIPanel {
     private TextureRegion background;
 
     public PlayerInventoryUIPanel(PlayerSystem playerSystem, TextureRegion background, float width, float height) {
-        super(playerSystem, - width / 2, - height / 2, width, height,
+        super(playerSystem, - width / 2f, - height / 2f, width, height,
             new GridPoint2(background.getRegionWidth(), background.getRegionHeight())
         );
         this.background = background;
@@ -33,8 +33,8 @@ public class PlayerInventoryUIPanel extends PlayerItemSlotsUIPanel {
      * 初始化所有物品槽位
      * */
     private void initSlots () {
-        float trueHeight = SlotUI.SLOT_HEIGHT + 2;
-        float trueWidth = SlotUI.SLOT_WIDTH + 2;
+        float trueHeight = SlotUI.SLOT_HEIGHT + 2f;
+        float trueWidth = SlotUI.SLOT_WIDTH + 2f;
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {
             addComponent(new PlayerSlotUI(getPlayerSystem(), index, 8 + (index * trueWidth), 8));

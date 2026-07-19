@@ -12,10 +12,12 @@ import ttk.muxiuesd.ui.text.Text;
  * */
 public class WorldSaveButtonUI extends UIButtonListItem implements UIButton.ClickEvent {
     private String worldName;
+    private long worldSeed;
 
-    public WorldSaveButtonUI (String worldName) {
+    public WorldSaveButtonUI (String worldName, long worldSeed) {
         super(Text.ofText(worldName), VOID_CLICK_EVENT);
         this.worldName = worldName;
+        this.worldSeed = worldSeed;
 
         setClickEvent(this);
     }
@@ -24,6 +26,7 @@ public class WorldSaveButtonUI extends UIButtonListItem implements UIButton.Clic
     public boolean handle (UIButton button, GridPoint2 interactPos) {
         //游戏世界名称设置到全局变量值上
         Fight.WORLD_NAME.setValue(this.worldName);
+        Fight.WORLD_SEED.setValue(this.worldSeed);
 
         //切换到游戏世界屏幕
         FightCore.getInstance().setScreen(FightCore.getInstance().mainGameScreen);

@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.particle;
 
 import com.badlogic.gdx.graphics.Texture;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.resource.AssetsLoader;
 
 /**
  * 粒子贴图资产注册
@@ -22,7 +22,7 @@ public class ParticleAssets {
      * */
     public static String loadTexture (String name, String path) {
         String id = Fight.ID(name);
-        AssetsLoader.getInstance().loadAsync(id, path, Texture.class, () -> {});
+        AssetsLoader.getInstance().load(id, path, Texture.class, () -> {});
         return id;
     }
 }

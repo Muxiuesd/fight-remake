@@ -4,6 +4,7 @@ import ttk.muxiuesd.util.Info;
 
 public class Fight {
     public static final String NAMESPACE = "fight";
+    /// 游戏内部文件的根路径
     public static final String AUDIO_ROOT = "audio/";
     public static final String MUSIC_ROOT = AUDIO_ROOT + "music/";
     public static final String SOUND_ROOT = AUDIO_ROOT + "sound/";
@@ -18,6 +19,7 @@ public class Fight {
 
     //世界的名称，也会作为存档文件夹的名称
     public static final Info<String> WORLD_NAME = Info.create("world_name", "null_world");
+    public static final Info<Long> WORLD_SEED = Info.create("world_seed", 114514L);
     //UI的调试框是否渲染
     public static final Info<Boolean> UI_DEBUG_BOX_RENDER = Info.create("ui_debug_box_render", true);
     //玩家的听觉范围，单位：世界中的1米

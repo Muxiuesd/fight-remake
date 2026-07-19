@@ -20,6 +20,9 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
 public class ItemStack implements Updateable {
+    /// 空物品堆叠
+    public static final ItemStack VOID = new ItemStack();
+
     //所持有的物品
     private final Item item;
     //物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
@@ -31,6 +34,13 @@ public class ItemStack implements Updateable {
     //使用时间计时器
     public Timer useTimer;
 
+    /**
+     * 给空物品使用的构造方法，啥也没有
+     * */
+    private ItemStack () {
+        this.item = null;
+        this.behaviour = null;
+    }
     public ItemStack (Item item) {
         //不指定数量就默认这个物品的最大数量
         this(item, item.property.getMaxCount());
@@ -76,28 +86,6 @@ public class ItemStack implements Updateable {
         this.getItem().update(delta, this);
         if (this.useTimer != null) this.useTimer.update(delta);
     }
-
-    /**
-     * 物品在持有实体手上的贴图绘制
-     * */
-    /*public void drawItemOnHand (Batch batch, LivingEntity<?> holder) {
-        //获取物品的渲染器来渲染
-        ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
-        if (renderer == null) return;
-        ItemRenderer.Context context = renderer.getContextByEntity(holder);
-        renderer.drawOnHand(batch, context, holder, this);
-        renderer.freeContext(context);
-    }*/
-
-    /**
-     * 物品在持有实体手上的形状绘制
-     * */
-    /*public void renderShapeOnHand (ShapeRenderer batch, LivingEntity<?> holder) {
-        //获取物品的渲染器来渲染
-        ItemRenderer<Item> renderer = ItemRendererRegistry.get(this.getItem());
-        if (renderer == null) return;
-        renderer.renderShapeOnHand(batch, holder, this);
-    }*/
 
     /**
      * 获取物品的词条文本

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -19,7 +20,7 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEntityRenderer<T> {
     public static final Color ATTACTED_COLOR = new Color(1f, 0f, 0f, 1f);
-    public static final TextureRegion ENTITY_SHADOW = Util.loadTextureRegion(
+    public static final Resource<TextureRegion> ENTITY_SHADOW_RESOURCE = Resource.ofTextureRegion(
         Fight.ID("entity_shadow"),
         Fight.EntityTexturePath("shadow.png")
     );
@@ -28,7 +29,7 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends StandardEnt
     public void draw (Batch batch, T entity, Context context) {
         batch.setColor(1f, 1f, 1f, 0.666f);
         //渲染影子
-        batch.draw(ENTITY_SHADOW,
+        batch.draw(ENTITY_SHADOW_RESOURCE.get(),
             context.x - context.width / 2f, context.y - (context.height / 5f) - (context.height / 2f),
             context.originX, context.originY,
             context.width, context.height,

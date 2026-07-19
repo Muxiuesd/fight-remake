@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.item;
 
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.world.item.abs.Item;
 
 import java.util.ArrayList;
@@ -8,14 +9,20 @@ import java.util.ArrayList;
  * 物品组
  * */
 public class ItemGroup {
-    private final String groupID;
-    private final ArrayList<ItemStack> itemsList;
+    private final Identifier identifier;
+    private ItemStack iconItemStack;
+    private ArrayList<ItemStack> itemsList;
 
-    public ItemGroup (String groupID) {
-        this(groupID, new ArrayList<>());
+
+    public ItemGroup (Identifier identifier) {
+        this(identifier, ItemStack.VOID);
     }
-    public ItemGroup(String groupID, ArrayList<ItemStack> itemsList) {
-        this.groupID = groupID;
+    public ItemGroup (Identifier identifier, ItemStack iconItemStack) {
+        this(identifier, iconItemStack, new ArrayList<>());
+    }
+    public ItemGroup(Identifier identifier, ItemStack iconItemStack, ArrayList<ItemStack> itemsList) {
+        this.identifier = identifier;
+        this.iconItemStack = iconItemStack;
         this.itemsList = itemsList;
     }
 
@@ -51,16 +58,70 @@ public class ItemGroup {
         return null;
     }
 
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
     public String getGroupID () {
-        return this.groupID;
+        return this.getIdentifier().getID();
     }
 
     public ArrayList<ItemStack> getItemsList() {
         return this.itemsList;
     }
 
+    public ItemGroup setItemsList (ArrayList<ItemStack> itemsList) {
+        this.itemsList = itemsList;
+        return this;
+    }
+
+    public ItemStack getIconItemStack () {
+        return this.iconItemStack;
+    }
+
+    public ItemGroup setIconItemStack (ItemStack iconItemStack) {
+        this.iconItemStack = iconItemStack;
+        return this;
+    }
+
+
+
     @FunctionalInterface
     public interface Self {
         void action (ItemGroup group);
+    }
+
+    /**
+     * 构造器
+     * */
+    public static class Builder {
+        private Identifier identifier;
+        private ItemStack iconItemStack;
+
+        public Builder () {}
+
+        public Builder setIdentifier (Identifier identifier) {
+            this.identifier = identifier;
+            return this;
+        }
+
+        public Builder setIdentifier (String id) {
+            this.identifier = Identifier.of(id);
+            return this;
+        }
+
+        public Builder setIconItemStack (Item item) {
+            this.iconItemStack = new ItemStack(item);
+            return this;
+        }
+
+        public Builder setIconItemStack (ItemStack iconItemStack) {
+            this.iconItemStack = iconItemStack;
+            return this;
+        }
+
+        public ItemGroup build () {
+            return new ItemGroup(this.identifier, this.iconItemStack);
+        }
     }
 }

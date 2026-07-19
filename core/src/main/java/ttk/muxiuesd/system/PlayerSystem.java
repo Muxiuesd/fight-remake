@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.Timer;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
@@ -24,7 +25,6 @@ import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.ui.screen.PlayerHUDUIScreen;
 import ttk.muxiuesd.ui.screen.PlayerUIScreen;
-import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -68,7 +68,7 @@ public class PlayerSystem extends WorldSystem {
     @Override
     public void initialize () {
         //有玩家数据就读取
-        if (AbsFileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
+        if (UnifiedFileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
             this.player = this.readPlayerData();
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
@@ -231,14 +231,17 @@ public class PlayerSystem extends WorldSystem {
         Codecs.PLAYER.encode(this.getPlayer(), dataWriter);
         dataWriter.objEnd();
 
-        new PlayerDataOutput().output(dataWriter);
+        PlayerDataOutput playerDataOutput = new PlayerDataOutput();
+        playerDataOutput.output(dataWriter);
+
+        Log.print(TAG(), "玩家数据保存成功！");
     }
 
     /**
      * 读取玩家数据
      * */
     public Player readPlayerData () {
-        JsonValue playerValue = AbsFileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
+        JsonValue playerValue = UnifiedFileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
         Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
         if (optionalPlayer.isPresent()) {
             return optionalPlayer.get();

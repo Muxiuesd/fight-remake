@@ -26,19 +26,18 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
 
         Vector2 renderStartPos = new Vector2(context.x - context.width / 2f, context.y - context.height / 2f);
         if (! fishPole.onUsing(itemStack)) {
-            //if (fishPole.textureRegion == null) return;
             //没抛竿渲染
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(fishPole.textureRegion,
+                batch.draw(fishPole.getTextureRegion(),
                     renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     rotation + 180);
             } else {
-                batch.draw(fishPole.textureRegion,
+                batch.draw(fishPole.getTextureRegion(),
                     renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
@@ -71,15 +70,13 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
     @Override
     public void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity) {
         Item item = itemEntity.getItemStack().getItem();
-        if (item.textureRegion != null) {
-            batch.draw(item.textureRegion,
-                context.x, context.y + itemEntity.getPositionOffset().y,
-                context.originX, context.originY,
-                context.width, context.height,
-                context.scaleX, context.scaleY,
-                context.rotation
-            );
-        }
+        batch.draw(item.getTextureRegion(),
+            context.x, context.y + itemEntity.getPositionOffset().y,
+            context.originX, context.originY,
+            context.width, context.height,
+            context.scaleX, context.scaleY,
+            context.rotation
+        );
     }
 
     /**

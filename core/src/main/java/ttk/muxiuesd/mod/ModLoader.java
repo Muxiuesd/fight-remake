@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
+import ttk.muxiuesd.resource.AssetsLoader;
 
 import java.util.HashMap;
 import java.util.Objects;

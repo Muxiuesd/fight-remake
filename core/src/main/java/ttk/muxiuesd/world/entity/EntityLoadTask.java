@@ -2,6 +2,7 @@ package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.async.ThreadUtils;
 import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.JsonDataReader;
@@ -35,11 +36,14 @@ public class EntityLoadTask extends EntityTask {
             String id = dataReader.readString("id");
             EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
 
-            //获取实体的编解码器来解码数据变成类
-            Codec codec = entityProvider.codec;
-            Optional<Entity<?>> optionalEntity = codec.decode(dataReader);
-            optionalEntity.ifPresent(entities::add);
-
+            try {
+                //获取实体的编解码器来解码数据变成类
+                Codec codec = entityProvider.codec;
+                Optional<Entity<?>> optionalEntity = codec.decode(dataReader);
+                optionalEntity.ifPresent(entities::add);
+            } catch (Exception ignored) {
+                ThreadUtils.yield();
+            }
         }
         //读取完成后删除文件
         AbsFileUtil.deleteFile(Fight.getPathSaveEntities(), chunkPosName + ".json");

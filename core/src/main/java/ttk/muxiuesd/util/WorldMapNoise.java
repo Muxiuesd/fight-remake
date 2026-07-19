@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * 世界地图的噪声函数
+ * */
 public class WorldMapNoise {
     private static final double SQRT_3 = Math.sqrt(3.0);
     private static final double F2 = 0.5 * (SQRT_3 - 1.0);
@@ -15,24 +18,24 @@ public class WorldMapNoise {
         {1, 0}, {-1, 0}, {0, 1}, {0, -1}
     };
 
-    private static final Map<String, int[]> gradientCache = new HashMap<>();
     private static final int CACHE_SIZE_LIMIT = 10000; // 限制缓存大小
+    private Map<String, int[]> gradientCache = new HashMap<>();
 
-    private final int seed;
+    private long seed;
 
-    public WorldMapNoise(int seed) {
+    public WorldMapNoise(long seed) {
         this.seed = seed;
     }
 
-    private int[] generateGradient(int x, int y, int seed) {
-        int hash = x * 374761393 + y * 668265263 + seed * 19349663;
+    private int[] generateGradient (int x, int y, long seed) {
+        long hash = x * 374761393 + y * 668265263 + seed * 19349663;
         hash = (hash ^ (hash >> 13)) * 1274126177;
         hash = hash ^ (hash >> 16);
-        int index = Math.abs(hash % GRADIENTS.length);
+        int index = (int) Math.abs(hash % GRADIENTS.length);
         return GRADIENTS[index];
     }
 
-    private int[] getGradient(int x, int y) {
+    private int[] getGradient (int x, int y) {
         String key = x + "," + y;
         if (gradientCache.containsKey(key)) {
             return gradientCache.get(key);
@@ -47,7 +50,7 @@ public class WorldMapNoise {
         }
     }
 
-    public double noise(double x, double y) {
+    public double noise (double x, double y) {
         double s = (x + y) * F2;
         int i = fastFloor(x + s);
         int j = fastFloor(y + s);
@@ -88,11 +91,11 @@ public class WorldMapNoise {
         return 70.0 * (n0 + n1 + n2);
     }
 
-    private static int fastFloor(double value) {
+    private static int fastFloor (double value) {
         return value > 0 ? (int) value : (int) value - 1;
     }
 
-    private static double dot(int[] gradient, double x, double y) {
+    private static double dot (int[] gradient, double x, double y) {
         return gradient[0] * x + gradient[1] * y;
     }
 
@@ -106,7 +109,7 @@ public class WorldMapNoise {
      * @param toHigh 新范围上限
      * @return 映射后的值
      */
-    public static double map(double value, double fromLow, double fromHigh, double toLow, double toHigh) {
+    public static double map (double value, double fromLow, double fromHigh, double toLow, double toHigh) {
         return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
     }
 
@@ -114,7 +117,7 @@ public class WorldMapNoise {
      * ---------------------------------------------------------------------------------
      * 测试区
      * */
-    public static void main(String[] args) {
+    public static void main (String[] args) {
         new Thread(
             new Runnable(){
                 public void run(){
@@ -139,7 +142,7 @@ public class WorldMapNoise {
         ).start();
     }
 
-    private static void spawnNoiseMap(int startX, int startY) {
+    private static void spawnNoiseMap (int startX, int startY) {
         int width = 80, height = 40;
         StringBuilder charMap = new StringBuilder();
         WorldMapNoise worldMapNoise = new WorldMapNoise(114514);
@@ -160,11 +163,17 @@ public class WorldMapNoise {
         double scl = 0.08;
         return this.getNorNoise(x, y, scl);
     }
+    /*public double getNorNoise(double x, double y, double scl){
+        double nx = x * scl;
+        double ny = y * scl;
+        return (SimplexNoise2D.noise(nx, ny) + 1) / 2;
+    }*/
+
     public double getNorNoise(double x, double y, double scl){
         double nx = x * scl;
         double ny = y * scl;
-        double value = (SimplexNoise2D.noise(nx, ny) + 1) / 2;
-        return value;
+        // Deleted: double value = (SimplexNoise2D.noise(nx, ny) + 1) / 2;
+        return (this.noise(nx, ny) + 1) / 2;
     }
 
     public static String noiseToChar(double value) {

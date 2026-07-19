@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.CameraUtil;
 import game.muxiuesd.bedrockcore.util.CoordinateUtil;
-import ttk.muxiuesd.assetsloader.AssetsLoader;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
+import ttk.muxiuesd.resource.AssetsLoader;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -206,17 +206,26 @@ public class Util {
 
     /**
      * 加载纹理区域
-     * @param id 纹理ID
+     * @param id 纹理的ID
      * @param texturePath 纹理路径，为null时默认之前加载过就会直接根据id来获取
      * */
     public static TextureRegion loadTextureRegion (String id, String texturePath) {
         if (texturePath == null) {
-            texturePath = AssetsLoader.getInstance().getPath(id);
+            texturePath = AssetsLoader.getInstance().getPath(Texture.class, id);
         }
 
-        AssetsLoader.getInstance().loadAsync(id, texturePath, Texture.class, null);
+        AssetsLoader.getInstance().load(id, texturePath, Texture.class, null);
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
     }
 
-
+    /**
+     * 将字符串转换为长整型哈希值
+     * */
+    public static long stringToLongHash (String str) {
+        if (str == null) return 0;
+        //将两个int合并成一个long（避免丢失信息）
+        int h1 = str.hashCode();
+        int h2 = str.hashCode() ^ 0x55555555; //简单扰动
+        return ((long) h1 << 32) | (h2 & 0xFFFFFFFFL);
+    }
 }
