@@ -1,7 +1,7 @@
 package ttk.muxiuesd.data;
 
-import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import game.muxiuesd.bedrockcore.app.interfaces.ShallowCopyable;
+import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
 
@@ -53,11 +53,11 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
     public JsonPropertiesMap copy () {
         JsonPropertiesMap map = new JsonPropertiesMap();
         this.propertiesMap.forEach((key, value) -> {
-            //如果是可浅拷贝的值就调用浅拷贝
+            //如果是可浅拷贝的值就调用浅拷贝（只复制值，是不同的实例对象）
             if (value instanceof ShallowCopyable<?> shallowCopyableValue) {
                 map.add(key, shallowCopyableValue.copy());
             }else {
-                //不是浅拷贝的值就直接添加
+                //不是浅拷贝的值就直接添加（相同的实例）
                 map.add(key, value);
             }
         });

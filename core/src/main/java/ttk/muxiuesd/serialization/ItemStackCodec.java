@@ -32,9 +32,9 @@ public class ItemStackCodec extends JsonCodec<ItemStack> {
         int amount = dataReader.readInt("amount");
         Item item = Registries.ITEM.get(id);
         Optional<Item.Property> optional = Codecs.ITEM_PROPERTY.decode(dataReader);
-        if (optional.isPresent()) {
-            return Optional.of(new ItemStack(item, amount, optional.get().getPropertiesMap()));
-        }
-        return Optional.of(new ItemStack(item, amount));
+        //属性读取正确就返回有对应属性的物品堆栈，没有就直接返回默认属性的物品堆栈
+        return optional
+            .map(property -> new ItemStack(item, amount, property.getPropertiesMap()))
+            .or(() -> Optional.of(new ItemStack(item, amount)));
     }
 }
