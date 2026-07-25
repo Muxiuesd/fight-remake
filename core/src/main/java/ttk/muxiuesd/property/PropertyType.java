@@ -4,12 +4,22 @@ import game.muxiuesd.bedrockcore.app.interfaces.data.IReadData;
 import game.muxiuesd.bedrockcore.app.interfaces.data.IWriteData;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
+import ttk.muxiuesd.registrant.Registries;
 
 /**
  * 属性类型，需要实现写入数据的逻辑接口：{@link IWriteData}
  * 读取接口传入的数据是一整个属性map的数据，根据id来获取对应的属性值
  * */
 public abstract class PropertyType<T> implements Codecable<PropertyType<T>>, IWriteData<T>, IReadData<T> {
+    public final Codec<PropertyType<T>> CODEC = Codec.STRING.xmap(
+        (id) -> {
+            // 解码：id 字符串 → PropertyType<?>（从注册表获取）
+            return (PropertyType<T>) Registries.PROPERTY_TYPE.get(id);
+        },
+        PropertyType::getId    // 编码：PropertyType<?> → id 字符串
+    );
+
+
     private String id;
 
     public String getId () {
@@ -19,6 +29,11 @@ public abstract class PropertyType<T> implements Codecable<PropertyType<T>>, IWr
     public PropertyType<T> setId (String id) {
         this.id = id;
         return this;
+    }
+
+    @Override
+    public Codec<PropertyType<T>> getCodec () {
+        return CODEC;
     }
 
     /**

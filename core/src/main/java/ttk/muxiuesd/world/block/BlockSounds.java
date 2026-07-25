@@ -1,13 +1,21 @@
 package ttk.muxiuesd.world.block;
 
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Sounds;
 
 /**
  * 方块音效类
  * */
-public class BlockSounds {
+public class BlockSounds implements Codecable<BlockSounds> {
+    public static final Codec<BlockSounds> CODEC = Codec.STRING.xmap(
+        Registries.BLOCK_SOUNDS::get,
+        BlockSounds::getID
+    );
+
     //默认都为石头的音效
     public static final BlockSounds DEFAULT = Sounds.STONE;
 
@@ -70,5 +78,10 @@ public class BlockSounds {
     public BlockSounds setAudioHolders (AudioHolder[] audioHolders) {
         this.audioHolders = audioHolders;
         return this;
+    }
+
+    @Override
+    public Codec<BlockSounds> getCodec () {
+        return CODEC;
     }
 }

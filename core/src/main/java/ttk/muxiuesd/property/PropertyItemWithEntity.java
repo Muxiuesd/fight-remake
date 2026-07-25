@@ -21,9 +21,4 @@ public class PropertyItemWithEntity extends PropertyType<Entity<?>>{
     public Codec<Entity<?>> getValueCodec () {
         return null;
     }
-
-    @Override
-    public Codec<PropertyType<Entity<?>>> getCodec () {
-        return null;
-    }
 }

@@ -2,8 +2,8 @@ package ttk.muxiuesd.property;
 
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
-import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
@@ -29,11 +29,6 @@ public class PropertyCats extends PropertyType<CatsHolder>{
 
     @Override
     public Codec<CatsHolder> getValueCodec () {
-        return null;
-    }
-
-    @Override
-    public Codec<PropertyType<CatsHolder>> getCodec () {
         return null;
     }
 }
