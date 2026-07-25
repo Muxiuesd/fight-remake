@@ -2,9 +2,11 @@ package ttk.muxiuesd.world.item;
 
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
+import game.muxiuesd.bedrockcore.serialization.Codecable;
 import game.muxiuesd.bedrockcore.util.Timer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -19,20 +21,23 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * <p>
  * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
-public class ItemStack implements Updateable {
+public class ItemStack implements Updateable, Codecable<ItemStack> {
+    public static final Codec<ItemStack> CODEC = CodecBuilder.of(ItemStack::new)
+        .field("item", ItemStack::getItem, ItemStack::setItem, Item.CODEC)
+        .field("amount", ItemStack::getAmount, ItemStack::setAmount, Codec.INT)
+        .field("property", ItemStack::getProperty, ItemStack::setProperty, Item.Property.CODEC)
+        .build();
+
+
     /// 空物品堆叠
     public static final ItemStack VOID = new ItemStack();
 
-    //所持有的物品
-    private final Item item;
-    //物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
-    private Item.Property property;
-    //数量
-    private int amount;
-    //物品堆叠所用的行为，一般来说根据物品的类型来判断
-    private final IItemStackBehaviour behaviour;
-    //使用时间计时器
-    public Timer useTimer;
+
+    private Item item;//所持有的物品
+    private IItemStackBehaviour behaviour;//物品堆叠所用的行为，一般来说根据物品的类型来判断
+    private Item.Property property;//物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
+    private int amount;         //数量
+    public Timer<?> useTimer;   //使用时间计时器
 
     /**
      * 给空物品使用的构造方法，啥也没有
@@ -46,23 +51,24 @@ public class ItemStack implements Updateable {
         this(item, item.property.getMaxCount());
     }
     public ItemStack (Item item, int amount) {
-        this(item, amount, item.getBehaviour(), item.property.getPropertiesMap().copy());
+        //没有指定物品属性就获取复制的
+        this(item, amount, item.getBehaviour(), item.property.copy());
     }
-    public ItemStack (Item item, int amount, PropertiesDataMap<?, ?, ?> propertiesMap) {
-        this(item, amount, item.getBehaviour(), propertiesMap);
+    //需要指定物品属性
+    public ItemStack (Item item, int amount, Item.Property property) {
+        this(item, amount, item.getBehaviour(), property);
     }
-    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, PropertiesDataMap<?, ?, ?> propertiesMap) {
+    public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, Item.Property property) {
         this.item = item;
         this.amount = amount;
         //传入的属性是原始的属性
         if (behaviour != null) this.behaviour = behaviour;
         else this.behaviour = ItemStackBehaviours.COMMON;   //防止null
 
-        this.property = new Item.Property() //将原物品的属性复制一份
-            .setPropertiesMap(propertiesMap.copy());
+        this.property = property;
 
         if (item instanceof Weapon weapon) {
-            this.useTimer = new Timer(weapon.getProperty().getUseSpan());
+            this.useTimer = new Timer<>(weapon.getProperty().getUseSpan());
         }
     }
 
@@ -120,7 +126,7 @@ public class ItemStack implements Updateable {
         int newAmount = Math.max(amount, 1);
         if (amount > this.getProperty().getMaxCount()) newAmount = this.getProperty().getMaxCount();
 
-        return new ItemStack(this.getItem(), newAmount, this.behaviour, this.property.getPropertiesMap());
+        return new ItemStack(this.getItem(), newAmount, this.behaviour, this.getProperty().copy());
     }
 
     /**
@@ -133,11 +139,11 @@ public class ItemStack implements Updateable {
         ItemStack newStack;
         //超过或者等于最大数量，直接返回目前的数量
         if (amount >= this.getAmount()) {
-            newStack = new ItemStack(this.getItem(), this.getAmount(), this.behaviour, this.property.getPropertiesMap());
+            newStack = new ItemStack(this.getItem(), this.getAmount(), this.behaviour, this.copyProperty());
             this.setAmount(0);
         }else {
             //没达到最大数量
-            newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.property.getPropertiesMap());
+            newStack = new ItemStack(this.getItem(), amount, this.behaviour, this.copyProperty());
             this.amountDecrease(amount);
         }
         return newStack;
@@ -183,9 +189,28 @@ public class ItemStack implements Updateable {
         return this.getProperty().get(PropertyTypes.ITEM_ON_USING, false);
     }
 
-
+    /**
+     * 获取持有的物品实例
+     * */
     public Item getItem () {
         return this.item;
+    }
+
+    /**
+     * 设置新的物品实例
+     * */
+    public ItemStack setItem (Item item) {
+        this.item = item;
+        this.behaviour = item.getBehaviour();
+        this.setProperty(item.getProperty().copy());
+        return this;
+    }
+
+    /**
+     * 复制这个物品堆栈的物品属性
+     * */
+    public Item.Property copyProperty () {
+        return this.getProperty().copy();
     }
 
     public Item.Property getProperty () {
@@ -274,4 +299,8 @@ public class ItemStack implements Updateable {
     }
 
 
+    @Override
+    public Codec<ItemStack> getCodec () {
+        return CODEC;
+    }
 }

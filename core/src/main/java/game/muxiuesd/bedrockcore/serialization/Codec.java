@@ -15,13 +15,18 @@ public abstract class Codec<T> {
 
     public abstract DataResult<T> decode(RawObject input);
 
+    /**
+     * @param to   解码
+     * @param from 编码
+     * */
     public <R> Codec<R> xmap (Function<T, R> to, Function<R, T> from) {
         Codec<T> self = this;
-        return new Codec<R>() {
-            public RawObject encode(R value) {
+        return new Codec<>() {
+            public RawObject encode (R value) {
                 return self.encode(from.apply(value));
             }
-            public DataResult<R> decode(RawObject input) {
+
+            public DataResult<R> decode (RawObject input) {
                 return self.decode(input).map(to);
             }
         };
@@ -52,6 +57,47 @@ public abstract class Codec<T> {
         public RawObject encode(Boolean value) { return RawObject.ofBoolean(value); }
         public DataResult<Boolean> decode(RawObject input) {
             return input.isBoolean() ? DataResult.success(input.asBoolean().get()) : DataResult.error("Not a boolean");
+        }
+    };
+
+    public static final Codec<Long> LONG = new Codec<Long>() {
+        public RawObject encode(Long value) { return RawObject.ofLong(value); }
+        public DataResult<Long> decode(RawObject input) {
+            if (input.isLong()) return DataResult.success(input.asLong().get());
+            if (input.isInt()) return DataResult.success((long) input.asInt().get());
+            if (input.isString()) {
+                try { return DataResult.success(Long.parseLong(input.asString().get())); }
+                catch (NumberFormatException e) { return DataResult.error("Not a long"); }
+            }
+            return DataResult.error("Not a long");
+        }
+    };
+
+    public static final Codec<Float> FLOAT = new Codec<Float>() {
+        public RawObject encode(Float value) { return RawObject.ofFloat(value); }
+        public DataResult<Float> decode(RawObject input) {
+            if (input.isFloat()) return DataResult.success(input.asFloat().get());
+            if (input.isDouble()) return DataResult.success((float) input.asDouble().get().doubleValue());
+            if (input.isString()) {
+                try { return DataResult.success(Float.parseFloat(input.asString().get())); }
+                catch (NumberFormatException e) { return DataResult.error("Not a float"); }
+            }
+            return DataResult.error("Not a float");
+        }
+    };
+
+    public static final Codec<Double> DOUBLE = new Codec<Double>() {
+        public RawObject encode(Double value) { return RawObject.ofDouble(value); }
+        public DataResult<Double> decode(RawObject input) {
+            if (input.isDouble()) return DataResult.success(input.asDouble().get());
+            if (input.isFloat()) return DataResult.success((double) input.asFloat().get());
+            if (input.isInt()) return DataResult.success((double) input.asInt().get());
+            if (input.isLong()) return DataResult.success((double) input.asLong().get());
+            if (input.isString()) {
+                try { return DataResult.success(Double.parseDouble(input.asString().get())); }
+                catch (NumberFormatException e) { return DataResult.error("Not a double"); }
+            }
+            return DataResult.error("Not a double");
         }
     };
 
@@ -115,13 +161,16 @@ public abstract class Codec<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static RawObject wrap(Object val) {
+    public static RawObject wrap (Object val) {
         if (val instanceof RawObject) return (RawObject) val;
         if (val instanceof Map) return RawObject.ofMap((Map<String, Object>) val);
         if (val instanceof List) return RawObject.ofList((List<Object>) val);
         if (val instanceof String) return RawObject.ofString((String) val);
         if (val instanceof Integer) return RawObject.ofInt((Integer) val);
         if (val instanceof Boolean) return RawObject.ofBoolean((Boolean) val);
+        if (val instanceof Long) return RawObject.ofLong((Long) val);
+        if (val instanceof Float) return RawObject.ofFloat((Float) val);
+        if (val instanceof Double) return RawObject.ofDouble((Double) val);
         if (val == null) return RawObject.ofNull();
         return RawObject.ofString(val.toString());
     }

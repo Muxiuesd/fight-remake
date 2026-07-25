@@ -35,5 +35,6 @@ public class MainWorld extends World {
         addSystem("MonsterGenerationSystem", new MonsterGenerationSystem(this));
         addSystem("UndergroundCreatureGenSystem", new UndergroundCreatureGenSystem(this));
         addSystem("LightSystem", new LightSystem(this));
+        addSystem("TestSystem", new TestSystem(this));
     }
 }

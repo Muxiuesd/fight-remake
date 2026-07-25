@@ -34,7 +34,7 @@ public class ItemStackCodec extends JsonCodec<ItemStack> {
         Optional<Item.Property> optional = Codecs.ITEM_PROPERTY.decode(dataReader);
         //属性读取正确就返回有对应属性的物品堆栈，没有就直接返回默认属性的物品堆栈
         return optional
-            .map(property -> new ItemStack(item, amount, property.getPropertiesMap()))
+            .map(property -> new ItemStack(item, amount, property))
             .or(() -> Optional.of(new ItemStack(item, amount)));
     }
 }

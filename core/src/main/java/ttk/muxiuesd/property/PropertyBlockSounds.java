@@ -3,6 +3,7 @@ package ttk.muxiuesd.property;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.data.JsonDataReader;
 import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
@@ -37,5 +38,15 @@ public class PropertyBlockSounds extends PropertyType<BlockSounds>{
             sounds = Registries.BLOCK_SOUNDS.get(obj.getString("id"));
         }
         return sounds;
+    }
+
+    @Override
+    public Codec<BlockSounds> getValueCodec () {
+        return null;
+    }
+
+    @Override
+    public Codec<PropertyType<BlockSounds>> getCodec () {
+        return null;
     }
 }
