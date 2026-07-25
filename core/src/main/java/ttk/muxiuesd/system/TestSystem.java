@@ -22,19 +22,22 @@ public class TestSystem extends WorldSystem {
     public void update (float delta) {
         super.update(delta);
 
-        if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
+        if (KeyBindings.PlayerShift.wasJustPressed()) {
             Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
             ItemStack handItemStack = player.getHandItemStack();
             RawObject rawObject = ItemStack.CODEC.encode(handItemStack);
             String json = RawObjectJsonConverter.toJson(rawObject);
-            Log.print(TAG(), json);
+
 
             DataResult<ItemStack> result = ItemStack.CODEC.decode(rawObject);
             if (result.isSuccess()) {
                 ItemStack itemStack = result.result().get();
-                itemStack.setAmount(32);
+                itemStack.setAmount(1);
                 player.getBackpack().addItem(itemStack);
                 Log.print(TAG(), "物品解码成功！");
+
+                Log.print(TAG(), "原始物品的json：" + json);
+                Log.print(TAG(), "解码物品的json：" + RawObjectJsonConverter.toJson(ItemStack.CODEC.encode(itemStack)));
             }else {
                 Log.error(TAG(), "物品解码失败！");
             }

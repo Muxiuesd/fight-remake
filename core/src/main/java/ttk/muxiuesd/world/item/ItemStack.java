@@ -59,17 +59,11 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
         this(item, amount, item.getBehaviour(), property);
     }
     public ItemStack (Item item, int amount, IItemStackBehaviour behaviour, Item.Property property) {
-        this.item = item;
-        this.amount = amount;
-        //传入的属性是原始的属性
+        this.setItem(item);
         if (behaviour != null) this.behaviour = behaviour;
         else this.behaviour = ItemStackBehaviours.COMMON;   //防止null
-
         this.property = property;
-
-        if (item instanceof Weapon weapon) {
-            this.useTimer = new Timer<>(weapon.getProperty().getUseSpan());
-        }
+        this.amount = Math.max(amount, 1);  //防止物品数量低于1
     }
 
     /**
@@ -203,6 +197,10 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
         this.item = item;
         this.behaviour = item.getBehaviour();
         this.setProperty(item.getProperty().copy());
+
+        if (item instanceof Weapon weapon) {
+            this.useTimer = new Timer<>(weapon.getProperty().getUseSpan());
+        }
         return this;
     }
 
