@@ -2,7 +2,7 @@ package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.data.EntityDataOutput;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.entity.abs.Entity;

@@ -2,6 +2,7 @@ package ttk.muxiuesd.system;
 
 import game.muxiuesd.bedrockcore.serialization.DataResult;
 import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -25,6 +26,9 @@ public class TestSystem extends WorldSystem {
             Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
             ItemStack handItemStack = player.getHandItemStack();
             RawObject rawObject = ItemStack.CODEC.encode(handItemStack);
+            String json = RawObjectJsonConverter.toJson(rawObject);
+            Log.print(TAG(), json);
+
             DataResult<ItemStack> result = ItemStack.CODEC.decode(rawObject);
             if (result.isSuccess()) {
                 ItemStack itemStack = result.result().get();

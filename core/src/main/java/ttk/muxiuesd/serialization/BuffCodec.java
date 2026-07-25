@@ -1,8 +1,8 @@
 package ttk.muxiuesd.serialization;
 
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;

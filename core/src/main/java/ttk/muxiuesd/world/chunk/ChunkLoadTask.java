@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.chunk;
 
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.AbsFileUtil;

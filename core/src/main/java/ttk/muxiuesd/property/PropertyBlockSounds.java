@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.BlockSounds;
 

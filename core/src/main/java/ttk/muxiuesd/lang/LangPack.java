@@ -2,7 +2,7 @@ package ttk.muxiuesd.lang;
 
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
 
 import java.util.HashMap;
 

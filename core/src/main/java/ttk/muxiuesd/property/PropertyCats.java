@@ -3,7 +3,7 @@ package ttk.muxiuesd.property;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**

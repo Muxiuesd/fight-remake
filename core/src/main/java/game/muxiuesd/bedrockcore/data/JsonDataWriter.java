@@ -1,4 +1,4 @@
-package ttk.muxiuesd.data;
+package game.muxiuesd.bedrockcore.data;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;

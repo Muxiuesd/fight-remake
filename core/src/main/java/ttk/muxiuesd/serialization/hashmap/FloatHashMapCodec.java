@@ -1,7 +1,7 @@
 package ttk.muxiuesd.serialization.hashmap;
 
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 
 public class FloatHashMapCodec extends WorldInfoHashMap<FloatHashMapCodec, Float> {
