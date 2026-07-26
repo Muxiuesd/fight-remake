@@ -24,15 +24,24 @@ public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurn
     public final Codec<BlockFurnace> CODEC = CodecBuilder.of(BlockFurnace::new)
         .field("id", Block::getID, (a, b)-> {}, Codec.STRING)
         .field("is_working", BlockFurnace::isWorking, BlockFurnace::setWorking, Codec.BOOL)
+        .field("block_entity",
+            BlockFurnace::getBlockEntity,
+            (block, blockEntity) -> {
+                block.setBlockEntity(blockEntity);
+                blockEntity.setBlock(block);
+            },
+            BlockEntityFurnace.CODEC
+        )
         .field("property",
-            (block -> {
+            block -> {
                 //调用cats写入
                 block.writeCatData(block.getProperty().get(PropertyTypes.CATS));
                 return block.getProperty();
-            }),
-            ((block, property) -> {
-
-            }),
+            },
+            (block, property) -> {
+                //读取cat，同时会读取方块实体的cat
+                //block.readCatData(property.get(PropertyTypes.CATS));
+            },
             Property.CODEC
         )
         .build();
