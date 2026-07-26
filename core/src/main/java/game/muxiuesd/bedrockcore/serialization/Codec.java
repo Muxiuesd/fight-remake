@@ -1,10 +1,8 @@
 package game.muxiuesd.bedrockcore.serialization;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 /**
  * 编解码器
@@ -101,23 +99,22 @@ public abstract class Codec<T> {
         }
     };
 
-    public static <T> Codec<List<T>> listOf (Codec<T> elementCodec) {
-        return new Codec<>() {
-            public RawObject encode (List<T> list) {
+    public static <T> Codec<List<T>> listOf(Codec<T> elementCodec) {
+        return new Codec<List<T>>() {
+            public RawObject encode(List<T> list) {
                 List<Object> encoded = new ArrayList<>();
                 for (T elem : list) encoded.add(elementCodec.encode(elem).unwrap());
                 return RawObject.ofList(encoded);
             }
-
-            public DataResult<List<T>> decode (RawObject input) {
-                if (! input.isList()) return DataResult.error("Not a list");
+            public DataResult<List<T>> decode(RawObject input) {
+                if (!input.isList()) return DataResult.error("Not a list");
                 List<?> rawList = input.asList().get();
                 List<T> result = new ArrayList<>();
                 StringBuilder errors = new StringBuilder();
                 boolean hasError = false;
                 for (int i = 0; i < rawList.size(); i++) {
                     DataResult<T> decoded = elementCodec.decode(wrap(rawList.get(i)));
-                    if (decoded.isSuccess()) result.add(((DataResult.Success<T>) decoded).value);
+                    if (decoded.isSuccess()) result.add(((DataResult.Success<T>)decoded).value);
                     else {
                         hasError = true;
                         errors.append("[").append(i).append("]: ").append(decoded.error().orElse("")).append("; ");
@@ -130,24 +127,31 @@ public abstract class Codec<T> {
         };
     }
 
-    public static <V> Codec<Map<String, V>> mapOf (Codec<V> valueCodec) {
-        return new Codec<>() {
-            public RawObject encode (Map<String, V> map) {
+    /** 数组 Codec (零反射，通过 IntFunction 提供数组构造) */
+    public static <T> Codec<T[]> arrayOf(Codec<T> elementCodec, IntFunction<T[]> arrayBuilder) {
+        return listOf(elementCodec).xmap(
+            list -> list.toArray(arrayBuilder.apply(list.size())),
+            Arrays::asList
+        );
+    }
+
+    public static <V> Codec<Map<String, V>> mapOf(Codec<V> valueCodec) {
+        return new Codec<Map<String, V>>() {
+            public RawObject encode(Map<String, V> map) {
                 Map<String, Object> encoded = new LinkedHashMap<>();
                 for (Map.Entry<String, V> e : map.entrySet())
                     encoded.put(e.getKey(), valueCodec.encode(e.getValue()).unwrap());
                 return RawObject.ofMap(encoded);
             }
-
-            public DataResult<Map<String, V>> decode (RawObject input) {
-                if (! input.isMap()) return DataResult.error("Not a map");
+            public DataResult<Map<String, V>> decode(RawObject input) {
+                if (!input.isMap()) return DataResult.error("Not a map");
                 Map<String, Object> rawMap = input.asMap().get();
                 Map<String, V> result = new LinkedHashMap<>();
                 StringBuilder errors = new StringBuilder();
                 boolean hasError = false;
                 for (Map.Entry<String, Object> e : rawMap.entrySet()) {
                     DataResult<V> decoded = valueCodec.decode(wrap(e.getValue()));
-                    if (decoded.isSuccess()) result.put(e.getKey(), ((DataResult.Success<V>) decoded).value);
+                    if (decoded.isSuccess()) result.put(e.getKey(), ((DataResult.Success<V>)decoded).value);
                     else {
                         hasError = true;
                         errors.append("[").append(e.getKey()).append("]: ").append(decoded.error().orElse("")).append("; ");
@@ -174,4 +178,19 @@ public abstract class Codec<T> {
         if (val == null) return RawObject.ofNull();
         return RawObject.ofString(val.toString());
     }
+
+
+    /**
+     * 构造器函数式接口 (1~5个参数)
+     * */
+    @FunctionalInterface
+    public interface Constructor1<A, T> { T apply(A a); }
+    @FunctionalInterface
+    public interface Constructor2<A, B, T> { T apply(A a, B b); }
+    @FunctionalInterface
+    public interface Constructor3<A, B, C, T> { T apply(A a, B b, C c); }
+    @FunctionalInterface
+    public interface Constructor4<A, B, C, D, T> { T apply(A a, B b, C c, D d); }
+    @FunctionalInterface
+    public interface Constructor5<A, B, C, D, E, T> { T apply(A a, B b, C c, D d, E e); }
 }

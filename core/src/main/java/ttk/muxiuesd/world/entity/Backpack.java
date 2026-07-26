@@ -1,17 +1,72 @@
 package ttk.muxiuesd.world.entity;
 
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.DataResult;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 实体所拥有的物品背包
  * */
 public class Backpack implements Inventory, Updateable {
+    public static final Codec<Backpack> CODEC = new Codec<>() {
+        @Override
+        public RawObject encode(Backpack backpack) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("size", Codec.INT.encode(backpack.getSize()).unwrap());
+
+            Map<String, Object> items = new LinkedHashMap<>();
+            for (int i = 0; i < backpack.getSize(); i++) {
+                ItemStack stack = backpack.getItemStack(i);
+                if (stack != null) {
+                    items.put(String.valueOf(i), ItemStack.CODEC.encode(stack).unwrap());
+                }
+            }
+            map.put("items", RawObject.ofMap(items).unwrap());
+            return RawObject.ofMap(map);
+        }
+
+        @Override
+        public DataResult<Backpack> decode(RawObject input) {
+            if (!input.isMap()) return DataResult.error("Expected a map");
+            Map<String, Object> rawMap = input.asMap().get();
+            Object sizeRaw = rawMap.get("size");
+            if (sizeRaw == null) return DataResult.error("Missing size");
+            DataResult<Integer> sizeResult = Codec.INT.decode(Codec.wrap(sizeRaw));
+            if (!sizeResult.isSuccess()) return DataResult.error("Invalid size: " + sizeResult.error().orElse(""));
+            int size = sizeResult.result().get();
+            Backpack backpack = new Backpack(size);
+            Object itemsRaw = rawMap.get("items");
+            if (itemsRaw != null) {
+                RawObject itemsObj = Codec.wrap(itemsRaw);
+                if (itemsObj.isMap()) {
+                    Map<String, Object> itemsMap = itemsObj.asMap().get();
+                    for (Map.Entry<String, Object> entry : itemsMap.entrySet()) {
+                        try {
+                            int index = Integer.parseInt(entry.getKey());
+                            DataResult<ItemStack> stackResult = ItemStack.CODEC.decode(Codec.wrap(entry.getValue()));
+                            if (stackResult.isSuccess()) {
+                                backpack.setItemStack(index, stackResult.result().get());
+                            }
+                        } catch (NumberFormatException e) {
+                            // 跳过无效键
+                        }
+                    }
+                }
+            }
+            return DataResult.success(backpack);
+        }
+    };
+
+
     private final LinkedHashMap<Integer, ItemStack> itemStacks;
     private final int size;
+
 
     public Backpack (int size) {
         this.itemStacks = new LinkedHashMap<>(size);
@@ -56,39 +111,6 @@ public class Backpack implements Inventory, Updateable {
         if (this.isFull(itemStack)) return itemStack;
 
         //TODO 解决相同物品不能存放多个堆叠的bug
-        /*boolean[] nullStacks = new boolean[this.size];
-        for (int i = 0; i < this.size; ++i) {
-            ItemStack stack = this.itemStacks.get(i);
-            if (stack != null) {
-                //同类型物品合并，（目前只检测Id是否相同）
-                if (Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {
-                    //堆叠数量达到上限直接跳过
-                    if (stack.getAmount() >= stack.getProperty().getMaxCount()) continue;
-
-                    int newAmount = stack.getAmount() + itemStack.getAmount();
-                    int maxCount = stack.getItem().property.getMaxCount();
-                    if (newAmount <= maxCount) {
-                        stack.setAmount(newAmount);
-                        return null;
-                    } else {
-                        stack.setAmount(maxCount);
-                        itemStack.setAmount(newAmount - maxCount);
-                        return itemStack;
-                    }
-                }
-                //不同类型就跳过
-                nullStacks[i] = false;
-                continue;
-            }
-            nullStacks[i] = true;
-        }
-        //查找空位，然后把物品堆叠放进去
-        for (int i = 0; i < nullStacks.length; ++i) {
-            if (nullStacks[i]) {
-                this.setItemStack(i, itemStack);
-                return null;
-            }
-        }*/
 
         // 尝试合并到已有的堆叠
         for (int i = 0; i < this.size; ++i) {

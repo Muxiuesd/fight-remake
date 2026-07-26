@@ -66,7 +66,7 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
             if (hasError) return DataResult.error(errors.toString(), result);
             return DataResult.success(result);
         }
-    };;
+    };
 
     public static final Codec<JsonPropertiesMap> CODEC = CodecBuilder.of(JsonPropertiesMap::new)
         .field("properties_map", JsonPropertiesMap::getPropertiesMap, JsonPropertiesMap::setPropertiesMap, MAP_CODEC)

@@ -201,11 +201,13 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     }
 
     public BlockPos getBlockPos () {
-        return blockPos;
+        return this.blockPos;
     }
 
     public BlockEntity setBlockPos (BlockPos blockPos) {
         this.blockPos = blockPos;
+        //方块实体的声源位置与方块实体的坐标绑定
+        this.sounder = () -> new Vector3(blockPos, 0f);
         return this;
     }
 

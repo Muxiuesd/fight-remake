@@ -3,11 +3,13 @@ package ttk.muxiuesd.world.block.abs;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
-import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
@@ -17,8 +19,19 @@ import ttk.muxiuesd.world.cat.CatsHolder;
 
 /**
  * 方块
+ * <p>
+ * 普通方块的都是全世界一个实例对象，在不同的坐标上多次渲染（享元模式）
  * */
-public abstract class Block implements ID<Block>, Disposable {
+public class Block implements ID<Block>, Disposable {
+    /**
+     * 普通方块的编解码器
+     * */
+    public static final Codec<Block> CODEC = Codec.STRING.xmap(
+        Registries.BLOCK::get,
+        Block::getID
+    );
+
+
     /// 方块的大小（最基础的属性）
     public static final float WIDTH = 1f, HEIGHT = 1f;
     /// 方块碰撞箱坐标偏移，自带正负号
@@ -96,24 +109,22 @@ public abstract class Block implements ID<Block>, Disposable {
 
     @Override
     public void dispose() {
-        /*if (this.textureRegion != null) {
-            this.textureRegion = null;
-        }*/
     }
 
-    /**方块属性
-     * 使用构建者模式
+
+    /**
+     * 方块的属性类
      * */
     public static class Property {
-        private static final JsonPropertiesMap BLOCK_DEFAULT_PROPERTIES_DATA_MAP = new JsonPropertiesMap()
-            .add(PropertyTypes.BLOCK_FRICTON, 1f)
-            .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE);
+        public static final Codec<Block.Property> CODEC = CodecBuilder.of(Block.Property::new)
+            .field("data_map", Block.Property::getPropertiesMap, Block.Property::setPropertiesMap, JsonPropertiesMap.CODEC)
+            .build();
 
         public static Property create () {
             return new Property();
         }
 
-        private PropertiesDataMap<?, ?, ?> propertiesDataMap;
+        private JsonPropertiesMap propertiesDataMap;
 
         public Property () {
             /// 这里有可能浅拷贝
@@ -156,11 +167,11 @@ public abstract class Block implements ID<Block>, Disposable {
             return this.getPropertiesMap().get(property);
         }
 
-        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
+        public JsonPropertiesMap getPropertiesMap () {
             return this.propertiesDataMap;
         }
 
-        public Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesDataMap) {
+        public Property setPropertiesMap (JsonPropertiesMap propertiesDataMap) {
             this.propertiesDataMap = propertiesDataMap;
             return this;
         }

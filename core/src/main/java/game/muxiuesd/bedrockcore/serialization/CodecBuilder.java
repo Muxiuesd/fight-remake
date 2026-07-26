@@ -12,99 +12,188 @@ import java.util.function.Supplier;
  * 编解码器的构造器
  * */
 public class CodecBuilder<T> {
-    private final Supplier<T> factory;
-    private final List<FieldBinding<T, ?>> fields = new ArrayList<>();
+    private final List<ParamField<T, ?, ?>> paramFields = new ArrayList<>();
+    private final List<FieldBinding<T, ?, ?>> setterFields = new ArrayList<>();
+    private Function<Object[], T> constructor;
 
-    private CodecBuilder(Supplier<T> factory) { this.factory = factory; }
+    private CodecBuilder() {}
 
-    public static <T> CodecBuilder<T> of(Supplier<T> factory) { return new CodecBuilder<>(factory); }
+    public static <T> CodecBuilder<T> create () {
+        return new CodecBuilder<>();
+    }
 
-    // 原有方法：同时编码和解码
-    public <F> CodecBuilder<T> field(String name,
-                                     Function<T, F> getter,
-                                     BiConsumer<T, F> setter,
-                                     Codec<F> codec) {
-        fields.add(new FieldBinding<>(name, getter, setter, codec, true));
+    public static <T> CodecBuilder<T> of (Supplier<T> supplier) {
+        return new CodecBuilder<T>().noArgFactory(supplier);
+    }
+
+    // 无参工厂 (用于无构造参数的对象)
+    public CodecBuilder<T> noArgFactory(Supplier<T> factory) {
+        if (!paramFields.isEmpty()) throw new IllegalStateException("Cannot use noArgFactory with paramFields");
+        this.constructor = args -> factory.get();
         return this;
     }
 
-    // 新增方法：仅编码不解码（只读字段）
-    public <F> CodecBuilder<T> encoderField(String name,
-                                            Function<T, F> getter,
-                                            Codec<F> codec) {
-        fields.add(new FieldBinding<>(name, getter, null, codec, false));
+    // 构造函数参数字段
+    public <F> CodecBuilder<T> paramField (String name, Function<T, F> getter, Codec<F> codec) {
+        paramFields.add(new ParamField<>(name, getter, codec));
         return this;
     }
 
-    public Codec<T> build() { return new ObjectCodec<>(factory, new ArrayList<>(fields)); }
+    // 工厂方法重载 (自动匹配参数个数)
+    public <A> CodecBuilder<T> factory(Codec.Constructor1<A, T> factory) {
+        checkParamCount(1);
+        this.constructor = args -> factory.apply((A) args[0]);
+        return this;
+    }
+    public <A, B> CodecBuilder<T> factory(Codec.Constructor2<A, B, T> factory) {
+        checkParamCount(2);
+        this.constructor = args -> factory.apply((A) args[0], (B) args[1]);
+        return this;
+    }
+    public <A, B, C> CodecBuilder<T> factory(Codec.Constructor3<A, B, C, T> factory) {
+        checkParamCount(3);
+        this.constructor = args -> factory.apply((A) args[0], (B) args[1], (C) args[2]);
+        return this;
+    }
+    public <A, B, C, D> CodecBuilder<T> factory(Codec.Constructor4<A, B, C, D, T> factory) {
+        checkParamCount(4);
+        this.constructor = args -> factory.apply((A) args[0], (B) args[1], (C) args[2], (D) args[3]);
+        return this;
+    }
+    public <A, B, C, D, E> CodecBuilder<T> factory(Codec.Constructor5<A, B, C, D, E, T> factory) {
+        checkParamCount(5);
+        this.constructor = args -> factory.apply((A) args[0], (B) args[1], (C) args[2], (D) args[3], (E) args[4]);
+        return this;
+    }
 
 
-    // 内部字段绑定（增加标志位 decodeOnRead）
-    static class FieldBinding<T, F> {
+
+    // 普通字段 (有 setter)
+    public <F, F1 extends F> CodecBuilder<T> field(String name, Function<T, F> getter, BiConsumer<T, F> setter, Codec<F1> codec) {
+        setterFields.add(new FieldBinding<>(name, getter, setter, codec, true));
+        return this;
+    }
+
+    // 只编码不解码的字段
+    public <F, F1 extends F> CodecBuilder<T> encoderField(String name, Function<T, F> getter, Codec<F1> codec) {
+        setterFields.add(new FieldBinding<>(name, getter, null, codec, false));
+        return this;
+    }
+
+    // 构建 Codec
+    public Codec<T> build() {
+        if (constructor == null)
+            throw new IllegalStateException("No factory provided");
+        return new ObjectCodec<>(constructor, paramFields, setterFields);
+    }
+
+    private void checkParamCount(int expected) {
+        if (paramFields.size() != expected)
+            throw new IllegalStateException("Expected " + expected + " param fields but found " + paramFields.size());
+    }
+
+    // ---------- 内部数据类 ----------
+    static class ParamField<T, F, F1 extends F> {
         final String name;
         final Function<T, F> getter;
-        final BiConsumer<T, F> setter;   // 如果 decodeOnRead == false，则为 null
-        final Codec<F> codec;
-        final boolean decodeOnRead;       // 是否在解码时处理该字段
-
-        FieldBinding(String name, Function<T, F> getter, BiConsumer<T, F> setter,
-                     Codec<F> codec, boolean decodeOnRead) {
-            this.name = name;
-            this.getter = getter;
-            this.setter = setter;
-            this.codec = codec;
-            this.decodeOnRead = decodeOnRead;
+        final Codec<F1> codec;
+        ParamField(String name, Function<T, F> getter, Codec<F1> codec) {
+            this.name = name; this.getter = getter; this.codec = codec;
         }
     }
 
-    // 对象 Codec 实现（解码时跳过 decodeOnRead == false 的字段）
-    static class ObjectCodec<T> extends Codec<T> {
-        private final Supplier<T> factory;
-        private final List<FieldBinding<T, ?>> fields;
+    static class FieldBinding<T, F, F1 extends F> {
+        final String name;
+        final Function<T, F> getter;
+        final BiConsumer<T, F> setter;
+        final Codec<F1> codec;
+        final boolean decodeOnRead;
 
-        ObjectCodec(Supplier<T> factory, List<FieldBinding<T, ?>> fields) {
-            this.factory = factory;
-            this.fields = fields;
+        FieldBinding(String name, Function<T, F> getter, BiConsumer<T, F> setter,
+                     Codec<F1> codec, boolean decodeOnRead) {
+            this.name = name; this.getter = getter; this.setter = setter;
+            this.codec = codec; this.decodeOnRead = decodeOnRead;
+        }
+    }
+
+    static class ObjectCodec<T> extends Codec<T> {
+        private final Function<Object[], T> constructor;
+        private final List<ParamField<T, ?, ?>> paramFields;
+        private final List<FieldBinding<T, ?, ?>> setterFields;
+
+        ObjectCodec(Function<Object[], T> constructor,
+                    List<ParamField<T, ?, ?>> paramFields,
+                    List<FieldBinding<T, ?, ?>> setterFields) {
+            this.constructor = constructor;
+            this.paramFields = paramFields;
+            this.setterFields = setterFields;
         }
 
-        @Override
-        @SuppressWarnings("unchecked")
+        @Override @SuppressWarnings("unchecked")
         public RawObject encode(T value) {
             Map<String, Object> map = new LinkedHashMap<>();
-            for (FieldBinding<T, ?> b : fields) {
-                Object fv = ((Function<T, Object>) b.getter).apply(value);
-                map.put(b.name, ((Codec<Object>) b.codec).encode(fv).unwrap());
+            for (ParamField<T, ?, ?> p : paramFields) {
+                Object fv = ((Function<T, Object>) p.getter).apply(value);
+                map.put(p.name, ((Codec<Object>) p.codec).encode(fv).unwrap());
+            }
+            for (FieldBinding<T, ?, ?> f : setterFields) {
+                if (!f.decodeOnRead) continue;
+                Object fv = ((Function<T, Object>) f.getter).apply(value);
+                map.put(f.name, ((Codec<Object>) f.codec).encode(fv).unwrap());
             }
             return RawObject.ofMap(map);
         }
 
-        @Override
-        @SuppressWarnings("unchecked")
+        @Override @SuppressWarnings("unchecked")
         public DataResult<T> decode(RawObject input) {
             if (!input.isMap()) return DataResult.error("Expected a Map");
             Map<String, Object> rawMap = input.asMap().get();
-            T instance = factory.get();
             StringBuilder errors = new StringBuilder();
             boolean hasError = false;
-            for (FieldBinding<T, ?> b : fields) {
-                if (!b.decodeOnRead) continue;  // 跳过只读字段
-                Object rawVal = rawMap.get(b.name);
+
+            // 收集构造参数
+            Object[] paramValues = new Object[paramFields.size()];
+            for (int i = 0; i < paramFields.size(); i++) {
+                ParamField<T, ?, ?> p = paramFields.get(i);
+                Object rawVal = rawMap.get(p.name);
                 if (rawVal == null) {
-                    errors.append(b.name).append(": Missing; ");
+                    errors.append(p.name).append(": Missing; ");
+                    hasError = true;
+                    paramValues[i] = null;
+                } else {
+                    DataResult<?> dr = p.codec.decode(Codec.wrap(rawVal));
+                    if (dr.isSuccess()) {
+                        paramValues[i] = ((DataResult.Success<?>) dr).value;
+                    } else {
+                        hasError = true;
+                        errors.append(p.name).append(": ").append(dr.error().orElse("")).append("; ");
+                        paramValues[i] = dr.result().orElse(null);
+                    }
+                }
+            }
+
+            T instance = constructor.apply(paramValues);
+
+            // setter 注入
+            for (FieldBinding<T, ?, ?> f : setterFields) {
+                if (!f.decodeOnRead) continue;
+                Object rawVal = rawMap.get(f.name);
+                if (rawVal == null) {
+                    errors.append(f.name).append(": Missing; ");
                     hasError = true;
                     continue;
                 }
-                DataResult<?> dr = b.codec.decode(Codec.wrap(rawVal));
+                DataResult<?> dr = f.codec.decode(Codec.wrap(rawVal));
                 if (dr.isSuccess()) {
-                    ((BiConsumer<T, Object>) b.setter).accept(instance,
-                        ((DataResult.Success<?>) dr).value);
+                    ((BiConsumer<T, Object>) f.setter).accept(instance, ((DataResult.Success<?>) dr).value);
                 } else {
                     hasError = true;
-                    errors.append(b.name).append(": ").append(dr.error().orElse("")).append("; ");
+                    errors.append(f.name).append(": ").append(dr.error().orElse("")).append("; ");
                     if (dr.result().isPresent())
-                        ((BiConsumer<T, Object>) b.setter).accept(instance, dr.result().get());
+                        ((BiConsumer<T, Object>) f.setter).accept(instance, dr.result().get());
                 }
             }
+
             if (hasError) return DataResult.error(errors.toString(), instance);
             return DataResult.success(instance);
         }

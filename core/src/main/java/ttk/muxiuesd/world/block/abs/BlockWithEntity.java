@@ -10,9 +10,9 @@ import ttk.muxiuesd.world.cat.CatsHolder;
 /**
  * 带有方块实体的方块
  * <p>
- * 这种方块每一个都是一个单独的实例
+ * 这种方块在世界中出现一个，就是一个单独的实例
  * */
-public abstract class BlockWithEntity extends Block implements ICatData {
+public abstract class BlockWithEntity extends Block implements ICatData{
     //方块对应的方块实体实例
     private BlockEntity blockEntity;
 

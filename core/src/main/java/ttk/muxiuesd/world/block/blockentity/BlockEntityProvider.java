@@ -16,6 +16,13 @@ public class BlockEntityProvider<T extends BlockEntity> {
         return this.id;
     }
 
+    /**
+     * 空参构造
+     * */
+    public T create () {
+        return this.factory.create(new BlockPos());
+    }
+
     public T create (BlockPos pos) {
         return this.factory.create(pos);
     }

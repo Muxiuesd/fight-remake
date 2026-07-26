@@ -13,8 +13,13 @@ public class RawObjectJsonConverter {
     /**
      * 将 RawObject 转换为 JSON 字符串
      */
-    public static String toJson(RawObject raw) {
+    public static String toJson (RawObject raw) {
         JsonDataWriter writer = new JsonDataWriter();
+        writeValue(writer, null, raw.unwrap()); // 直接取出原始对象开始递归
+        return writer.getResult();
+    }
+
+    public static String toJson (JsonDataWriter writer, RawObject raw) {
         writeValue(writer, null, raw.unwrap()); // 直接取出原始对象开始递归
         return writer.getResult();
     }

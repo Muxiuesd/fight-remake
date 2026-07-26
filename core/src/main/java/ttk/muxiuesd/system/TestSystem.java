@@ -1,12 +1,17 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.utils.Json;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.serialization.DataResult;
 import game.muxiuesd.bedrockcore.serialization.RawObject;
 import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
+import ttk.muxiuesd.data.abs.JsonDataOutput;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -41,6 +46,20 @@ public class TestSystem extends WorldSystem {
             }else {
                 Log.error(TAG(), "物品解码失败！");
             }
+
+            RawObject rawBackpackObj = Backpack.CODEC.encode(player.getBackpack());
+            JsonDataWriter writer = new JsonDataWriter();
+            Log.print(TAG(), RawObjectJsonConverter.toJson(writer, rawBackpackObj));
+            new JsonDataOutput() {
+                @Override
+                public void output (JsonDataWriter writer) {
+                    Json json = writer.getWriter();
+                    String string = json.getWriter().getWriter().toString();
+                    UnifiedFileUtil
+                        .createFile("A:@test/", "test_backpack.json")
+                        .writeString(json.prettyPrint(string), false);
+                }
+            }.output(writer);
         }
     }
 }
