@@ -172,7 +172,7 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 物品的属性类
      * */
     public static class Property implements Codecable<Property>{
-        public static final Codec<Property> CODEC = CodecBuilder.of(Property::new)
+        public static final Codec<Property> CODEC = CodecBuilder.create(Property::new)
             .field("data_map", Property::getPropertiesMap, Property::setPropertiesMap, JsonPropertiesMap.CODEC)
             .build();
 

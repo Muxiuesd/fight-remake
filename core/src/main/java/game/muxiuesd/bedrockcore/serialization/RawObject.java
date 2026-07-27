@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 编解码器输出的原始对象（一堆数据的集合）
+ * 现代化编解码器输出的原始对象（一堆数据的集合）
  * */
 public class RawObject {
     private final Object value;
@@ -94,7 +94,7 @@ public class RawObject {
 
 
     public Object unwrap() {
-        return value;
+        return this.value;
     }
 
     @Override

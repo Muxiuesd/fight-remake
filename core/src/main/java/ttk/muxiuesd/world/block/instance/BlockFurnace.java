@@ -21,7 +21,7 @@ import ttk.muxiuesd.world.cat.CatsHolder;
  * */
 public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurnace> {
     //从注册表注册的方块实例获取复制
-    public final Codec<BlockFurnace> CODEC = CodecBuilder.of(BlockFurnace::new)
+    public final Codec<BlockFurnace> CODEC = CodecBuilder.create(BlockFurnace::new)
         .field("id", Block::getID, (a, b)-> {}, Codec.STRING)
         .field("is_working", BlockFurnace::isWorking, BlockFurnace::setWorking, Codec.BOOL)
         .field("block_entity",

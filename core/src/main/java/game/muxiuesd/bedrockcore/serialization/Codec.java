@@ -5,33 +5,61 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 /**
- * 编解码器
+ * 现代化的编解码器类
  * */
 public abstract class Codec<T> {
-
-    public abstract RawObject encode(T value);
-
-    public abstract DataResult<T> decode(RawObject input);
+    /**
+     * 编码
+     * @param value 被编码的对象
+     * @return 原始对象数据
+     * */
+    public abstract RawObject encode (T value);
 
     /**
-     * @param to   解码
-     * @param from 编码
+     * 编码
+     * @param input 原始对象数据
+     * @return 编码出来的对象结果容器
+     * */
+    public abstract DataResult<T> decode (RawObject input);
+
+
+
+    /**
+     * 两个类的相互转换的方法
+     * @param <R> 另一种形式
+     * @param to   T -> R
+     * @param from R -> T
      * */
     public <R> Codec<R> xmap (Function<T, R> to, Function<R, T> from) {
         Codec<T> self = this;
         return new Codec<>() {
+            @Override
             public RawObject encode (R value) {
-                return self.encode(from.apply(value));
+                T t = from.apply(value);
+                return self.encode(t);
             }
 
+            @Override
             public DataResult<R> decode (RawObject input) {
                 return self.decode(input).map(to);
             }
         };
     }
 
-    /// 基础类型的编解码器实现
+    /**
+     * 获取这种对象的list类型的编码器
+     * */
+    public Codec<List<T>> listOf () {
+        return listOf(this);
+    }
 
+    public Codec<Map<String,T>> mapOf () {
+        return mapOf(this);
+    }
+
+
+    /// 基础类型的编解码器实现
+    //int
     public static final Codec<Integer> INT = new Codec<Integer>() {
         public RawObject encode(Integer value) { return RawObject.ofInt(value); }
         public DataResult<Integer> decode(RawObject input) {
@@ -43,7 +71,7 @@ public abstract class Codec<T> {
             return DataResult.error("Not an int");
         }
     };
-
+    //string
     public static final Codec<String> STRING = new Codec<String>() {
         public RawObject encode(String value) { return RawObject.ofString(value); }
         public DataResult<String> decode(RawObject input) {
@@ -51,6 +79,7 @@ public abstract class Codec<T> {
         }
     };
 
+    //boolean
     public static final Codec<Boolean> BOOL = new Codec<Boolean>() {
         public RawObject encode(Boolean value) { return RawObject.ofBoolean(value); }
         public DataResult<Boolean> decode(RawObject input) {
@@ -58,6 +87,7 @@ public abstract class Codec<T> {
         }
     };
 
+    //long
     public static final Codec<Long> LONG = new Codec<Long>() {
         public RawObject encode(Long value) { return RawObject.ofLong(value); }
         public DataResult<Long> decode(RawObject input) {
@@ -71,6 +101,7 @@ public abstract class Codec<T> {
         }
     };
 
+    //float
     public static final Codec<Float> FLOAT = new Codec<Float>() {
         public RawObject encode(Float value) { return RawObject.ofFloat(value); }
         public DataResult<Float> decode(RawObject input) {
@@ -84,6 +115,7 @@ public abstract class Codec<T> {
         }
     };
 
+    //double
     public static final Codec<Double> DOUBLE = new Codec<Double>() {
         public RawObject encode(Double value) { return RawObject.ofDouble(value); }
         public DataResult<Double> decode(RawObject input) {
@@ -99,59 +131,86 @@ public abstract class Codec<T> {
         }
     };
 
-    public static <T> Codec<List<T>> listOf(Codec<T> elementCodec) {
-        return new Codec<List<T>>() {
-            public RawObject encode(List<T> list) {
+    /**
+     * 构建一个类型的list编码器
+     * @param <T> 对象的类型
+     * @param elementCodec 被编码成list的对象的编解码器
+     * @return 这个类型的list编解码器
+     * */
+    public static <T> Codec<List<T>> listOf (Codec<T> elementCodec) {
+        return new Codec<>() {
+
+            @Override
+            public RawObject encode (List<T> list) {
                 List<Object> encoded = new ArrayList<>();
                 for (T elem : list) encoded.add(elementCodec.encode(elem).unwrap());
                 return RawObject.ofList(encoded);
             }
-            public DataResult<List<T>> decode(RawObject input) {
-                if (!input.isList()) return DataResult.error("Not a list");
+
+            @Override
+            public DataResult<List<T>> decode (RawObject input) {
+                if (!input.isList()) return DataResult.error("不是一个List类型！！！");
+
                 List<?> rawList = input.asList().get();
-                List<T> result = new ArrayList<>();
-                StringBuilder errors = new StringBuilder();
+                List<T> resultList = new ArrayList<>();
+
+                StringBuilder errorsStringBuilder = new StringBuilder();
                 boolean hasError = false;
+
                 for (int i = 0; i < rawList.size(); i++) {
+                    //解码
                     DataResult<T> decoded = elementCodec.decode(wrap(rawList.get(i)));
-                    if (decoded.isSuccess()) result.add(((DataResult.Success<T>)decoded).value);
-                    else {
+
+                    if (decoded.isSuccess()) {
+                        resultList.add(((DataResult.Success<T>) decoded).value);
+                    } else {
                         hasError = true;
-                        errors.append("[").append(i).append("]: ").append(decoded.error().orElse("")).append("; ");
-                        result.add(decoded.result().orElse(null));
+                        errorsStringBuilder
+                            .append("[").append(i).append("]: ")
+                            .append(decoded.error().orElse("")).append("; ");
+                        resultList.add(decoded.result().orElse(null));
                     }
                 }
-                if (hasError) return DataResult.error(errors.toString(), result);
-                return DataResult.success(result);
+
+                if (hasError) return DataResult.error(errorsStringBuilder.toString(), resultList);
+                return DataResult.success(resultList);
             }
         };
     }
 
-    /** 数组 Codec (零反射，通过 IntFunction 提供数组构造) */
-    public static <T> Codec<T[]> arrayOf(Codec<T> elementCodec, IntFunction<T[]> arrayBuilder) {
+    /**
+     * 对象的数组 Codec (零反射，通过 IntFunction 提供数组构造)
+     * */
+    public static <T> Codec<T[]> arrayOf (Codec<T> elementCodec, IntFunction<T[]> arrayBuilder) {
         return listOf(elementCodec).xmap(
             list -> list.toArray(arrayBuilder.apply(list.size())),
             Arrays::asList
         );
     }
 
+    /**
+     * 对象的MapCodec
+     * */
     public static <V> Codec<Map<String, V>> mapOf(Codec<V> valueCodec) {
-        return new Codec<Map<String, V>>() {
-            public RawObject encode(Map<String, V> map) {
+        return new Codec<>() {
+            @Override
+            public RawObject encode (Map<String, V> map) {
                 Map<String, Object> encoded = new LinkedHashMap<>();
                 for (Map.Entry<String, V> e : map.entrySet())
                     encoded.put(e.getKey(), valueCodec.encode(e.getValue()).unwrap());
                 return RawObject.ofMap(encoded);
             }
-            public DataResult<Map<String, V>> decode(RawObject input) {
-                if (!input.isMap()) return DataResult.error("Not a map");
+
+            @Override
+            public DataResult<Map<String, V>> decode (RawObject input) {
+                if (! input.isMap()) return DataResult.error("Not a map");
                 Map<String, Object> rawMap = input.asMap().get();
                 Map<String, V> result = new LinkedHashMap<>();
                 StringBuilder errors = new StringBuilder();
                 boolean hasError = false;
                 for (Map.Entry<String, Object> e : rawMap.entrySet()) {
                     DataResult<V> decoded = valueCodec.decode(wrap(e.getValue()));
-                    if (decoded.isSuccess()) result.put(e.getKey(), ((DataResult.Success<V>)decoded).value);
+                    if (decoded.isSuccess()) result.put(e.getKey(), ((DataResult.Success<V>) decoded).value);
                     else {
                         hasError = true;
                         errors.append("[").append(e.getKey()).append("]: ").append(decoded.error().orElse("")).append("; ");

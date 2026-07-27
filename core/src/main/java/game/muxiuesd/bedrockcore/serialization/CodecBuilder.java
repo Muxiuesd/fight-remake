@@ -12,22 +12,32 @@ import java.util.function.Supplier;
  * 编解码器的构造器
  * */
 public class CodecBuilder<T> {
-    private final List<ParamField<T, ?, ?>> paramFields = new ArrayList<>();
-    private final List<FieldBinding<T, ?, ?>> setterFields = new ArrayList<>();
-    private Function<Object[], T> constructor;
+
+    private Function<Object[], T> constructor;                          //对象的构造方法的构造器
+    private List<ParamField<T, ?, ?>> paramFields = new ArrayList<>();  //对象的构造方法的字段
+    private List<FieldBinding<T, ?, ?>> fields = new ArrayList<>();     //普通字段
+
 
     private CodecBuilder() {}
 
+    /**
+     * 创建一个编解码器，对象的工厂需要后面指定
+     * */
     public static <T> CodecBuilder<T> create () {
         return new CodecBuilder<>();
     }
 
-    public static <T> CodecBuilder<T> of (Supplier<T> supplier) {
+    /**
+     * 创建一个编解码器，适用于无需向构造方法传入参数的对象（无参构造）
+     * */
+    public static <T> CodecBuilder<T> create (Supplier<T> supplier) {
         return new CodecBuilder<T>().noArgFactory(supplier);
     }
 
+
+
     // 无参工厂 (用于无构造参数的对象)
-    public CodecBuilder<T> noArgFactory(Supplier<T> factory) {
+    public CodecBuilder<T> noArgFactory (Supplier<T> factory) {
         if (!paramFields.isEmpty()) throw new IllegalStateException("Cannot use noArgFactory with paramFields");
         this.constructor = args -> factory.get();
         return this;
@@ -35,8 +45,62 @@ public class CodecBuilder<T> {
 
     // 构造函数参数字段
     public <F> CodecBuilder<T> paramField (String name, Function<T, F> getter, Codec<F> codec) {
-        paramFields.add(new ParamField<>(name, getter, codec));
+        this.paramFields.add(new ParamField<>(name, getter, codec));
         return this;
+    }
+
+    /**
+     * 普通字段的编解码
+     * */
+    public <F, F1 extends F> CodecBuilder<T> field(String name, Function<T, F> getter, BiConsumer<T, F> setter, Codec<F1> codec) {
+        this.fields.add(new FieldBinding<>(name, getter, setter, codec, true));
+        return this;
+    }
+
+    // 只编码不解码的字段
+    public <F, F1 extends F> CodecBuilder<T> encoderField(String name, Function<T, F> getter, Codec<F1> codec) {
+        this.fields.add(new FieldBinding<>(name, getter, null, codec, false));
+        return this;
+    }
+
+    // 构建 Codec
+    public Codec<T> build() {
+        if (this.constructor == null)
+            throw new IllegalStateException("No factory provided");
+        return new ObjectCodec<>(constructor, paramFields, fields);
+    }
+
+    private void checkParamCount(int expected) {
+        if (paramFields.size() != expected)
+            throw new IllegalStateException("Expected " + expected + " param fields but found " + paramFields.size());
+    }
+
+    // ---------- 内部数据类 ----------
+    public static class ParamField<T, F, F1 extends F> {
+        final String name;
+        final Function<T, F> getter;
+        final Codec<F1> codec;
+        ParamField(String name, Function<T, F> getter, Codec<F1> codec) {
+            this.name = name; this.getter = getter; this.codec = codec;
+        }
+    }
+
+    /**
+     * 字段绑定
+     * */
+    public static class FieldBinding<T, F, F1 extends F> {
+        final String name;              //字段名称
+        final Function<T, F> getter;    //字段的获取方法接口
+        final BiConsumer<T, F> setter;  //字段的设置方法接口
+        final Codec<F1> codec;          //字段的编解码器
+        final boolean decodeOnRead;
+
+        FieldBinding(String name,
+                     Function<T, F> getter, BiConsumer<T, F> setter,
+                     Codec<F1> codec, boolean decodeOnRead) {
+            this.name = name; this.getter = getter; this.setter = setter;
+            this.codec = codec; this.decodeOnRead = decodeOnRead;
+        }
     }
 
     // 工厂方法重载 (自动匹配参数个数)
@@ -67,56 +131,10 @@ public class CodecBuilder<T> {
     }
 
 
-
-    // 普通字段 (有 setter)
-    public <F, F1 extends F> CodecBuilder<T> field(String name, Function<T, F> getter, BiConsumer<T, F> setter, Codec<F1> codec) {
-        setterFields.add(new FieldBinding<>(name, getter, setter, codec, true));
-        return this;
-    }
-
-    // 只编码不解码的字段
-    public <F, F1 extends F> CodecBuilder<T> encoderField(String name, Function<T, F> getter, Codec<F1> codec) {
-        setterFields.add(new FieldBinding<>(name, getter, null, codec, false));
-        return this;
-    }
-
-    // 构建 Codec
-    public Codec<T> build() {
-        if (constructor == null)
-            throw new IllegalStateException("No factory provided");
-        return new ObjectCodec<>(constructor, paramFields, setterFields);
-    }
-
-    private void checkParamCount(int expected) {
-        if (paramFields.size() != expected)
-            throw new IllegalStateException("Expected " + expected + " param fields but found " + paramFields.size());
-    }
-
-    // ---------- 内部数据类 ----------
-    static class ParamField<T, F, F1 extends F> {
-        final String name;
-        final Function<T, F> getter;
-        final Codec<F1> codec;
-        ParamField(String name, Function<T, F> getter, Codec<F1> codec) {
-            this.name = name; this.getter = getter; this.codec = codec;
-        }
-    }
-
-    static class FieldBinding<T, F, F1 extends F> {
-        final String name;
-        final Function<T, F> getter;
-        final BiConsumer<T, F> setter;
-        final Codec<F1> codec;
-        final boolean decodeOnRead;
-
-        FieldBinding(String name, Function<T, F> getter, BiConsumer<T, F> setter,
-                     Codec<F1> codec, boolean decodeOnRead) {
-            this.name = name; this.getter = getter; this.setter = setter;
-            this.codec = codec; this.decodeOnRead = decodeOnRead;
-        }
-    }
-
-    static class ObjectCodec<T> extends Codec<T> {
+    /**
+     * 一个具体的对象的现代化编解码器
+     * */
+    public static class ObjectCodec<T> extends Codec<T> {
         private final Function<Object[], T> constructor;
         private final List<ParamField<T, ?, ?>> paramFields;
         private final List<FieldBinding<T, ?, ?>> setterFields;
@@ -129,13 +147,16 @@ public class CodecBuilder<T> {
             this.setterFields = setterFields;
         }
 
-        @Override @SuppressWarnings("unchecked")
+        @Override
+        @SuppressWarnings("unchecked")
         public RawObject encode(T value) {
             Map<String, Object> map = new LinkedHashMap<>();
+
             for (ParamField<T, ?, ?> p : paramFields) {
                 Object fv = ((Function<T, Object>) p.getter).apply(value);
                 map.put(p.name, ((Codec<Object>) p.codec).encode(fv).unwrap());
             }
+
             for (FieldBinding<T, ?, ?> f : setterFields) {
                 if (!f.decodeOnRead) continue;
                 Object fv = ((Function<T, Object>) f.getter).apply(value);
@@ -144,7 +165,8 @@ public class CodecBuilder<T> {
             return RawObject.ofMap(map);
         }
 
-        @Override @SuppressWarnings("unchecked")
+        @Override
+        @SuppressWarnings("unchecked")
         public DataResult<T> decode(RawObject input) {
             if (!input.isMap()) return DataResult.error("Expected a Map");
             Map<String, Object> rawMap = input.asMap().get();

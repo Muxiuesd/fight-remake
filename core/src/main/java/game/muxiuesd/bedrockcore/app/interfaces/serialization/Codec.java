@@ -12,6 +12,7 @@ import java.util.Optional;
  * @param <W> 数据写入类
  * @param <R> 数据读取类
  * */
+@Deprecated
 public interface Codec<T, W extends DataWriter<?>, R extends DataReader<?>> {
     /**
      * 编码成指定格式

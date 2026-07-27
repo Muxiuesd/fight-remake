@@ -116,7 +116,7 @@ public class Block implements ID<Block>, Disposable {
      * 方块的属性类
      * */
     public static class Property {
-        public static final Codec<Block.Property> CODEC = CodecBuilder.of(Block.Property::new)
+        public static final Codec<Block.Property> CODEC = CodecBuilder.create(Block.Property::new)
             .field("data_map", Block.Property::getPropertiesMap, Block.Property::setPropertiesMap, JsonPropertiesMap.CODEC)
             .build();
 

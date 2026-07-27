@@ -13,7 +13,7 @@ public class Identifier implements Codecable<Identifier> {
     //正则表达式规则：第一部分是小写字母，第二部分是小写字母、数字或下划线
     public static final String REGEX = "^[a-z]+:[a-z0-9_]+$";
 
-    public static final Codec<Identifier> CODEC = CodecBuilder.of(Identifier::new)
+    public static final Codec<Identifier> CODEC = CodecBuilder.create(Identifier::new)
         .field("id", Identifier::getID, Identifier::setID, Codec.STRING)
         .build();
 
