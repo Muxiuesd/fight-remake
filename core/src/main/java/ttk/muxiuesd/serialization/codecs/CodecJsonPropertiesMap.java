@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * {@link JsonPropertiesMap}的现代化编解码器
  * */
-public class CodecJsonPropertiesMap extends Codec<JsonPropertiesMap> {
+public class CodecJsonPropertiesMap {
     /**
      * map的编解码器
      * */
@@ -69,17 +69,10 @@ public class CodecJsonPropertiesMap extends Codec<JsonPropertiesMap> {
         }
     };
 
-    public static final Codec<JsonPropertiesMap> CODEC = CodecBuilder.create(JsonPropertiesMap::new)
-        .field("properties_map", JsonPropertiesMap::getPropertiesMap, JsonPropertiesMap::setPropertiesMap, MAP_CODEC)
-        .build();
-
-    @Override
-    public RawObject encode (JsonPropertiesMap value) {
-        return null;
-    }
-
-    @Override
-    public DataResult<JsonPropertiesMap> decode (RawObject input) {
-        return null;
-    }
+    public static final Codec<JsonPropertiesMap> CODEC = CodecBuilder.<JsonPropertiesMap>create()
+        .field("properties_map",
+            JsonPropertiesMap::getPropertiesMap,
+            JsonPropertiesMap::setPropertiesMap,
+            MAP_CODEC)
+        .noArgFactory(JsonPropertiesMap::new);
 }

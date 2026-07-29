@@ -243,13 +243,13 @@ public abstract class Codec<T> {
      * 构造器函数式接口 (1~5个参数)
      * */
     @FunctionalInterface
-    public interface Constructor1<A, T> { T apply(A a); }
+    public interface Func1<A, T> { T apply(A a); }
     @FunctionalInterface
-    public interface Constructor2<A, B, T> { T apply(A a, B b); }
+    public interface Func2<A, B, T> { T apply(A a, B b); }
     @FunctionalInterface
-    public interface Constructor3<A, B, C, T> { T apply(A a, B b, C c); }
+    public interface Func3<A, B, C, T> { T apply(A a, B b, C c); }
     @FunctionalInterface
-    public interface Constructor4<A, B, C, D, T> { T apply(A a, B b, C c, D d); }
+    public interface Func4<A, B, C, D, T> { T apply(A a, B b, C c, D d); }
     @FunctionalInterface
-    public interface Constructor5<A, B, C, D, E, T> { T apply(A a, B b, C c, D d, E e); }
+    public interface Func5<A, B, C, D, E, T> { T apply(A a, B b, C c, D d, E e); }
 }

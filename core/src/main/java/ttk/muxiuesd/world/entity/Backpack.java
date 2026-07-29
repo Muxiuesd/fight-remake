@@ -2,75 +2,28 @@ package ttk.muxiuesd.world.entity;
 
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.serialization.DataResult;
-import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * 实体所拥有的物品背包
  * */
 public class Backpack implements Inventory, Updateable {
-    public static final Codec<Backpack> CODEC = new Codec<>() {
-        @Override
-        public RawObject encode(Backpack backpack) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("size", Codec.INT.encode(backpack.getSize()).unwrap());
+    public static final int DEFAULT_SIZE = 1;
+    public static final Codec<Inventory> CODEC = new InventoryCodec<>(Backpack::new);
 
-            Map<String, Object> items = new LinkedHashMap<>();
-            for (int i = 0; i < backpack.getSize(); i++) {
-                ItemStack stack = backpack.getItemStack(i);
-                if (stack != null) {
-                    items.put(String.valueOf(i), ItemStack.CODEC.encode(stack).unwrap());
-                }
-            }
-            map.put("items", RawObject.ofMap(items).unwrap());
-            return RawObject.ofMap(map);
-        }
+    private LinkedHashMap<Integer, ItemStack> itemStacks;
+    private int size;
 
-        @Override
-        public DataResult<Backpack> decode(RawObject input) {
-            if (!input.isMap()) return DataResult.error("Expected a map");
-            Map<String, Object> rawMap = input.asMap().get();
-            Object sizeRaw = rawMap.get("size");
-            if (sizeRaw == null) return DataResult.error("Missing size");
-            DataResult<Integer> sizeResult = Codec.INT.decode(Codec.wrap(sizeRaw));
-            if (!sizeResult.isSuccess()) return DataResult.error("Invalid size: " + sizeResult.error().orElse(""));
-            int size = sizeResult.result().get();
-            Backpack backpack = new Backpack(size);
-            Object itemsRaw = rawMap.get("items");
-            if (itemsRaw != null) {
-                RawObject itemsObj = Codec.wrap(itemsRaw);
-                if (itemsObj.isMap()) {
-                    Map<String, Object> itemsMap = itemsObj.asMap().get();
-                    for (Map.Entry<String, Object> entry : itemsMap.entrySet()) {
-                        try {
-                            int index = Integer.parseInt(entry.getKey());
-                            DataResult<ItemStack> stackResult = ItemStack.CODEC.decode(Codec.wrap(entry.getValue()));
-                            if (stackResult.isSuccess()) {
-                                backpack.setItemStack(index, stackResult.result().get());
-                            }
-                        } catch (NumberFormatException e) {
-                            // 跳过无效键
-                        }
-                    }
-                }
-            }
-            return DataResult.success(backpack);
-        }
-    };
-
-
-    private final LinkedHashMap<Integer, ItemStack> itemStacks;
-    private final int size;
-
-
+    public Backpack () {
+        //默认设置大小为1
+        this(DEFAULT_SIZE);
+    }
     public Backpack (int size) {
-        this.itemStacks = new LinkedHashMap<>(size);
-        this.size = size;
+        setSize(size);
     }
 
     @Override
@@ -83,6 +36,21 @@ public class Backpack implements Inventory, Updateable {
     public void setItemStack (int index, ItemStack itemStack) {
         if (this.exceed(index)) throw new IndexOutOfBoundsException();
         this.itemStacks.put(index, itemStack);
+    }
+
+    /**
+     * 设置大小
+     * */
+    @Override
+    public void setSize (int size) {
+        if (size < 1) {
+            Log.error(this.getClass().getName(), "新设置的背包大小不合法，新值：" + size + "！！！", new IllegalArgumentException());
+            return;
+        }
+        this.size = size;
+        LinkedHashMap<Integer, ItemStack> newMap = new LinkedHashMap<>(size);
+        if (this.itemStacks != null) newMap.putAll(this.itemStacks);    //把旧的map的东西放入新的map
+        this.itemStacks = newMap;
     }
 
     /**

@@ -4,7 +4,6 @@ import game.muxiuesd.bedrockcore.app.interfaces.ShallowCopyable;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
@@ -18,13 +17,6 @@ import java.util.function.BiConsumer;
  * Json格式的属性数据map，各种属性将会按照json格式来读取和写入
  * */
 public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, JsonDataWriter, JsonDataReader> {
-    public static final Codec<JsonPropertiesMap> CODEC = CodecBuilder.create(JsonPropertiesMap::new)
-        .field("properties_map",
-            JsonPropertiesMap::getPropertiesMap,
-            JsonPropertiesMap::setPropertiesMap,
-            CodecJsonPropertiesMap.MAP_CODEC)
-        .build();
-
 
     private LinkedHashMap<PropertyType, Object> propertiesMap;
 
@@ -135,6 +127,6 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
 
     @Override
     public Codec<JsonPropertiesMap> getCodec () {
-        return CODEC;
+        return CodecJsonPropertiesMap.CODEC;
     }
 }

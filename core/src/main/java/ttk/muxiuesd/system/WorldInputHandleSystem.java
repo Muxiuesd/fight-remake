@@ -69,7 +69,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         Vector2 playerCenter = player.getCenterPos();
         Block block = cs.getBlock(playerCenter.x, playerCenter.y);
         //更新鼠标指向的世界坐标
-        this.mouseBlockPosition = this.getMouseBlockPosition();
+        this.mouseBlockPosition = getMouseBlockPosition();
 
         if (KeyBindings.Exit.wasJustPressed()) {
             //如果是玩家HUD屏幕就是退出游戏世界，回到主菜单
@@ -255,16 +255,15 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
 
     @Override
     public boolean scrolled (float amountX, float amountY) {
-        //玩家背包物品指针循环
+        //玩家快捷栏指针循环
         Player player = playerSystem.getPlayer();
         int newIndex = player.getHandIndex() + (int) amountY;
-        if (newIndex >= player.backpack.getSize()) {
-            newIndex -= player.backpack.getSize();
+        if (newIndex > 8) {
+            newIndex = 0;
         }else if (newIndex < 0) {
-            newIndex = player.backpack.getSize() + (int) amountY;
+            newIndex = 8;
         }
         player.setHandIndex(newIndex);
-        System.out.println(newIndex);
         return false;
     }
 
@@ -282,7 +281,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
     /**
      * 获取鼠标指向的方块坐标
      * */
-    public BlockPosition getMouseBlockPosition() {
+    public static BlockPosition getMouseBlockPosition() {
         Vector2 wp = Util.getMouseWorldPosition();
         //return new BlockPosition((int) Math.floor(wp.x), (int) Math.floor(wp.y));
         return new BlockPosition((int) Util.fastRound(wp.x), (int) Util.fastRound(wp.y));

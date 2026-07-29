@@ -13,6 +13,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -116,9 +117,12 @@ public class Block implements ID<Block>, Disposable {
      * 方块的属性类
      * */
     public static class Property {
-        public static final Codec<Block.Property> CODEC = CodecBuilder.create(Block.Property::new)
-            .field("data_map", Block.Property::getPropertiesMap, Block.Property::setPropertiesMap, JsonPropertiesMap.CODEC)
-            .build();
+        public static final Codec<Block.Property> CODEC = CodecBuilder.<Property>create()
+            .field("data_map",
+                Block.Property::getPropertiesMap,
+                Block.Property::setPropertiesMap,
+                CodecJsonPropertiesMap.CODEC)
+            .noArgFactory(Property::new);
 
         public static Property create () {
             return new Property();

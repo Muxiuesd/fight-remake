@@ -10,6 +10,7 @@ import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
@@ -37,10 +38,16 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEntityFurnace> {
     public static final Codec<BlockEntityFurnace> CODEC = CodecBuilder.<BlockEntityFurnace>create()
         .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
-        .factory((blockPos)-> new BlockEntityFurnace((BlockPos) blockPos))
-        .encoderField("id", (entity) -> entity.getProvider().getID(), Codec.STRING)
+        .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
         .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC)
-        .build();
+        .factory((blockPos, id) -> {
+            //从注册表拿到方块实体的提供者
+            BlockEntityProvider<?> provider = Registries.BLOCK_ENTITY.get(id);
+            BlockEntity blockEntity = provider.create(blockPos);
+            blockEntity.setProvider(provider);
+            return (BlockEntityFurnace) blockEntity;
+        });
+
 
     private int curEnergy = 0;  //能量，每tick减1
     private int curTick = 0;

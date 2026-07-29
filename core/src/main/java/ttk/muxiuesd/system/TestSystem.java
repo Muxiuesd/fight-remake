@@ -1,5 +1,6 @@
 package ttk.muxiuesd.system;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.serialization.DataResult;
@@ -10,7 +11,12 @@ import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.data.abs.JsonDataOutput;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.abs.WorldSystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
+import ttk.muxiuesd.world.block.blockentity.BlockEntityFurnace;
+import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -60,6 +66,30 @@ public class TestSystem extends WorldSystem {
                         .writeString(json.prettyPrint(string), false);
                 }
             }.output(writer);
+        }
+
+        //方块实体编码测试
+        if (KeyBindings.PlayerInteract.wasJustPressed()) {
+            Vector2 mouseWorldPosition = Util.getMouseWorldPosition();
+            ChunkSystem cs = getWorld().getSystem(ChunkSystem.class);
+            Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
+            if (mouseBlock instanceof BlockFurnace blockFurnace) {
+                BlockEntity blockEntity = blockFurnace.getBlockEntity();
+                RawObject rawObject = BlockEntityFurnace.CODEC.encode((BlockEntityFurnace) blockEntity);
+                JsonDataWriter writer = new JsonDataWriter();
+                Log.print(TAG(), RawObjectJsonConverter.toJson(writer, rawObject));
+
+                new JsonDataOutput() {
+                    @Override
+                    public void output (JsonDataWriter writer) {
+                        Json json = writer.getWriter();
+                        String string = json.getWriter().getWriter().toString();
+                        UnifiedFileUtil
+                            .createFile("A:@test/", "test_block_entity_furnace.json")
+                            .writeString(json.prettyPrint(string), false);
+                    }
+                }.output(writer);
+            }
         }
     }
 }
