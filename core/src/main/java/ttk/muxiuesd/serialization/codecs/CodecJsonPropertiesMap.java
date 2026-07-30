@@ -28,9 +28,11 @@ public class CodecJsonPropertiesMap {
                 String key = entry.getKey().getId();
                 //调用这个属性类型的值的编解码器
                 Codec<Object> codec = (Codec<Object>) entry.getKey().getValueCodec();
-                //将属性的值编码
-                RawObject rawObject = codec.encode(entry.getValue());
-                encodedMap.put(key, rawObject.unwrap());
+                if (codec != null) {
+                    //将属性的值编码
+                    RawObject rawObject = codec.encode(entry.getValue());
+                    encodedMap.put(key, rawObject.unwrap());
+                }
             }
 
             return RawObject.ofMap(encodedMap);
@@ -54,14 +56,16 @@ public class CodecJsonPropertiesMap {
                     continue;
                 }
                 Codec<Object> codec = (Codec<Object>) propType.getValueCodec();
-                DataResult<Object> decoded = codec.decode(Codec.wrap(rawEntry.getValue()));
-                if (decoded.isSuccess()) {
-                    result.put(propType, decoded.result().get());
-                } else {
-                    hasError = true;
-                    errors.append("[").append(id).append("]: ").append(decoded.error().orElse("")).append("; ");
-                    if (decoded.result().isPresent())
+                if (codec != null) {
+                    DataResult<Object> decoded = codec.decode(Codec.wrap(rawEntry.getValue()));
+                    if (decoded.isSuccess()) {
                         result.put(propType, decoded.result().get());
+                    } else {
+                        hasError = true;
+                        errors.append("[").append(id).append("]: ").append(decoded.error().orElse("")).append("; ");
+                        if (decoded.result().isPresent())
+                            result.put(propType, decoded.result().get());
+                    }
                 }
             }
             if (hasError) return DataResult.error(errors.toString(), result);

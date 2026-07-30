@@ -21,7 +21,7 @@ public class BlockWithEntityCodecBuilder {
      * */
     public static <T extends BlockWithEntity> Codec<T> create (
         Supplier<T> supplier,
-        Codec<BlockEntity> blockEntityCodec,
+        Codec<? extends BlockEntity> blockEntityCodec,
         Function<CodecBuilder0<T>, CodecBuilder0<T>> function
     ) {
         CodecBuilder0<T> builder = CodecBuilder.create();

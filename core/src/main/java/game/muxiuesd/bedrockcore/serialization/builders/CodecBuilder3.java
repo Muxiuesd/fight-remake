@@ -12,9 +12,17 @@ public class CodecBuilder3<T, A, B, C> {
 
     CodecBuilder3(CodecBuilder0<T> base) { this.base = base; }
 
+    /**
+     * TODO 声明第四个构造参数字段
+     * */
 
-
-    public <F> CodecBuilder3<T, A, B, C> field (String name, Function<T, F> getter, BiConsumer<T, F> setter, Codec<F> codec) {
+    /**
+     *
+     * */
+    public <F> CodecBuilder3<T, A, B, C> field (String name,
+                                                Function<T, ? extends F> getter,
+                                                BiConsumer<T, ? extends F> setter,
+                                                Codec<? extends F> codec) {
         base.setterFields.add(new FieldBinding<>(name, getter, setter, codec, true));
         return this;
     }

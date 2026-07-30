@@ -13,12 +13,20 @@ public class CodecBuilder2<T, A, B> {
 
     CodecBuilder2(CodecBuilder0<T> base) { this.base = base; }
 
-    public <C> CodecBuilder3<T, A, B, C> paramField(String name, Function<T, C> getter, Codec<C> codec) {
+    /**
+     * 声明第三个构造参数字段
+     * */
+    public <C> CodecBuilder3<T, A, B, C> paramField (String name,
+                                                     Function<T, ? extends C> getter,
+                                                     Codec<? extends C> codec) {
         base.paramFields.add(new ParamField<>(name, getter, codec));
         return new CodecBuilder3<>(base);
     }
 
-    public <F> CodecBuilder2<T, A, B> field(String name, Function<T, F> getter, BiConsumer<T, F> setter, Codec<F> codec) {
+    public <F> CodecBuilder2<T, A, B> field(String name,
+                                            Function<T, ? extends F> getter,
+                                            BiConsumer<T, ? extends F> setter,
+                                            Codec<? extends F> codec) {
         base.setterFields.add(new FieldBinding<>(name, getter, setter, codec, true));
         return this;
     }
