@@ -71,19 +71,46 @@ public abstract class Codec<T> {
             return DataResult.error("Not an int");
         }
     };
+
     //string
     public static final Codec<String> STRING = new Codec<String>() {
-        public RawObject encode(String value) { return RawObject.ofString(value); }
+        public RawObject encode(String value) {
+            return RawObject.ofString(value);
+        }
         public DataResult<String> decode(RawObject input) {
-            return input.isString() ? DataResult.success(input.asString().get()) : DataResult.error("Not a string");
+            if (input.isString()) {
+                String string = input.asString().get();
+                return DataResult.success(string);
+            }
+            if (input.isNull()) {
+                return DataResult.success("Null_String");
+            }
+
+            return DataResult.error("Not a string");
         }
     };
 
     //boolean
     public static final Codec<Boolean> BOOL = new Codec<Boolean>() {
-        public RawObject encode(Boolean value) { return RawObject.ofBoolean(value); }
+        public RawObject encode(Boolean value) {
+            return RawObject.ofBoolean(value);
+        }
         public DataResult<Boolean> decode(RawObject input) {
-            return input.isBoolean() ? DataResult.success(input.asBoolean().get()) : DataResult.error("Not a boolean");
+            if (input.isBoolean()) return DataResult.success(input.asBoolean().get());
+            if (input.isInt()) {
+                int value = input.asInt().get();
+                if (value == 0) return DataResult.success(true);
+                //防止解码失败，非法值一律false
+                else return DataResult.success(false);
+            }
+            if (input.isString()) {
+                String string = input.asString().get();
+                if (string.equals("true")) return DataResult.success(true);
+                else if (string.equals("false")) return DataResult.success(false);
+                //防止解码失败，非法值一律false
+                else return DataResult.success(Boolean.valueOf(string));
+            }
+            return DataResult.error("Not a boolean");
         }
     };
 
@@ -107,6 +134,8 @@ public abstract class Codec<T> {
         public DataResult<Float> decode(RawObject input) {
             if (input.isFloat()) return DataResult.success(input.asFloat().get());
             if (input.isDouble()) return DataResult.success((float) input.asDouble().get().doubleValue());
+            if (input.isInt()) return DataResult.success((float) input.asInt().get().intValue());
+            if (input.isLong()) return DataResult.success((float) input.asLong().get().longValue());
             if (input.isString()) {
                 try { return DataResult.success(Float.parseFloat(input.asString().get())); }
                 catch (NumberFormatException e) { return DataResult.error("Not a float"); }

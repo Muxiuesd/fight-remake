@@ -11,8 +11,8 @@ import java.util.List;
 public class BlockPos extends Vector2 {
     public static final Codec<BlockPos> CODEC = Codec.listOf(Codec.FLOAT)
         .xmap(
-            list -> new BlockPos(list.get(0), list.get(1)), // 解码
-            vec -> List.of(vec.getX(), vec.getY())            // 编码
+            list -> new BlockPos(list.get(0), list.get(1)),          // 解码
+            blockPos -> List.of(blockPos.getX(), blockPos.getY())      // 编码
         );
 
     public BlockPos () {
