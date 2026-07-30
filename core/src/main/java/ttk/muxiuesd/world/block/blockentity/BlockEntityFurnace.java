@@ -15,6 +15,7 @@ import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.serialization.codecs.BlockEntityCodecBuilder;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundSystem;
@@ -36,7 +37,7 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
  * 熔炉
  * */
 public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEntityFurnace> {
-    public static final Codec<BlockEntityFurnace> CODEC = CodecBuilder.<BlockEntityFurnace>create()
+    public static final Codec<BlockEntityFurnace> CODEC1 = CodecBuilder.<BlockEntityFurnace>create()
         .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
         .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
         .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC)
@@ -47,6 +48,13 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
             blockEntity.setProvider(provider);
             return (BlockEntityFurnace) blockEntity;
         });
+
+    public static final Codec<BlockEntityFurnace> CODEC = BlockEntityCodecBuilder
+        .create(builder ->
+            builder
+                .field("curEnergy", BlockEntityFurnace::getCurEnergy, BlockEntityFurnace::setCurEnergy, Codec.INT)
+                .field("curTick", BlockEntityFurnace::getCurTick, BlockEntityFurnace::setCurTick, Codec.INT)
+    );
 
 
     private int curEnergy = 0;  //能量，每tick减1
@@ -281,6 +289,15 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
     public void setWorking (boolean working) {
         BlockFurnace furnace = (BlockFurnace) getBlock();
         furnace.setWorking(working);
+    }
+
+    public int getCurEnergy () {
+        return curEnergy;
+    }
+
+    public BlockEntityFurnace setCurEnergy (int curEnergy) {
+        this.curEnergy = curEnergy;
+        return this;
     }
 
     @Override
