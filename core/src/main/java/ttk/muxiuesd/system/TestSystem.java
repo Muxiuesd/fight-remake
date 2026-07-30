@@ -14,10 +14,13 @@ import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
+
+import java.util.Optional;
 
 /**
  * 测试系统
@@ -72,21 +75,33 @@ public class TestSystem extends WorldSystem {
             ChunkSystem cs = getWorld().getSystem(ChunkSystem.class);
             Block mouseBlock = cs.getBlock(mouseWorldPosition.x, mouseWorldPosition.y);
             if (mouseBlock instanceof BlockFurnace blockFurnace) {
-                //BlockEntity blockEntity = blockFurnace.getBlockEntity();
+                //测试从对象编码到json
                 RawObject rawObject = BlockFurnace.CODEC.encode(blockFurnace);
                 JsonDataWriter writer = new JsonDataWriter();
+                Log.print(TAG(), "熔炉方块编码成功！");
                 Log.print(TAG(), RawObjectJsonConverter.toJson(writer, rawObject));
 
                 new JsonDataOutput() {
                     @Override
                     public void output (JsonDataWriter writer) {
-                        Json json = writer.getWriter();
-                        String string = json.getWriter().getWriter().toString();
+                        String string = writer.getResult();
                         UnifiedFileUtil
                             .createFile("A:@test/", "test_block_furnace.json")
-                            .writeString(json.prettyPrint(string), false);
+                            .writeString(writer.getWriter().prettyPrint(string), false);
                     }
                 }.output(writer);
+
+                //测试从json解码到对象
+                String jsonString = writer.getResult();
+                RawObject blockFurnaceRawObj = RawObjectJsonConverter.fromJson(jsonString);
+                DataResult<BlockFurnace> furnaceDataResult = BlockFurnace.CODEC.decode(blockFurnaceRawObj);
+                if (furnaceDataResult.isSuccess()) {
+                    Log.print(TAG(), "熔炉方块解码成功！");
+                    Optional<BlockFurnace> optional = furnaceDataResult.result();
+                    BlockFurnace bf = optional.get();
+                    BlockEntity blockEntity = bf.getBlockEntity();
+                    Log.print(TAG(), "熔炉方块：" + bf + " 熔炉方块实体：" + blockEntity);
+                }
             }
         }
     }

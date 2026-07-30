@@ -6,11 +6,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
@@ -37,7 +35,7 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
  * 熔炉
  * */
 public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEntityFurnace> {
-    public static final Codec<BlockEntityFurnace> CODEC1 = CodecBuilder.<BlockEntityFurnace>create()
+    /*public static final Codec<BlockEntityFurnace> CODEC1 = CodecBuilder.<BlockEntityFurnace>create()
         .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
         .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
         .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC)
@@ -47,7 +45,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
             BlockEntity blockEntity = provider.create(blockPos);
             blockEntity.setProvider(provider);
             return (BlockEntityFurnace) blockEntity;
-        });
+        });*/
 
     public static final Codec<BlockEntityFurnace> CODEC = BlockEntityCodecBuilder
         .create(builder ->

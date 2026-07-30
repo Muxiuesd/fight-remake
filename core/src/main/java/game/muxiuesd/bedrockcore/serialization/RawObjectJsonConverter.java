@@ -3,6 +3,8 @@ package game.muxiuesd.bedrockcore.serialization;
 import com.badlogic.gdx.utils.JsonWriter;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +13,7 @@ import java.util.Map;
  * */
 public class RawObjectJsonConverter {
     /**
-     * 将 RawObject 转换为 JSON 字符串
+     * 核心工具：将 RawObject 转换为 JSON 字符串
      */
     public static String toJson (RawObject raw) {
         JsonDataWriter writer = new JsonDataWriter();
@@ -118,5 +120,163 @@ public class RawObjectJsonConverter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 核心工具：将 JSON 字符串反序列化为 RawObject
+     * @throws RuntimeException 若 JSON 格式非法
+     */
+    public static RawObject fromJson (String json) {
+        Object parsed = parseValue(new StringReader(json));
+        return wrapToRawObject(parsed);
+    }
+
+    /** 根据 Java 原始对象类型，调用对应的 RawObject 工厂方法 */
+    private static RawObject wrapToRawObject(Object value) {
+        if (value == null) {
+            return RawObject.ofNull();
+        } else if (value instanceof String) {
+            return RawObject.ofString((String) value);
+        } else if (value instanceof Integer) {
+            return RawObject.ofInt((Integer) value);
+        } else if (value instanceof Long) {
+            return RawObject.ofLong((Long) value);
+        } else if (value instanceof Double) {
+            return RawObject.ofDouble((Double) value);
+        } else if (value instanceof Boolean) {
+            return RawObject.ofBoolean((Boolean) value);
+        } else if (value instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
+            return RawObject.ofMap(map);
+        } else if (value instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<Object> list = (List<Object>) value;
+            return RawObject.ofList(list);
+        } else {
+            // 未知类型降级为字符串（通常不会发生）
+            return RawObject.ofString(value.toString());
+        }
+    }
+
+    // ---------- 解析核心 ----------
+    private static Object parseValue(StringReader r) {
+        skipWhitespace(r);
+        if (!r.hasNext()) throw new RuntimeException("Unexpected end of JSON");
+        char c = r.peek();
+        if (c == '"') return parseString(r);
+        if (c == '{') return parseObject(r);
+        if (c == '[') return parseArray(r);
+        if (c == 't' || c == 'f') return parseBoolean(r);
+        if (c == 'n') { parseNull(r); return null; }
+        return parseNumber(r);
+    }
+
+    private static void skipWhitespace(StringReader r) {
+        while (r.hasNext() && Character.isWhitespace(r.peek())) r.next();
+    }
+
+    private static String parseString(StringReader r) {
+        r.next(); // 跳过开始双引号
+        StringBuilder sb = new StringBuilder();
+        while (r.hasNext()) {
+            char c = r.next();
+            if (c == '"') return sb.toString();
+            if (c == '\\') {
+                char n = r.next();
+                switch (n) {
+                    case '"': sb.append('"'); break;
+                    case '\\': sb.append('\\'); break;
+                    case '/': sb.append('/'); break;
+                    case 'n': sb.append('\n'); break;
+                    case 'r': sb.append('\r'); break;
+                    case 't': sb.append('\t'); break;
+                    default: sb.append(n);
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        throw new RuntimeException("Unterminated string");
+    }
+
+    private static Map<String, Object> parseObject(StringReader r) {
+        r.next(); // 跳过 '{'
+        Map<String, Object> map = new LinkedHashMap<>();
+        skipWhitespace(r);
+        if (r.peek() == '}') { r.next(); return map; }
+        while (true) {
+            skipWhitespace(r);
+            String key = parseString(r);
+            skipWhitespace(r);
+            if (r.next() != ':') throw new RuntimeException("Expected ':'");
+            Object value = parseValue(r);
+            map.put(key, value);
+            skipWhitespace(r);
+            char next = r.next();
+            if (next == '}') break;
+            if (next != ',') throw new RuntimeException("Expected ',' or '}'");
+        }
+        return map;
+    }
+
+    private static List<Object> parseArray(StringReader r) {
+        r.next(); // 跳过 '['
+        List<Object> list = new ArrayList<>();
+        skipWhitespace(r);
+        if (r.peek() == ']') { r.next(); return list; }
+        while (true) {
+            list.add(parseValue(r));
+            skipWhitespace(r);
+            char next = r.next();
+            if (next == ']') break;
+            if (next != ',') throw new RuntimeException("Expected ',' or ']'");
+        }
+        return list;
+    }
+
+    private static boolean parseBoolean(StringReader r) {
+        if (r.peek() == 't') { consume(r, "true"); return true; }
+        else { consume(r, "false"); return false; }
+    }
+
+    private static void parseNull(StringReader r) { consume(r, "null"); }
+
+    /**
+     * 解析数字，使其与 RawObject 的类型系统兼容：
+     * - 整数优先返回 Integer（适配 asInt()），超出范围则返回 Long（适配 asLong()）
+     * - 浮点数统一返回 Double（适配 asDouble()，asFloat() 可接受 Double）
+     */
+    private static Number parseNumber(StringReader r) {
+        StringBuilder sb = new StringBuilder();
+        while (r.hasNext() && (Character.isDigit(r.peek()) || r.peek() == '.' || r.peek() == '-' || r.peek() == '+' || r.peek() == 'e' || r.peek() == 'E')) {
+            sb.append(r.next());
+        }
+        String num = sb.toString();
+        if (num.contains(".") || num.contains("e") || num.contains("E")) {
+            return Double.parseDouble(num);
+        } else {
+            try {
+                return Integer.parseInt(num);
+            } catch (NumberFormatException e) {
+                return Long.parseLong(num);
+            }
+        }
+    }
+
+    private static void consume(StringReader r, String expected) {
+        for (char c : expected.toCharArray()) {
+            if (!r.hasNext() || r.next() != c) throw new RuntimeException("Expected " + expected);
+        }
+    }
+
+    // ---------- 内部字符流 ----------
+    private static class StringReader {
+        private final String str;
+        private int pos;
+        StringReader(String s) { this.str = s; this.pos = 0; }
+        char peek() { return str.charAt(pos); }
+        char next() { return str.charAt(pos++); }
+        boolean hasNext() { return pos < str.length(); }
     }
 }

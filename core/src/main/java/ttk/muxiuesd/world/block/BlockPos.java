@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.block;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * 方块位置
@@ -11,8 +11,8 @@ import java.util.Arrays;
 public class BlockPos extends Vector2 {
     public static final Codec<BlockPos> CODEC = Codec.listOf(Codec.FLOAT)
         .xmap(
-            list -> new BlockPos(list.get(0), list.get(1)),// 解码
-            vec -> Arrays.asList(vec.x, vec.y)               // 编码
+            list -> new BlockPos(list.get(0), list.get(1)), // 解码
+            vec -> List.of(vec.getX(), vec.getY())            // 编码
         );
 
     public BlockPos () {
