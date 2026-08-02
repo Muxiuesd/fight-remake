@@ -13,12 +13,12 @@ import ttk.muxiuesd.world.entity.effect.EffectPoison;
 public final class StatusEffects {
     public static void init() {}
 
-    public static final StatusEffect HEALING = register(new EffectHealing(Fight.ID("healing")));
-    public static final StatusEffect POISON = register(new EffectPoison(Fight.ID("poison")));
+    public static final StatusEffect HEALING = register(new EffectHealing(Identifier.of(Fight.ID("healing"))));
+    public static final StatusEffect POISON = register(new EffectPoison(Identifier.of(Fight.ID("poison"))));
 
 
 
     public static StatusEffect register(StatusEffect effect) {
-        return Registries.STATUS_EFFECT.register(new Identifier(effect.getId()), effect);
+        return Registries.STATUS_EFFECT.register(effect.getIdentifier(), effect);
     }
 }

@@ -4,6 +4,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.data.IReadData;
 import game.muxiuesd.bedrockcore.app.interfaces.data.IWriteData;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 
 /**
@@ -20,14 +21,27 @@ public abstract class PropertyType<T> implements Codecable<PropertyType<T>>, IWr
     );
 
 
-    private String id;
+    private Identifier identifier;
 
     public String getId () {
-        return this.id;
+        return this.getIdentifier() == null ? null : this.getIdentifier().getID();
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public PropertyType<T> setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
     public PropertyType<T> setId (String id) {
-        this.id = id;
+        if (this.identifier == null) {
+            this.identifier = new Identifier(id);
+        } else {
+            this.identifier.setID(id);
+        }
         return this;
     }
 

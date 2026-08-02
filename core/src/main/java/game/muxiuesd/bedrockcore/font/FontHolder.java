@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ObjectMap;
 import game.muxiuesd.bedrockcore.util.Log;
+import ttk.muxiuesd.id.Identifier;
 
 /**
  * 游戏中的字体持有者
@@ -14,13 +15,13 @@ public class FontHolder {
     public static final int FONT_SIZE = 16; //字体大小，最好是8的整数倍，不然中文字体会糊
     public static final float FONT_SCALE = 0.5f; //字体缩放，最好缩放后也是8的整数倍
 
-    private final String id;
+    private final Identifier identifier;
     private final FreeTypeFontGenerator generator;
 
     private final ObjectMap<Integer, BitmapFont> fontsCache;    //不同字号的字体缓存
 
-    public FontHolder (String id, FreeTypeFontGenerator generator) {
-        this.id = id;
+    public FontHolder (Identifier identifier, FreeTypeFontGenerator generator) {
+        this.identifier = identifier;
         this.generator = generator;
         this.fontsCache = new ObjectMap<>();
     }
@@ -36,7 +37,7 @@ public class FontHolder {
         }
 
         if (this.generator == null) {
-            Log.error(this.getClass().getName(), "无法获取id为：" + id + " 的字体！！！");
+            Log.error(this.getClass().getName(), "无法获取id为：" + this.identifier.getID() + " 的字体！！！");
             return null;
         }
 

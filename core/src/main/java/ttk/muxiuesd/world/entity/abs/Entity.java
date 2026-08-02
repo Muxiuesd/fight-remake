@@ -12,6 +12,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Tickable;
@@ -64,7 +65,7 @@ public abstract class Entity<T extends Entity<T>>
     /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
-    private String id;  //实体的id
+    private Identifier identifier;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
     private float speed;
     private float x, y;                     //实体的世界坐标
@@ -526,12 +527,25 @@ public abstract class Entity<T extends Entity<T>>
 
     @Override
     public String getID () {
-        return this.id;
+        return this.getIdentifier() == null ? null : this.getIdentifier().getID();
     }
 
     @Override
     public T setID (String id) {
-        this.id = id;
+        if (this.identifier == null) {
+            this.identifier = new Identifier(id);
+        } else {
+            this.identifier.setID(id);
+        }
+        return (T) this;
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public T setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
         return (T) this;
     }
 

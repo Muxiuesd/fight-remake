@@ -23,7 +23,7 @@ public final class FurnaceRecipes {
      * 普通的配方注册，输入一个就输出一个
      * */
     public static CookingRecipe register (String name, Item input, Item output) {
-        return register(new CookingRecipe(Fight.ID(name), new ItemStack(input, 1)) {
+        return register(new CookingRecipe(new Identifier(Fight.ID(name)), new ItemStack(input, 1)) {
             @Override
             public ItemStack getOutput () {
                 return new ItemStack(output, 1);
@@ -39,7 +39,7 @@ public final class FurnaceRecipes {
             throw new IllegalArgumentException("id为：" + recipe.getId() + " 的熔炼配方已存在！！！");
         }
         map.put(recipe.getInput().getItem(), recipe);
-        return Registries.COOKING_RECIPE.register(new Identifier(recipe.getId()), recipe);
+        return Registries.COOKING_RECIPE.register(recipe.getIdentifier(), recipe);
     }
 
     public static CookingRecipe get (String id) {

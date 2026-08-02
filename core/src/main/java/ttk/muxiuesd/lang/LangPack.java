@@ -3,6 +3,7 @@ package ttk.muxiuesd.lang;
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import ttk.muxiuesd.id.Identifier;
 
 import java.util.HashMap;
 
@@ -10,14 +11,14 @@ import java.util.HashMap;
  * 语言包：持有一种语言的类
  * */
 public class LangPack {
-    private final String id; //语言id
+    private final Identifier identifier; //语言id
     private final String name; //语言的名字
 
     private final HashMap<String, String> texts;    //文本映射
 
 
-    public LangPack (String id, String name) {
-        this.id = id;
+    public LangPack (Identifier identifier, String name) {
+        this.identifier = identifier;
         this.name = name;
         this.texts = new HashMap<>();
     }
@@ -61,7 +62,11 @@ public class LangPack {
     }
 
     public String getId () {
-        return this.id;
+        return this.identifier.getID();
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
     }
 
     public String getName () {

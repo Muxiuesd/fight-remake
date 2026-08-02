@@ -1,6 +1,7 @@
 package ttk.muxiuesd.interfaces.world.entity;
 
 import game.muxiuesd.bedrockcore.serialization.Codec;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
@@ -12,7 +13,7 @@ import java.util.function.Supplier;
  * 实体的提供类
  * */
 public class EntityProvider<T extends Entity<T>> {
-    private String id;
+    private Identifier identifier;
 
     public final Factory<T> factory;
     public final EntityType<? super T> defaultType;
@@ -49,11 +50,24 @@ public class EntityProvider<T extends Entity<T>> {
     }
 
     public String getID () {
-        return this.id;
+        return this.getIdentifier() == null ? null : this.getIdentifier().getID();
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public EntityProvider<T> setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
     public EntityProvider<T> setID (String id) {
-        this.id = id;
+        if (this.identifier == null) {
+            this.identifier = new Identifier(id);
+        } else {
+            this.identifier.setID(id);
+        }
         return this;
     }
 

@@ -96,7 +96,7 @@ public final class Entities {
      * */
     public static <T extends Entity<T>> EntityProvider<T> register (String name, EntityProvider<T> provider) {
         Identifier identifier = new Identifier(Fight.NAMESPACE, name);
-        Registries.ENTITY.register(identifier, provider.setID(identifier.getID()));
+        Registries.ENTITY.register(identifier, provider.setIdentifier(identifier));
         EntityRendererRegistry.register(provider, provider.renderer);
         return provider;
     }
