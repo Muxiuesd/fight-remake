@@ -8,7 +8,9 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.entity.*;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
@@ -26,7 +28,7 @@ public final class Entities {
         EntityProvider.Builder.<ItemEntity>create(ItemEntity::new)
             .setDefaultType(EntityTypes.ITEM_ENTITY)
             .setRenderer(ItemEntityRenderer::new)
-            .setCodec(Codecs.ITEM_ENTITY)
+            .setCodec(ItemEntity.CODEC)
             .build()
     );
     //活物实体
@@ -35,7 +37,7 @@ public final class Entities {
         EntityProvider.Builder.<Player>create(Player::new)
             .setDefaultType(EntityTypes.PLAYER)
             .setRenderer(PlayerRenderer::new)
-            .setCodec(Codecs.PLAYER)
+            .setCodec(Player.CODEC)
             .build()
     );
 
@@ -45,7 +47,7 @@ public final class Entities {
         EntityProvider.Builder.<Slime>create(Slime::new)
             .setDefaultType(EntityTypes.ENEMY)
             .setRenderer(EnemyRenderer::new)
-            .setCodec(Codecs.LIVING_ENTITY)
+            .setCodec(Slime.CODEC)
             .build()
     );
 
@@ -54,7 +56,7 @@ public final class Entities {
         EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
             .setDefaultType(EntityTypes.ENEMY)
             .setRenderer(EnemyRenderer::new)
-            .setCodec(Codecs.LIVING_ENTITY)
+            .setCodec(LivingEntity.CODEC)
             .build()
     );
 
@@ -64,7 +66,7 @@ public final class Entities {
         EntityProvider.Builder.<PufferFish>create(PufferFish::new)
             .setDefaultType(EntityTypes.CREATURE)
             .setRenderer(LivingEntityRenderer::new)
-            .setCodec(Codecs.LIVING_ENTITY)
+            .setCodec(LivingEntity.CODEC)
             .build()
     );
 
@@ -74,7 +76,7 @@ public final class Entities {
         EntityProvider.Builder.<BulletFire>create(BulletFire::new)
             .setDefaultType(EntityTypes.ENEMY_BULLET)
             .setRenderer(BulletRenderer::new)
-            .setCodec(Codecs.ENTITY)
+            .setCodec(Bullet.CODEC)
             .build()
     );
 
@@ -84,7 +86,7 @@ public final class Entities {
         EntityProvider.Builder.<EntityFishingHook>create(EntityFishingHook::new)
             .setDefaultType(EntityTypes.PLAYER_FIASHING_HOOK)
             .setRenderer(FishingHookRenderer::new)
-            .setCodec(Codecs.ENTITY)
+            .setCodec(Entity.CODEC)
             .setCanBeSaved(false)
             .build()
     );

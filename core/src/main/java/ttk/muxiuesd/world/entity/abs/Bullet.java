@@ -4,7 +4,8 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import ttk.muxiuesd.serialization.codecs.EntityCodecBuilder;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatFloat;
@@ -15,6 +16,17 @@ import ttk.muxiuesd.world.entity.EntityType;
  * 子弹
  */
 public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
+    /**
+     * 子弹的现代化编解码器
+     * <p>
+     * 解码时通过实体注册表创建实例，编码时编码基础实体与子弹的全部字段
+     */
+    public static final Codec<Bullet<?>> CODEC = EntityCodecBuilder.<Bullet<?>>create()
+        .field("damage", Bullet::getDamage, Bullet::setDamage, Codec.FLOAT)
+        .field("maxLiveTime", Bullet::getMaxLiveTime, Bullet::setMaxLiveTime, Codec.FLOAT)
+        .field("liveTime", Bullet::getLiveTime, Bullet::setLiveTime, Codec.FLOAT)
+        .factory(EntityCodecBuilder::createEntity);
+
     public Entity<?> owner;
 
     public float damage;
@@ -143,10 +155,5 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         // 计算旋转角度
         Vector2 velocity = getVelocity();
         setRotation(MathUtils.atan2Deg(velocity.y, velocity.x));
-    }
-
-    @Override
-    public Codec getCodec () {
-        return super.getCodec();
     }
 }

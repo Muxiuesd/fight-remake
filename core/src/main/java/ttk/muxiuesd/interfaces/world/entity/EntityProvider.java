@@ -1,8 +1,7 @@
 package ttk.muxiuesd.interfaces.world.entity;
 
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -18,13 +17,13 @@ public class EntityProvider<T extends Entity<T>> {
     public final Factory<T> factory;
     public final EntityType<? super T> defaultType;
     public final EntityRenderer<T> renderer;
-    public final Codec<? super T, ?, ?> codec;
+    public final Codec<? super T> codec;
 
     public final boolean canBeSaved;
 
     public EntityProvider (Factory<T> factory, EntityType<? super T> defaultType,
                            EntityRenderer<T> renderer,
-                           Codec<? super T, ?, ?> codec,
+                           Codec<? super T> codec,
                            boolean canBeSaved) {
         this.factory = factory;
         this.defaultType = defaultType;
@@ -65,7 +64,7 @@ public class EntityProvider<T extends Entity<T>> {
         EntityType<? super T> defaultType;
         EntityRenderer<T> renderer;
 
-        Codec<? super T, ?, ?> codec = Codecs.ENTITY;    //默认的实体的编解码器
+        Codec<? super T> codec = Entity.CODEC;    //默认的实体的编解码器
         boolean canBeSaved  = true; //实体能否被保存，默认可以
 
         private Builder (Factory<T> factory) {
@@ -95,7 +94,7 @@ public class EntityProvider<T extends Entity<T>> {
         /**
          * 设置实体的编解码器
          * */
-        public Builder<T> setCodec (Codec<? super T, ?, ?> codec) {
+        public Builder<T> setCodec (Codec<? super T> codec) {
             this.codec = codec;
             return this;
         }

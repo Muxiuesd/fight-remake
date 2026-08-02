@@ -6,9 +6,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codecable;
 import game.muxiuesd.bedrockcore.math.Vec2;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
@@ -17,11 +16,11 @@ import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.property.PropertyType;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.serialization.codecs.EntityCodecBuilder;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.util.Util;
@@ -41,7 +40,15 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<T>>
-    implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
+    implements ID<T>, ICatData, Disposable, Updateable, Tickable {
+
+    /**
+     * 基础实体的现代化编解码器
+     * <p>
+     * 解码时通过实体注册表创建实例，编码时仅编码基础实体自身的字段
+     */
+    public static final Codec<Entity<?>> CODEC = EntityCodecBuilder.<Entity<?>>create()
+        .factory(EntityCodecBuilder::createEntity);
 
     /**
      * 加载纹理区域
@@ -528,9 +535,80 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
-    @Override
-    public Codec getCodec () {
-        return Codecs.ENTITY;
+    /**
+     * 设置实体的宽度（世界渲染）
+     * */
+    public T setWidth (float width) {
+        this.width = width;
+        return (T) this;
+    }
+
+    /**
+     * 设置实体的高度（世界渲染）
+     * */
+    public T setHeight (float height) {
+        this.height = height;
+        return (T) this;
+    }
+
+    /**
+     * 获取旋转中心的x坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public float getOriginX () {
+        return this.originX;
+    }
+
+    /**
+     * 获取旋转中心的y坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public float getOriginY () {
+        return this.originY;
+    }
+
+    /**
+     * 设置旋转中心的x坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public T setOriginX (float originX) {
+        this.originX = originX;
+        return (T) this;
+    }
+
+    /**
+     * 设置旋转中心的y坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public T setOriginY (float originY) {
+        this.originY = originY;
+        return (T) this;
+    }
+
+    /**
+     * 获取x轴缩放比例
+     * */
+    public float getScaleX () {
+        return this.scaleX;
+    }
+
+    /**
+     * 获取y轴缩放比例
+     * */
+    public float getScaleY () {
+        return this.scaleY;
+    }
+
+    /**
+     * 设置x轴缩放比例
+     * */
+    public T setScaleX (float scaleX) {
+        this.scaleX = scaleX;
+        return (T) this;
+    }
+
+    /**
+     * 设置y轴缩放比例
+     * */
+    public T setScaleY (float scaleY) {
+        this.scaleY = scaleY;
+        return (T) this;
     }
 
     /**

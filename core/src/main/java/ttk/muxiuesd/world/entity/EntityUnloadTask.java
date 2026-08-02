@@ -1,12 +1,20 @@
 package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.data.EntityDataOutput;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
+import ttk.muxiuesd.data.EntityDataOutput;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.EntityTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 实体卸载任务
@@ -25,22 +33,17 @@ public class EntityUnloadTask extends EntityTask {
         String chunkPosName = chunkPosition.toString();
 
         //TODO 修改实体保存的格式
-        JsonDataWriter dataWriter = new JsonDataWriter();
-        dataWriter.arrayStart();
+        List<Object> entitiesList = new ArrayList<>();
         for (Entity<?> entity: this.getEntities()) {
-            dataWriter.objStart();
-            /*if (entity instanceof ItemEntity itemEntity) {
-                Codecs.ITEM_ENTITY.encode(itemEntity, dataWriter);
-            }else {
-                Codecs.ENTITY.encode(entity, dataWriter);
-            }*/
-
             //获取实体的编解码器来编码自己
-            entity.getCodec().encode(entity, dataWriter);
-
-            dataWriter.objEnd();
+            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            Codec<Entity<?>> codec = (Codec<Entity<?>>) entityProvider.codec;
+            RawObject rawObject = codec.encode(entity);
+            entitiesList.add(rawObject.unwrap());
         }
-        dataWriter.arrayEnd();
+
+        JsonDataWriter dataWriter = new JsonDataWriter();
+        RawObjectJsonConverter.toJson(dataWriter, RawObject.ofList(entitiesList));
 
         EntityDataOutput entityDataOutput = new EntityDataOutput(chunkPosName);
         entityDataOutput.output(dataWriter);

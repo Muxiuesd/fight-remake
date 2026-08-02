@@ -3,13 +3,14 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.serialization.DataResult;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.Timer;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
-import game.muxiuesd.bedrockcore.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.data.PlayerDataOutput;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -33,8 +34,6 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-
-import java.util.Optional;
 
 /**
  * 玩家系统
@@ -227,9 +226,7 @@ public class PlayerSystem extends WorldSystem {
      * */
     public void savePlayerData () {
         JsonDataWriter dataWriter = new JsonDataWriter();
-        dataWriter.objStart();
-        Codecs.PLAYER.encode(this.getPlayer(), dataWriter);
-        dataWriter.objEnd();
+        RawObjectJsonConverter.toJson(dataWriter, Player.CODEC.encode(this.getPlayer()));
 
         PlayerDataOutput playerDataOutput = new PlayerDataOutput();
         playerDataOutput.output(dataWriter);
@@ -241,12 +238,13 @@ public class PlayerSystem extends WorldSystem {
      * 读取玩家数据
      * */
     public Player readPlayerData () {
-        JsonValue playerValue = UnifiedFileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
-        Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
-        if (optionalPlayer.isPresent()) {
-            return optionalPlayer.get();
+        String playerJson = UnifiedFileUtil.readFileAsString(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
+        RawObject playerRaw = RawObjectJsonConverter.fromJson(playerJson);
+        DataResult<Player> playerResult = Player.CODEC.decode(playerRaw);
+        if (playerResult.isSuccess()) {
+            return playerResult.result().get();
         }
-        Log.error(TAG(), "玩家读取失败！json原文：" + playerValue.toString());
+        Log.error(TAG(), "玩家读取失败！json原文：" + playerJson);
         return new Player(getWorld(), EntityTypes.PLAYER);
     }
 
