@@ -1,7 +1,8 @@
-package ttk.muxiuesd.serialization.codecs;
+package ttk.muxiuesd.serialization.codecs.builders;
 
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.builders.CodecBuilder2;
+import ttk.muxiuesd.serialization.codecs.CodecStatusEffects;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 

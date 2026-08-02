@@ -1,4 +1,4 @@
-package ttk.muxiuesd.serialization.codecs;
+package ttk.muxiuesd.serialization.codecs.builders;
 
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;

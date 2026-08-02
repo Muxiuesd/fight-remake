@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.serialization.codecs.BlockWithEntityCodecBuilder;
+import ttk.muxiuesd.serialization.codecs.builders.BlockWithEntityCodecBuilder;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;

@@ -13,7 +13,7 @@ import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.serialization.codecs.BlockEntityCodecBuilder;
+import ttk.muxiuesd.serialization.codecs.builders.BlockEntityCodecBuilder;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundSystem;

@@ -11,7 +11,7 @@ import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.serialization.codecs.EntityCodecBuilder;
+import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
