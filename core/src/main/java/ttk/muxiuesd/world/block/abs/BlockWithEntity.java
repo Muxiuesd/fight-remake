@@ -54,8 +54,10 @@ public abstract class BlockWithEntity extends Block implements ICatData{
     }
 
     public BlockWithEntity setBlockEntity (BlockEntity blockEntity) {
-        if (blockEntity != null) this.blockEntity = blockEntity;
-        blockEntity.setBlock(this);
+        if (blockEntity != null) {
+            this.blockEntity = blockEntity;
+            blockEntity.setBlock(this);
+        }
         return this;
     }
 
