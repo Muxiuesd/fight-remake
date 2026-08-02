@@ -272,6 +272,16 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         }
     }
 
+    /**
+     * 判断是否手上持有物品
+     * */
+    public boolean handIsEmpty () {
+        ItemStack handItemStack = this.getHandItemStack();
+        return handItemStack == null
+            || handItemStack == ItemStack.VOID
+            || handItemStack.getAmount() == 0;
+    }
+
     public ItemStack getHandItemStack () {
         return this.backpack.getItemStack(this.handIndex);
     }

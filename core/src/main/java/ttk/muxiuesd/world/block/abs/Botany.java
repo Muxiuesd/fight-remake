@@ -4,9 +4,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -23,6 +27,31 @@ import ttk.muxiuesd.world.item.abs.Item;
  * 姑且算方块，使用方块的逻辑
  * */
 public abstract class Botany extends Block implements Tickable, ICatData {
+    /**
+     * 植物的现代化编解码器
+     * <p>
+     * 解码时通过方块注册表拿到原型，再调用{@link #createSelf}创建一个新的实例
+     * */
+    public static final Codec<Botany> CODEC = CodecBuilder.<Botany>create()
+        .paramField("id", Botany::getID, Codec.STRING)
+        .field("growLevel", Botany::getGrowLevel, Botany::setGrowLevel, Codec.INT)
+        .field("property",
+            botany -> {
+                //把当前的cats数据写入属性，保证保存的数据是最新的
+                CatsHolder cats = botany.getProperty().get(PropertyTypes.CATS);
+                if (cats != null) {
+                    botany.writeCatData(cats);
+                }
+                return botany.getProperty();
+            },
+            Botany::setProperty,
+            Block.Property.CODEC)
+        .factory(id -> {
+            Block block = Registries.BLOCK.get(id);
+            if (block instanceof Botany botany) return botany.createSelf();
+            throw new IllegalArgumentException("方块注册表中不存在植物方块：" + id);
+        });
+
     public static TextureRegion loadTextureRegion (String name) {
         return Util.loadTextureRegion(Fight.ID(name), Fight.BotanyTexturePath("crops/" + name));
     }

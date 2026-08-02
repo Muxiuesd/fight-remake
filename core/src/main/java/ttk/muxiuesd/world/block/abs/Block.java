@@ -32,6 +32,15 @@ public class Block implements ID<Block>, Disposable {
         Block::getID
     );
 
+    /**
+     * 获取这个方块使用的编解码器
+     * <p>
+     * 普通方块使用{@link #CODEC}，带有方块实体等自定义数据的方块会覆写此方法返回自己的编解码器
+     * */
+    public Codec<? extends Block> getCodec () {
+        return CODEC;
+    }
+
 
     /// 方块的大小（最基础的属性）
     public static final float WIDTH = 1f, HEIGHT = 1f;

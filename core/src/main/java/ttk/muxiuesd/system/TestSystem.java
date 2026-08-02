@@ -34,8 +34,9 @@ public class TestSystem extends WorldSystem {
     public void update (float delta) {
         super.update(delta);
 
-        if (KeyBindings.PlayerShift.wasJustPressed()) {
-            Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
+        Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
+
+        if (player.getHandItemStack() != null && KeyBindings.PlayerShift.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();
             RawObject rawObject = ItemStack.CODEC.encode(handItemStack);
             String json = RawObjectJsonConverter.toJson(rawObject);

@@ -4,7 +4,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.HitboxHolder;
@@ -15,6 +18,23 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  * */
 public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRenderable {
     public static final String DEFAULT_HITBOX_ID = Fight.ID("wall");
+
+    /**
+     * 墙体的现代化编解码器
+     * <p>
+     * 解码时通过墙体注册表拿到原型，再调用{@link #createSelf}创建一个新的实例
+     * */
+    public static final Codec<Wall<?>> CODEC = CodecBuilder.<Wall<?>>create()
+        .paramField("id", Wall::getID, Codec.STRING)
+        .paramField("x", wall -> wall.x, Codec.FLOAT)
+        .paramField("y", wall -> wall.y, Codec.FLOAT)
+        .field("property", Wall::getProperty, Wall::setProperty, Block.Property.CODEC)
+        .factory((id, x, y) -> {
+            Wall<?> prototype = Registries.WALL.get(id);
+            Wall<?> self = prototype.createSelf(new Vector2(x, y));
+            self.setID(id);
+            return self;
+        });
 
     public float x, y;
     private RectHitbox rectHitbox;  //普通墙体只有一个矩形碰撞箱，最好也只有一个

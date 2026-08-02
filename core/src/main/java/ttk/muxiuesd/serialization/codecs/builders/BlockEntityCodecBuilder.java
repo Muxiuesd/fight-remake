@@ -27,11 +27,10 @@ public class BlockEntityCodecBuilder {
             .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC);
 
         return function.apply(builder2).factory((blockPos, id) -> {
-            //从注册表拿到方块实体的提供者
+            //从注册表获取这个种类的方块实体的提供者
             BlockEntityProvider<?> provider = Registries.BLOCK_ENTITY.get(id);
-            BlockEntity blockEntity = provider.create(blockPos);
-            blockEntity.setProvider(provider);
-            return (T) blockEntity;
+            //实例由提供者创建，同一种方块实体持有相同的提供者（相同的id）
+            return (T) provider.create(blockPos);
         });
     }
 }

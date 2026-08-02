@@ -18,29 +18,6 @@ import ttk.muxiuesd.world.cat.CatsHolder;
  * 熔炉方块
  * */
 public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurnace> {
-
-    /*public final Codec<BlockFurnace> CODEC1 = CodecBuilder.<BlockFurnace>create()
-        .field("id", Block::getID, (a, b)-> {}, Codec.STRING)
-        .field("is_working", BlockFurnace::isWorking, BlockFurnace::setWorking, Codec.BOOL)
-        .field("block_entity",
-            BlockFurnace::getBlockEntity,
-            BlockFurnace::setBlockEntity,
-            BlockEntityFurnace.CODEC
-        )
-        .field("property",
-            block -> {
-                //调用cats写入
-                block.writeCatData(block.getProperty().get(PropertyTypes.CATS));
-                return block.getProperty();
-            },
-            (block, property) -> {
-                //读取cat，同时会读取方块实体的cat
-                //block.readCatData(property.get(PropertyTypes.CATS));
-            },
-            Property.CODEC
-        )
-        .noArgFactory(BlockFurnace::new);*/
-
     public static final Codec<BlockFurnace> CODEC = BlockWithEntityCodecBuilder.create(
         BlockFurnace::new,
         BlockEntityFurnace.CODEC,
