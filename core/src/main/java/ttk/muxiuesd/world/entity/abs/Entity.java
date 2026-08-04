@@ -173,6 +173,7 @@ public abstract class Entity<T extends Entity<T>>
         if (this.textureRegion != null) {
             this.textureRegion = null;
         }
+        this.bodyTextureRegionResource = null;
     }
 
     /**
@@ -500,7 +501,7 @@ public abstract class Entity<T extends Entity<T>>
      * 获取身体的贴图材质
      * */
     public TextureRegion getBodyTextureRegion () {
-        return this.bodyTextureRegionResource.get();
+        return this.bodyTextureRegionResource != null ? this.bodyTextureRegionResource.get() : null;
     }
 
     /**

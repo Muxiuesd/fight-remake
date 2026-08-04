@@ -54,9 +54,10 @@ public class TabButtonUI extends UIComponent {
         //设置这个物品组页面按钮是被选中的
         this.createTabUIPanel.setSelectedTabButton(this);
 
+        Vector3 pos = new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0);
         SpatialAudioSystem.getInstance().playUIAudio(
             Sounds.ITEM_CLICK,
-            () -> new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0)
+            () -> pos
         );
         return super.click(interactPos);
     }

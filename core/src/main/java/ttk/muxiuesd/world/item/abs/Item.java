@@ -142,7 +142,7 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 获取物品贴图材质
      * */
     public TextureRegion getTextureRegion () {
-        return this.getTextureRegionResource().get();
+        return this.textureRegionResource != null ? this.textureRegionResource.get() : null;
     }
 
     public Resource<TextureRegion> getTextureRegionResource () {

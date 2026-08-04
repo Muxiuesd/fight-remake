@@ -2,15 +2,16 @@ package ttk.muxiuesd.system;
 
 import com.aliasifkhan.hackLights.HackLight;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.render.fix.FightHackLightEngine;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.light.PointLight;
@@ -24,6 +25,7 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
     public static final int MAX_LIGHTS = 256;
     private int lightSize = 0;
     private TimeSystem timeSystem;
+    private final Resource<TextureRegion> lightResource;
 
     private Color DAY_COLOR = new Color(1.0f, 0.98f, 0.9f, 1f);    // 浅黄色（白天）
     private Color NIGHT_COLOR = new Color(0.04f, 0.06f, 0.12f, 1f);  // 深蓝色（夜晚）
@@ -33,13 +35,15 @@ public class LightSystem extends WorldSystem implements IWorldParticleRender {
 
     public LightSystem(World world) {
         super(world);
+        this.lightResource = Resource.ofTextureRegion(
+            Fight.ID("light"), "texture/light/light.png");
     }
 
     @Override
     public void initialize() {
         this.lightEngine = new FightHackLightEngine();
         this.lights = new HackLight[MAX_LIGHTS];
-        TextureRegion lightRegion = new TextureRegion(new Texture("texture/light/light.png"));
+        TextureRegion lightRegion = this.lightResource.get();
         for (int i = 0; i < this.lights.length; i++) {
             this.lights[i] = new HackLight(lightRegion, 1, 1, 1, 1);
             this.lights[i].setScale(0);

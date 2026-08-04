@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
 import ttk.muxiuesd.audio.AudioHolder;
-import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.world.World;
@@ -14,7 +13,6 @@ import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
-import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
@@ -29,11 +27,11 @@ public class SoundSystem extends WorldSystem {
     private EntitySystem es;
 
     //正在播放的音效
-    private LinkedHashMap<Identifier, SpatialAudio> activeSoundsMap;
     private Array<SpatialAudio> activeSounds;
     private Array<SpatialAudio> needRemoved;
 
     private AudioHolder curWalkAudio;
+    private SpatialAudio curWalkAudioInstance;
 
     public SoundSystem (World world) {
         super(world);
@@ -41,7 +39,6 @@ public class SoundSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        this.activeSoundsMap = new LinkedHashMap<>();
         this.activeSounds = new Array<>();
         this.needRemoved = new Array<>();
         this.ps = getWorld().getSystem(PlayerSystem.class);
@@ -60,6 +57,13 @@ public class SoundSystem extends WorldSystem {
         this.updatePlayerSoundEffect(delta);
         this.updateEnemySoundEffect(delta);
         this.updateEnvironmentalEffects(delta);
+    }
+
+    @Override
+    public void dispose () {
+        this.stopPlayerWalkSound();
+        this.activeSounds.forEach(SpatialAudio::stop);
+        this.activeSounds.clear();
     }
 
     /**
@@ -86,13 +90,14 @@ public class SoundSystem extends WorldSystem {
                 //再播放新的音效
                 this.startPlayerWalkSound(walkAudio, player);
             }
-            if (!this.activeSoundsMap.containsKey(this.curWalkAudio.getIdentifier())) {
+            if (this.curWalkAudioInstance != null && !this.curWalkAudioInstance.isPlaying()) {
                 this.startPlayerWalkSound(walkAudio, player);
             }
         }else if (
             !this.ps.playerMoved()
             && this.curWalkAudio != null
-            && this.activeSoundsMap.containsKey(this.curWalkAudio.getIdentifier())
+            && this.curWalkAudioInstance != null
+            && this.curWalkAudioInstance.isPlaying()
         ) { //如果玩家停止了，但是音效在播放，就停止音效
             this.stopPlayerWalkSound();
             this.curWalkAudio = null;
@@ -105,19 +110,17 @@ public class SoundSystem extends WorldSystem {
     public void startPlayerWalkSound (AudioHolder walkAudio, Player player) {
         SpatialAudio audio = this.playSpatialSound(walkAudio, player);
         audio.setLooping(true);
-        this.activeSoundsMap.put(walkAudio.getIdentifier(), audio);
         this.curWalkAudio = walkAudio;
+        this.curWalkAudioInstance = audio;
     }
 
     /**
      * 停止播放玩家走路音效
      * */
     public void stopPlayerWalkSound () {
-        if (this.curWalkAudio != null
-            && this.activeSoundsMap.containsKey(this.curWalkAudio.getIdentifier()))
-        {
-            SpatialAudio removed = this.activeSoundsMap.remove(this.curWalkAudio.getIdentifier());
-            removed.stop();
+        if (this.curWalkAudioInstance != null) {
+            this.curWalkAudioInstance.stop();
+            this.curWalkAudioInstance = null;
         }
     }
 
@@ -159,7 +162,9 @@ public class SoundSystem extends WorldSystem {
      * @param source      声音源
      * */
     public SpatialAudio playSpatialSound (AudioHolder audioHolder, SpatialAudioSource source) {
-        return SpatialAudioSystem.getInstance().playAudio(audioHolder, source);
+        SpatialAudio audio = SpatialAudioSystem.getInstance().playAudio(audioHolder, source);
+        this.activeSounds.add(audio);
+        return audio;
     }
 
 }

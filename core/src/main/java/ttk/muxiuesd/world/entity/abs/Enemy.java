@@ -26,14 +26,6 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
 
-    public Enemy (World world, EntityType<?> entityType,
-                  String textureId, float maxHealth, float curHealth,
-                  float visionRange, float attackRange, float attackSpan, float speed) {
-        this(world, entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
-
-        //this.setBodyTextureRegion(getTextureRegion(textureId, null));
-    }
-
     public Enemy (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10, 10, 5, 2, 3);
     }

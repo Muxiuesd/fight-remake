@@ -41,6 +41,7 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     private Inventory inventory;                        //方块实体所拥有的容器
     private List<InteractSlot> interactSlots;           //交互槽位
     private SpatialAudioSource sounder;                 //方块实体的发声源
+    private Vector3 sounderPosCache = new Vector3();    //声源位置缓存
 
     public BlockEntity (BlockEntityProvider<?> blockEntityProvider, BlockPos blockPos) {
         this(blockPos);
@@ -50,7 +51,8 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
         this.blockPos = blockPos;
         this.setInteractGridSize(new GridPoint2(16, 16));
         this.interactSlots = new ArrayList<>();
-        this.sounder = () -> new Vector3(blockPos, 0f);
+        this.sounderPosCache.set(blockPos.x, blockPos.y, 0f);
+        this.sounder = () -> this.sounderPosCache;
     }
 
     /**
@@ -207,7 +209,7 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
     public BlockEntity setBlockPos (BlockPos blockPos) {
         this.blockPos = blockPos;
         //方块实体的声源位置与方块实体的坐标绑定
-        this.sounder = () -> new Vector3(blockPos, 0f);
+        this.sounderPosCache.set(blockPos.x, blockPos.y, 0f);
         return this;
     }
 

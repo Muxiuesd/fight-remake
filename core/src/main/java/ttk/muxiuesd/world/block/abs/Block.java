@@ -91,11 +91,11 @@ public class Block implements ID<Block>, Disposable {
      * 检测方快的材质贴图是否存在
      * */
     public boolean textureIsValid() {
-        return this.getTextureRegion() != null;
+        return this.textureResource != null && this.textureResource.get() != null;
     }
 
     public TextureRegion getTextureRegion () {
-        return this.textureResource.get();
+        return this.textureResource != null ? this.textureResource.get() : null;
     }
 
     @Override

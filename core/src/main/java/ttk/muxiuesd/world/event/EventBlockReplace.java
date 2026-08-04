@@ -11,6 +11,7 @@ public class EventBlockReplace extends BlockReplaceEvent {
     @Override
     public void handle (World world, Block newBlock, Block oldBlock, float wx, float wy) {
         AudioHolder destroySound = oldBlock.getProperty().getSounds().destroy();
-        world.getSystem(SoundSystem.class).playSpatialSound(destroySound, () -> new Vector3(wx, wy, 0));
+        Vector3 pos = new Vector3(wx, wy, 0);
+        world.getSystem(SoundSystem.class).playSpatialSound(destroySound, () -> pos);
     }
 }

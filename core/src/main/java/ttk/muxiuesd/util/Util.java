@@ -219,6 +219,15 @@ public class Util {
     }
 
     /**
+     * 注册纹理 id→路径 映射（无 GL 调用，线程安全）
+     * <p>
+     * 确保路径映射在延迟加载前就存在，避免通过 id 查找路径时失败
+     * */
+    public static void registerTextureIdPath (String id, String path) {
+        AssetsLoader.getInstance().addIdMapPath(Texture.class, id, path);
+    }
+
+    /**
      * 将字符串转换为长整型哈希值
      * */
     public static long stringToLongHash (String str) {

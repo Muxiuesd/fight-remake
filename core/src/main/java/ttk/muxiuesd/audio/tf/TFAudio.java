@@ -31,7 +31,7 @@ public class TFAudio implements SpatialAudio {
 
     @Override
     public void resume() {
-        //没有
+        this.soundBufferSource.play();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class TFAudio implements SpatialAudio {
 
     @Override
     public boolean isPlaying() {
-        return this.soundBufferSource.isPlaying();
+        return this.soundBufferSource != null && this.soundBufferSource.isPlaying();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class TFAudio implements SpatialAudio {
 
     @Override
     public void updatePos () {
-        if (this.boundSource != null && this.soundBufferSource.isPlaying()) {
+        if (this.boundSource != null && this.soundBufferSource != null && this.soundBufferSource.isPlaying()) {
             Vector3 pos = this.boundSource.getPos();
             this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
             this.soundBufferSource.setDirection(this.boundSource.getForward());
@@ -124,8 +124,10 @@ public class TFAudio implements SpatialAudio {
 
     @Override
     public void dispose () {
-        this.soundBufferSource.free();
-        this.soundBufferSource = null;
+        if (this.soundBufferSource != null) {
+            this.soundBufferSource.free();
+            this.soundBufferSource = null;
+        }
         this.audioEngine = null;
         this.removeSpatialSource();
     }

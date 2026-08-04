@@ -1,6 +1,6 @@
 package ttk.muxiuesd.util;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -19,7 +19,7 @@ public class WorldMapNoise {
     };
 
     private static final int CACHE_SIZE_LIMIT = 10000; // 限制缓存大小
-    private Map<String, int[]> gradientCache = new HashMap<>();
+    private Map<String, int[]> gradientCache = new ConcurrentHashMap<>();
 
     private long seed;
 
@@ -37,17 +37,14 @@ public class WorldMapNoise {
 
     private int[] getGradient (int x, int y) {
         String key = x + "," + y;
-        if (gradientCache.containsKey(key)) {
-            return gradientCache.get(key);
-        }
-        else {
-            if (gradientCache.size() > CACHE_SIZE_LIMIT) {
-                gradientCache.clear(); // 超过限制时清理缓存
-            }
-            int[] gradient = generateGradient(x, y, this.seed);
-            gradientCache.put(key, gradient);
+        int[] gradient = gradientCache.get(key);
+        if (gradient != null) {
             return gradient;
         }
+        if (gradientCache.size() > CACHE_SIZE_LIMIT) {
+            gradientCache.clear();
+        }
+        return gradientCache.computeIfAbsent(key, k -> generateGradient(x, y, this.seed));
     }
 
     public double noise (double x, double y) {

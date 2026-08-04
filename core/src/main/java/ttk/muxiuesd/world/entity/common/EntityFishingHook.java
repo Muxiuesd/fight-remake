@@ -9,7 +9,6 @@ import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.util.Direction;
-import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.EntityType;
@@ -38,9 +37,9 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         super(world, entityType);
         setSpeed(0);
         setSize(0.7f, 0.7f);
-        textureRegion = Util.loadTextureRegion(
+        setBodyTextureRegionResource(
             Fight.ID("fishing_hook"),
-            Fight.EntityTexturePath("fish/fishing_hook.png")
+            "fish/fishing_hook.png"
         );
         fastAddBodyHitBox();
 

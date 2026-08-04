@@ -115,8 +115,10 @@ public class TFAudioEngine implements SpatialAudioEngine {
 
     @Override
     public void dispose () {
-        this.soundBuffersCache.clear();
         this.activeAudios.forEach(SpatialAudio::dispose);
+        this.activeAudios.clear();
+        this.soundBuffersCache.values().forEach(SoundBuffer::dispose);
+        this.soundBuffersCache.clear();
         this.audio.dispose();
     }
 
