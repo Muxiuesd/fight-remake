@@ -90,9 +90,7 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     @Override
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
-        //setPosition(x + getSpeed() * delta * velX, y + getSpeed() * delta * velY);
-        positionChange(delta);
-
+        // 位移由 BulletCollisionSystem 统一处理（含墙体碰撞与 CCD 分步）
         super.update(delta);
     }
 

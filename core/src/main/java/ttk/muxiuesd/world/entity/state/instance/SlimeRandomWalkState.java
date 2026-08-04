@@ -33,14 +33,12 @@ public class SlimeRandomWalkState extends StateEnemy<Slime> {
             },
             ()->{
                 //还在游走状态;
-                //设置速度
+                //设置速度（位移由 GroundEntityCollisionSystem 统一处理）
                 float curSpeed = entity.getCurSpeed();
                 entity.setVelocity(
                     this.walkDistance.x * curSpeed,
                     this.walkDistance.y * curSpeed
                 );
-                entity.positionChange(delta);
-                //entity.setPosition(entity.getPosition().add(entity.getVelocity().scl(delta)));
             }
         );
     }

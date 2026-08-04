@@ -15,6 +15,19 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class ItemEntityRenderer implements EntityRenderer<ItemEntity> {
     @Override
     public void draw (Batch batch, ItemEntity entity, Context context) {
+        // 渲染影子（不随物品浮动偏移而上下移动，影子始终在地面）
+        batch.setColor(1f, 1f, 1f, 0.666f);
+        batch.draw(LivingEntityRenderer.ENTITY_SHADOW_RESOURCE.get(),
+            context.x - context.width / 2f,
+            context.y - (context.height / 5f) - (context.height / 2f),
+            context.originX, context.originY,
+            context.width, context.height,
+            context.scaleX, context.scaleY / 2f,
+            context.rotation
+        );
+        batch.setColor(1f, 1f, 1f, 1f);
+
+        // 渲染物品贴图（带浮动偏移）
         ItemStack stack = entity.getItemStack();
         if (stack != null) {
             Item item = stack.getItem();

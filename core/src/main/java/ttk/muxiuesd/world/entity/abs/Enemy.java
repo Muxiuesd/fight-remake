@@ -55,7 +55,7 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         }*/
 
         //先坐标更新，再更新其他的，否则实体移动速度有bug
-        positionChange(delta);
+        // positionChange 已移至 GroundEntityCollisionSystem 统一处理
         super.update(delta);
     }
 

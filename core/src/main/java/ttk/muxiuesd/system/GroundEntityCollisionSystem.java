@@ -3,12 +3,16 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.chunk.Chunk;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.wall.Wall;
@@ -16,7 +20,7 @@ import ttk.muxiuesd.world.wall.Wall;
 /**
  * 地面的实体的碰撞系统
  * <p>
- * TODO 实体与实体之间的碰撞，实体与墙体的碰撞
+ * 处理所有地面实体与墙体的碰撞
  * */
 public class GroundEntityCollisionSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
@@ -26,7 +30,6 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     // 最大碰撞修正次数
     private static final int MAX_FIXES = 5;
     // 连续碰撞检测的最大步长（越小越精确但性能消耗略高）
-    // 建议设置为墙体最小单位的1/2（这里假设墙体最小单位是1x1）
     private static final float MAX_STEP = 0.5f;
 
     private final EntitySystem es;
@@ -40,141 +43,102 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
     @Override
     public void update (float delta) {
-        Player player = es.getPlayer();
-        if (player != null) {
-            //玩家实体与墙体的检测
-            this.checkEntityWithWallCollisions(player, delta, Player.HITBOX_OFFSET.x, Player.HITBOX_OFFSET.y);
+        // 敌方实体与墙体的碰撞
+        Array<Enemy<?>> enemies = es.getEnemyEntity();
+        for (Enemy<?> enemy : enemies) {
+            this.checkEntityWithWallCollisions(enemy, delta);
         }
 
+        // 生物实体与墙体的碰撞
+        Array<LivingEntity<?>> creatures = es.getEntityArray(EntityTypes.CREATURE);
+        for (LivingEntity<?> creature : creatures) {
+            this.checkEntityWithWallCollisions(creature, delta);
+        }
 
-        /*Hitbox bodyHitbox = player.getBodyHitbox();
-        if (bodyHitbox instanceof RectHitbox rectHitbox) {
-            Rectangle rect = rectHitbox.getRectangle();
-            Vector2 vel = player.getVelocity();
+        // 物品实体与墙体的碰撞
+        Array<ItemEntity> items = es.getEntityArray(EntityTypes.ITEM_ENTITY);
+        for (ItemEntity item : items) {
+            this.checkEntityWithWallCollisions(item, delta);
+        }
 
-            // 计算总移动距离
-            float totalMoveX = vel.x * delta;
-            float totalMoveY = vel.y * delta;
-
-            // 计算需要分解的步数（解决高速移动隧穿问题的核心）
-            float totalDistance = (float) Math.sqrt(totalMoveX * totalMoveX + totalMoveY * totalMoveY);
-            int steps = (int) Math.ceil(totalDistance / MAX_STEP);
-            if (steps == 0) steps = 1; // 至少一步
-
-            // 每步的移动量
-            float stepX = totalMoveX / steps;
-            float stepY = totalMoveY / steps;
-
-            // 分步移动并检测碰撞
-            for (int i = 0; i < steps; i++) {
-                // X轴分步移动
-                if (Math.abs(stepX) > EPS) {
-                    rect.x += stepX;
-                    if (this.fixCollisions(rect, 1, 0, stepX)) {
-                        // 如果发生碰撞，剩余步数不再移动X轴
-                        stepX = 0;
-                        player.setVelX(0);
-                    }
-                }
-
-                // Y轴分步移动
-                if (Math.abs(stepY) > EPS) {
-                    rect.y += stepY;
-                    if (this.fixCollisions(rect, 0, 1, stepY)) {
-                        // 如果发生碰撞，剩余步数不再移动Y轴
-                        stepY = 0;
-                        player.setVelY(0);
-                    }
-                }
-
-                // 如果X和Y轴都发生碰撞，提前退出循环
-                if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
-                    break;
-                }
-            }
-
-            // 更新玩家位置
-            player.setPosition(
-                rect.x + (player.getWidth() / 2f - Player.HITBOX_OFFSET.x),
-                rect.y + (player.getHeight() / 2f - Player.HITBOX_OFFSET.y)
-            );
-            // 重置速度
-            //player.setVelocity(0, 0);
-        }*/
+        // 玩家实体与墙体的碰撞
+        Player player = es.getPlayer();
+        if (player != null) {
+            this.checkEntityWithWallCollisions(player, delta);
+        }
     }
 
     /**
-     * 核心算法：对于某个实体的碰撞箱检测
-     *
-     * @param entity 待检测的实体
-     * @param delta 帧间隔时间
-     * @param hitboxOffsetX 实体的碰撞箱x坐标偏移量
-     * @param hitboxOffsetY 实体的碰撞箱y坐标偏移量
+     * 核心算法：对某个实体的碰撞箱与墙体做连续碰撞检测 (CCD)
      * */
-    public void checkEntityWithWallCollisions (Entity<?> entity, float delta, float hitboxOffsetX, float hitboxOffsetY) {
+    public void checkEntityWithWallCollisions (Entity<?> entity, float delta) {
         Hitbox bodyHitbox = entity.getBodyHitbox();
-        if (bodyHitbox instanceof RectHitbox rectBodyHitbox) {
-            Rectangle rect = rectBodyHitbox.getRectangle();
-            Vector2 rectBodyHitboxCenterPos = rectBodyHitbox.getCenterPos();
-            //计算碰撞箱左下角坐标与碰撞箱中心坐标的偏移量
-            Vector2 rectPosToCenterDelta = new Vector2(
-                rectBodyHitboxCenterPos.x - rect.x,
-                rectBodyHitboxCenterPos.y - rect.y
-            );
-            //计算碰撞箱中心坐标与实体坐标的偏移量
-            Vector2 entityCenterPos = entity.getPosition();
-            Vector2 entityCenterToRectCenterDelta = new Vector2(
-                rectBodyHitboxCenterPos.x - entityCenterPos.x,
-                rectBodyHitboxCenterPos.y - entityCenterPos.y
-            );
+        if (!(bodyHitbox instanceof RectHitbox rectBodyHitbox)) {
+            return;
+        }
 
-            Vector2 vel = entity.getVelocity();
+        Vector2 vel = entity.getVelocity();
+        // 速度为零的实体跳过（无移动无需碰撞检测）
+        if (Math.abs(vel.x) < EPS && Math.abs(vel.y) < EPS) {
+            return;
+        }
 
-            // 计算总移动距离
-            float totalMoveX = vel.x * delta;
-            float totalMoveY = vel.y * delta;
+        Rectangle rect = rectBodyHitbox.getRectangle();
+        Vector2 rectBodyHitboxCenterPos = rectBodyHitbox.getCenterPos();
+        // 计算碰撞箱左下角坐标与碰撞箱中心坐标的偏移量
+        Vector2 rectPosToCenterDelta = new Vector2(
+            rectBodyHitboxCenterPos.x - rect.x,
+            rectBodyHitboxCenterPos.y - rect.y
+        );
+        // 计算碰撞箱中心坐标与实体坐标的偏移量
+        Vector2 entityCenterPos = entity.getPosition();
+        Vector2 entityCenterToRectCenterDelta = new Vector2(
+            rectBodyHitboxCenterPos.x - entityCenterPos.x,
+            rectBodyHitboxCenterPos.y - entityCenterPos.y
+        );
 
-            // 计算需要分解的步数（解决高速移动隧穿问题的核心）
-            float totalDistance = (float) Math.sqrt(totalMoveX * totalMoveX + totalMoveY * totalMoveY);
-            int steps = (int) Math.ceil(totalDistance / MAX_STEP);
-            if (steps == 0) steps = 1; // 至少一步
+        // 计算总移动距离
+        float totalMoveX = vel.x * delta;
+        float totalMoveY = vel.y * delta;
 
-            // 每步的移动量
-            float stepX = totalMoveX / steps;
-            float stepY = totalMoveY / steps;
+        // 计算需要分解的步数（解决高速移动隧穿问题）
+        float totalDistance = (float) Math.sqrt(totalMoveX * totalMoveX + totalMoveY * totalMoveY);
+        int steps = (int) Math.ceil(totalDistance / MAX_STEP);
+        if (steps == 0) steps = 1;
 
-            // 分步移动并检测碰撞
-            for (int i = 0; i < steps; i++) {
-                // X轴分步移动
-                if (Math.abs(stepX) > EPS) {
-                    rect.x += stepX;
-                    if (this.fixCollisions(rect, 1, 0, stepX)) {
-                        // 如果发生碰撞，剩余步数不再移动X轴
-                        stepX = 0;
-                        entity.setVelX(0);
-                    }
-                }
-                // Y轴分步移动
-                if (Math.abs(stepY) > EPS) {
-                    rect.y += stepY;
-                    if (this.fixCollisions(rect, 0, 1, stepY)) {
-                        // 如果发生碰撞，剩余步数不再移动Y轴
-                        stepY = 0;
-                        entity.setVelY(0);
-                    }
-                }
-                // 如果X和Y轴都发生碰撞，提前退出循环
-                if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
-                    break;
+        // 每步的移动量
+        float stepX = totalMoveX / steps;
+        float stepY = totalMoveY / steps;
+
+        // 分步移动并检测碰撞
+        for (int i = 0; i < steps; i++) {
+            // X轴分步移动
+            if (Math.abs(stepX) > EPS) {
+                rect.x += stepX;
+                if (this.fixCollisions(rect, 1, 0, stepX)) {
+                    stepX = 0;
+                    entity.setVelX(0);
                 }
             }
-
-            // 更新实体位置
-            entity.setPosition(
-                rect.x + rectPosToCenterDelta.x - entityCenterToRectCenterDelta.x,
-                rect.y + rectPosToCenterDelta.y - entityCenterToRectCenterDelta.y
-            );
+            // Y轴分步移动
+            if (Math.abs(stepY) > EPS) {
+                rect.y += stepY;
+                if (this.fixCollisions(rect, 0, 1, stepY)) {
+                    stepY = 0;
+                    entity.setVelY(0);
+                }
+            }
+            // 如果X和Y轴都发生碰撞，提前退出循环
+            if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
+                break;
+            }
         }
+
+        // 更新实体位置
+        entity.setPosition(
+            rect.x + rectPosToCenterDelta.x - entityCenterToRectCenterDelta.x,
+            rect.y + rectPosToCenterDelta.y - entityCenterToRectCenterDelta.y
+        );
     }
 
     /**
@@ -183,7 +147,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     private boolean fixCollisions (Rectangle hitbox, int axisX, int axisY, float move) {
         Array<Wall<?>> collidingWalls = this.getCollidingWalls(hitbox);
         if (collidingWalls.isEmpty()) {
-            return false; // 无碰撞
+            return false;
         }
 
         int fixes = 0;
@@ -219,43 +183,36 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     /**
      * 计算精确的重叠量
      */
-    private float calculateOverlap (Rectangle player, Rectangle wall, int axisX, int axisY, float move) {
+    private float calculateOverlap (Rectangle rect, Rectangle wall, int axisX, int axisY, float move) {
         if (axisX == 1) {
-            // X轴碰撞计算
-            float playerRight = player.x + player.width;
+            float rectRight = rect.x + rect.width;
             float wallLeft = wall.x;
             float wallRight = wall.x + wall.width;
 
             if (move > 0) {
-                // 向右移动：玩家右侧与墙体左侧重叠
-                return Math.max(0, playerRight - wallLeft);
+                return Math.max(0, rectRight - wallLeft);
             } else {
-                // 向左移动：玩家左侧与墙体右侧重叠
-                return Math.max(0, wallRight - player.x);
+                return Math.max(0, wallRight - rect.x);
             }
         } else {
-            // Y轴碰撞计算
-            float playerTop = player.y + player.height;
+            float rectTop = rect.y + rect.height;
             float wallBottom = wall.y;
             float wallTop = wall.y + wall.height;
 
             if (move > 0) {
-                // 向上移动：玩家顶部与墙体底部重叠
-                return Math.max(0, playerTop - wallBottom);
+                return Math.max(0, rectTop - wallBottom);
             } else {
-                // 向下移动：玩家底部与墙体顶部重叠
-                return Math.max(0, wallTop - player.y);
+                return Math.max(0, wallTop - rect.y);
             }
         }
     }
 
     /**
-     * 优化墙体检测范围，只检测移动路径上可能接触的区块
+     * 优化墙体检测范围，只检测碰撞箱所在的区块
      */
     private Array<Wall<?>> getCollidingWalls (Rectangle hitbox) {
         Array<Wall<?>> result = new Array<>();
 
-        // 计算玩家碰撞箱四角所在的区块，确保覆盖所有可能接触的区块
         int[] xChecks = {
             (int) hitbox.x,
             (int) (hitbox.x + hitbox.width)
@@ -265,7 +222,6 @@ public class GroundEntityCollisionSystem extends WorldSystem {
             (int) (hitbox.y + hitbox.height)
         };
 
-        // 收集所有需要检测的区块坐标
         Array<ChunkPosition> positions = new Array<>();
         for (int x : xChecks) {
             for (int y : yChecks) {
@@ -276,9 +232,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
             }
         }
 
-        // 检测这些区块内的墙体
         for (ChunkPosition pos : positions) {
-            // 检测当前区块及相邻区块（3x3范围）
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     Chunk chunk = cs.getChunk(pos.getX() + dx, pos.getY() + dy);

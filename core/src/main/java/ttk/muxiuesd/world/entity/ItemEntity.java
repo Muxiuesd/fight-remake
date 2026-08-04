@@ -131,9 +131,8 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         this.livingTime += delta;
         this.cycle += delta / 4;
         if (cycle > 1f) cycle %= 1f;
-        this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.3f);
-
-        positionChange(delta);
+        // 位移由 GroundEntityCollisionSystem 统一处理（含墙体碰撞）
+        this.positionOffset.set(0, MathUtils.sin(MathUtils.PI2 * this.cycle) * 0.12f);
 
         super.update(delta);
     }
