@@ -16,6 +16,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.World;
@@ -172,9 +173,12 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 物品的属性类
      * */
     public static class Property implements Codecable<Property>{
-        public static final Codec<Property> CODEC = CodecBuilder.of(Property::new)
-            .field("data_map", Property::getPropertiesMap, Property::setPropertiesMap, JsonPropertiesMap.CODEC)
-            .build();
+        public static final Codec<Property> CODEC = CodecBuilder.<Property>create()
+            .field("data_map",
+                Property::getPropertiesMap,
+                Property::setPropertiesMap,
+                CodecJsonPropertiesMap.CODEC)
+            .noArgFactory(Property::new);
 
 
         //属性映射

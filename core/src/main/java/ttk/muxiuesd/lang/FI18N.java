@@ -19,16 +19,16 @@ public class FI18N {
 
     public static LangPack register (String namespace, String name) {
         //根据namespace加载语言文件
-        return register(Fight.ID(namespace), name, Fight.LangPath(namespace));
+        return register(Identifier.of(Fight.ID(namespace)), name, Fight.LangPath(namespace));
     }
 
     /**
      * 注册一种语言包
      * */
-    public static LangPack register (String id, String name, String langFilePath) {
-        LangPack langPack = new LangPack(id, name);
+    public static LangPack register (Identifier identifier, String name, String langFilePath) {
+        LangPack langPack = new LangPack(identifier, name);
         langPack.loadTexts(Gdx.files.internal(langFilePath));
-        return Registries.LANG_HOLDER.register(new Identifier(id), langPack);
+        return Registries.LANG_HOLDER.register(langPack.getIdentifier(), langPack);
     }
 
     private static LangPack curLang;

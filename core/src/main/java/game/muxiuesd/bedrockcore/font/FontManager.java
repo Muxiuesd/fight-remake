@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ObjectMap;
 import game.muxiuesd.bedrockcore.util.Log;
+import ttk.muxiuesd.id.Identifier;
 
 /**
  * 字体管理器
@@ -16,9 +17,9 @@ public class FontManager {
     /**
      * 注册一种字体
      * */
-    public static FontHolder registerFont (String id, FileHandle fontFile) {
-        FontHolder fontHolder = new FontHolder(id, loadGenerator(fontFile));
-        FONT_HOLDERS.put(id, fontHolder);
+    public static FontHolder registerFont (Identifier identifier, FileHandle fontFile) {
+        FontHolder fontHolder = new FontHolder(identifier, loadGenerator(fontFile));
+        FONT_HOLDERS.put(identifier.getID(), fontHolder);
         return fontHolder;
     }
 

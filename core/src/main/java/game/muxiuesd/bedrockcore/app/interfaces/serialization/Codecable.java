@@ -6,6 +6,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
 /**
  * 接口：可编解码
  * */
+@Deprecated
 public interface Codecable<T, W extends DataWriter<W>, R extends DataReader<R>> {
     /**
      * 获取编解码器

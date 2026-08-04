@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 
 public class CatString extends CatValue<String> {
-
     public CatString (String value) {
         super(value == null ? "NullCatString": value);
     }
@@ -23,4 +22,5 @@ public class CatString extends CatValue<String> {
     public CatValue<String> newSelf () {
         return new CatString(get());
     }
+
 }

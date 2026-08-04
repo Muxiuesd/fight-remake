@@ -1,21 +1,22 @@
 package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.util.Util;
 
 /**
  * 状态效果抽象类
  * */
 public abstract class StatusEffect {
-    private final String id;
+    private final Identifier identifier;
     private TextureRegion icon;
 
-    public StatusEffect (String id, String iconPath) {
-        this(id);
-        loadIcon(id, iconPath);
+    public StatusEffect (Identifier identifier, String iconPath) {
+        this(identifier);
+        loadIcon(identifier.getID(), iconPath);
     }
-    public StatusEffect (String id) {
-        this.id = id;
+    public StatusEffect (Identifier identifier) {
+        this.identifier = identifier;
     }
 
     /**
@@ -36,7 +37,11 @@ public abstract class StatusEffect {
 
 
     public String getId () {
-        return this.id;
+        return this.identifier.getID();
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
     }
 
     public StatusEffect loadIcon (String textureId, String path) {

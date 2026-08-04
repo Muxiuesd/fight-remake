@@ -22,11 +22,11 @@ import ttk.muxiuesd.world.item.abs.Weapon;
  * 物品传进来后会复制一份属性数据进物品堆叠里面持有，对物品堆叠里的物品属性进行修改不会影响原本的物品实例
  * */
 public class ItemStack implements Updateable, Codecable<ItemStack> {
-    public static final Codec<ItemStack> CODEC = CodecBuilder.of(ItemStack::new)
+    public static final Codec<ItemStack> CODEC = CodecBuilder.<ItemStack>create()
         .field("item", ItemStack::getItem, ItemStack::setItem, Item.CODEC)
         .field("amount", ItemStack::getAmount, ItemStack::setAmount, Codec.INT)
         .field("property", ItemStack::getProperty, ItemStack::setProperty, Item.Property.CODEC)
-        .build();
+        .noArgFactory(ItemStack::new);
 
 
     /// 空物品堆叠

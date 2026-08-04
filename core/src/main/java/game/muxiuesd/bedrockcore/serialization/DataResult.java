@@ -40,7 +40,7 @@ public abstract class DataResult<T> {
     }
 
     public static class Success<T> extends DataResult<T> {
-        final T value;
+        public final T value;
         Success(T value) { this.value = value; }
         public Optional<T> result() { return Optional.of(value); }
         public Optional<String> error() { return Optional.empty(); }

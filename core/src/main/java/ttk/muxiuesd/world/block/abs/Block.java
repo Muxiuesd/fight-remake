@@ -13,6 +13,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -30,6 +31,15 @@ public class Block implements ID<Block>, Disposable {
         Registries.BLOCK::get,
         Block::getID
     );
+
+    /**
+     * 获取这个方块使用的编解码器
+     * <p>
+     * 普通方块使用{@link #CODEC}，带有方块实体等自定义数据的方块会覆写此方法返回自己的编解码器
+     * */
+    public Codec<? extends Block> getCodec () {
+        return CODEC;
+    }
 
 
     /// 方块的大小（最基础的属性）
@@ -116,9 +126,12 @@ public class Block implements ID<Block>, Disposable {
      * 方块的属性类
      * */
     public static class Property {
-        public static final Codec<Block.Property> CODEC = CodecBuilder.of(Block.Property::new)
-            .field("data_map", Block.Property::getPropertiesMap, Block.Property::setPropertiesMap, JsonPropertiesMap.CODEC)
-            .build();
+        public static final Codec<Block.Property> CODEC = CodecBuilder.<Property>create()
+            .field("data_map",
+                Block.Property::getPropertiesMap,
+                Block.Property::setPropertiesMap,
+                CodecJsonPropertiesMap.CODEC)
+            .noArgFactory(Property::new);
 
         public static Property create () {
             return new Property();

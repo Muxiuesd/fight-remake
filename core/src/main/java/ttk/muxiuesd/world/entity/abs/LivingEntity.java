@@ -4,13 +4,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
+import ttk.muxiuesd.serialization.codecs.builders.LivingEntityCodecBuilder;
 import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
@@ -37,6 +38,15 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
+
+    /**
+     * 活物实体的现代化编解码器
+     * <p>
+     * 解码时通过实体注册表创建实例（会创建出正确的实体类），
+     * 编码时编码基础实体与活物实体的全部字段
+     */
+    public static final Codec<LivingEntity<?>> CODEC = LivingEntityCodecBuilder.<LivingEntity<?>>create()
+        .factory(EntityCodecBuilder::createEntity);
 
     private LinkedHashMap<String, LivingEntityState<T>> states; //状态机
     private LivingEntityState<T> curState;                      //当前状态
@@ -262,6 +272,16 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         }
     }
 
+    /**
+     * 判断是否手上持有物品
+     * */
+    public boolean handIsEmpty () {
+        ItemStack handItemStack = this.getHandItemStack();
+        return handItemStack == null
+            || handItemStack == ItemStack.VOID
+            || handItemStack.getAmount() == 0;
+    }
+
     public ItemStack getHandItemStack () {
         return this.backpack.getItemStack(this.handIndex);
     }
@@ -280,7 +300,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             if (this.handIndex != handIndex) {
                 //放下先前的物品堆叠
                 ItemStack handItemStack = this.getHandItemStack();
-                if (handItemStack != null) {
+                //实体系统为空说明实体还未加入世界（例如解码读取数据时），不需要放下物品
+                if (handItemStack != null && this.getEntitySystem() != null) {
                     handItemStack.putDown(this.getEntitySystem().getWorld(), this);
                 }
                 this.handIndex = handIndex;
@@ -478,11 +499,6 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public T setEffects (LinkedHashMap<StatusEffect, StatusEffect.Data> effectsMap) {
         this.effects = effectsMap;
         return (T) this;
-    }
-
-    @Override
-    public Codec getCodec () {
-        return Codecs.LIVING_ENTITY;
     }
 
     @Override

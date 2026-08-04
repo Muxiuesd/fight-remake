@@ -1,5 +1,6 @@
 package ttk.muxiuesd.recipe;
 
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.RecipeOutput;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -8,12 +9,12 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public abstract class CookingRecipe implements RecipeOutput {
     //这个配方的id
-    private String id;
+    private Identifier identifier;
     //需要的物品输入，用于匹配
     private ItemStack input;
 
-    public CookingRecipe (String id, ItemStack input) {
-        this.id = id;
+    public CookingRecipe (Identifier identifier, ItemStack input) {
+        this.identifier = identifier;
         this.input = input;
     }
 
@@ -25,11 +26,24 @@ public abstract class CookingRecipe implements RecipeOutput {
     }
 
     public String getId () {
-        return id;
+        return this.getIdentifier() == null ? null : this.getIdentifier().getID();
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public CookingRecipe setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
     public CookingRecipe setId (String id) {
-        this.id = id;
+        if (this.identifier == null) {
+            this.identifier = new Identifier(id);
+        } else {
+            this.identifier.setID(id);
+        }
         return this;
     }
 
