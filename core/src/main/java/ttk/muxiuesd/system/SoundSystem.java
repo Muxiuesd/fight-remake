@@ -13,6 +13,7 @@ import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -30,6 +31,8 @@ public class SoundSystem extends WorldSystem {
     private Array<SpatialAudio> activeSounds;
     private Array<SpatialAudio> needRemoved;
 
+    // 走路音效缓存：每种方块类型的走路音效只创建一次 SpatialAudio，切换方块时 pause/play 而不是 stop+new
+    private final HashMap<AudioHolder, SpatialAudio> walkAudioCache = new HashMap<>();
     private AudioHolder curWalkAudio;
     private SpatialAudio curWalkAudioInstance;
 
@@ -61,7 +64,9 @@ public class SoundSystem extends WorldSystem {
 
     @Override
     public void dispose () {
-        this.stopPlayerWalkSound();
+        this.muteWalkSound();
+        this.walkAudioCache.values().forEach(SpatialAudio::stop);
+        this.walkAudioCache.clear();
         this.activeSounds.forEach(SpatialAudio::stop);
         this.activeSounds.clear();
     }
@@ -77,49 +82,48 @@ public class SoundSystem extends WorldSystem {
      *  玩家走路音效
      * */
     private void updatePlayerWalkSoundEffect (float delta) {
-        //如果玩家在移动
         if (this.ps.playerMoved()) {
             Player player = this.ps.getPlayer();
             Vector2 playerCenter = player.getCenterPos();
             Block underfootBlock = cs.getBlock(playerCenter.x, playerCenter.y);
             AudioHolder walkAudio = underfootBlock.getProperty().getSounds().walk();
-            //检测方块不一样时walkAudio是否一样
             if (! Objects.equals(this.curWalkAudio, walkAudio)) {
-                //先停止先前的音效
-                this.stopPlayerWalkSound();
-                //再播放新的音效
-                this.startPlayerWalkSound(walkAudio, player);
+                this.muteWalkSound();
+                this.playWalkSound(walkAudio, player);
             }
-            if (this.curWalkAudioInstance != null && !this.curWalkAudioInstance.isPlaying()) {
-                this.startPlayerWalkSound(walkAudio, player);
+            // 更新声源位置（玩家在移动）
+            if (this.curWalkAudioInstance != null) {
+                this.curWalkAudioInstance.setBoundSource(player.getSounder());
             }
-        }else if (
-            !this.ps.playerMoved()
-            && this.curWalkAudio != null
-            && this.curWalkAudioInstance != null
-            && this.curWalkAudioInstance.isPlaying()
-        ) { //如果玩家停止了，但是音效在播放，就停止音效
-            this.stopPlayerWalkSound();
+        } else if (this.curWalkAudio != null) {
+            this.muteWalkSound();
             this.curWalkAudio = null;
         }
     }
 
     /**
-     * 开始播放玩家走路音效
+     * 播放/恢复玩家走路音效（优先复用缓存）
      * */
-    public void startPlayerWalkSound (AudioHolder walkAudio, Player player) {
-        SpatialAudio audio = this.playSpatialSound(walkAudio, player);
-        audio.setLooping(true);
+    public void playWalkSound (AudioHolder walkAudio, Player player) {
+        SpatialAudio audio = this.walkAudioCache.get(walkAudio);
+        if (audio == null || !audio.isPlaying()) {
+            audio = this.playSpatialSound(walkAudio, player);
+            audio.setLooping(true);
+            this.walkAudioCache.put(walkAudio, audio);
+        } else {
+            audio.setBoundSource(player.getSounder());
+            audio.setVolume(1f);
+        }
         this.curWalkAudio = walkAudio;
         this.curWalkAudioInstance = audio;
     }
 
     /**
-     * 停止播放玩家走路音效
+     * 静音当前的走路音效（不停止播放，避免引擎 dispose）
      * */
-    public void stopPlayerWalkSound () {
+    public void muteWalkSound () {
         if (this.curWalkAudioInstance != null) {
-            this.curWalkAudioInstance.stop();
+            this.curWalkAudioInstance.setVolume(0f);
             this.curWalkAudioInstance = null;
         }
     }

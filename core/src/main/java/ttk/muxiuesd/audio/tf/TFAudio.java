@@ -18,49 +18,61 @@ public class TFAudio implements SpatialAudio {
         this.soundBufferSource = soundBufferSource;
     }
 
+    private boolean isDisposed () {
+        return this.soundBufferSource == null;
+    }
+
     @Override
     public void play() {
+        if (this.isDisposed()) return;
         this.soundBufferSource.play();
         this.audioEngine.addActive(this);
     }
 
     @Override
     public void pause() {
+        if (this.isDisposed()) return;
         this.soundBufferSource.pause();
     }
 
     @Override
     public void resume() {
+        if (this.isDisposed()) return;
         this.soundBufferSource.play();
     }
 
     @Override
     public void stop() {
+        if (this.isDisposed()) return;
         this.soundBufferSource.stop();
     }
 
     @Override
     public boolean isPlaying() {
-        return this.soundBufferSource != null && this.soundBufferSource.isPlaying();
+        return !this.isDisposed() && this.soundBufferSource.isPlaying();
     }
 
     @Override
     public void setLooping(boolean looping) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setLooping(looping);
     }
 
     @Override
     public void setVolume(float volume) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setVolume(volume);
     }
 
     @Override
     public void setPitch (float pitch) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setPitch(pitch);
     }
 
     @Override
     public void setPos (float x, float y, float z) {
+        if (this.isDisposed()) return;
         // 手动设置位置时自动解除源绑定
         this.boundSource = null;
         this.soundBufferSource.setPosition(x, y, z);
@@ -68,34 +80,39 @@ public class TFAudio implements SpatialAudio {
 
     @Override
     public void setDirection (float x, float y, float z) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setDirection(new Vector3(x, y, z));
     }
 
     @Override
     public void setMinAttenuation (float minDistance) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setAttenuationMinDistance(minDistance);
     }
 
     @Override
     public void setMaxAttenuation (float maxDistance) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setAttenuationMaxDistance(maxDistance);
     }
 
     @Override
     public void setAttenuationFactor (float factor) {
+        if (this.isDisposed()) return;
         this.soundBufferSource.setAttenuationFactor(factor);
     }
 
     @Override
     public void setAttenuationEnabled (boolean enabled) {
+        if (this.isDisposed()) return;
         if (enabled) this.soundBufferSource.enableAttenuation();
         else this.soundBufferSource.disableAttenuation();
     }
 
     @Override
     public void setBoundSource (SpatialAudioSource source) {
+        if (this.isDisposed()) return;
         this.boundSource = source;
-        // 立即同步一次位置与朝向
         if (source != null) {
             Vector3 pos = source.getPos();
             this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
@@ -115,16 +132,15 @@ public class TFAudio implements SpatialAudio {
 
     @Override
     public void updatePos () {
-        if (this.boundSource != null && this.soundBufferSource != null && this.soundBufferSource.isPlaying()) {
-            Vector3 pos = this.boundSource.getPos();
-            this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
-            this.soundBufferSource.setDirection(this.boundSource.getForward());
-        }
+        if (this.isDisposed() || this.boundSource == null || !this.soundBufferSource.isPlaying()) return;
+        Vector3 pos = this.boundSource.getPos();
+        this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
+        this.soundBufferSource.setDirection(this.boundSource.getForward());
     }
 
     @Override
     public void dispose () {
-        if (this.soundBufferSource != null) {
+        if (!this.isDisposed()) {
             this.soundBufferSource.free();
             this.soundBufferSource = null;
         }
