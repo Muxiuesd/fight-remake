@@ -69,11 +69,11 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         setSpeed(speed);
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        //setBodyTextureRegion(getTextureRegion(textureId, texturePath));
         setBodyTextureRegionResource(textureId, texturePath);
         //默认大小
         setSize(0.5f, 0.5f);
         fastAddBodyHitBox();
+        setOnGround(false);
     }
 
     @Override
