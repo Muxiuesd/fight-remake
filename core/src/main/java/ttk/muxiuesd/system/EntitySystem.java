@@ -283,6 +283,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 对实体进行当前速度计算
      * */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
+        //子弹实体不受方块摩擦力影响，只受空气阻力（在 Bullet 内部处理）
+        if (entity instanceof Bullet) return;
+
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
 

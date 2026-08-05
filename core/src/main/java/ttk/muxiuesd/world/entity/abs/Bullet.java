@@ -16,6 +16,9 @@ import ttk.muxiuesd.world.entity.EntityType;
  * 子弹
  */
 public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
+    //空气阻力：每秒速度衰减到的比例（帧率无关，通过 delta 指数计算）
+    private static final float AIR_DRAG_PER_SECOND = 0.98f;
+
     /**
      * 子弹的现代化编解码器
      * <p>
@@ -90,6 +93,12 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     @Override
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
+
+        //空气阻力：子弹不受方块摩擦影响，速度只随空气阻力逐渐衰减
+        float drag = (float) Math.pow(AIR_DRAG_PER_SECOND, delta);
+        this.setVelX(this.getVelX() * drag);
+        this.setVelY(this.getVelY() * drag);
+
         // 位移由 BulletCollisionSystem 统一处理（含墙体碰撞与 CCD 分步）
         super.update(delta);
 
