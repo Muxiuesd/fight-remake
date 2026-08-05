@@ -17,6 +17,12 @@ public class Direction {
     public Direction () {
         Vector2 mouse = Util.getMouseWindowPos();
         float length = (float) Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
+        if (length < 0.0001f) {
+            // 鼠标在窗口中心：零向量，设为无方向
+            this.x = 0;
+            this.y = 0;
+            return;
+        }
         this.x = mouse.x / length;
         this.y = mouse.y / length;
     }
@@ -60,6 +66,12 @@ public class Direction {
 
     public void nor () {
         float length = (float) Math.sqrt(this.x * this.x + this.y * this.y);
+        // 零向量防护：长度为 0 时不归一化，避免产生 NaN
+        if (length < 0.0001f) {
+            this.x = 0;
+            this.y = 0;
+            return;
+        }
         this.x = this.x / length;
         this.y = this.y / length;
     }

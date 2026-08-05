@@ -35,7 +35,7 @@ import java.util.LinkedHashMap;
  * TODO 活物实体能有buff影响其行为状态
  * */
 public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> {
-    public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
+    public static final Vector2 DEFAULT_SIZE = new Vector2(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
 
@@ -437,6 +437,12 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public void setState (String id) {
         LinkedHashMap<String, LivingEntityState<T>> states = this.getStates();
         LivingEntityState<T> state = states.get(id);
+        //未注册的状态不切换，防止 curState 为 null 时 start() NPE
+        if (state == null) {
+            game.muxiuesd.bedrockcore.util.Log.error(this.getClass().getName(),
+                "实体：" + this.getID() + " 不存在id为：" + id + " 的状态！！！");
+            return;
+        }
         this.setCurState(state);
     }
 
@@ -461,7 +467,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
 
     public LivingEntity<T> setCurState (LivingEntityState<T> curState) {
         //确保不会空
-        if (getEntitySystem() != null) {
+        if (getEntitySystem() != null && curState != null) {
             World world = getEntitySystem().getWorld();
             if (this.getCurState() != null) this.curState.end(world, (T) this);
             this.curState = curState;
@@ -508,5 +514,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         Pools.TASK_TIMER.free(this.attackedTimer);
         Pools.TASK_TIMER.free(this.effectPreTickTimer);
         Pools.TASK_TIMER.free(this.effectPreSecondTimer);
+        if (this.swingHandTimer != null) {
+            Pools.TASK_TIMER.free(this.swingHandTimer);
+            this.swingHandTimer = null;
+        }
     }
 }

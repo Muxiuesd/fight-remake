@@ -189,4 +189,12 @@ public class Player extends LivingEntity<Player> {
     public TextureRegion getShieldTextureRegion () {
         return this.shieldTextureRegionResource.get();
     }
+
+    @Override
+    public void dispose () {
+        super.dispose();
+        //回收防御相关计时器
+        Pools.TASK_TIMER.free(this.defendCDTimer);
+        Pools.TASK_TIMER.free(this.defendDurationTimer);
+    }
 }

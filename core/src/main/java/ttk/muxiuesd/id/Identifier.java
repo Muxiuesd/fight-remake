@@ -4,6 +4,7 @@ import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -65,6 +66,25 @@ public class Identifier implements Codecable<Identifier> {
 
     public void setID (String id) {
         if (check(id)) this.id = id;
+    }
+
+    /**
+     * 值语义：相同的 id 字符串视为同一个标识符
+     * <p>
+     * 保证 Identifier 可以作为 HashMap/ConcurrentHashMap 的键，
+     * 不同实例但相同 id 可以互相查找到
+     * */
+    @Override
+    public boolean equals (Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Identifier)) return false;
+        Identifier that = (Identifier) o;
+        return Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode () {
+        return this.id == null ? 0 : this.id.hashCode();
     }
 
     @Override

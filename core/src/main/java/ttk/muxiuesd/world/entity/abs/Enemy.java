@@ -64,6 +64,11 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
      * */
     public void walkToTarget (float delta) {
         Entity<?> target = this.getCurTarget();
+        //无目标或目标死亡时不做任何移动
+        if (target == null || (target instanceof LivingEntity<?> livingEntity && livingEntity.isDeath())) {
+            this.setVelocity(0, 0);
+            return;
+        }
         Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
         setVelocity(direction.getX(), direction.getY());
         setCurSpeed(getSpeed());
@@ -106,6 +111,10 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         this.attackTimer.update(delta);
 
         Entity<?> target = this.getCurTarget();
+        //无目标或目标已死亡不攻击
+        if (target == null || (target instanceof LivingEntity<?> livingEntity && livingEntity.isDeath())) {
+            return;
+        }
         float distance = Util.getDistance(this, target);
         //在攻击范围之外不攻击
         if (distance > this.getAttackRange()) {

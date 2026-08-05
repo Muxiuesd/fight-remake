@@ -157,7 +157,7 @@ public abstract class Entity<T extends Entity<T>>
      * */
     public void updateHitboxCenterPos (float x, float y) {
         this.getHitboxHolder().getBoxes().forEach((id, box) -> {
-            box.setCenterPos(this.x, this.y);
+            box.setCenterPos(x, y);
         });
     }
 
@@ -533,11 +533,8 @@ public abstract class Entity<T extends Entity<T>>
 
     @Override
     public T setID (String id) {
-        if (this.identifier == null) {
-            this.identifier = new Identifier(id);
-        } else {
-            this.identifier.setID(id);
-        }
+        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
+        this.identifier = new Identifier(id);
         return (T) this;
     }
 

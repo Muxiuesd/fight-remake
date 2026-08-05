@@ -92,6 +92,11 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         this.setLiveTime(this.getLiveTime() + delta);
         // 位移由 BulletCollisionSystem 统一处理（含墙体碰撞与 CCD 分步）
         super.update(delta);
+
+        // 存活时间耗尽，从实体系统移除（防止泄漏）
+        if (!this.isAlive() && this.getEntitySystem() != null) {
+            this.getEntitySystem().remove(this);
+        }
     }
 
     public Entity<?> getOwner () {

@@ -91,7 +91,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     public void readCatData (JsonValue values) {
         super.readCatData(values);
         this.cycle = values.getFloat("cycle", 0f);
-        this.livingTime = values.getFloat("living_time", 0f);
+        this.livingTime = values.getFloat("livingTime", 0f);
 
 
         if (values.has("on_air")) {
@@ -145,6 +145,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         setVelocity(0f, 0f);
         setItemStack(null);
         setLivingTime(0f);
+        this.cycle = 0f;    //重置悬浮动画相位
         getPositionOffset().set(0f, 0f);
 
         TaskTimer taskTimer = this.getOnAirTimer();

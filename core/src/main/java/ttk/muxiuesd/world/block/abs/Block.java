@@ -104,7 +104,8 @@ public class Block implements ID<Block>, Disposable {
     }
     @Override
     public Block setID (String id) {
-        this.getIdentifier().setID(id);
+        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
+        this.identifier = new Identifier(id);
         return this;
     }
 

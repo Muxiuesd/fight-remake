@@ -17,7 +17,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 河豚
  * */
 public class PufferFish extends LivingEntity<PufferFish> {
-    public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(0.7f, 0.7f);
+    public static final Vector2 DEFAULT_SIZE = new Vector2(0.7f, 0.7f);
 
 
     private Vector2 walkDistance;

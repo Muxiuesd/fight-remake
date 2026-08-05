@@ -465,7 +465,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void unloadAllEntities () {
         HashMap<String, ChunkPosition> chunkPos = new HashMap<>();
         HashMap<ChunkPosition, Array<Entity<?>>> unloadArray = new HashMap<>();
-        Array<Entity<?>> allEntities = this.getEntities();
+        //复制一份，避免直接修改内部实体数组
+        Array<Entity<?>> allEntities = new Array<>(this.getEntities());
         //单独去除玩家实体
         allEntities.removeValue(this.getPlayer(), true);
         ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
