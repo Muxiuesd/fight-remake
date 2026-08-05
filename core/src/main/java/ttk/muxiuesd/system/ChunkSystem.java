@@ -157,15 +157,20 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             this.activeChunks.addAll(this._loadChunks);
             this._loadChunks.clear();
         }
+
         //把需要被卸载的区块放进线程池
         if (!this._unloadChunks.isEmpty()) {
             for (Chunk chunk : this._unloadChunks) {
+                // 已经提交过卸载任务的区块跳过，避免重复提交导致并发写同一文件
+                if (this.chunkUnloadingTasks.containsKey(chunk.getChunkPosition())) continue;
                 // 生成任务并提交到线程池里卸载区块
                 ChunkUnloadTask task = new ChunkUnloadTask(this, chunk);
                 Future<Chunk> future = this.executor.submit(task);
                 this.chunkUnloadingTasks.put(chunk.getChunkPosition(), future);
             }
             this.activeChunks.removeAll(this._unloadChunks);
+            // 提交后立即清空，防止下一帧重复提交同样的卸载任务
+            this._unloadChunks.clear();
         }
 
         // 更新正在活跃的区块
@@ -337,16 +342,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 普通方块全世界一个实例，方块实体每一个都是单独实例，植物方块也是单独实例
      * */
     private void addBlockInstance (Block block) {
-        //如果是带有方块实体的方块
-        /*if (block instanceof BlockWithEntity blockWithEntity) {
-            this.blockInstances.put(this.getBlockKey(blockWithEntity), blockWithEntity);
-        } else if (block instanceof Botany botany) {
-            this.blockInstances.put(this.getBlockKey(botany), botany);
-        } else if (! this.blockInstances.containsKey(block.getID())) {
-            //普通方块
-            this.blockInstances.put(block.getID(), block);
-        }*/
-
         String blockKey = this.getBlockKey(block);
         if (! this.blockInstances.containsKey(blockKey)) {
             this.blockInstances.put(blockKey, block);
@@ -522,6 +517,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 破坏植物
      * @param position 世界坐标
+     * @return 被移除的植物，如果这个坐标上没有植物就返回空
      * */
     public Botany destroyBotany (Vector2 position) {
         return this.destroyBotany(position.x, position.y);

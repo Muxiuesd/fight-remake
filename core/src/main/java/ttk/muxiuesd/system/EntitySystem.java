@@ -126,7 +126,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 移除实体
      * */
     public <T extends Entity> void remove (T entity) {
-        if (this.entities.contains(entity, true)) {
+        //防止重复移除：实体已不在系统中，或已在移除队列中，直接跳过
+        if (this.entities.contains(entity, true)
+            && !this._delayRemove.contains(entity, true)) {
             this._delayRemove.add(entity);
         }
     }
@@ -155,6 +157,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * @param entity 实体
      */
     private <T extends Entity> void _remove (T entity) {
+        //幂等防御：实体已不在系统中则跳过（防止重复移除导致池化对象 double-free）
+        if (!this.entities.contains(entity, true)) return;
+
         Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
         entityArray.removeValue(entity, true);
 
@@ -162,7 +167,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.updatableEntity.removeValue(entity, true);
         this.incationEntity.removeValue(entity, true);
         //把实体移除出渲染层级
-        this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
+        Array<Entity<?>> renderLayerEntities = this.renderableEntities.get(entity.getRenderLayer());
+        if (renderLayerEntities != null) renderLayerEntities.removeValue(entity, true);
         //执行池化实体释放逻辑
         if (entity instanceof PoolableEntity poolableEntity) {
             poolableEntity.freeSelf();
@@ -385,6 +391,18 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 Future<Array<Entity<?>>> future = this.entityUnloadingTasks.get(chunkPosition);
                 if (future != null && future.isDone()) {
                     this.entityUnloadingTasks.remove(chunkPosition);
+                    try {
+                        Array<Entity<?>> unloaded = future.get();
+                        //卸载保存完成，将实体从系统中移除，避免实体残留导致重复加载（实体翻倍）和内存泄漏
+                        if (unloaded != null) {
+                            for (Entity<?> entity : unloaded) {
+                                this.remove(entity);
+                            }
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        //保存失败，实体保留在系统中，防止数据丢失
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -428,6 +446,14 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (unload.isEmpty()) return;
 
         unload.removeValue(this.getPlayer(), true);
+
+        //该区块已有卸载任务在途：跳过本次提交。
+        //实体仍留在系统中，等原任务完成（实体被移除）后，下次卸载时会被重新收集保存；
+        //若此时覆盖提交，旧 Future 的完成回调会丢失，导致已收集的实体永不移除。
+        if (this.entityUnloadingTasks.containsKey(chunk.getChunkPosition())) {
+            return;
+        }
+
         EntityUnloadTask unloadTask = new EntityUnloadTask(this, unload, chunk.getChunkPosition());
         Future<Array<Entity<?>>> submit = this.executor.submit(unloadTask);
         this.entityUnloadingTasks.put(chunk.getChunkPosition(), submit);
