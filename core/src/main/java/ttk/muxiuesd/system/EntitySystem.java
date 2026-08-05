@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -22,7 +23,6 @@ import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -503,8 +503,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     public void loadEntities (ChunkSystem cs, Chunk chunk) {
         ChunkPosition chunkPosition = chunk.getChunkPosition();
+        //该区块实体正在被卸载保存（写盘）中，跳过本次加载，避免读到半截文件；下次区块重新加载时会再尝试
+        if (this.entityUnloadingTasks.containsKey(chunkPosition)) {
+            return;
+        }
         //文件不存在就是区块上没有实体，直接跳过
-        if (! AbsFileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
+        if (! UnifiedFileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
             return;
         }
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
@@ -518,13 +522,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void initLoadEntities (ChunkPosition chunkPosition) {
         String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (! AbsFileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
+        if (! UnifiedFileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
 
-        AbsFileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
+        UnifiedFileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
     }
 
     @Override
@@ -628,3 +632,5 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return 10000;
     }
 }
+
+

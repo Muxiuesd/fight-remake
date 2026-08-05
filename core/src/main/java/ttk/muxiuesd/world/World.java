@@ -3,6 +3,7 @@ package ttk.muxiuesd.world;
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
@@ -11,7 +12,6 @@ import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
-import ttk.muxiuesd.util.AbsFileUtil;
 
 import java.util.Optional;
 
@@ -84,9 +84,9 @@ public abstract class World implements Updateable, Disposable {
      * */
     public void readWorldInfo() {
         //检查世界信息文件是否存在
-        if(AbsFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
+        if(UnifiedFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
             //存在就读取
-            String file = AbsFileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
+            String file = UnifiedFileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
             Optional<WorldInfo> optional = WorldInfo.CODEC.parse(new JsonDataReader(file));
             //让这个实例存在
             optional.ifPresent(worldInfo -> WorldInfo.INSTANCE = worldInfo);
@@ -136,3 +136,5 @@ public abstract class World implements Updateable, Disposable {
         return this.getClass().getName();
     }
 }
+
+

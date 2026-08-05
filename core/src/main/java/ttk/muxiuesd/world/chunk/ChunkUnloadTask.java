@@ -2,9 +2,9 @@ package ttk.muxiuesd.world.chunk;
 
 import game.muxiuesd.bedrockcore.serialization.RawObject;
 import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.ChunkSystem;
-import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 
 /**
@@ -22,8 +22,11 @@ public class ChunkUnloadTask extends ChunkTask {
     public Chunk call() {
         RawObject rawObject = Chunk.CODEC.encode(this.chunk);
         String json = RawObjectJsonConverter.toJson(rawObject);
-        AbsFileUtil.createFile(Fight.getPathSaveChunks(), this.chunk.getChunkPosition().toString() + ".json")
-            .writeString(json, false);
+        //原子写入：先写临时文件再重命名，防止写盘被中断导致半截文件损坏存档
+        UnifiedFileUtil.writeFileAtomic(
+            Fight.getPathSaveChunks(),
+            this.chunk.getChunkPosition().toString() + ".json",
+            json);
 
         return this.chunk;
     }

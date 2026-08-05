@@ -329,8 +329,18 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         Vector2 round = Util.fastRound(wx, wy);
 
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
+        //区块未加载时无法移除
+        if (chunk == null) return removed;
         GridPoint2 chunkBlockPos = Chunk.worldToChunk(round.x, round.y);
-        chunk.setBlock(null, chunkBlockPos.x, chunkBlockPos.y);
+
+        //只移除独立实例（带方块实体/植物），普通方块是全世界共享实例不能移除
+        if (removed instanceof BlockWithEntity blockWithEntity) {
+            this.removeBlockInstance(blockWithEntity);
+        }else if (removed instanceof Botany botany) {
+            this.removeBlockInstance(botany);
+        }
+        //用空气方块占位（不能直接 setBlock(null)，会触发 addBlock(null) NPE）
+        chunk.setBlock(Blocks.ARI, chunkBlockPos.x, chunkBlockPos.y);
 
         return removed;
     }
@@ -426,6 +436,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         ChunkPosition chunkPosition = this.getChunkPosition(round);
         Chunk chunk = this.getChunk(chunkPosition);
+        //区块未加载时无法替换
+        if (chunk == null) return oldBlock;
         GridPoint2 chunkBlockPos = Chunk.worldToChunk(round.x, round.y);
 
         //如果旧的方块是带有方块实体的方块
@@ -436,18 +448,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             this.removeBlockInstance(oldBlock);
         }
 
-        //如果新方块是带有方块实体的方块
+        //如果新方块是带有方块实体的方块，需要新建一个实例再添加
+        //setBlock 内部会统一调用 addBlock（只执行一次，避免 bePlaced 重复触发）
         if (newBlock instanceof BlockWithEntity blockWithEntity) {
-            //需要新建一个实例再添加
-            BlockWithEntity self = blockWithEntity.createSelf();
-            this.addBlock(self, wx, wy);
-            chunk.setBlock(self, chunkBlockPos.x, chunkBlockPos.y);
+            chunk.setBlock(blockWithEntity.createSelf(), chunkBlockPos.x, chunkBlockPos.y);
         }else {
-            this.addBlock(newBlock, wx, wy);
             chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
         }
 
-        //chunk.setBlock(this.getBlockInstancesMap().get(this.getBlockKey(newBlock)), chunkBlockPos.x, chunkBlockPos.y);
         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
         return oldBlock;
@@ -469,6 +477,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //每一个墙体都是一个单独的实例
         Wall<?> instance = wall.createSelf(round);
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
+        //区块未加载时无法放置
+        if (chunk == null) return false;
         GridPoint2 chunkWallPos = Chunk.worldToChunk(round.x, round.y);
         chunk.setWall(instance, chunkWallPos.x, chunkWallPos.y);
 
@@ -490,6 +500,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         if (this.getWall(wx, wy) == null) return null;
         Vector2 round = Util.fastRound(wx, wy);
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
+        //区块未加载时无法破坏
+        if (chunk == null) return null;
         GridPoint2 cp = Chunk.worldToChunk(round.x, round.y);
         Wall<?> wall = chunk.getWall(cp.x, cp.y);
         chunk.setWall(null, cp.x, cp.y);
@@ -503,6 +515,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     public void placeBotany (Botany botany, float wx, float wy) {
         Chunk chunk = this.getChunk(wx, wy);
+        //区块未加载时无法放置
+        if (chunk == null) return;
         Vector2 roundPos = Util.fastRound(wx, wy);
         GridPoint2 chunkPos = Chunk.worldToChunk(roundPos.x, roundPos.y);
         //如果这个坐标上没有其他植物就可以放置
@@ -528,6 +542,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * */
     public Botany destroyBotany (float wx, float wy) {
         Chunk chunk = this.getChunk(wx, wy);
+        //区块未加载时无法破坏
+        if (chunk == null) return null;
         Vector2 roundPos = Util.fastRound(wx, wy);
         GridPoint2 chunkPos = Chunk.worldToChunk(roundPos.x, roundPos.y);
 
@@ -714,6 +730,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             if (loadChunk.getChunkPosition().equals(position)) return true;
         }
 
+        //在卸载任务里查找（卸载中的区块也算存在，避免加载与卸载并发读写同一文件）
+        if (this.chunkUnloadingTasks.containsKey(position)) return true;
+
+        //在卸载延迟队列里查找
+        for (Chunk unloadChunk : this._unloadChunks) {
+            if (unloadChunk.getChunkPosition().equals(position)) return true;
+        }
+
         return false;
     }
 
@@ -759,11 +783,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         Block block = chunk.seekBlock(round.x, round.y);
-        // 如果在当前区块找不到的话
-        if (block == null) {
-            Log.print(TAG, "没尽力");
-        }
-        // 运行到这里应该就是查找到方块了
         return block;
     }
 
@@ -824,10 +843,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                 return chunk;
             }
         }
-        // 如果没有这个区块,暂时就这么处理
-        Chunk chunk = this.initChunk(chunkPosition.getX(), chunkPosition.getY());
-        if (chunk != null && !this.chunkExist(chunkPosition)) this._loadChunks.add(chunk);
-        return chunk;
+        // 该位置有加载/卸载任务在途，返回 null，避免：
+        // 1. 主线程同步生成区块导致卡顿（碰撞检测等高频调用）
+        // 2. 生成出与异步加载任务重复的"幽灵区块"
+        // 区块会由异步加载流程（calculateNeedLoadedChunk）补充加载
+        return null;
     }
 
     /**
@@ -885,9 +905,12 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 检测所在坐标是否为区块的中心区域
      * */
     public boolean isChunkCenter (ChunkPosition chunkPosition, float wx, float wy) {
+        //区块编号换算成世界坐标（区块左下角），再取中心区域
+        float chunkWorldX = chunkPosition.getX() * Chunk.ChunkWidth;
+        float chunkWorldY = chunkPosition.getY() * Chunk.ChunkHeight;
         Rectangle chunkCenterZone = new Rectangle(
-            chunkPosition.getX() + 5f,
-            chunkPosition.getY() + 5f,
+            chunkWorldX + 5f,
+            chunkWorldY + 5f,
             6f, 6f);
         return chunkCenterZone.contains(wx, wy);
     }

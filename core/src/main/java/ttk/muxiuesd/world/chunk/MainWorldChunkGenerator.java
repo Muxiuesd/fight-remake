@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.chunk;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
@@ -13,6 +12,7 @@ import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 主世界区块生成器
@@ -49,7 +49,8 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
             if (chunk.getBlock(x, y) instanceof BlockWater) {
                 return;
             }
-            int random = MathUtils.random(0, 15);
+            //使用 ThreadLocalRandom：区块生成在线程池中并发执行，MathUtils.random 内部共享 Random 非线程安全
+            int random = ThreadLocalRandom.current().nextInt(0, 16);
             if (random < 1) {
                 Wall<?> wall = Walls.SMOOTH_STONE.createSelf(new Vector2(chunk.getWorldX(x), chunk.getWorldY(y)));
                 chunk.setWall(wall, x, y);
