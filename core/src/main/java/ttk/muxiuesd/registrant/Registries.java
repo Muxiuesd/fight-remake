@@ -1,6 +1,6 @@
 package ttk.muxiuesd.registrant;
 
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
@@ -32,7 +32,7 @@ import java.util.LinkedHashMap;
 public class Registries {
     public static final HashMap<RegistryKey<?>, Registry<?>> ALL_REGISTRY = new HashMap<>();
 
-    public static final Registry<Codec<?, ?, ?>> CODEC = create(RegistryKeys.CODEC);
+    public static final Registry<Codec<?>> CODEC = create(RegistryKeys.CODEC);
 
     public static final Registry<Item> ITEM = create(RegistryKeys.ITEM);
     public static final Registry<ItemGroup> ITEM_GROUP = create(RegistryKeys.ITEM_GROUP);
@@ -131,6 +131,17 @@ public class Registries {
                 throw new RuntimeException("注册Id：" + id + " 不存在！！！");
             }
             return this.regedit.get(this.idMap.get(id));
+        }
+
+        /**
+         * 安全获取：id 未注册时返回 null 而不是抛异常
+         * <p>
+         * 用于存档解码等容错路径（未知 id 的旧数据应跳过而不是崩溃/整块重建）
+         * */
+        public T getOrNull (String id) {
+            Identifier identifier = this.idMap.get(id);
+            if (identifier == null) return null;
+            return this.regedit.get(identifier);
         }
 
         @Override

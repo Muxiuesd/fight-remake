@@ -241,7 +241,8 @@ public class PlayerSystem extends WorldSystem {
         String playerJson = UnifiedFileUtil.readFileAsString(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
         RawObject playerRaw = RawObjectJsonConverter.fromJson(playerJson);
         DataResult<Player> playerResult = Player.CODEC.decode(playerRaw);
-        if (playerResult.isSuccess()) {
+        //error 但 result 有值时也使用解码结果（如旧存档缺失新字段导致的部分失败），避免玩家数据整体丢失
+        if (playerResult.result().isPresent()) {
             return playerResult.result().get();
         }
         Log.error(TAG(), "玩家读取失败！json原文：" + playerJson);

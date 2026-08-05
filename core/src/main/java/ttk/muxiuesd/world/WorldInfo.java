@@ -1,13 +1,17 @@
 package ttk.muxiuesd.world;
 
-import game.muxiuesd.bedrockcore.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.DataResult;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
+import ttk.muxiuesd.serialization.hashmap.FloatHashMapCodec;
+import ttk.muxiuesd.serialization.hashmap.IntHashMapCodec;
+import ttk.muxiuesd.serialization.hashmap.LongHashMapCodec;
 
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 世界信息类
@@ -15,7 +19,53 @@ import java.util.Optional;
  * 存储一些需要跟随存档读写的数据
  * */
 public class WorldInfo {
-    public static final Codec CODEC = new Codec();
+    /**
+     * 世界信息的现代化编解码器（新式 RawObject 格式，键结构与旧 JSON 格式兼容）
+     */
+    public static final Codec<WorldInfo> CODEC = new Codec<>() {
+        @Override
+        public RawObject encode (WorldInfo obj) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            obj.information.forEach((id, mapCodec) -> {
+                Map<String, Object> inner = new LinkedHashMap<>();
+                mapCodec.forEach((key, value) -> inner.put(key, value));
+                map.put(id, inner);
+            });
+            return RawObject.ofMap(map);
+        }
+
+        @Override
+        public DataResult<WorldInfo> decode (RawObject input) {
+            if (!input.isMap()) return DataResult.error("Expected a map");
+            WorldInfo worldInfo = new WorldInfo();
+
+            input.asMap().get().forEach((infoTypeId, rawValue) -> {
+                //未知的信息类型（旧存档数据/已移除的info type）：跳过，不崩溃
+                WorldInfoHashMap<?, ?> infoTypeMap = worldInfo.getInfoTypeMap(infoTypeId);
+                if (infoTypeMap == null) return;
+
+                RawObject inner = game.muxiuesd.bedrockcore.serialization.Codec.wrap(rawValue);
+                if (!inner.isMap()) return;
+                inner.asMap().get().forEach((key, value) -> {
+                    ((Map<String, Object>) infoTypeMap).put(key, convertValue(infoTypeMap, value));
+                });
+            });
+
+            return DataResult.success(worldInfo);
+        }
+
+        /**
+         * 根据 map 的类型把 JSON 解析出的数值转换到正确的类型
+         */
+        private Object convertValue (WorldInfoHashMap<?, ?> map, Object raw) {
+            if (raw instanceof Number n) {
+                if (map instanceof IntHashMapCodec) return n.intValue();
+                if (map instanceof LongHashMapCodec) return n.longValue();
+                if (map instanceof FloatHashMapCodec) return n.floatValue();
+            }
+            return raw;
+        }
+    };
     public static WorldInfo INSTANCE;
     public static String FILE_NAME = "worldInfo.json";
 
@@ -71,30 +121,5 @@ public class WorldInfo {
     public  WorldInfoHashMap<?, ?> getInfoTypeMap (String infoTypeId) {
         if (!this.information.containsKey(infoTypeId)) return null;
         return this.information.get(infoTypeId);
-    }
-
-    /**
-    * 编解码器
-    * */
-    public static class Codec extends JsonCodec<WorldInfo> {
-        @Override
-        public void encode (WorldInfo obj, JsonDataWriter dataWriter) {
-            for (WorldInfoHashMap<?, ?> mapCodec : obj.information.values()) {
-                dataWriter.objStart(mapCodec.getId());
-                mapCodec.encode(dataWriter);
-                dataWriter.objEnd();
-            }
-        }
-        @Override
-        public Optional<WorldInfo> parse (JsonDataReader dataReader) {
-            WorldInfo worldInfo = new WorldInfo();
-
-            dataReader.getParse().forEach((obj -> {
-                WorldInfoHashMap<?, ?> infoTypeMap = worldInfo.getInfoTypeMap(obj.name());
-                infoTypeMap.decode(new JsonDataReader(obj));
-            }));
-
-            return Optional.of(worldInfo);
-        }
     }
 }

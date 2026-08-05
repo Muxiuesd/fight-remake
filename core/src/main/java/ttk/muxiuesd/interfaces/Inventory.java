@@ -160,6 +160,8 @@ public interface Inventory {
                             }
                         } catch (NumberFormatException e) {
                             // 跳过无效键
+                        } catch (Exception e) {
+                            // 未知物品 id 等解码异常（旧存档数据）：跳过该槽位，不中断整个背包解码
                         }
                     }
                 }

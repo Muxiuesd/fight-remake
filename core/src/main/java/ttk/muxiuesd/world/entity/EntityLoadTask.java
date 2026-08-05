@@ -44,8 +44,11 @@ public class EntityLoadTask extends EntityTask {
                     Codec<Entity<?>> codec = (Codec<Entity<?>>) entityProvider.codec;
                     Entity<?> entity = codec.decode(raw).result().orElse(null);
                     if (entity != null) entities.add(entity);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    //单个实体解码失败（如旧存档数据缺失/未注册）：跳过该实体，不影响其他实体
                     ThreadUtils.yield();
+                    game.muxiuesd.bedrockcore.util.Log.error(this.getClass().getName(),
+                        "区块：" + chunkPosName + " 中有一个实体解码失败，已跳过：" + e.getMessage());
                 }
             }
             loadSuccess = true;

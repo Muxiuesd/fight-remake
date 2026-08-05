@@ -1,14 +1,14 @@
 package ttk.muxiuesd.serialization.abs;
 
-import game.muxiuesd.bedrockcore.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.util.Info;
+
+import java.util.HashMap;
 
 /**
  * 世界信息的哈希表
  * */
-public abstract class WorldInfoHashMap<T, V> extends HashMapCodec<T, String, V, JsonDataWriter, JsonDataReader>{
+public abstract class WorldInfoHashMap<T, V> extends HashMap<String, V>{
     private Identifier identifier;
 
     public String getId () {

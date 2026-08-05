@@ -1,23 +1,10 @@
 package ttk.muxiuesd.serialization.hashmap;
 
-import game.muxiuesd.bedrockcore.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 
 /**
  * 可以编解码的String类型的HashMap
  * */
 public class StringHashMapCodec extends WorldInfoHashMap<StringHashMapCodec, String> {
-    @Override
-    public void encode (JsonDataWriter writer) {
-        forEach(writer::writeString);
-    }
 
-    @Override
-    public void decode (JsonDataReader reader) {
-        reader.getParse().forEach(pair -> {
-            //这么写才不会出错
-            put(pair.name(), pair.asString());
-        });
-    }
 }

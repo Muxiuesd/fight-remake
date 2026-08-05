@@ -108,8 +108,13 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
     public void read (JsonDataReader reader) {
         reader.getParse().forEach(propertyTypeValue -> {
             String typeId = propertyTypeValue.name();
-            //查找注册的属性类型
-            PropertyType propertyType = Registries.PROPERTY_TYPE.get(typeId);
+            //查找注册的属性类型（未知属性类型跳过，与 CodecJsonPropertiesMap 的降级行为一致）
+            PropertyType propertyType = Registries.PROPERTY_TYPE.getOrNull(typeId);
+            if (propertyType == null) {
+                game.muxiuesd.bedrockcore.util.Log.error(this.getClass().getName(),
+                    "属性类型：" + typeId + " 未注册，已跳过该属性（旧存档数据）");
+                return;
+            }
             Object value = propertyType.read(reader, typeId);
             this.add(propertyType, value);
         });

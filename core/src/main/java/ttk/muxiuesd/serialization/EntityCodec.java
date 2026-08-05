@@ -34,10 +34,21 @@ public class EntityCodec extends JsonCodec<Entity<?>> {
     @Override
     public Optional<Entity<?>> parse (JsonDataReader dataReader) {
         String id = dataReader.readString("id");
-        EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
+        EntityProvider<?> entityProvider = Registries.ENTITY.getOrNull(id);
+        if (entityProvider == null) {
+            return Optional.empty();
+        }
 
         String typeId = dataReader.readString("type");
-        EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.get(typeId);
+        EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.getOrNull(typeId);
+        if (entityType == null) {
+            return Optional.empty();
+        }
+        //菜单场景（无世界）时无法创建实体，返回空
+        if (FightCore.getInstance().mainGameScreen == null
+            || FightCore.getInstance().mainGameScreen.getWorld() == null) {
+            return Optional.empty();
+        }
         Entity<?> entity = entityProvider.create(FightCore.getInstance().mainGameScreen.getWorld(), entityType);
 
         JsonValue propertyValue = dataReader.readObj("property");

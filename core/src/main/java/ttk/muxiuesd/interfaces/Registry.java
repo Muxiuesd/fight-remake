@@ -24,6 +24,13 @@ public interface Registry<T> {
     T get(String id);
 
     /**
+     * 安全获取：id 未注册时返回 null 而不是抛异常（存档解码等容错路径使用）
+     * */
+    default T getOrNull(String id) {
+        return null;
+    }
+
+    /**
      * 根据id类检测是否包含
      * */
     boolean contains (Identifier identifier);

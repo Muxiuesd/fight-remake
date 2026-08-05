@@ -650,6 +650,11 @@ public abstract class Entity<T extends Entity<T>>
             return this.get(PropertyTypes.CATS);
         }
 
+        public Entity.Property setCatsHolder (CatsHolder catsHolder) {
+            this.add(PropertyTypes.CATS, catsHolder);
+            return this;
+        }
+
         public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
             return this.propertiesMap;
         }

@@ -6,6 +6,9 @@ import game.muxiuesd.bedrockcore.serialization.builders.CodecBuilder2;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.serialization.codecs.CodecCatsHolder;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
@@ -37,7 +40,23 @@ public class EntityCodecBuilder {
             .field("scaleX", Entity::getScaleX, Entity::setScaleX, Codec.FLOAT)
             .field("scaleY", Entity::getScaleY, Entity::setScaleY, Codec.FLOAT)
             .field("rotation", Entity::getRotation, Entity::setRotation, Codec.FLOAT)
-            .field("onGround", Entity::isOnGround, Entity::setOnGround, Codec.BOOL);
+            .field("onGround", Entity::isOnGround, Entity::setOnGround, Codec.BOOL)
+            //cats 自定义数据：编码时先把实体字段写入 cats，解码时恢复（缺失字段时跳过，兼容旧存档）
+            .field("cats",
+                entity -> {
+                    CatsHolder cats = entity.getProperty().getCatsHolder();
+                    //防御：property 异常路径可能没有 CATS 属性
+                    if (cats == null) cats = new CatsHolder();
+                    entity.writeCatData(cats);
+                    return cats;
+                },
+                (entity, cats) -> {
+                    if (cats != null) {
+                        entity.getProperty().setCatsHolder(cats);
+                        entity.readCatData(CodecCatsHolder.toJsonValue(cats));
+                    }
+                },
+                CodecCatsHolder.CODEC);
     }
 
     /**
@@ -46,8 +65,20 @@ public class EntityCodecBuilder {
      * 解码时实体由注册表内的工厂创建，从而保证创建出来的是正确的实体类
      * */
     public static <T extends Entity<?>> T createEntity (String id, String typeId) {
-        EntityProvider<?> entityProvider = Registries.ENTITY.get(id);
-        EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.get(typeId);
-        return (T) entityProvider.create(FightCore.getInstance().mainGameScreen.getWorld(), entityType);
+        EntityProvider<?> entityProvider = Registries.ENTITY.getOrNull(id);
+        if (entityProvider == null) {
+            throw new IllegalArgumentException("实体注册表中不存在id为：" + id + " 的实体（旧存档数据）");
+        }
+        EntityType<Entity<?>> entityType = (EntityType<Entity<?>>) Registries.ENTITY_TYPE.getOrNull(typeId);
+        if (entityType == null) {
+            throw new IllegalArgumentException("实体类型注册表中不存在id为：" + typeId + " 的实体类型（旧存档数据）");
+        }
+        World world = FightCore.getInstance().mainGameScreen == null
+            ? null
+            : FightCore.getInstance().mainGameScreen.getWorld();
+        if (world == null) {
+            throw new IllegalStateException("当前没有可用的世界（实体必须在游戏世界中加载）");
+        }
+        return (T) entityProvider.create(world, entityType);
     }
 }

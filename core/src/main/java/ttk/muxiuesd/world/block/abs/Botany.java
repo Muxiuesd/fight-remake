@@ -47,7 +47,7 @@ public abstract class Botany extends Block implements Tickable, ICatData {
             Botany::setProperty,
             Block.Property.CODEC)
         .factory(id -> {
-            Block block = Registries.BLOCK.get(id);
+            Block block = Registries.BLOCK.getOrNull(id);
             if (block instanceof Botany botany) return botany.createSelf();
             throw new IllegalArgumentException("方块注册表中不存在植物方块：" + id);
         });

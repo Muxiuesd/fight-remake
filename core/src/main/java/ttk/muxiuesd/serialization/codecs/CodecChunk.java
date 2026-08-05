@@ -84,33 +84,45 @@ public class CodecChunk {
             chunk.traversal((x, y) -> {
                 String name = getCellName(x, y);
 
-                //方块
+                //方块（解码异常时跳过该格，不中断整块区块）
                 if (blocks.containsKey(name)) {
-                    DataResult<Block> blockResult = decodeBlock(Codec.wrap(blocks.get(name)));
-                    if (blockResult.isSuccess()) {
-                        chunk.setBlock(blockResult.result().get(), x, y);
-                    } else {
-                        errors.append("[").append(name).append("]方块: ").append(blockResult.error().orElse("")).append("; ");
+                    try {
+                        DataResult<Block> blockResult = decodeBlock(Codec.wrap(blocks.get(name)));
+                        if (blockResult.isSuccess()) {
+                            chunk.setBlock(blockResult.result().get(), x, y);
+                        } else {
+                            errors.append("[").append(name).append("]方块: ").append(blockResult.error().orElse("")).append("; ");
+                        }
+                    } catch (Exception e) {
+                        errors.append("[").append(name).append("]方块解码异常: ").append(e.getMessage()).append("; ");
                     }
                 }
 
-                //墙体
+                //墙体（解码异常时跳过该格，不中断整块区块）
                 if (walls.containsKey(name)) {
-                    DataResult<Wall<?>> wallResult = Wall.CODEC.decode(Codec.wrap(walls.get(name)));
-                    if (wallResult.isSuccess()) {
-                        chunk.setWall(wallResult.result().get(), x, y);
-                    } else {
-                        errors.append("[").append(name).append("]墙体: ").append(wallResult.error().orElse("")).append("; ");
+                    try {
+                        DataResult<Wall<?>> wallResult = Wall.CODEC.decode(Codec.wrap(walls.get(name)));
+                        if (wallResult.isSuccess()) {
+                            chunk.setWall(wallResult.result().get(), x, y);
+                        } else {
+                            errors.append("[").append(name).append("]墙体: ").append(wallResult.error().orElse("")).append("; ");
+                        }
+                    } catch (Exception e) {
+                        errors.append("[").append(name).append("]墙体解码异常: ").append(e.getMessage()).append("; ");
                     }
                 }
 
-                //植物
+                //植物（解码异常时跳过该格，不中断整块区块）
                 if (botanys.containsKey(name)) {
-                    DataResult<Botany> botanyResult = Botany.CODEC.decode(Codec.wrap(botanys.get(name)));
-                    if (botanyResult.isSuccess()) {
-                        chunk.setBotany(botanyResult.result().get(), x, y);
-                    } else {
-                        errors.append("[").append(name).append("]植物: ").append(botanyResult.error().orElse("")).append("; ");
+                    try {
+                        DataResult<Botany> botanyResult = Botany.CODEC.decode(Codec.wrap(botanys.get(name)));
+                        if (botanyResult.isSuccess()) {
+                            chunk.setBotany(botanyResult.result().get(), x, y);
+                        } else {
+                            errors.append("[").append(name).append("]植物: ").append(botanyResult.error().orElse("")).append("; ");
+                        }
+                    } catch (Exception e) {
+                        errors.append("[").append(name).append("]植物解码异常: ").append(e.getMessage()).append("; ");
                     }
                 }
 
@@ -139,9 +151,9 @@ public class CodecChunk {
      * */
     private static DataResult<Block> decodeBlock (RawObject raw) {
         if (raw.isString()) {
-            //普通方块
+            //普通方块（getOrNull：未知 id 返回 null 不抛异常，该格降级为空气方块）
             String id = raw.asString().get();
-            Block block = Registries.BLOCK.get(id);
+            Block block = Registries.BLOCK.getOrNull(id);
             if (block == null) return DataResult.error("不存在的方块：" + id);
             return DataResult.success(block);
         }
@@ -149,7 +161,7 @@ public class CodecChunk {
             //带方块实体的方块
             String id = Codec.STRING.decode(Codec.wrap(raw.asMap().get().get("id"))).result().orElse(null);
             if (id == null) return DataResult.error("缺少方块id");
-            Block prototype = Registries.BLOCK.get(id);
+            Block prototype = Registries.BLOCK.getOrNull(id);
             if (prototype == null) return DataResult.error("不存在的方块：" + id);
             Codec<Block> codec = (Codec<Block>) prototype.getCodec();
             return codec.decode(raw);

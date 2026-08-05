@@ -1,7 +1,5 @@
 package ttk.muxiuesd.serialization.hashmap;
 
-import game.muxiuesd.bedrockcore.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 
 /**
@@ -9,16 +7,4 @@ import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
  * */
 public class IntHashMapCodec extends WorldInfoHashMap<IntHashMapCodec, Integer> {
 
-    @Override
-    public void encode (JsonDataWriter writer) {
-        forEach(writer::writeInt);
-    }
-
-    @Override
-    public void decode (JsonDataReader reader) {
-        reader.getParse().forEach(pair -> {
-            //这么写才不会出错
-            put(pair.name(), pair.asInt());
-        });
-    }
 }

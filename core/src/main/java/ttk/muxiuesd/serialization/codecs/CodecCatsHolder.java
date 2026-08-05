@@ -48,7 +48,7 @@ public class CodecCatsHolder {
      * */
     private static CatValue<?> createCatValue (Object raw) {
         if (raw instanceof Integer i) return new CatInt(i);
-        if (raw instanceof Long l) return new CatInt(l.intValue());
+        if (raw instanceof Long l) return new CatLong(l);
         if (raw instanceof Boolean b) return new CatBoolean(b);
         if (raw instanceof Float f) return new CatFloat(f);
         if (raw instanceof Double d) return new CatFloat(d.floatValue());
@@ -72,6 +72,7 @@ public class CodecCatsHolder {
     private static JsonValue toJsonValue (CatValue<?> catValue) {
         Object value = catValue.get();
         if (value instanceof Integer i) return new JsonValue(i);
+        if (value instanceof Long l) return new JsonValue(l);
         if (value instanceof Boolean b) return new JsonValue(b);
         if (value instanceof Float f) return new JsonValue(f);
         if (value instanceof Double d) return new JsonValue(d);

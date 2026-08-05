@@ -30,7 +30,10 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
         .paramField("y", wall -> wall.y, Codec.FLOAT)
         .field("property", Wall::getProperty, Wall::setProperty, Block.Property.CODEC)
         .factory((id, x, y) -> {
-            Wall<?> prototype = Registries.WALL.get(id);
+            Wall<?> prototype = Registries.WALL.getOrNull(id);
+            if (prototype == null) {
+                throw new IllegalArgumentException("墙体注册表中不存在id为：" + id + " 的墙体原型（旧存档数据）");
+            }
             Wall<?> self = prototype.createSelf(new Vector2(x, y));
             self.setID(id);
             return self;
