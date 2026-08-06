@@ -85,9 +85,9 @@ public class WorldMapNoise {
         double t2 = 0.5 - x2 * x2 - y2 * y2;
         double n2 = (t2 < 0) ? 0.0 : Math.pow(t2, 4) * dot(gradient2, x2, y2);
 
-        //Simplex 噪声（n0+n1+n2）输出范围约 [-1, 1]；
-        //之前放大 70 倍导致 getNorNoise 的 (v+1)/2 归一化失效（实际 [-34.5, 35.5]），地形高度饱和
-        return n0 + n1 + n2;
+        //70 是标准 2D Simplex 噪声的归一化常数：单角贡献 t^4·dot 最大约 0.088，
+        //三个角求和后必须乘 70 才能得到约 [-1,1] 的输出范围（去掉会导致地形高度几乎恒定）
+        return 70.0 * (n0 + n1 + n2);
     }
 
     private static int fastFloor (double value) {
