@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.effect;
 
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
@@ -11,8 +12,8 @@ import ttk.muxiuesd.world.entity.abs.StatusEffect;
  * 中毒效果
  * */
 public class EffectPoison extends StatusEffect {
-    public EffectPoison (String id) {
-        super(id, Fight.UITexturePath("effect/poison.png"));
+    public EffectPoison (Identifier identifier) {
+        super(identifier, Fight.UITexturePath("effect/poison.png"));
     }
 
     @Override

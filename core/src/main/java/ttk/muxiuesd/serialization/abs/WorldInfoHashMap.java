@@ -1,21 +1,32 @@
 package ttk.muxiuesd.serialization.abs;
 
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.util.Info;
+
+import java.util.HashMap;
 
 /**
  * 世界信息的哈希表
  * */
-public abstract class WorldInfoHashMap<T, V> extends HashMapCodec<T, String, V, JsonDataWriter, JsonDataReader>{
-    private String id;
+public abstract class WorldInfoHashMap<T, V> extends HashMap<String, V>{
+    private Identifier identifier;
 
     public String getId () {
-        return id;
+        return this.getIdentifier() == null ? null : this.getIdentifier().getID();
+    }
+
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public WorldInfoHashMap<T, V> setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
     public WorldInfoHashMap<T, V> setId (String id) {
-        this.id = id;
+        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
+        this.identifier = new Identifier(id);
         return this;
     }
 

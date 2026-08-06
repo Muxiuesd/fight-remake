@@ -3,9 +3,10 @@ package ttk.muxiuesd.property;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataReader;
 import game.muxiuesd.bedrockcore.app.interfaces.data.DataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.audio.AudioHolder;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Sounds;
 
@@ -30,5 +31,9 @@ public class PropertyItemUseSound extends PropertyType<AudioHolder>{
             audioHolder = Registries.AUDIOS.get(obj.getString("id"));
         }
         return audioHolder;
+    }
+    @Override
+    public Codec<AudioHolder> getValueCodec () {
+        return AudioHolder.CODEC;
     }
 }

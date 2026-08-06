@@ -26,14 +26,6 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
     private float visionRange;  //视野范围
     private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
 
-    public Enemy (World world, EntityType<?> entityType,
-                  String textureId, float maxHealth, float curHealth,
-                  float visionRange, float attackRange, float attackSpan, float speed) {
-        this(world, entityType, maxHealth, curHealth, visionRange, attackRange, attackSpan, speed);
-
-        //this.setBodyTextureRegion(getTextureRegion(textureId, null));
-    }
-
     public Enemy (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10, 10, 5, 2, 3);
     }
@@ -63,7 +55,7 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         }*/
 
         //先坐标更新，再更新其他的，否则实体移动速度有bug
-        positionChange(delta);
+        // positionChange 已移至 GroundEntityCollisionSystem 统一处理
         super.update(delta);
     }
 
@@ -72,6 +64,11 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
      * */
     public void walkToTarget (float delta) {
         Entity<?> target = this.getCurTarget();
+        //无目标或目标死亡时不做任何移动
+        if (target == null || (target instanceof LivingEntity<?> livingEntity && livingEntity.isDeath())) {
+            this.setVelocity(0, 0);
+            return;
+        }
         Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
         setVelocity(direction.getX(), direction.getY());
         setCurSpeed(getSpeed());
@@ -114,6 +111,10 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         this.attackTimer.update(delta);
 
         Entity<?> target = this.getCurTarget();
+        //无目标或目标已死亡不攻击
+        if (target == null || (target instanceof LivingEntity<?> livingEntity && livingEntity.isDeath())) {
+            return;
+        }
         float distance = Util.getDistance(this, target);
         //在攻击范围之外不攻击
         if (distance > this.getAttackRange()) {
@@ -140,7 +141,8 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.ID("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
-        bullet.setPosition(getX() + (getWidth() - bullet.getWidth())/2, getY() + (getHeight() - bullet.getHeight())/2);
+        //实体坐标与子弹坐标都是中心坐标，直接对齐发射
+        bullet.setPosition(getX(), getY());
         bullet.setVelocity(direction, bullet.getSpeed());
         return bullet;
     }

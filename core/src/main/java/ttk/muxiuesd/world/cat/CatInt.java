@@ -1,7 +1,7 @@
 package ttk.muxiuesd.world.cat;
 
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 
 public class CatInt extends CatValue<Integer>{
     public CatInt (int value) {

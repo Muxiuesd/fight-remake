@@ -38,9 +38,10 @@ public class FightUITextButton extends UITextButton {
 
     @Override
     public void playClickSound () {
+        Vector3 pos = new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0);
         SpatialAudioSystem.getInstance().playUIAudio(
             Sounds.ITEM_CLICK,
-            () -> new Vector3(getX() + getWidth() / 2f, getY() + getHeight() / 2f, 0)
+            () -> pos
         );
     }
 }

@@ -1,4 +1,4 @@
-package ttk.muxiuesd.data;
+package game.muxiuesd.bedrockcore.data;
 
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;

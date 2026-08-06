@@ -8,8 +8,8 @@ import game.muxiuesd.bedrockcore.app.ui.components.UITextField;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
@@ -17,12 +17,8 @@ import ttk.muxiuesd.ui.components.FightUITextField;
 import ttk.muxiuesd.ui.components.SavesListUI;
 import ttk.muxiuesd.ui.components.WorldSaveButtonUI;
 import ttk.muxiuesd.ui.text.Text;
-import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.WorldInfo;
-
-import javax.swing.text.html.HTML;
-import java.util.Arrays;
 
 /**
  * 世界存档选择菜单UIScreen
@@ -121,13 +117,13 @@ public class WorldsMenuUIScreen extends UIScreen {
      * 读取存档目录
      * */
     public void readSavesDir () {
-        boolean saveDirIsExist = AbsFileUtil.dirExists(Fight.PATH_SAVE);
+        boolean saveDirIsExist = UnifiedFileUtil.dirExists(Fight.PATH_SAVE);
         if (!saveDirIsExist) {
             Log.error(this.getClass().getName(), "没有存档文件夹， 已自动创建！！！");
         }
 
         //读取存档文件夹下所有的存档文件目录
-        FileHandle savesDirFileHandle = AbsFileUtil.getFileHandle(Fight.PATH_SAVE);
+        FileHandle savesDirFileHandle = UnifiedFileUtil.getFileHandle(Fight.PATH_SAVE);
         FileHandle[] saveDirs = savesDirFileHandle.list();
         Log.print(TAG, "探查到存档目录：");
 
@@ -145,10 +141,10 @@ public class WorldsMenuUIScreen extends UIScreen {
         //读取目录中的世界信息
         for (FileHandle saveDir : saveDirs) {
             //如果不存在世界信息文件就跳过这个目录
-            if (! AbsFileUtil.fileExists(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME)) continue;
+            if (! UnifiedFileUtil.fileExists(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME)) continue;
 
             //有世界信息文件就读取
-            JsonValue worldInfoJsonFile = AbsFileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
+            JsonValue worldInfoJsonFile = UnifiedFileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
             JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
 
             JsonValue stringValues = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
@@ -183,3 +179,4 @@ public class WorldsMenuUIScreen extends UIScreen {
         return this;
     }
 }
+

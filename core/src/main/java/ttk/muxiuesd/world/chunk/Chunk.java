@@ -10,12 +10,15 @@ import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
 import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.WallRendererRegistry;
+import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.serialization.codecs.CodecChunk;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -29,6 +32,11 @@ import ttk.muxiuesd.world.wall.Wall;
  * 一行一行更新绘制
  * */
 public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
+    /**
+     * 区块的现代化编解码器
+     * */
+    public static final Codec<Chunk> CODEC = CodecChunk.CODEC;
+
     /**
      * 将传入的世界坐标转换为这个区块里的方块数组坐标
      * @param rwx 四舍五入过的世界横坐标
@@ -150,8 +158,11 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     /**
      * 在对应坐标上设置方块
+     * <p>
+     * block 为 null 时用空气方块占位（防止 addBlock(null) NPE）
      * */
     public void setBlock (Block block, int cx, int cy) {
+        if (block == null) block = Blocks.ARI;
         this.blocks[cy][cx] = block;
         //确保区块系统里存在这个方块
         if (this.chunkSystem != null) {

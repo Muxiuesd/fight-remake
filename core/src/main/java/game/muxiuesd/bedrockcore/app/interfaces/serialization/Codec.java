@@ -11,7 +11,9 @@ import java.util.Optional;
  * @param <T> 需要被编解码的类型
  * @param <W> 数据写入类
  * @param <R> 数据读取类
+ * @deprecated 已弃用：请使用新式编解码器 {@link game.muxiuesd.bedrockcore.serialization.Codec}（RawObject 格式）
  * */
+@Deprecated
 public interface Codec<T, W extends DataWriter<?>, R extends DataReader<?>> {
     /**
      * 编码成指定格式

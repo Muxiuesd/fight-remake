@@ -2,6 +2,7 @@ package game.muxiuesd.bedrockcore.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 /**
@@ -92,6 +93,47 @@ public class UnifiedFileUtil {
     }
 
     /**
+     * 获取文件处理
+     * @param path 带标记的路径
+     * */
+    public static FileHandle getFileHandle (String path) {
+        FileUtil fileUtil = getFileUtil(path);
+        return fileUtil.getFileHandle(removePathStarts(path));
+    }
+
+    /**
+     * 获取文件处理
+     * @param path 带标记的路径
+     * @param name 文件或文件夹名称
+     * */
+    public static FileHandle getFileHandle (String path, String name) {
+        FileUtil fileUtil = getFileUtil(path);
+        return fileUtil.getFileHandle(removePathStarts(path), name);
+    }
+
+    /**
+     * 原子写入文件（先写临时文件再重命名）
+     * <p>
+     * 防止写入过程中被中断/并发写导致半截文件损坏存档
+     * */
+    public static void writeFileAtomic (String path, String fileName, String content) {
+        FileUtil fileUtil = getFileUtil(path);
+        String cleanPath = removePathStarts(path);
+
+        FileHandle tmpFile = fileUtil.getFileHandle(cleanPath, fileName + ".tmp");
+        tmpFile.writeString(content, false);
+
+        java.io.File tmp = tmpFile.file();
+        java.io.File target = fileUtil.getFileHandle(cleanPath, fileName).file();
+        //同目录下 renameTo 是原子操作；Windows 上目标存在时 rename 会失败，先删除目标
+        if (target.exists()) target.delete();
+        if (tmp.renameTo(target)) return;
+        //rename 失败（如文件被占用），回退为直接写目标
+        fileUtil.getFileHandle(cleanPath, fileName).writeString(content, false);
+        tmp.delete();
+    }
+
+    /**
      * 创建文件夹
      * @param path 路径
      * @param dirName 文件夹名称
@@ -154,6 +196,29 @@ public class UnifiedFileUtil {
     public static boolean fileExists (String path, String fileName) {
         FileUtil fileUtil = getFileUtil(path);
         return fileUtil.fileExists(removePathStarts(path), fileName);
+    }
+
+    /**
+     * 判断文件是否存在
+     * @param fileHandle 文件夹的文件处理
+     * */
+    public static boolean fileExists (FileHandle fileHandle, String fileName) {
+        FileHandle file = fileHandle.child(fileName);
+        return file.exists() && !file.isDirectory();
+    }
+
+    /**
+     * 将读取到的json文件转化为json值
+     * @param fileHandle 文件夹的文件处理
+     * @param fileName 默认.json后缀
+     * */
+    public static JsonValue readJsonFile (FileHandle fileHandle, String fileName) {
+        if (fileName.endsWith(".json")) {
+            String string = fileHandle.child(fileName).readString();
+            return new JsonReader().parse(string);
+        }
+        String string = fileHandle.child(fileName + ".json").readString();
+        return new JsonReader().parse(string);
     }
 
     /**

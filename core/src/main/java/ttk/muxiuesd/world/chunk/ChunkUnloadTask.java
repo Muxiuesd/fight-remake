@@ -1,8 +1,9 @@
 package ttk.muxiuesd.world.chunk;
 
-import ttk.muxiuesd.data.ChunkJsonDataOutput;
-import ttk.muxiuesd.data.JsonDataWriter;
-import ttk.muxiuesd.registry.Codecs;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.world.chunk.abs.ChunkTask;
 
@@ -19,11 +20,13 @@ public class ChunkUnloadTask extends ChunkTask {
 
     @Override
     public Chunk call() {
-        JsonDataWriter chunkDataWriter = new JsonDataWriter();
-        chunkDataWriter.objStart();
-        Codecs.CHUNK.encode(this.chunk, chunkDataWriter);
-        chunkDataWriter.objEnd();
-        new ChunkJsonDataOutput(chunk.getChunkPosition().toString()).output(chunkDataWriter);
+        RawObject rawObject = Chunk.CODEC.encode(this.chunk);
+        String json = RawObjectJsonConverter.toJson(rawObject);
+        //原子写入：先写临时文件再重命名，防止写盘被中断导致半截文件损坏存档
+        UnifiedFileUtil.writeFileAtomic(
+            Fight.getPathSaveChunks(),
+            this.chunk.getChunkPosition().toString() + ".json",
+            json);
 
         return this.chunk;
     }

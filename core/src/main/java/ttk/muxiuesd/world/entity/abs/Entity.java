@@ -6,22 +6,22 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codecable;
 import game.muxiuesd.bedrockcore.math.Vec2;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.data.abs.PropertiesDataMap;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.property.PropertyType;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.util.Util;
@@ -41,7 +41,15 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
  * 拥有游戏内的坐标、运动参数以及渲染参数
  */
 public abstract class Entity<T extends Entity<T>>
-    implements ID<T>, ICatData, Disposable, Updateable, Tickable, Codecable {
+    implements ID<T>, ICatData, Disposable, Updateable, Tickable {
+
+    /**
+     * 基础实体的现代化编解码器
+     * <p>
+     * 解码时通过实体注册表创建实例，编码时仅编码基础实体自身的字段
+     */
+    public static final Codec<Entity<?>> CODEC = EntityCodecBuilder.<Entity<?>>create()
+        .factory(EntityCodecBuilder::createEntity);
 
     /**
      * 加载纹理区域
@@ -57,7 +65,7 @@ public abstract class Entity<T extends Entity<T>>
     /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
-    private String id;  //实体的id
+    private Identifier identifier;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
     private float speed;
     private float x, y;                     //实体的世界坐标
@@ -91,11 +99,12 @@ public abstract class Entity<T extends Entity<T>>
     @Override
     public void readCatData (JsonValue values) {
         this.speed = values.getFloat("speed", 1.145f);
-        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
         this.x = values.getFloat("x", 1.145f);
         this.y = values.getFloat("y", 1.145f);
         this.velX = values.getFloat("velX", 0);
         this.velY = values.getFloat("velY", 0);
+        //curSpeed 在速度矢量之后设置（setCurSpeed 缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
+        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
         this.width = values.getFloat("width", 1f);
         this.height = values.getFloat("height", 1f);
         this.originX = values.getFloat("originX", 0);
@@ -149,7 +158,7 @@ public abstract class Entity<T extends Entity<T>>
      * */
     public void updateHitboxCenterPos (float x, float y) {
         this.getHitboxHolder().getBoxes().forEach((id, box) -> {
-            box.setCenterPos(this.x, this.y);
+            box.setCenterPos(x, y);
         });
     }
 
@@ -165,6 +174,7 @@ public abstract class Entity<T extends Entity<T>>
         if (this.textureRegion != null) {
             this.textureRegion = null;
         }
+        this.bodyTextureRegionResource = null;
     }
 
     /**
@@ -262,7 +272,8 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     public T setSpeed (float speed) {
-        if (this.speed >= 0) {
+        //守卫检查新值（原来检查旧值，负速度可被写入且无法改回）
+        if (speed >= 0) {
             this.speed = speed;
         }
         return (T) this;
@@ -276,13 +287,16 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 设置当前速率
+     * 设置当前速率（缩放已有速度矢量到指定长度）
+     * <p>
+     * 注意：必须先设置速度矢量（{@link #setVelocity(float, float)}）再调用本方法；
+     * 速度矢量为零时无法确定方向，保持为零
      * */
     public T setCurSpeed (float curSpeed) {
         curSpeed = Math.abs(curSpeed);
         float len = Vec2.len(this.getVelX(), this.getVelY());
         if (len < EntitySystem.MIN_SPEED) {
-            //当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
+            //当前速度为零（没有方向可缩放），保持速度为零
             this.setVelocity(0, 0);
             return (T) this;
         }
@@ -492,7 +506,7 @@ public abstract class Entity<T extends Entity<T>>
      * 获取身体的贴图材质
      * */
     public TextureRegion getBodyTextureRegion () {
-        return this.bodyTextureRegionResource.get();
+        return this.bodyTextureRegionResource != null ? this.bodyTextureRegionResource.get() : null;
     }
 
     /**
@@ -519,18 +533,99 @@ public abstract class Entity<T extends Entity<T>>
 
     @Override
     public String getID () {
-        return this.id;
+        return this.getIdentifier() == null ? null : this.getIdentifier().getID();
     }
 
     @Override
     public T setID (String id) {
-        this.id = id;
+        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
+        this.identifier = new Identifier(id);
         return (T) this;
     }
 
-    @Override
-    public Codec getCodec () {
-        return Codecs.ENTITY;
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
+
+    public T setIdentifier (Identifier identifier) {
+        this.identifier = identifier;
+        return (T) this;
+    }
+
+    /**
+     * 设置实体的宽度（世界渲染）
+     * */
+    public T setWidth (float width) {
+        this.width = width;
+        return (T) this;
+    }
+
+    /**
+     * 设置实体的高度（世界渲染）
+     * */
+    public T setHeight (float height) {
+        this.height = height;
+        return (T) this;
+    }
+
+    /**
+     * 获取旋转中心的x坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public float getOriginX () {
+        return this.originX;
+    }
+
+    /**
+     * 获取旋转中心的y坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public float getOriginY () {
+        return this.originY;
+    }
+
+    /**
+     * 设置旋转中心的x坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public T setOriginX (float originX) {
+        this.originX = originX;
+        return (T) this;
+    }
+
+    /**
+     * 设置旋转中心的y坐标，这个中心是相对于贴图渲染起点的（贴图的左下角）
+     * */
+    public T setOriginY (float originY) {
+        this.originY = originY;
+        return (T) this;
+    }
+
+    /**
+     * 获取x轴缩放比例
+     * */
+    public float getScaleX () {
+        return this.scaleX;
+    }
+
+    /**
+     * 获取y轴缩放比例
+     * */
+    public float getScaleY () {
+        return this.scaleY;
+    }
+
+    /**
+     * 设置x轴缩放比例
+     * */
+    public T setScaleX (float scaleX) {
+        this.scaleX = scaleX;
+        return (T) this;
+    }
+
+    /**
+     * 设置y轴缩放比例
+     * */
+    public T setScaleY (float scaleY) {
+        this.scaleY = scaleY;
+        return (T) this;
     }
 
     /**
@@ -558,6 +653,11 @@ public abstract class Entity<T extends Entity<T>>
 
         public CatsHolder getCatsHolder () {
             return this.get(PropertyTypes.CATS);
+        }
+
+        public Entity.Property setCatsHolder (CatsHolder catsHolder) {
+            this.add(PropertyTypes.CATS, catsHolder);
+            return this;
         }
 
         public PropertiesDataMap<?, ?, ?> getPropertiesMap () {

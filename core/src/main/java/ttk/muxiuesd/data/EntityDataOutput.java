@@ -1,6 +1,7 @@
 package ttk.muxiuesd.data;
 
 import com.badlogic.gdx.utils.Json;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.abs.JsonDataOutput;
@@ -19,11 +20,7 @@ public class EntityDataOutput extends JsonDataOutput {
     public void output (JsonDataWriter writer) {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
-        /*AbsFileUtil.createFile(Fight.getPathSaveEntities(), this.fileName + ".json")
-            .writeString(json.prettyPrint(string), false);*/
-
-        UnifiedFileUtil
-            .createFile(Fight.getPathSaveEntities(), this.fileName + ".json")
-            .writeString(json.prettyPrint(string), false);
+        //原子写入：先写临时文件再重命名，防止写盘被中断导致半截文件损坏存档
+        UnifiedFileUtil.writeFileAtomic(Fight.getPathSaveEntities(), this.fileName + ".json", json.prettyPrint(string));
     }
 }

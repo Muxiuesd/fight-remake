@@ -1,13 +1,13 @@
 package ttk.muxiuesd.world.cat;
 
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.data.JsonDataWriter;
 
 /**
  * 用于存储cat值的包装类
  * */
-public abstract class CatValue<T> implements Cloneable {
+public abstract class CatValue<T> implements Cloneable{
     private T value;
 
     public CatValue(T value) {

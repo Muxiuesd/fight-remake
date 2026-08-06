@@ -2,17 +2,21 @@ package ttk.muxiuesd.world.item.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
+import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
-import ttk.muxiuesd.data.abs.PropertiesDataMap;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
+import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.World;
@@ -24,12 +28,20 @@ import ttk.muxiuesd.world.item.ItemStack;
  * <p>
  * 游戏中一种物品只有一个实例，同一种物品的不同物品堆叠都持有同一个物品实例，对这个物品实例的修改会影响整个游戏的相同物品
  * */
-public abstract class Item implements ID<Item>, ItemUpdateable {
+public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
+    public static final Codec<Item> CODEC = Codec.STRING.xmap(
+        Registries.ITEM::get,       // 解码: String -> Item (从注册表获取)
+        Item::getID                 // 编码: Item -> String (取id)
+    );
+
+
+
     private Identifier identifier;                          //物品的id标识
     public Type type;                                       //物品的类型
     public Property property;                               //物品最原始的属性，原则上不直接对这个原始数据进行操作
     private Resource<TextureRegion> textureRegionResource;  //物品的贴图材质资源
 
+    public Item () {}
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
     }
@@ -81,7 +93,9 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
      * <p>
      * 没有物品行为的物品将不能正常被使用
      * */
-    public abstract IItemStackBehaviour getBehaviour ();
+    public IItemStackBehaviour getBehaviour () {
+        return null;
+    };
 
     /**
      * 获取物品的属性
@@ -111,7 +125,8 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
 
     @Override
     public Item setID (String id) {
-        this.getIdentifier().setID(id);
+        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
+        this.identifier = new Identifier(id);
         return this;
     }
 
@@ -128,7 +143,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
      * 获取物品贴图材质
      * */
     public TextureRegion getTextureRegion () {
-        return this.getTextureRegionResource().get();
+        return this.textureRegionResource != null ? this.textureRegionResource.get() : null;
     }
 
     public Resource<TextureRegion> getTextureRegionResource () {
@@ -138,6 +153,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
     public Item setTextureRegionResource (Resource<TextureRegion> textureRegionResource) {
         this.textureRegionResource = textureRegionResource;
         return this;
+    }
+
+    @Override
+    public Codec<Item> getCodec () {
+        return CODEC;
     }
 
     /**
@@ -153,9 +173,17 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
     /**
      * 物品的属性类
      * */
-    public static class Property {
+    public static class Property implements Codecable<Property>{
+        public static final Codec<Property> CODEC = CodecBuilder.<Property>create()
+            .field("data_map",
+                Property::getPropertiesMap,
+                Property::setPropertiesMap,
+                CodecJsonPropertiesMap.CODEC)
+            .noArgFactory(Property::new);
+
+
         //属性映射
-        private PropertiesDataMap<?, ?, ?> propertiesMap;
+        private JsonPropertiesMap propertiesMap;
 
         /**
          * 实例化默认属性
@@ -179,7 +207,7 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
          * 获取一个属性
          * */
         public <T> T get (PropertyType<T> propertyType) {
-            return getPropertiesMap().get(propertyType);
+            return (T) getPropertiesMap().get(propertyType);
         }
 
         public <T> Property add (PropertyType<T> propertyType, T value) {
@@ -245,11 +273,11 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
             return this.getPropertiesMap().contain(type);
         }
 
-        public PropertiesDataMap<?, ?, ?> getPropertiesMap () {
+        public JsonPropertiesMap getPropertiesMap () {
             return this.propertiesMap;
         }
 
-        public Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
+        public Property setPropertiesMap (JsonPropertiesMap propertiesMap) {
             this.propertiesMap = propertiesMap;
             return this;
         }
@@ -259,6 +287,18 @@ public abstract class Item implements ID<Item>, ItemUpdateable {
          **/
         public boolean equals (Property property) {
             return this.getPropertiesMap().equals(property.getPropertiesMap());
+        }
+
+        /**
+         * 复制一份属性
+         * */
+        public Property copy () {
+            return new Property().setPropertiesMap(this.getPropertiesMap().copy());
+        }
+
+        @Override
+        public Codec<Property> getCodec () {
+            return CODEC;
         }
     }
 }

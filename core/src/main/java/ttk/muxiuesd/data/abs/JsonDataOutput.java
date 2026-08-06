@@ -1,6 +1,6 @@
 package ttk.muxiuesd.data.abs;
 
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.app.interfaces.data.IDataOutput;
 
 /**

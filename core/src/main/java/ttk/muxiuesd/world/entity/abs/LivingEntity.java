@@ -4,13 +4,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
+import ttk.muxiuesd.serialization.codecs.builders.LivingEntityCodecBuilder;
 import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
@@ -34,9 +35,18 @@ import java.util.LinkedHashMap;
  * TODO 活物实体能有buff影响其行为状态
  * */
 public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> {
-    public static final Vector2 DEFAULT_SIZE = Pools.VEC2.obtain().set(1f, 1f);
+    public static final Vector2 DEFAULT_SIZE = new Vector2(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
+
+    /**
+     * 活物实体的现代化编解码器
+     * <p>
+     * 解码时通过实体注册表创建实例（会创建出正确的实体类），
+     * 编码时编码基础实体与活物实体的全部字段
+     */
+    public static final Codec<LivingEntity<?>> CODEC = LivingEntityCodecBuilder.<LivingEntity<?>>create()
+        .factory(EntityCodecBuilder::createEntity);
 
     private LinkedHashMap<String, LivingEntityState<T>> states; //状态机
     private LivingEntityState<T> curState;                      //当前状态
@@ -256,10 +266,21 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             if (itemEntity != null) {
                 itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
                 itemEntity.setSpeed(speed);
-                itemEntity.setCurSpeed(speed);
+                //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
                 itemEntity.setVelocity(velX, velY);
+                itemEntity.setCurSpeed(speed);
             }
         }
+    }
+
+    /**
+     * 判断是否手上持有物品
+     * */
+    public boolean handIsEmpty () {
+        ItemStack handItemStack = this.getHandItemStack();
+        return handItemStack == null
+            || handItemStack == ItemStack.VOID
+            || handItemStack.getAmount() == 0;
     }
 
     public ItemStack getHandItemStack () {
@@ -280,7 +301,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             if (this.handIndex != handIndex) {
                 //放下先前的物品堆叠
                 ItemStack handItemStack = this.getHandItemStack();
-                if (handItemStack != null) {
+                //实体系统为空说明实体还未加入世界（例如解码读取数据时），不需要放下物品
+                if (handItemStack != null && this.getEntitySystem() != null) {
                     handItemStack.putDown(this.getEntitySystem().getWorld(), this);
                 }
                 this.handIndex = handIndex;
@@ -416,6 +438,12 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public void setState (String id) {
         LinkedHashMap<String, LivingEntityState<T>> states = this.getStates();
         LivingEntityState<T> state = states.get(id);
+        //未注册的状态不切换，防止 curState 为 null 时 start() NPE
+        if (state == null) {
+            game.muxiuesd.bedrockcore.util.Log.error(this.getClass().getName(),
+                "实体：" + this.getID() + " 不存在id为：" + id + " 的状态！！！");
+            return;
+        }
         this.setCurState(state);
     }
 
@@ -440,7 +468,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
 
     public LivingEntity<T> setCurState (LivingEntityState<T> curState) {
         //确保不会空
-        if (getEntitySystem() != null) {
+        if (getEntitySystem() != null && curState != null) {
             World world = getEntitySystem().getWorld();
             if (this.getCurState() != null) this.curState.end(world, (T) this);
             this.curState = curState;
@@ -481,16 +509,15 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     @Override
-    public Codec getCodec () {
-        return Codecs.LIVING_ENTITY;
-    }
-
-    @Override
     public void dispose () {
         super.dispose();
         //回收计时器
         Pools.TASK_TIMER.free(this.attackedTimer);
         Pools.TASK_TIMER.free(this.effectPreTickTimer);
         Pools.TASK_TIMER.free(this.effectPreSecondTimer);
+        if (this.swingHandTimer != null) {
+            Pools.TASK_TIMER.free(this.swingHandTimer);
+            this.swingHandTimer = null;
+        }
     }
 }

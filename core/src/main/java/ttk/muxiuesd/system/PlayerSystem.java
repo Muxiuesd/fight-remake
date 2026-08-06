@@ -3,13 +3,14 @@ package ttk.muxiuesd.system;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.serialization.DataResult;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.Timer;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.PlayerDataOutput;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -28,13 +29,12 @@ import ttk.muxiuesd.ui.screen.PlayerUIScreen;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-
-import java.util.Optional;
 
 /**
  * 玩家系统
@@ -99,7 +99,8 @@ public class PlayerSystem extends WorldSystem {
         //玩家速度计算
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Vector2 playerCenter = this.player.getCenterPos();
-        Block block = cs.getBlock(playerCenter.x, playerCenter.y);
+        //用玩家底部判定是否在水中（半身没入水中也算游泳），而不是中心点
+        Block block = cs.getBlock(playerCenter.x, playerCenter.y - this.player.getHeight() / 2f);
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
@@ -154,36 +155,37 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerShortcutKey_7.wasJustPressed()) curPlayer.setHandIndex(6);
             if (KeyBindings.PlayerShortcutKey_8.wasJustPressed()) curPlayer.setHandIndex(7);
             if (KeyBindings.PlayerShortcutKey_9.wasJustPressed()) curPlayer.setHandIndex(8);
-        }
 
-        //移动方向
-        int inputX = 0;
-        int inputY = 0;
+            //移动方向（放在守卫内：打开GUI时不能移动）
+            int inputX = 0;
+            int inputY = 0;
+            if (KeyBindings.PlayerWalkUp.wasPressed()) {
+                inputY += 1;
+            }
+            if (KeyBindings.PlayerWalkDown.wasPressed()) {
+                inputY -= 1;
+            }
+            if (KeyBindings.PlayerWalkLeft.wasPressed()) {
+                inputX -= 1;
+            }
+            if (KeyBindings.PlayerWalkRight.wasPressed()) {
+                inputX += 1;
+            }
 
-        //玩家移动
-        if (KeyBindings.PlayerWalkUp.wasPressed()) {
-            inputY += 1;
-        }
-        if (KeyBindings.PlayerWalkDown.wasPressed()) {
-            inputY -= 1;
-        }
-        if (KeyBindings.PlayerWalkLeft.wasPressed()) {
-            inputX -= 1;
-        }
-        if (KeyBindings.PlayerWalkRight.wasPressed()) {
-            inputX += 1;
-        }
-
-        if (inputX != 0 || inputY != 0) {
-            // 计算方向向量的长度
-            float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
-            // 归一化并乘以当前速度
-            float playerSpeed = curPlayer.getSpeed();
-            float velX = (inputX / length) * playerSpeed;
-            float velY = (inputY / length) * playerSpeed;
-            curPlayer.setVelocity(velX, velY);
-        }
-        if (inputX == 0 && inputY == 0) {
+            if (inputX != 0 || inputY != 0) {
+                // 计算方向向量的长度
+                float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
+                // 归一化并乘以当前速度
+                float playerSpeed = curPlayer.getSpeed();
+                float velX = (inputX / length) * playerSpeed;
+                float velY = (inputY / length) * playerSpeed;
+                curPlayer.setVelocity(velX, velY);
+            }
+            if (inputX == 0 && inputY == 0) {
+                curPlayer.setVelocity(0, 0);
+            }
+        } else {
+            //GUI 打开时玩家不能移动，停止速度（否则残留速度会继续滑行）
             curPlayer.setVelocity(0, 0);
         }
     }
@@ -206,6 +208,8 @@ public class PlayerSystem extends WorldSystem {
         //生成新的玩家实体
         this.player = Entities.PLAYER.create(getWorld());
         this.player.setEntitySystem(es);
+        //重生位置安全检查：出生点被墙/水占据时向上搜索安全位置（防止卡墙/溺水）
+        this.ensureSafeSpawnPosition();
         this.playerLastPosition = this.player.getPosition();
         es.add(player);
 
@@ -215,6 +219,26 @@ public class PlayerSystem extends WorldSystem {
 
         //播放复活音频
         getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
+    }
+
+    /**
+     * 确保玩家重生位置安全：向上搜索第一个可站立的位置
+     * */
+    private void ensureSafeSpawnPosition () {
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
+        float px = this.player.getX();
+        float py = this.player.getY();
+        float halfH = this.player.getHeight() / 2f;
+        for (int i = 0; i < 64; i++) {
+            float checkY = py + i;
+            Block b = cs.getBlock(px, checkY - halfH);
+            //空气方块可站立
+            if (b == Blocks.ARI || b instanceof BlockAir) {
+                this.player.setPosition(px, checkY);
+                return;
+            }
+        }
+        //找不到安全位置就保持默认位置
     }
 
     @Override
@@ -227,9 +251,7 @@ public class PlayerSystem extends WorldSystem {
      * */
     public void savePlayerData () {
         JsonDataWriter dataWriter = new JsonDataWriter();
-        dataWriter.objStart();
-        Codecs.PLAYER.encode(this.getPlayer(), dataWriter);
-        dataWriter.objEnd();
+        RawObjectJsonConverter.toJson(dataWriter, Player.CODEC.encode(this.getPlayer()));
 
         PlayerDataOutput playerDataOutput = new PlayerDataOutput();
         playerDataOutput.output(dataWriter);
@@ -241,12 +263,14 @@ public class PlayerSystem extends WorldSystem {
      * 读取玩家数据
      * */
     public Player readPlayerData () {
-        JsonValue playerValue = UnifiedFileUtil.readJsonFile(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
-        Optional<Player> optionalPlayer = Codecs.PLAYER.decode(new JsonDataReader(playerValue));
-        if (optionalPlayer.isPresent()) {
-            return optionalPlayer.get();
+        String playerJson = UnifiedFileUtil.readFileAsString(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME);
+        RawObject playerRaw = RawObjectJsonConverter.fromJson(playerJson);
+        DataResult<Player> playerResult = Player.CODEC.decode(playerRaw);
+        //error 但 result 有值时也使用解码结果（如旧存档缺失新字段导致的部分失败），避免玩家数据整体丢失
+        if (playerResult.result().isPresent()) {
+            return playerResult.result().get();
         }
-        Log.error(TAG(), "玩家读取失败！json原文：" + playerValue.toString());
+        Log.error(TAG(), "玩家读取失败！json原文：" + playerJson);
         return new Player(getWorld(), EntityTypes.PLAYER);
     }
 

@@ -59,7 +59,8 @@ public class RectHitbox extends Hitbox {
 
     @Override
     public Vector2 getCenterPos () {
-        return Pools.VEC2.obtain().set(this.getCenterX(), this.getCenterY());
+        //返回新实例（调用方从不 free 池化对象，改为 new 避免池泄漏）
+        return new Vector2(this.getCenterX(), this.getCenterY());
     }
 
     /**
@@ -82,11 +83,13 @@ public class RectHitbox extends Hitbox {
 
     /**
      * 获取这个碰撞箱的矩形
+     * <p>
+     * 返回新建的矩形实例（调用方可自由修改，无需归还池，避免池化对象被多处引用污染）
      * */
     public Rectangle getRectangle () {
         float startX = this.getStartX();
         float startY = this.getStartY();
-        return Pools.RECT.obtain().set(
+        return new Rectangle(
             this.getCenterX() + startX,
             this.getCenterY() + startY,
             Math.abs(this.getEndX() - startX),

@@ -62,8 +62,18 @@ public class Util {
     /**
      * 获取窗口中心到鼠标方向的单位向量
      * */
-    public static Direction getDirection() {
+    public static Direction getDirection () {
         return new Direction();
+    }
+
+    /**
+     * 获取指定位置（如玩家）到鼠标指向的世界坐标方向的单位向量
+     * <p>
+     * 相机带偏移时窗口中心 ≠ 玩家位置，用这个才能保证瞄准方向正确
+     * */
+    public static Direction getDirection (Vector2 from) {
+        Vector2 mouse = getMouseWorldPosition();
+        return new Direction(from, mouse);
     }
 
     /**
@@ -216,6 +226,15 @@ public class Util {
 
         AssetsLoader.getInstance().load(id, texturePath, Texture.class, null);
         return new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
+    }
+
+    /**
+     * 注册纹理 id→路径 映射（无 GL 调用，线程安全）
+     * <p>
+     * 确保路径映射在延迟加载前就存在，避免通过 id 查找路径时失败
+     * */
+    public static void registerTextureIdPath (String id, String path) {
+        AssetsLoader.getInstance().addIdMapPath(Texture.class, id, path);
     }
 
     /**

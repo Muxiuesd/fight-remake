@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -22,7 +23,6 @@ import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.abs.WorldSystem;
-import ttk.muxiuesd.util.AbsFileUtil;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -126,7 +126,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 移除实体
      * */
     public <T extends Entity> void remove (T entity) {
-        if (this.entities.contains(entity, true)) {
+        //防止重复移除：实体已不在系统中，或已在移除队列中，直接跳过
+        if (this.entities.contains(entity, true)
+            && !this._delayRemove.contains(entity, true)) {
             this._delayRemove.add(entity);
         }
     }
@@ -155,6 +157,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * @param entity 实体
      */
     private <T extends Entity> void _remove (T entity) {
+        //幂等防御：实体已不在系统中则跳过（防止重复移除导致池化对象 double-free）
+        if (!this.entities.contains(entity, true)) return;
+
         Array<T> entityArray = (Array<T>) this.getEntityArray(entity.getType());
         entityArray.removeValue(entity, true);
 
@@ -162,7 +167,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.updatableEntity.removeValue(entity, true);
         this.incationEntity.removeValue(entity, true);
         //把实体移除出渲染层级
-        this.renderableEntities.get(entity.getRenderLayer()).removeValue(entity, true);
+        Array<Entity<?>> renderLayerEntities = this.renderableEntities.get(entity.getRenderLayer());
+        if (renderLayerEntities != null) renderLayerEntities.removeValue(entity, true);
         //执行池化实体释放逻辑
         if (entity instanceof PoolableEntity poolableEntity) {
             poolableEntity.freeSelf();
@@ -232,6 +238,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         }
     }
 
+    /**
+     * 更新物品实体相关的东西
+     * */
     private void updateItemEntity (ItemEntity itemEntity, float delta) {
         //移除超过存活时间的物品实体
         if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME.getValue()) {
@@ -248,7 +257,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    //AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
                     getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, player);
                     //整个捡起来就没必要执行下面的代码了
                     return;
@@ -256,17 +264,29 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     //部分捡起时刷新存在时间
                     itemEntity.setLivingTime(0);
                 }
-                //捡起失败则什么也没发生
+                //捡起失败则什么也没发生（速度与基准速度都清零，防止残留速度）
+                itemEntity.setBeingAttracted(false);
                 itemEntity.setVelocity(0, 0);
+                itemEntity.setSpeed(0);
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
-                && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+            //物品实体是否在玩家实体的吸引范围内
+            boolean inRange = distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
+                && !player.getBackpack().isFull(itemEntity.getItemStack());
+            if (inRange) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
+                itemEntity.setBeingAttracted(true);
                 Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
                 itemEntity.setVelocity(direction.getX(), direction.getY());
-                itemEntity.setSpeed(7.7f);
+                //吸引速度随距离衰减：远处快、近处慢（避免物品在玩家周围环绕抖动）
+                float speed = Math.min(12f, distance * 4f);
+                itemEntity.setSpeed(speed);
+            } else if (itemEntity.isBeingAttracted()) {
+                //离开了吸引范围：停止朝向玩家移动（不再保留残留速度）
+                itemEntity.setBeingAttracted(false);
+                itemEntity.setVelocity(0, 0);
+                itemEntity.setSpeed(0);
             }
         }
 
@@ -277,6 +297,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * 对实体进行当前速度计算
      * */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
+        //子弹实体不受方块摩擦力影响，只受空气阻力（在 Bullet 内部处理）
+        if (entity instanceof Bullet) return;
+
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
 
@@ -285,6 +308,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Block block = cs.getBlock(center.x, center.y);
         if (block == null) return;
 
+        //目标速度 = 基准速度 × 摩擦系数，直接设置立即生效
+        //（不能用 lerp 平滑逼近：玩家的速度矢量每帧被输入系统重置，lerp 起点每帧都是全速，
+        //  导致永远无法收敛到目标速度，摩擦几乎失效）
         float friction = block.getProperty().getFriction();
         float curSpeed = entity.getSpeed() * friction;
         //速度过小直接为0
@@ -303,8 +329,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (entity.getSpeed() <= 0) return;
 
         float curSpeed = entity.getSpeed();
-        //实体在地面上
-        if (entity.isOnGround()) {
+        //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）
+        if (!entity.isBeingAttracted() && entity.isOnGround()) {
             //计算脚下方块摩擦对速度的影响
             Vector2 center = entity.getCenterPos();
             Block block = cs.getBlock(center.x, center.y);
@@ -385,6 +411,18 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 Future<Array<Entity<?>>> future = this.entityUnloadingTasks.get(chunkPosition);
                 if (future != null && future.isDone()) {
                     this.entityUnloadingTasks.remove(chunkPosition);
+                    try {
+                        Array<Entity<?>> unloaded = future.get();
+                        //卸载保存完成，将实体从系统中移除，避免实体残留导致重复加载（实体翻倍）和内存泄漏
+                        if (unloaded != null) {
+                            for (Entity<?> entity : unloaded) {
+                                this.remove(entity);
+                            }
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        //保存失败，实体保留在系统中，防止数据丢失
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -428,6 +466,14 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (unload.isEmpty()) return;
 
         unload.removeValue(this.getPlayer(), true);
+
+        //该区块已有卸载任务在途：跳过本次提交。
+        //实体仍留在系统中，等原任务完成（实体被移除）后，下次卸载时会被重新收集保存；
+        //若此时覆盖提交，旧 Future 的完成回调会丢失，导致已收集的实体永不移除。
+        if (this.entityUnloadingTasks.containsKey(chunk.getChunkPosition())) {
+            return;
+        }
+
         EntityUnloadTask unloadTask = new EntityUnloadTask(this, unload, chunk.getChunkPosition());
         Future<Array<Entity<?>>> submit = this.executor.submit(unloadTask);
         this.entityUnloadingTasks.put(chunk.getChunkPosition(), submit);
@@ -439,7 +485,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void unloadAllEntities () {
         HashMap<String, ChunkPosition> chunkPos = new HashMap<>();
         HashMap<ChunkPosition, Array<Entity<?>>> unloadArray = new HashMap<>();
-        Array<Entity<?>> allEntities = this.getEntities();
+        //复制一份，避免直接修改内部实体数组
+        Array<Entity<?>> allEntities = new Array<>(this.getEntities());
         //单独去除玩家实体
         allEntities.removeValue(this.getPlayer(), true);
         ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
@@ -473,8 +520,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     public void loadEntities (ChunkSystem cs, Chunk chunk) {
         ChunkPosition chunkPosition = chunk.getChunkPosition();
+        //该区块实体正在被卸载保存（写盘）中，跳过本次加载，避免读到半截文件；下次区块重新加载时会再尝试
+        if (this.entityUnloadingTasks.containsKey(chunkPosition)) {
+            return;
+        }
         //文件不存在就是区块上没有实体，直接跳过
-        if (! AbsFileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
+        if (! UnifiedFileUtil.fileExists(Fight.getPathSaveEntities(), chunkPosition.toString() + ".json")) {
             return;
         }
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
@@ -488,13 +539,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     public void initLoadEntities (ChunkPosition chunkPosition) {
         String fileName = chunkPosition.toString() + ".json";
         //没有实体数据就跳过
-        if (! AbsFileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
+        if (! UnifiedFileUtil.fileExists(Fight.getPathSaveEntities(), fileName)) return;
 
         EntityLoadTask loadTask = new EntityLoadTask(this, chunkPosition);
         Array<Entity<?>> entities = loadTask.call();
         this._delayAdd.addAll(entities);
 
-        AbsFileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
+        UnifiedFileUtil.deleteFile(Fight.getPathSaveEntities(), fileName);
     }
 
     @Override
@@ -598,3 +649,5 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         return 10000;
     }
 }
+
+

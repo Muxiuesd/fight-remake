@@ -4,7 +4,8 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatFloat;
@@ -15,6 +16,20 @@ import ttk.muxiuesd.world.entity.EntityType;
  * 子弹
  */
 public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
+    //空气阻力：每秒速度衰减到的比例（帧率无关，通过 delta 指数计算）
+    private static final float AIR_DRAG_PER_SECOND = 0.98f;
+
+    /**
+     * 子弹的现代化编解码器
+     * <p>
+     * 解码时通过实体注册表创建实例，编码时编码基础实体与子弹的全部字段
+     */
+    public static final Codec<Bullet<?>> CODEC = EntityCodecBuilder.<Bullet<?>>create()
+        .field("damage", Bullet::getDamage, Bullet::setDamage, Codec.FLOAT)
+        .field("maxLiveTime", Bullet::getMaxLiveTime, Bullet::setMaxLiveTime, Codec.FLOAT)
+        .field("liveTime", Bullet::getLiveTime, Bullet::setLiveTime, Codec.FLOAT)
+        .factory(EntityCodecBuilder::createEntity);
+
     public Entity<?> owner;
 
     public float damage;
@@ -54,11 +69,11 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         setSpeed(speed);
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        //setBodyTextureRegion(getTextureRegion(textureId, texturePath));
         setBodyTextureRegionResource(textureId, texturePath);
         //默认大小
         setSize(0.5f, 0.5f);
         fastAddBodyHitBox();
+        setOnGround(false);
     }
 
     @Override
@@ -78,10 +93,19 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     @Override
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
-        //setPosition(x + getSpeed() * delta * velX, y + getSpeed() * delta * velY);
-        positionChange(delta);
 
+        //空气阻力：子弹不受方块摩擦影响，速度只随空气阻力逐渐衰减
+        float drag = (float) Math.pow(AIR_DRAG_PER_SECOND, delta);
+        this.setVelX(this.getVelX() * drag);
+        this.setVelY(this.getVelY() * drag);
+
+        // 位移由 BulletCollisionSystem 统一处理（含墙体碰撞与 CCD 分步）
         super.update(delta);
+
+        // 存活时间耗尽，从实体系统移除（防止泄漏）
+        if (!this.isAlive() && this.getEntitySystem() != null) {
+            this.getEntitySystem().remove(this);
+        }
     }
 
     public Entity<?> getOwner () {
@@ -143,10 +167,5 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         // 计算旋转角度
         Vector2 velocity = getVelocity();
         setRotation(MathUtils.atan2Deg(velocity.y, velocity.x));
-    }
-
-    @Override
-    public Codec getCodec () {
-        return super.getCodec();
     }
 }

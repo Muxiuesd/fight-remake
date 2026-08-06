@@ -5,12 +5,15 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Fuels;
 import ttk.muxiuesd.registry.FurnaceRecipes;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.serialization.codecs.builders.BlockEntityCodecBuilder;
 import ttk.muxiuesd.system.LightSystem;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundSystem;
@@ -31,7 +34,27 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
 /**
  * 熔炉
  * */
-public class BlockEntityFurnace extends BlockEntity {
+public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEntityFurnace> {
+    /*public static final Codec<BlockEntityFurnace> CODEC1 = CodecBuilder.<BlockEntityFurnace>create()
+        .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
+        .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
+        .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC)
+        .factory((blockPos, id) -> {
+            //从注册表拿到方块实体的提供者
+            BlockEntityProvider<?> provider = Registries.BLOCK_ENTITY.get(id);
+            BlockEntity blockEntity = provider.create(blockPos);
+            blockEntity.setProvider(provider);
+            return (BlockEntityFurnace) blockEntity;
+        });*/
+
+    public static final Codec<BlockEntityFurnace> CODEC = BlockEntityCodecBuilder
+        .create(builder ->
+            builder
+                .field("curEnergy", BlockEntityFurnace::getCurEnergy, BlockEntityFurnace::setCurEnergy, Codec.INT)
+                .field("curTick", BlockEntityFurnace::getCurTick, BlockEntityFurnace::setCurTick, Codec.INT)
+    );
+
+
     private int curEnergy = 0;  //能量，每tick减1
     private int curTick = 0;
     private InteractSlot inputInteractSlot;
@@ -55,12 +78,14 @@ public class BlockEntityFurnace extends BlockEntity {
     public void writeCatData (CatsHolder holder) {
         super.writeCatData(holder);
         holder.put("curEnergy", new CatInt(this.curEnergy));
+        holder.put("curTick", new CatInt(this.curTick));
     }
 
     @Override
     public void readCatData (JsonValue values) {
         super.readCatData(values);
         this.curEnergy = values.getInt("curEnergy", 0);
+        this.curTick = values.getInt("curTick", 0);
     }
 
 
@@ -262,5 +287,19 @@ public class BlockEntityFurnace extends BlockEntity {
     public void setWorking (boolean working) {
         BlockFurnace furnace = (BlockFurnace) getBlock();
         furnace.setWorking(working);
+    }
+
+    public int getCurEnergy () {
+        return curEnergy;
+    }
+
+    public BlockEntityFurnace setCurEnergy (int curEnergy) {
+        this.curEnergy = curEnergy;
+        return this;
+    }
+
+    @Override
+    public Codec<BlockEntityFurnace> getCodec () {
+        return CODEC;
     }
 }

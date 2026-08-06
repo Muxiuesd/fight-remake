@@ -1,8 +1,8 @@
 package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.PropertyTypes;

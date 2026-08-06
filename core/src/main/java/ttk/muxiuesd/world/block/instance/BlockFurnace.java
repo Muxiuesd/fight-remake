@@ -2,7 +2,10 @@ package ttk.muxiuesd.world.block.instance;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.serialization.codecs.builders.BlockWithEntityCodecBuilder;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
@@ -14,7 +17,15 @@ import ttk.muxiuesd.world.cat.CatsHolder;
 /**
  * 熔炉方块
  * */
-public class BlockFurnace extends BlockWithEntity {
+public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurnace> {
+    public static final Codec<BlockFurnace> CODEC = BlockWithEntityCodecBuilder.create(
+        BlockFurnace::new,
+        BlockEntityFurnace.CODEC,
+        builder -> builder
+                .field("is_working", BlockFurnace::isWorking, BlockFurnace::setWorking, Codec.BOOL)
+    );
+
+
     private TextureRegion workingTexture;
     private boolean isWorking = false;
 
@@ -53,5 +64,10 @@ public class BlockFurnace extends BlockWithEntity {
 
     public void setWorking (boolean working) {
         isWorking = working;
+    }
+
+    @Override
+    public Codec<BlockFurnace> getCodec () {
+        return CODEC;
     }
 }

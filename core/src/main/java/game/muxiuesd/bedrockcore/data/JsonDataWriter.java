@@ -1,4 +1,4 @@
-package ttk.muxiuesd.data;
+package game.muxiuesd.bedrockcore.data;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
@@ -126,7 +126,7 @@ public class JsonDataWriter implements DataWriter<Json> {
     }
 
     /**
-     * 获取结果
+     * 获取结果json
      * */
     public String getResult () {
         return this.writer.getWriter().getWriter().toString();

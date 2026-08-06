@@ -2,18 +2,17 @@ package ttk.muxiuesd.world;
 
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.serialization.DataResult;
+import game.muxiuesd.bedrockcore.serialization.RawObject;
+import game.muxiuesd.bedrockcore.serialization.RawObjectJsonConverter;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.data.JsonDataReader;
-import ttk.muxiuesd.data.JsonDataWriter;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
-import ttk.muxiuesd.util.AbsFileUtil;
-
-import java.util.Optional;
 
 /**
  * 世界的基类
@@ -84,12 +83,17 @@ public abstract class World implements Updateable, Disposable {
      * */
     public void readWorldInfo() {
         //检查世界信息文件是否存在
-        if(AbsFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
+        if(UnifiedFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
             //存在就读取
-            String file = AbsFileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
-            Optional<WorldInfo> optional = WorldInfo.CODEC.parse(new JsonDataReader(file));
-            //让这个实例存在
-            optional.ifPresent(worldInfo -> WorldInfo.INSTANCE = worldInfo);
+            String file = UnifiedFileUtil.readFileAsString(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME);
+            RawObject raw = RawObjectJsonConverter.fromJson(file);
+            DataResult<WorldInfo> result = WorldInfo.CODEC.decode(raw);
+            //让这个实例存在（error 但 result 有值时也使用解码结果；完全失败时兜底新建）
+            if (result.result().isPresent()) {
+                WorldInfo.INSTANCE = result.result().get();
+            } else {
+                WorldInfo.INSTANCE = new WorldInfo();
+            }
         }else {
             //如果不存在，就新建一个
             WorldInfo.INSTANCE = new WorldInfo();
@@ -101,12 +105,10 @@ public abstract class World implements Updateable, Disposable {
      * */
     private void writeWorldInfo () {
         try {
-            JsonDataWriter dataWriter = new JsonDataWriter();
-            dataWriter.objStart();
-            WorldInfo.CODEC.encode(WorldInfo.INSTANCE, dataWriter);
-            dataWriter.objEnd();
+            RawObject raw = WorldInfo.CODEC.encode(WorldInfo.INSTANCE);
+            String json = RawObjectJsonConverter.toJson(raw);
             //输出
-            new WorldInfoDataOutput().output(dataWriter);
+            new WorldInfoDataOutput().output(json);
         }catch (Exception e) {
             Log.error(TAG(), "世界信息写入失败！！！原因：", e);
         }
@@ -136,3 +138,5 @@ public abstract class World implements Updateable, Disposable {
         return this.getClass().getName();
     }
 }
+
+

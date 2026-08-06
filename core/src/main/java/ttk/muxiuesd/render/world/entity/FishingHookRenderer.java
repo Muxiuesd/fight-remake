@@ -1,6 +1,7 @@
 package ttk.muxiuesd.render.world.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
@@ -11,8 +12,9 @@ import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 public class FishingHookRenderer implements EntityRenderer<EntityFishingHook> {
     @Override
     public void draw (Batch batch, EntityFishingHook entity, Context context) {
-        if (entity.textureRegion != null) {
-            batch.draw(entity.textureRegion,
+        TextureRegion region = entity.getBodyTextureRegion();
+        if (region != null) {
+            batch.draw(region,
                 context.x - context.width / 2f, context.y - context.height /2f + entity.getPositionOffset().y,
                 context.originX, context.originY,
                 context.width, context.height,

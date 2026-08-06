@@ -10,10 +10,12 @@ import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 
 /**
  * 文件工具
- * TODO 废弃使用这个
+ * <p>
+ * @deprecated 已弃用，统一使用 {@link game.muxiuesd.bedrockcore.util.UnifiedFileUtil}
  * <p>
  * 规定：path都是基于游戏文件的路径（基准路径）起始的路径，也就是说这个文件工具是外部文件工具
  * */
+@Deprecated
 public class AbsFileUtil {
     public static String TAG = AbsFileUtil.class.getName();
 
@@ -37,6 +39,25 @@ public class AbsFileUtil {
         }*/
 
         return UnifiedFileUtil.createFile(UnifiedFileUtil.ABSOLUTE_MARK + path, fileName);
+    }
+
+    /**
+     * 原子写入文件（先写临时文件再重命名）
+     * <p>
+     * 防止写入过程中被中断/并发写导致半截文件损坏存档
+     * */
+    public static void writeFileAtomic (String path, String fileName, String content) {
+        FileHandle tmpFile = getFileHandle(path, fileName + ".tmp");
+        tmpFile.writeString(content, false);
+
+        java.io.File tmp = tmpFile.file();
+        java.io.File target = getFileHandle(path, fileName).file();
+        //同目录下 renameTo 是原子操作；Windows 上目标存在时 rename 会失败，先删除目标
+        if (target.exists()) target.delete();
+        if (tmp.renameTo(target)) return;
+        //rename 失败（如文件被占用），回退为直接写目标
+        getFileHandle(path, fileName).writeString(content, false);
+        tmp.delete();
     }
 
     /**

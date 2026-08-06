@@ -53,7 +53,7 @@ public class BulletCollisionSystem extends WorldSystem {
 
             // 根据子弹类型获取相关碰撞目标（墙体+实体）
             Array<Wall<?>> relevantWalls = getRelevantWalls(delta, bullet);
-            Array<LivingEntity<?>> relevantEntities = getRelevantEntities(bullet);
+            Array<LivingEntity<?>> relevantEntities = getRelevantEntities(bullet, delta);
 
             // 分步更新并检测碰撞（墙体+实体）
             updateBulletWithEntityCollision(bullet, delta, relevantWalls, relevantEntities);
@@ -67,9 +67,12 @@ public class BulletCollisionSystem extends WorldSystem {
         if (bodyHitbox instanceof RectHitbox rectHitbox) {
             Rectangle bulletRectHitbox = rectHitbox.getRectangle();
             Vector2 velocity = bullet.getVelocity();
+            //pathBounds 覆盖子弹移动路径 + 完整 hitbox（含负侧半个尺寸，避免边缘漏检）
+            float halfW = bulletRectHitbox.width / 2f;
+            float halfH = bulletRectHitbox.height / 2f;
             Rectangle pathBounds = new Rectangle(
-                Math.min(bullet.getX(), bullet.getX() + velocity.x * delta),
-                Math.min(bullet.getY(), bullet.getY() + velocity.y * delta),
+                Math.min(bullet.getX(), bullet.getX() + velocity.x * delta) - halfW,
+                Math.min(bullet.getY(), bullet.getY() + velocity.y * delta) - halfH,
                 Math.abs(velocity.x * delta) + bulletRectHitbox.width,
                 Math.abs(velocity.y * delta) + bulletRectHitbox.height
             );
@@ -101,7 +104,7 @@ public class BulletCollisionSystem extends WorldSystem {
     }
 
     // 根据子弹类型获取需要检测的实体（玩家子弹→敌人；敌人子弹→玩家）
-    private Array<LivingEntity<?>> getRelevantEntities (Bullet bullet) {
+    private Array<LivingEntity<?>> getRelevantEntities (Bullet bullet, float delta) {
         Array<LivingEntity<?>> targets = new Array<>();
         if (bullet.getOwner() == null) return targets;
 
@@ -118,23 +121,25 @@ public class BulletCollisionSystem extends WorldSystem {
         }
 
         // 过滤掉不在子弹路径范围内的实体（优化性能）
-        return this.filterEntitiesByPath(bullet, targets);
+        return this.filterEntitiesByPath(bullet, targets, delta);
     }
 
     // 过滤子弹路径范围外的实体（减少检测量）
-    private Array<LivingEntity<?>> filterEntitiesByPath(Bullet bullet, Array<LivingEntity<?>> entities) {
+    private Array<LivingEntity<?>> filterEntitiesByPath(Bullet bullet, Array<LivingEntity<?>> entities, float delta) {
         Array<LivingEntity<?>> filtered = new Array<>();
         //Rectangle bulletHitbox = bullet.getHitbox();
         Hitbox bodyHitbox = bullet.getBodyHitbox();
         if (bodyHitbox instanceof RectHitbox rectHitbox) {
             Rectangle bulletRectHitbox = rectHitbox.getRectangle();
             Vector2 velocity = bullet.getVelocity();
-            float delta = 1f; // 预测1帧内的移动距离（可根据实际帧率调整）
+            // 使用实际帧间隔预测移动距离（原来硬编码 1 秒，卡顿帧会漏检目标）
+            float halfW = bulletRectHitbox.width / 2f;
+            float halfH = bulletRectHitbox.height / 2f;
 
             // 计算子弹移动路径的边界框
             Rectangle pathBounds = new Rectangle(
-                Math.min(bullet.getX(), bullet.getX() + velocity.x * delta),
-                Math.min(bullet.getY(), bullet.getY() + velocity.y * delta),
+                Math.min(bullet.getX(), bullet.getX() + velocity.x * delta) - halfW,
+                Math.min(bullet.getY(), bullet.getY() + velocity.y * delta) - halfH,
                 Math.abs(velocity.x * delta) + bulletRectHitbox.width,
                 Math.abs(velocity.y * delta) + bulletRectHitbox.height
             );
@@ -178,7 +183,11 @@ public class BulletCollisionSystem extends WorldSystem {
 
                 // 移动一步
                 bullet.positionChange(step);
-                bulletRectHitbox.setPosition(bullet.getX(), bullet.getY());
+                // 矩形左下角 = 子弹中心 + 碰撞箱起始偏移（不能直接放到中心，否则碰撞框偏移半个子弹尺寸）
+                bulletRectHitbox.setPosition(
+                    bullet.getX() + rectHitbox.getStartX(),
+                    bullet.getY() + rectHitbox.getStartY()
+                );
 
                 // 3. 检测与墙体碰撞（复用之前的逻辑）
                 if (checkWallCollision(bullet, walls, prevX, prevY)) {

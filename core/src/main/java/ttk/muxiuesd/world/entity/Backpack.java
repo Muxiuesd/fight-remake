@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.entity;
 
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -10,12 +12,18 @@ import java.util.LinkedHashMap;
  * 实体所拥有的物品背包
  * */
 public class Backpack implements Inventory, Updateable {
-    private final LinkedHashMap<Integer, ItemStack> itemStacks;
-    private final int size;
+    public static final int DEFAULT_SIZE = 1;
+    public static final Codec<Inventory> CODEC = new InventoryCodec<>(Backpack::new);
 
+    private LinkedHashMap<Integer, ItemStack> itemStacks;
+    private int size;
+
+    public Backpack () {
+        //默认设置大小为1
+        this(DEFAULT_SIZE);
+    }
     public Backpack (int size) {
-        this.itemStacks = new LinkedHashMap<>(size);
-        this.size = size;
+        setSize(size);
     }
 
     @Override
@@ -28,6 +36,21 @@ public class Backpack implements Inventory, Updateable {
     public void setItemStack (int index, ItemStack itemStack) {
         if (this.exceed(index)) throw new IndexOutOfBoundsException();
         this.itemStacks.put(index, itemStack);
+    }
+
+    /**
+     * 设置大小
+     * */
+    @Override
+    public void setSize (int size) {
+        if (size < 1) {
+            Log.error(this.getClass().getName(), "新设置的背包大小不合法，新值：" + size + "！！！", new IllegalArgumentException());
+            return;
+        }
+        this.size = size;
+        LinkedHashMap<Integer, ItemStack> newMap = new LinkedHashMap<>(size);
+        if (this.itemStacks != null) newMap.putAll(this.itemStacks);    //把旧的map的东西放入新的map
+        this.itemStacks = newMap;
     }
 
     /**
@@ -56,39 +79,6 @@ public class Backpack implements Inventory, Updateable {
         if (this.isFull(itemStack)) return itemStack;
 
         //TODO 解决相同物品不能存放多个堆叠的bug
-        /*boolean[] nullStacks = new boolean[this.size];
-        for (int i = 0; i < this.size; ++i) {
-            ItemStack stack = this.itemStacks.get(i);
-            if (stack != null) {
-                //同类型物品合并，（目前只检测Id是否相同）
-                if (Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {
-                    //堆叠数量达到上限直接跳过
-                    if (stack.getAmount() >= stack.getProperty().getMaxCount()) continue;
-
-                    int newAmount = stack.getAmount() + itemStack.getAmount();
-                    int maxCount = stack.getItem().property.getMaxCount();
-                    if (newAmount <= maxCount) {
-                        stack.setAmount(newAmount);
-                        return null;
-                    } else {
-                        stack.setAmount(maxCount);
-                        itemStack.setAmount(newAmount - maxCount);
-                        return itemStack;
-                    }
-                }
-                //不同类型就跳过
-                nullStacks[i] = false;
-                continue;
-            }
-            nullStacks[i] = true;
-        }
-        //查找空位，然后把物品堆叠放进去
-        for (int i = 0; i < nullStacks.length; ++i) {
-            if (nullStacks[i]) {
-                this.setItemStack(i, itemStack);
-                return null;
-            }
-        }*/
 
         // 尝试合并到已有的堆叠
         for (int i = 0; i < this.size; ++i) {

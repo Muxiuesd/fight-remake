@@ -1,6 +1,6 @@
 package ttk.muxiuesd.registrant;
 
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
@@ -31,7 +31,7 @@ import ttk.muxiuesd.world.wall.Wall;
  * */
 public class RegistryKeys {
 
-    public static final RegistryKey<Codec<?, ?, ?>> CODEC = new RegistryKey<>();
+    public static final RegistryKey<Codec<?>> CODEC = new RegistryKey<>();
 
     public static final RegistryKey<Item> ITEM = new RegistryKey<>();
     public static final RegistryKey<ItemGroup> ITEM_GROUP = new RegistryKey<>();

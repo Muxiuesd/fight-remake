@@ -10,6 +10,8 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  * */
 public class EntitySounder implements SpatialAudioSource {
     private final Entity<?> entity;
+    private final Vector3 posCache = new Vector3();
+    private final Vector3 forwardCache = new Vector3();
 
     public EntitySounder (Entity<?> entity) {
         this.entity = entity;
@@ -18,21 +20,20 @@ public class EntitySounder implements SpatialAudioSource {
     @Override
     public Vector3 getPos () {
         Vector2 centerPos = this.entity.getCenterPos();
-        return new Vector3(centerPos, 0f);
+        return this.posCache.set(centerPos.x, centerPos.y, 0f);
     }
 
     @Override
     public Vector3 getForward () {
-        //如果实体没有速度，那就使用默认朝向
         if (this.entity.getCurSpeed() == 0f) {
-            return SpatialAudioSource.super.getForward();
+            return SpatialAudioSource.DEFAULT_FORWARD;
         }
-        //如果实体有速度，就以速度方向为实体的前方朝向
-        return new Vector3(this.entity.getVelocity(), 0f);
+        Vector2 velocity = this.entity.getVelocity();
+        return this.forwardCache.set(velocity.x, velocity.y, 0f);
     }
 
     @Override
     public Vector3 getUp () {
-        return SpatialAudioSource.super.getUp();
+        return SpatialAudioSource.DEFAULT_UP;
     }
 }

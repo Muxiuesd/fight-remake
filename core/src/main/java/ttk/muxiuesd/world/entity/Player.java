@@ -3,11 +3,10 @@ package ttk.muxiuesd.world.entity;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
-import game.muxiuesd.bedrockcore.app.interfaces.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.resource.Resource;
@@ -24,6 +23,16 @@ public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
     //碰撞箱起点（前两个值）和终点（后两个值）的偏移
     public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, -0.1f, -0.1f);
+
+    /**
+     * 玩家的现代化编解码器
+     * <p>
+     * 玩家没有额外需要序列化的字段，直接复用活物实体的编解码器
+     */
+    public static final Codec<Player> CODEC = LivingEntity.CODEC.xmap(
+        entity -> (Player) entity,
+        player -> player
+    );
 
 
     private Resource<TextureRegion> shieldTextureRegionResource;
@@ -111,8 +120,9 @@ public class Player extends LivingEntity<Player> {
             float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
             float v = Math.min(distance, 4f);
             itemEntity.setSpeed(v);
-            itemEntity.setCurSpeed(v);
+            //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
             itemEntity.setVelocity(getDirection().toVector2());
+            itemEntity.setCurSpeed(v);
         }
 
         return itemEntity;
@@ -154,12 +164,8 @@ public class Player extends LivingEntity<Player> {
 
     @Override
     public Direction getDirection () {
-        return Util.getDirection();
-    }
-
-    @Override
-    public Codec getCodec () {
-        return Codecs.PLAYER;
+        //以玩家位置为起点瞄准鼠标，而不是窗口中心（相机带偏移时两者不同）
+        return Util.getDirection(getCenterPos());
     }
 
     public boolean isUsingItem () {
@@ -184,5 +190,13 @@ public class Player extends LivingEntity<Player> {
 
     public TextureRegion getShieldTextureRegion () {
         return this.shieldTextureRegionResource.get();
+    }
+
+    @Override
+    public void dispose () {
+        super.dispose();
+        //回收防御相关计时器
+        Pools.TASK_TIMER.free(this.defendCDTimer);
+        Pools.TASK_TIMER.free(this.defendDurationTimer);
     }
 }

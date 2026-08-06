@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import game.muxiuesd.bedrockcore.font.FontHolder;
 import game.muxiuesd.bedrockcore.font.FontManager;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.id.Identifier;
 
 /**
  * 字体注册
@@ -15,7 +16,6 @@ public class Fonts {
 
 
     public static FontHolder register (String name) {
-        String id = Fight.ID(name);
-        return FontManager.registerFont(id, Gdx.files.internal(Fight.FontPath(name)));
+        return FontManager.registerFont(Identifier.of(Fight.ID(name)), Gdx.files.internal(Fight.FontPath(name)));
     }
 }

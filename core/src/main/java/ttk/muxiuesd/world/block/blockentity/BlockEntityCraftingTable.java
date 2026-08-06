@@ -1,12 +1,15 @@
 package ttk.muxiuesd.world.block.blockentity;
 
 import com.badlogic.gdx.math.GridPoint2;
+import game.muxiuesd.bedrockcore.serialization.Codec;
+import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.recipe.CraftingTableRecipe;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.BlockEntities;
 import ttk.muxiuesd.registry.Sounds;
+import ttk.muxiuesd.serialization.codecs.builders.BlockEntityCodecBuilder;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
@@ -20,8 +23,11 @@ import ttk.muxiuesd.world.item.ItemStack;
 /**
  * 工作台方块实体
  * */
-public class BlockEntityCraftingTable extends BlockEntity {
+public class BlockEntityCraftingTable extends BlockEntity implements Codecable<BlockEntityCraftingTable> {
     public static final int OUTPUT_SLOT_INDEX = 9;
+
+    public static final Codec<BlockEntityCraftingTable> CODEC = BlockEntityCodecBuilder
+        .create(builder -> builder);
 
     public BlockEntityCraftingTable (BlockPos blockPos) {
         super(BlockEntities.CRAFTING_TABLE, blockPos);
@@ -116,6 +122,11 @@ public class BlockEntityCraftingTable extends BlockEntity {
         //后续不该这么写
         this.updateOutput();
         super.tick(world, delta);
+    }
+
+    @Override
+    public Codec<BlockEntityCraftingTable> getCodec () {
+        return CODEC;
     }
 
     /**

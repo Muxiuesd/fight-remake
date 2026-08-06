@@ -10,6 +10,7 @@ import ttk.muxiuesd.mod.ModContainer;
 import ttk.muxiuesd.resource.AssetsLoader;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * modApi：mod文件加载
@@ -20,7 +21,7 @@ import java.util.HashMap;
 public class ModFileLoader {
     public static final String TAG = ModFileLoader.class.getName();
 
-    private static final HashMap<String, ModFileLoader> loaders = new HashMap<String, ModFileLoader>();
+    private static final ConcurrentHashMap<String, ModFileLoader> loaders = new ConcurrentHashMap<>();
 
     public final String modRoot;    //mod的根文件夹
 
@@ -39,13 +40,10 @@ public class ModFileLoader {
             throw new RuntimeException("不存在namespace为：" + namespace + " 的模组！！！");
         }
 
-        if (loaders.containsKey(namespace)) {
-            return loaders.get(namespace);
-        }
-        Mod mod = modContainer.get(namespace);
-        ModFileLoader loader = new ModFileLoader(mod.getModPath());
-        loaders.put(namespace, loader);
-        return loader;
+        return loaders.computeIfAbsent(namespace, ns -> {
+            Mod mod = modContainer.get(ns);
+            return new ModFileLoader(mod.getModPath());
+        });
     }
 
 

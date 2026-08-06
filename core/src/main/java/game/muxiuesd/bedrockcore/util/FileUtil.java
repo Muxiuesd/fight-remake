@@ -4,7 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.util.AbsFileUtil;
 
 /**
  * 抽象的文件工具类
@@ -12,7 +11,7 @@ import ttk.muxiuesd.util.AbsFileUtil;
  * 获取文件的基准路径需要自己实现，实现后获取的每一个文件的路径都以基准路径为起始点来获取。
  * */
 public abstract class FileUtil {
-    public  String TAG = AbsFileUtil.class.getName();
+    public  String TAG = UnifiedFileUtil.class.getName();
 
     /**
      * 获取文件读写的基准路径

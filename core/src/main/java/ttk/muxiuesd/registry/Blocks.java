@@ -60,8 +60,8 @@ public final class Blocks {
     public static final Botany POTATO = registerBotany("potato", BotanyPotato::new);
 
     /// 带有方块实体的方块
-    public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
-    public static final Block FURNACE = register("furnace", BlockFurnace::new);
+    public static final BlockCraftingTable CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
+    public static final BlockFurnace FURNACE = register("furnace", BlockFurnace::new);
 
 
     /**
