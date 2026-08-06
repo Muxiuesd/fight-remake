@@ -280,7 +280,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
                 itemEntity.setVelocity(direction.getX(), direction.getY());
                 //吸引速度随距离衰减：远处快、近处慢（避免物品在玩家周围环绕抖动）
-                float speed = Math.min(8.7f, distance * 3f);
+                float speed = Math.min(12f, distance * 4f);
                 itemEntity.setSpeed(speed);
             } else if (itemEntity.isBeingAttracted()) {
                 //离开了吸引范围：停止朝向玩家移动（不再保留残留速度）
