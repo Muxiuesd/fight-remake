@@ -22,6 +22,14 @@ public class TFAudio implements SpatialAudio {
         return this.soundBufferSource == null;
     }
 
+    /**
+     * 数值有效性检查：NaN/Infinity 会导致 OpenAL 调用失败（AL_INVALID_VALUE），
+     * 且错误是粘性的——不清除会让后续所有音频播放失败（大量播放后无声的根因）
+     */
+    private static boolean isInvalid (float v) {
+        return Float.isNaN(v) || Float.isInfinite(v);
+    }
+
     @Override
     public void play() {
         if (this.isDisposed()) return;
@@ -73,6 +81,8 @@ public class TFAudio implements SpatialAudio {
     @Override
     public void setPos (float x, float y, float z) {
         if (this.isDisposed()) return;
+        //NaN 防护：无效坐标会触发 OpenAL 粘性错误导致后续全部无声
+        if (isInvalid(x) || isInvalid(y) || isInvalid(z)) return;
         // 手动设置位置时自动解除源绑定
         this.boundSource = null;
         this.soundBufferSource.setPosition(x, y, z);
@@ -81,6 +91,8 @@ public class TFAudio implements SpatialAudio {
     @Override
     public void setDirection (float x, float y, float z) {
         if (this.isDisposed()) return;
+        //NaN 防护：无效方向会触发 OpenAL 粘性错误
+        if (isInvalid(x) || isInvalid(y) || isInvalid(z)) return;
         this.soundBufferSource.setDirection(new Vector3(x, y, z));
     }
 
@@ -115,8 +127,17 @@ public class TFAudio implements SpatialAudio {
         this.boundSource = source;
         if (source != null) {
             Vector3 pos = source.getPos();
-            this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
-            this.soundBufferSource.setDirection(source.getForward());
+            if (isInvalid(pos.x) || isInvalid(pos.y) || isInvalid(pos.z)) {
+                //声源位置无效：跳过位置设置（防止 AL 粘性错误）
+            } else {
+                this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
+            }
+            Vector3 forward = source.getForward();
+            if (isInvalid(forward.x) || isInvalid(forward.y) || isInvalid(forward.z)) {
+                //声源方向无效：跳过方向设置
+            } else {
+                this.soundBufferSource.setDirection(forward);
+            }
         }
     }
 
@@ -134,8 +155,14 @@ public class TFAudio implements SpatialAudio {
     public void updatePos () {
         if (this.isDisposed() || this.boundSource == null || !this.soundBufferSource.isPlaying()) return;
         Vector3 pos = this.boundSource.getPos();
+        Vector3 forward = this.boundSource.getForward();
+        //NaN 防护：无效位置/方向会触发 OpenAL 粘性错误导致后续全部无声
+        if (isInvalid(pos.x) || isInvalid(pos.y) || isInvalid(pos.z)
+            || isInvalid(forward.x) || isInvalid(forward.y) || isInvalid(forward.z)) {
+            return;
+        }
         this.soundBufferSource.setPosition(pos.x, pos.y, pos.z);
-        this.soundBufferSource.setDirection(this.boundSource.getForward());
+        this.soundBufferSource.setDirection(forward);
     }
 
     @Override

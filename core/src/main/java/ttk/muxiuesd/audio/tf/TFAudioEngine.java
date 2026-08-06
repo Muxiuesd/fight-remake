@@ -2,6 +2,7 @@ package ttk.muxiuesd.audio.tf;
 
 import com.badlogic.gdx.files.FileHandle;
 import de.pottgames.tuningfork.*;
+import de.pottgames.tuningfork.logger.TuningForkLogger;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioEngine;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioListener;
@@ -14,7 +15,10 @@ import java.util.*;
  */
 public class TFAudioEngine implements SpatialAudioEngine {
     public final String TAG = this.getClass().getName();
-    public static final int SIMULTANEOUS_SOURCES = 1024;
+    //同时可用的音频源数量：不能超过硬件/驱动的 OpenAL source 上限（常见限制 256），
+    //超出部分 alGenSources 会返回 0（无效 sourceId），播放失败 + free 报 AL_INVALID_NAME（大量播放后无声的根因）
+    //游戏同时播放的音频（走路+攻击+环境+UI）一般 < 50，128 完全够用
+    public static final int SIMULTANEOUS_SOURCES = 128;
     public static final int IDLE_TASKS = 100;
     // SoundBuffer 缓存上限（防止大量不同音频文件导致 AL buffer 无限增长）
     public static final int MAX_SOUND_BUFFERS = 1024;
@@ -30,26 +34,69 @@ public class TFAudioEngine implements SpatialAudioEngine {
     private SpatialAudioListener audioListener;
     private Map<FileHandle, SoundBuffer> soundBuffersCache;     //音频文件数据的缓存
     private Set<SpatialAudio> activeAudios;
+    private final TuningForkErrorCatcher errorCatcher = new TuningForkErrorCatcher();
 
-    //诊断统计（用于定位大量播放后无声的根因）
-    private int sourcePoolExhaustedCount;
-    private int soundLoadFailCount;
-    private int activeAudiosPeak;
-    private float statusLogTimer;
+    /**
+     * 自定义 TuningFork 日志捕获器：监听 TuningFork 内部的错误日志，
+     * 特别是 SoundBuffer 创建失败（"Failed to create the SoundBuffer - AL_INVALID_NAME"）
+     * 这类 AL 层面错误——出现时标记，后续清空缓存强制重新加载，避免无效 buffer 反复使用导致永久无声
+     */
+    private class TuningForkErrorCatcher implements TuningForkLogger {
+        //volatile：TuningFork 可能在内部线程调用 logger
+        private volatile boolean soundBufferError;
 
-    //TODO 缓存SoundBuffer，减少AL开销，避免报错
+        @Override
+        public void error (Class<?> clazz, String message) {
+            Log.error(TAG, "[TuningFork] " + clazz.getSimpleName() + ": " + message);
+            if (message != null
+                && (message.contains("SoundBuffer")
+                    || message.toLowerCase().contains("buffer")
+                    || message.contains("AL_INVALID_NAME"))) {
+                this.soundBufferError = true;
+            }
+        }
+
+        @Override
+        public void warn (Class<?> clazz, String message) {
+        }
+
+        @Override
+        public void info (Class<?> clazz, String message) {
+        }
+
+        @Override
+        public void debug (Class<?> clazz, String message) {
+        }
+
+        @Override
+        public void trace (Class<?> clazz, String message) {
+        }
+
+        /**
+         * 消费并清除 SoundBuffer 错误标记
+         */
+        boolean consumeSoundBufferError () {
+            boolean flag = this.soundBufferError;
+            this.soundBufferError = false;
+            return flag;
+        }
+    }
 
     @Override
     public void init () {
         AudioDeviceConfig deviceConfig = new AudioDeviceConfig();
         deviceConfig.setOutputMode(OutputMode.STEREO_HRTF); //设置HRTF
 
-        AudioConfig config = new AudioConfig(deviceConfig)
-            .setSimultaneousSources(SIMULTANEOUS_SOURCES)
-            .setIdleTasks(IDLE_TASKS)
+        AudioConfig config = new AudioConfig(
+            deviceConfig,
+            DistanceAttenuationModel.INVERSE_DISTANCE_CLAMPED,
+            SIMULTANEOUS_SOURCES,
+            IDLE_TASKS,
             //禁用虚拟化：Virtualization.ON 会在同时播放的音频超过硬件 source 上限时
             //把音频"虚拟化"（不实际播放、静音，但状态保持播放中）——这会导致大量播放后部分音频无声
-            .setVirtualization(AudioConfig.Virtualization.OFF_DROP_CHANNELS);
+            AudioConfig.Virtualization.OFF_DROP_CHANNELS,
+            this.errorCatcher
+        );
 
         this.audio = Audio.init(config);
 
@@ -66,6 +113,11 @@ public class TFAudioEngine implements SpatialAudioEngine {
     @Override
     public SpatialAudio createAudio (FileHandle fileHandle) {
         Map<FileHandle, SoundBuffer> cache = this.getSoundBuffersCache();
+        //TuningFork 报告过 SoundBuffer 错误：清空缓存强制重新加载（缓存中可能有无效 buffer）
+        if (this.errorCatcher.consumeSoundBufferError()) {
+            cache.clear();
+        }
+
         //一个buffer就是一个音频的内存数据，需要控制数量，可重复使用
         SoundBuffer soundBuffer;
         //先查找有无缓存
@@ -81,8 +133,11 @@ public class TFAudioEngine implements SpatialAudioEngine {
                 soundBuffer = SoundLoader.load(fileHandle);
             } catch (Exception e) {
                 //音频文件加载失败（文件损坏/AL 资源不足）：记录日志并返回静默音频，不中断其他播放
-                this.soundLoadFailCount++;
                 Log.error(TAG, "音频文件加载失败：" + fileHandle.path() + "，" + e.getMessage());
+                return new TFAudio(this, null);
+            }
+            //刚发生了 SoundBuffer 创建错误（如 AL_INVALID_NAME）：这个 buffer 无效，不缓存、不播放
+            if (this.errorCatcher.consumeSoundBufferError()) {
                 return new TFAudio(this, null);
             }
             cache.put(fileHandle, soundBuffer);
@@ -93,12 +148,9 @@ public class TFAudioEngine implements SpatialAudioEngine {
         this.recycleStoppedAudios();
 
         //一个source就是一个播放实例，数量可以很多
-        //TuningFork 在 source 池耗尽时 obtainSource 返回 null（见 SoundSourcePool.findFreeSource）
+        //TuningFork 在 source 池耗尽时 obtainSource 返回 null（同一时刻播放超过上限），此时静默跳过本次播放
         BufferedSoundSource source = this.audio.obtainSource(soundBuffer);
         if (source == null) {
-            //同一时刻播放的音效数量超过物理上限（极端情况），静默跳过本次播放，不崩溃
-            this.sourcePoolExhaustedCount++;
-            Log.error(TAG, "TuningFork 音频源池已耗尽（同一时刻播放的音效过多），本次播放被跳过");
             return new TFAudio(this, null);
         }
         return new TFAudio(this, source);
@@ -173,17 +225,6 @@ public class TFAudioEngine implements SpatialAudioEngine {
                 //单个音频位置更新异常不能中断整个更新循环
                 Log.error(TAG, "更新音频位置失败：" + e.getMessage());
             }
-        }
-
-        //周期输出音频状态（诊断用）：活跃数/峰值/源池耗尽次数/加载失败次数
-        this.activeAudiosPeak = Math.max(this.activeAudiosPeak, this.activeAudios.size());
-        this.statusLogTimer += delta;
-        if (this.statusLogTimer >= 5f) {
-            this.statusLogTimer = 0f;
-            Log.print(TAG, "音频状态：活跃=" + this.activeAudios.size()
-                + " 峰值=" + this.activeAudiosPeak
-                + " 源池耗尽=" + this.sourcePoolExhaustedCount
-                + " 加载失败=" + this.soundLoadFailCount);
         }
     }
 
