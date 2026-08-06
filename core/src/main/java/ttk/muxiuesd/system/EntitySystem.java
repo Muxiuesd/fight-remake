@@ -238,6 +238,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         }
     }
 
+    /**
+     * 更新物品实体相关的东西
+     * */
     private void updateItemEntity (ItemEntity itemEntity, float delta) {
         //移除超过存活时间的物品实体
         if (itemEntity.getLivingTime() > Fight.MAX_ITEM_ENTITY_LIVING_TIME.getValue()) {
@@ -254,7 +257,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 ItemPickUpState state = player.pickUpItem(itemStack);
                 if (state == ItemPickUpState.WHOLE) {
                     this.remove(itemEntity);
-                    //AudioPlayer.getInstance().playSound(Sounds.ITEM_POP);
                     getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_POP, player);
                     //整个捡起来就没必要执行下面的代码了
                     return;
@@ -263,19 +265,28 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     itemEntity.setLivingTime(0);
                 }
                 //捡起失败则什么也没发生（速度与基准速度都清零，防止残留速度）
+                itemEntity.setBeingAttracted(false);
                 itemEntity.setVelocity(0, 0);
                 itemEntity.setSpeed(0);
             }
 
             float distance = Util.getDistance(itemEntity, player);
-            if (distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
-                && !player.getBackpack().isFull(itemEntity.getItemStack())) {
+            //物品实体是否在玩家实体的吸引范围内
+            boolean inRange = distance <= Fight.PLAYER_PICKUP_RANGE.getValue()
+                && !player.getBackpack().isFull(itemEntity.getItemStack());
+            if (inRange) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
+                itemEntity.setBeingAttracted(true);
                 Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
                 itemEntity.setVelocity(direction.getX(), direction.getY());
                 //吸引速度随距离衰减：远处快、近处慢（避免物品在玩家周围环绕抖动）
-                float speed = Math.min(7.7f, distance * 3f);
+                float speed = Math.min(8.7f, distance * 3f);
                 itemEntity.setSpeed(speed);
+            } else if (itemEntity.isBeingAttracted()) {
+                //离开了吸引范围：停止朝向玩家移动（不再保留残留速度）
+                itemEntity.setBeingAttracted(false);
+                itemEntity.setVelocity(0, 0);
+                itemEntity.setSpeed(0);
             }
         }
 
@@ -319,8 +330,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (entity.getSpeed() <= 0) return;
 
         float curSpeed = entity.getSpeed();
-        //实体在地面上
-        if (entity.isOnGround()) {
+        //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）
+        if (!entity.isBeingAttracted() && entity.isOnGround()) {
             //计算脚下方块摩擦对速度的影响
             Vector2 center = entity.getCenterPos();
             Block block = cs.getBlock(center.x, center.y);

@@ -76,6 +76,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     private TaskTimer onAirTimer;   //在空中的计时器，可以自定义物品实体在空中运动的时间
     private float cycle;
     private float livingTime;   //存在时间
+    private boolean beingAttracted;  //是否正在被玩家吸引（吸引期间不受方块摩擦力影响）
 
     public ItemEntity (World world, EntityType<? super ItemEntity> entityType) {
         this(world);
@@ -85,6 +86,21 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         this.positionOffset = new Vector2();
         setSize(DEFAULT_SIZE);
         fastAddBodyHitBox();
+    }
+
+    /**
+     * 物品实体是否被吸引
+     * */
+    public boolean isBeingAttracted () {
+        return this.beingAttracted;
+    }
+
+    /**
+     * 设置物品实体是否被吸引
+     * */
+    public ItemEntity setBeingAttracted (boolean beingAttracted) {
+        this.beingAttracted = beingAttracted;
+        return this;
     }
 
     @Override
@@ -147,6 +163,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         setLivingTime(0f);
         this.cycle = 0f;    //重置悬浮动画相位
         getPositionOffset().set(0f, 0f);
+        this.beingAttracted = false;    //重置吸引状态
 
         TaskTimer taskTimer = this.getOnAirTimer();
         if (taskTimer != null) {
