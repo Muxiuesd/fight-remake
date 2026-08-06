@@ -308,12 +308,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Block block = cs.getBlock(center.x, center.y);
         if (block == null) return;
 
+        //目标速度 = 基准速度 × 摩擦系数，直接设置立即生效
+        //（不能用 lerp 平滑逼近：玩家的速度矢量每帧被输入系统重置，lerp 起点每帧都是全速，
+        //  导致永远无法收敛到目标速度，摩擦几乎失效）
         float friction = block.getProperty().getFriction();
-        //目标速度 = 基准速度 × 摩擦系数
-        float targetSpeed = entity.getSpeed() * friction;
-        //当前速度向目标速度随时间平滑逼近（真实阻尼，不再是每帧常数重设，速度能衰减到 0）
-        float lerpFactor = 1f - (float) Math.pow(0.0001, delta);
-        float curSpeed = com.badlogic.gdx.math.MathUtils.lerp(entity.getCurSpeed(), targetSpeed, lerpFactor);
+        float curSpeed = entity.getSpeed() * friction;
         //速度过小直接为0
         if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);

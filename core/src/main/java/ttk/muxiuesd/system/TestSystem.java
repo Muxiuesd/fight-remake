@@ -36,7 +36,7 @@ public class TestSystem extends WorldSystem {
 
         Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
 
-        if (player.handIsEmpty() && KeyBindings.PlayerShift.wasJustPressed()) {
+        if (!player.handIsEmpty() && KeyBindings.PlayerShift.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();
             RawObject rawObject = ItemStack.CODEC.encode(handItemStack);
             String json = RawObjectJsonConverter.toJson(rawObject);
