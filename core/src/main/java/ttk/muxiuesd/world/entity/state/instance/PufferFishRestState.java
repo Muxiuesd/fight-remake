@@ -22,6 +22,8 @@ public class PufferFishRestState extends StatePufferFish{
 
     @Override
     public void start (World world, PufferFish entity) {
+        //休息时清除速度，防止残留速度导致静止实体漂移
+        entity.setVelocity(0, 0);
         setTimer(Pools.TASK_TIMER.obtain().setMaxSpan(MathUtils.random(1f, 3f)));
     }
 

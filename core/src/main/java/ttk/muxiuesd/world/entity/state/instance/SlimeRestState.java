@@ -12,6 +12,8 @@ import ttk.muxiuesd.world.entity.state.abs.StateEnemy;
 public class SlimeRestState extends StateEnemy<Slime> {
     @Override
     public void start (World world, Slime entity) {
+        //休息时清除速度，防止残留速度导致静止实体无限滑行
+        entity.setVelocity(0, 0);
         //休息计时器
         setTimer(Pools.TASK_TIMER.obtain().setMaxSpan(MathUtils.random(1.8f, 3f)));
     }

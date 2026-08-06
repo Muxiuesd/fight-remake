@@ -29,6 +29,7 @@ import ttk.muxiuesd.ui.screen.PlayerUIScreen;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.Player;
@@ -98,7 +99,8 @@ public class PlayerSystem extends WorldSystem {
         //玩家速度计算
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Vector2 playerCenter = this.player.getCenterPos();
-        Block block = cs.getBlock(playerCenter.x, playerCenter.y);
+        //用玩家底部判定是否在水中（半身没入水中也算游泳），而不是中心点
+        Block block = cs.getBlock(playerCenter.x, playerCenter.y - this.player.getHeight() / 2f);
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
@@ -153,36 +155,37 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerShortcutKey_7.wasJustPressed()) curPlayer.setHandIndex(6);
             if (KeyBindings.PlayerShortcutKey_8.wasJustPressed()) curPlayer.setHandIndex(7);
             if (KeyBindings.PlayerShortcutKey_9.wasJustPressed()) curPlayer.setHandIndex(8);
-        }
 
-        //移动方向
-        int inputX = 0;
-        int inputY = 0;
+            //移动方向（放在守卫内：打开GUI时不能移动）
+            int inputX = 0;
+            int inputY = 0;
+            if (KeyBindings.PlayerWalkUp.wasPressed()) {
+                inputY += 1;
+            }
+            if (KeyBindings.PlayerWalkDown.wasPressed()) {
+                inputY -= 1;
+            }
+            if (KeyBindings.PlayerWalkLeft.wasPressed()) {
+                inputX -= 1;
+            }
+            if (KeyBindings.PlayerWalkRight.wasPressed()) {
+                inputX += 1;
+            }
 
-        //玩家移动
-        if (KeyBindings.PlayerWalkUp.wasPressed()) {
-            inputY += 1;
-        }
-        if (KeyBindings.PlayerWalkDown.wasPressed()) {
-            inputY -= 1;
-        }
-        if (KeyBindings.PlayerWalkLeft.wasPressed()) {
-            inputX -= 1;
-        }
-        if (KeyBindings.PlayerWalkRight.wasPressed()) {
-            inputX += 1;
-        }
-
-        if (inputX != 0 || inputY != 0) {
-            // 计算方向向量的长度
-            float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
-            // 归一化并乘以当前速度
-            float playerSpeed = curPlayer.getSpeed();
-            float velX = (inputX / length) * playerSpeed;
-            float velY = (inputY / length) * playerSpeed;
-            curPlayer.setVelocity(velX, velY);
-        }
-        if (inputX == 0 && inputY == 0) {
+            if (inputX != 0 || inputY != 0) {
+                // 计算方向向量的长度
+                float length = (float) Math.sqrt(inputX * inputX + inputY * inputY);
+                // 归一化并乘以当前速度
+                float playerSpeed = curPlayer.getSpeed();
+                float velX = (inputX / length) * playerSpeed;
+                float velY = (inputY / length) * playerSpeed;
+                curPlayer.setVelocity(velX, velY);
+            }
+            if (inputX == 0 && inputY == 0) {
+                curPlayer.setVelocity(0, 0);
+            }
+        } else {
+            //GUI 打开时玩家不能移动，停止速度（否则残留速度会继续滑行）
             curPlayer.setVelocity(0, 0);
         }
     }
@@ -205,6 +208,8 @@ public class PlayerSystem extends WorldSystem {
         //生成新的玩家实体
         this.player = Entities.PLAYER.create(getWorld());
         this.player.setEntitySystem(es);
+        //重生位置安全检查：出生点被墙/水占据时向上搜索安全位置（防止卡墙/溺水）
+        this.ensureSafeSpawnPosition();
         this.playerLastPosition = this.player.getPosition();
         es.add(player);
 
@@ -214,6 +219,26 @@ public class PlayerSystem extends WorldSystem {
 
         //播放复活音频
         getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
+    }
+
+    /**
+     * 确保玩家重生位置安全：向上搜索第一个可站立的位置
+     * */
+    private void ensureSafeSpawnPosition () {
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
+        float px = this.player.getX();
+        float py = this.player.getY();
+        float halfH = this.player.getHeight() / 2f;
+        for (int i = 0; i < 64; i++) {
+            float checkY = py + i;
+            Block b = cs.getBlock(px, checkY - halfH);
+            //空气方块可站立
+            if (b == Blocks.ARI || b instanceof BlockAir) {
+                this.player.setPosition(px, checkY);
+                return;
+            }
+        }
+        //找不到安全位置就保持默认位置
     }
 
     @Override

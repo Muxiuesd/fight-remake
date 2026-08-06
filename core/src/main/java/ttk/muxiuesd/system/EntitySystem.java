@@ -262,8 +262,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     //部分捡起时刷新存在时间
                     itemEntity.setLivingTime(0);
                 }
-                //捡起失败则什么也没发生
+                //捡起失败则什么也没发生（速度与基准速度都清零，防止残留速度）
                 itemEntity.setVelocity(0, 0);
+                itemEntity.setSpeed(0);
             }
 
             float distance = Util.getDistance(itemEntity, player);
@@ -272,7 +273,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
                 Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
                 itemEntity.setVelocity(direction.getX(), direction.getY());
-                itemEntity.setSpeed(7.7f);
+                //吸引速度随距离衰减：远处快、近处慢（避免物品在玩家周围环绕抖动）
+                float speed = Math.min(7.7f, distance * 3f);
+                itemEntity.setSpeed(speed);
             }
         }
 
@@ -295,7 +298,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         if (block == null) return;
 
         float friction = block.getProperty().getFriction();
-        float curSpeed = entity.getSpeed() * friction;
+        //目标速度 = 基准速度 × 摩擦系数
+        float targetSpeed = entity.getSpeed() * friction;
+        //当前速度向目标速度随时间平滑逼近（真实阻尼，不再是每帧常数重设，速度能衰减到 0）
+        float lerpFactor = 1f - (float) Math.pow(0.0001, delta);
+        float curSpeed = com.badlogic.gdx.math.MathUtils.lerp(entity.getCurSpeed(), targetSpeed, lerpFactor);
         //速度过小直接为0
         if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);

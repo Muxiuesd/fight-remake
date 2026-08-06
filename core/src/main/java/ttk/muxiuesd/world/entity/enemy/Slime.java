@@ -102,7 +102,8 @@ public class Slime extends Enemy<Slime> {
             (float) (bullet.getWidth() * Math.pow(this.factor, this.generation)),
             (float) (bullet.getHeight() * Math.pow(this.factor, this.generation))
         );
-        bullet.setPosition(getX() - bullet.getWidth() / 2f, getY() - bullet.getHeight() / 2f);
+        //实体坐标与子弹坐标都是中心坐标，直接对齐发射
+        bullet.setPosition(getX(), getY());
         bullet.setVelocity(direction, bullet.getSpeed());
 
         bullet.fastAddBodyHitBox();

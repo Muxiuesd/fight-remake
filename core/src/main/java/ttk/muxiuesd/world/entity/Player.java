@@ -120,8 +120,9 @@ public class Player extends LivingEntity<Player> {
             float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
             float v = Math.min(distance, 4f);
             itemEntity.setSpeed(v);
-            itemEntity.setCurSpeed(v);
+            //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
             itemEntity.setVelocity(getDirection().toVector2());
+            itemEntity.setCurSpeed(v);
         }
 
         return itemEntity;
@@ -163,7 +164,8 @@ public class Player extends LivingEntity<Player> {
 
     @Override
     public Direction getDirection () {
-        return Util.getDirection();
+        //以玩家位置为起点瞄准鼠标，而不是窗口中心（相机带偏移时两者不同）
+        return Util.getDirection(getCenterPos());
     }
 
     public boolean isUsingItem () {

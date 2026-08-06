@@ -62,8 +62,18 @@ public class Util {
     /**
      * 获取窗口中心到鼠标方向的单位向量
      * */
-    public static Direction getDirection() {
+    public static Direction getDirection () {
         return new Direction();
+    }
+
+    /**
+     * 获取指定位置（如玩家）到鼠标指向的世界坐标方向的单位向量
+     * <p>
+     * 相机带偏移时窗口中心 ≠ 玩家位置，用这个才能保证瞄准方向正确
+     * */
+    public static Direction getDirection (Vector2 from) {
+        Vector2 mouse = getMouseWorldPosition();
+        return new Direction(from, mouse);
     }
 
     /**

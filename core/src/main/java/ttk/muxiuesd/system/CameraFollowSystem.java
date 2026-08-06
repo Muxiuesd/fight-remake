@@ -45,15 +45,17 @@ public class CameraFollowSystem extends WorldSystem {
         if (camera.zoom > MAX_ZOOM) camera.zoom = MAX_ZOOM;
         if (camera.zoom < MIN_ZOOM) camera.zoom = MIN_ZOOM;
 
-        // 使相机跟随鼠标移动
+        // 使相机跟随鼠标移动（带平滑插值，避免生硬抖动）
         Direction direction = Util.getDirection();
         Vector2 vector2 = Util.getMouseWindowPos();
         float xOffset = Math.abs(vector2.x) * direction.getX() / 300;
         float yOffset = Math.abs(vector2.y) * direction.getY() / 300;
-        PlayerCamera.INSTANCE.setPosition(
-            follower.getX() + xOffset,
-            follower.getY() + yOffset
-        );
+        float targetX = follower.getX() + xOffset;
+        float targetY = follower.getY() + yOffset;
+        //时间相关的平滑过渡（系数与摩擦平滑一致，跟随及时不滞后）
+        float lerpFactor = 1f - (float) Math.pow(0.0001, delta);
+        camera.position.x = com.badlogic.gdx.math.MathUtils.lerp(camera.position.x, targetX, lerpFactor);
+        camera.position.y = com.badlogic.gdx.math.MathUtils.lerp(camera.position.y, targetY, lerpFactor);
 
     }
 

@@ -214,12 +214,12 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         Array<Wall<?>> result = new Array<>();
 
         int[] xChecks = {
-            (int) hitbox.x,
-            (int) (hitbox.x + hitbox.width)
+            (int) Math.floor(hitbox.x),
+            (int) Math.floor(hitbox.x + hitbox.width)
         };
         int[] yChecks = {
-            (int) hitbox.y,
-            (int) (hitbox.y + hitbox.height)
+            (int) Math.floor(hitbox.y),
+            (int) Math.floor(hitbox.y + hitbox.height)
         };
 
         Array<ChunkPosition> positions = new Array<>();

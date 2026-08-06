@@ -59,7 +59,7 @@ public class ItemFishPole extends Item {
             fishingHook.setOnGround(false);
             fishingHook.setOwner(user)
                 .setPole(itemStack)
-                .setThrowDirection(Util.getDirection())  //未考虑其他LivingEntity抛竿的方向情况
+                .setThrowDirection(Util.getDirection(user.getCenterPos()))  //以玩家位置为起点瞄准鼠标
                 .setChunkSystem(world.getSystem(ChunkSystem.class))
                 .setParticleSystem(world.getSystem(ParticleSystem.class));
             EntitySystem es = world.getSystem(EntitySystem.class);

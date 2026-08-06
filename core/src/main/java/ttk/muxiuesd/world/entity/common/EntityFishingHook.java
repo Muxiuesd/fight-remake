@@ -26,8 +26,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     private Direction throwDirection;
     private ChunkSystem cs;
     private ParticleSystem pts;
-    private Timer moveTimer;
-    private Timer bubbleEmitTimer;
+    private Timer<?> moveTimer;
+    private Timer<?> bubbleEmitTimer;
     private Vector2 positionOffset;
     private float cycle;
     public boolean isReturning;
@@ -63,10 +63,13 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         if (this.moveTimer != null && !this.moveTimer.isReady()) {
             //抛钩移动
             this.throwMovement(delta);
-            this.moveTimer.update(delta);
+            //throwMovement 撞墙时会置空 moveTimer，需要重新检查再更新计时器
+            if (this.moveTimer != null) {
+                this.moveTimer.update(delta);
+            }
         }else {
             setOnGround(true);
-            if (this.cs.getBlock(getX(), getY()) instanceof BlockWater) {
+            if (this.cs != null && this.cs.getBlock(getX(), getY()) instanceof BlockWater) {
                 //只有鱼钩在水中才上下漂浮和产生气泡粒子
                 this.cycle += delta / 2;
                 if (this.cycle > 1f) this.cycle -= 1f;
@@ -99,6 +102,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         setVelocity(this.throwDirection.getX(), this.throwDirection.getY());
         setCurSpeed(getSpeed());
         positionChange(delta);
+        //撞墙则停止抛钩（鱼钩不能穿墙）；cs 未设置时跳过墙体检测
+        if (this.cs != null && this.cs.getWall(getX(), getY()) != null) {
+            this.moveTimer = null;
+        }
     }
 
     /**
@@ -108,6 +115,10 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         Direction dir = new Direction(getCenterPos(), this.getOwner().getCenterPos());
         setVelocity(getSpeed() * dir.getX(), getSpeed() * dir.getY());
         positionChange(delta);
+        //撞墙则停止回收（鱼钩卡在墙边，等玩家再次操作）；cs 未设置时跳过墙体检测
+        if (this.cs != null && this.cs.getWall(getX(), getY()) != null) {
+            this.isReturning = false;
+        }
     }
 
     public LivingEntity<?> getOwner () {

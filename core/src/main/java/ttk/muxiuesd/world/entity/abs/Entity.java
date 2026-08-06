@@ -99,11 +99,12 @@ public abstract class Entity<T extends Entity<T>>
     @Override
     public void readCatData (JsonValue values) {
         this.speed = values.getFloat("speed", 1.145f);
-        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
         this.x = values.getFloat("x", 1.145f);
         this.y = values.getFloat("y", 1.145f);
         this.velX = values.getFloat("velX", 0);
         this.velY = values.getFloat("velY", 0);
+        //curSpeed 在速度矢量之后设置（setCurSpeed 缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
+        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
         this.width = values.getFloat("width", 1f);
         this.height = values.getFloat("height", 1f);
         this.originX = values.getFloat("originX", 0);
@@ -271,7 +272,8 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     public T setSpeed (float speed) {
-        if (this.speed >= 0) {
+        //守卫检查新值（原来检查旧值，负速度可被写入且无法改回）
+        if (speed >= 0) {
             this.speed = speed;
         }
         return (T) this;
@@ -285,13 +287,16 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 设置当前速率
+     * 设置当前速率（缩放已有速度矢量到指定长度）
+     * <p>
+     * 注意：必须先设置速度矢量（{@link #setVelocity(float, float)}）再调用本方法；
+     * 速度矢量为零时无法确定方向，保持为零
      * */
     public T setCurSpeed (float curSpeed) {
         curSpeed = Math.abs(curSpeed);
         float len = Vec2.len(this.getVelX(), this.getVelY());
         if (len < EntitySystem.MIN_SPEED) {
-            //当前速度为零，无法归一化，直接设置速度为零（保持原有速度方向不变）
+            //当前速度为零（没有方向可缩放），保持速度为零
             this.setVelocity(0, 0);
             return (T) this;
         }

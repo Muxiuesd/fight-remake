@@ -141,7 +141,8 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.ID("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);
-        bullet.setPosition(getX() + (getWidth() - bullet.getWidth())/2, getY() + (getHeight() - bullet.getHeight())/2);
+        //实体坐标与子弹坐标都是中心坐标，直接对齐发射
+        bullet.setPosition(getX(), getY());
         bullet.setVelocity(direction, bullet.getSpeed());
         return bullet;
     }

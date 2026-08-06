@@ -266,8 +266,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             if (itemEntity != null) {
                 itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
                 itemEntity.setSpeed(speed);
-                itemEntity.setCurSpeed(speed);
+                //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
                 itemEntity.setVelocity(velX, velY);
+                itemEntity.setCurSpeed(speed);
             }
         }
     }

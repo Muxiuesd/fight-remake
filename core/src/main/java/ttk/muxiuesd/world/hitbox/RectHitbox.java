@@ -59,7 +59,8 @@ public class RectHitbox extends Hitbox {
 
     @Override
     public Vector2 getCenterPos () {
-        return Pools.VEC2.obtain().set(this.getCenterX(), this.getCenterY());
+        //返回新实例（调用方从不 free 池化对象，改为 new 避免池泄漏）
+        return new Vector2(this.getCenterX(), this.getCenterY());
     }
 
     /**
