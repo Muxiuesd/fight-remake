@@ -2,16 +2,16 @@ package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
-import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import game.muxiuesd.bedrockcore.app.ui.components.UITextField;
+import game.muxiuesd.bedrockcore.data.JsonDataReader;
+import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
-import game.muxiuesd.bedrockcore.data.JsonDataReader;
-import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.registry.WorldInfoTypes;
+import ttk.muxiuesd.ui.abs.FightUIScreen;
 import ttk.muxiuesd.ui.components.CreateNewWorldButtonUI;
 import ttk.muxiuesd.ui.components.FightUITextField;
 import ttk.muxiuesd.ui.components.SavesListUI;
@@ -25,7 +25,7 @@ import ttk.muxiuesd.world.WorldInfo;
  * <p>
  * 列出读取到的所有世界的存档数据，以列表的形式展现
  * */
-public class WorldsMenuUIScreen extends UIScreen {
+public class WorldsMenuUIScreen extends FightUIScreen {
     public static final String TAG = WorldsMenuUIScreen.class.getName();
     //存档的UI列表面板
     private SavesListUI savesList;

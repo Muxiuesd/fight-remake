@@ -3,10 +3,10 @@ package game.muxiuesd.bedrockcore.app.ui.abs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
@@ -14,11 +14,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIResize;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
-import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.render.camera.GUICamera;
-import ttk.muxiuesd.system.game.InputHandleSystem;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.util.pool.PoolableRectangle;
 
 import java.util.LinkedHashSet;
 
@@ -30,17 +26,33 @@ import java.util.LinkedHashSet;
  * 如果要处理全局的键盘和鼠标的输入，就把实例加入gdx的input处理
  * */
 public abstract class UIScreen
-    implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder, InputProcessor{
+    implements Updateable, Drawable, ShapeRenderable, GUIResize, UIComponentsHolder, InputProcessor {
 
     private final LinkedHashSet<UIComponent> components = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayAddComponents = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
+    private final Rectangle rectangle = new Rectangle();  ///重复利用的矩形区域
 
     private boolean mouseOver = false;  ///当鼠标指针在任意的可交互的组件上就标记为true，否则为false
     private UIComponent focusComponent; ///焦点组件，当有焦点组件时，键盘输入只在焦点组件里生效
 
 
-    public UIScreen () {
+    public UIScreen () {}
+
+    /**
+     * 被展示出来时调用
+     * */
+    public void show () {
+    }
+
+    /**
+     * 被隐藏时调用
+     * */
+    public void hide () {
+        this.getComponents().forEach(uiComponent -> {
+            uiComponent.setMouseOver(false);
+            uiComponent.setClicked(false);
+        });
     }
 
     @Override
@@ -54,23 +66,8 @@ public abstract class UIScreen
     }
 
     /**
-     * 被展示出来时调用
+     * UIScreen的核心更新逻辑
      * */
-    public void show () {
-        //调整大小
-        OrthographicCamera camera = GUICamera.INSTANCE.getCamera();
-        resize(camera.viewportWidth, camera.viewportHeight);
-
-        InputHandleSystem.getInstance().addProcessor(this);
-    }
-
-    /**
-     * 被隐藏时调用
-     * */
-    public void hide () {
-        InputHandleSystem.getInstance().removeProcessor(this);
-    }
-
     @Override
     public void update (float delta) {
         //检查延迟添加和延迟删除
@@ -82,8 +79,7 @@ public abstract class UIScreen
         if (getComponents().isEmpty()) return;
         boolean clickFlag = false;  //没有点到任何ui组件时就是false
         Vector2 mouseUIPosition = Util.getMouseUIPosition();
-        //重复利用的矩形区域
-        PoolableRectangle rectangle = Pools.RECT.obtain();
+
 
         for (UIComponent uiComponent : getComponents()) {
             //更新组件
@@ -93,9 +89,9 @@ public abstract class UIScreen
 
             //记录这个ui上一个状态是否被鼠标覆盖
             boolean uiComponentMouseOver = uiComponent.isMouseOver();
-            rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
+            this.rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
             //鼠标坐标在ui的区域上
-            if (rectangle.contains(mouseUIPosition)) {
+            if (this.rectangle.contains(mouseUIPosition)) {
                 //计算交互区域坐标
                 GridPoint2 interactGrid = uiComponent.getInteractGridSize();
                 Vector2 position = uiComponent.getPosition();
@@ -148,13 +144,14 @@ public abstract class UIScreen
             this.setFocusComponent(null);
         }
 
-        Pools.RECT.free(rectangle);
+        //还原
+        this.rectangle.set(0, 0, 0, 0);
     }
 
     /**
      * 处理延迟添加和删除
      * */
-    private void handleDelayEvents () {
+    public void handleDelayEvents () {
         if (!this.delayAddComponents.isEmpty()) {
             this.delayAddComponents.forEach(delayAddComponent -> {
                 delayAddComponent.setScreen(this);

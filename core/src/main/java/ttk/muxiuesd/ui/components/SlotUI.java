@@ -11,7 +11,6 @@ import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.ui.text.TextUI;
-import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -29,22 +28,17 @@ public class SlotUI extends UIComponent {
     public static final float ITEM_RENDER_HEIGHT = SLOT_HEIGHT - 2f;
 
 
-    private TextureRegion slotHighlight;
     private Resource<TextureRegion> slotHighlightResource;
-    private TextUI textUI;
+    private TextUI ammountTextUI;       //显示数量的文本UI
 
     public SlotUI (float x, float y, float width, float height) {
         super(x, y, width, height, new GridPoint2(1, 1));
-        this.slotHighlight = Util.loadTextureRegion(
-            Fight.ID("slot_highlight"),
-            Fight.UITexturePath("slot_highlight.png")
-        );
         this.slotHighlightResource = Resource.ofTextureRegion(
             Fight.ID("slot_highlight"),
             Fight.UITexturePath("slot_highlight.png")
         );
-        this.textUI = new TextUI();
-        this.textUI.setPosition(x, y);
+        this.ammountTextUI = new TextUI();
+        this.ammountTextUI.setPosition(x, y);
     }
 
     @Override
@@ -86,9 +80,10 @@ public class SlotUI extends UIComponent {
                 this.drawAmount(batch, parent, renderX, renderY, amount);
             }
         }
+
         //绘制鼠标放在槽位上的高光
-        if (this.slotHighlight != null && isMouseOver()) {
-            batch.draw(this.slotHighlight, renderX, renderY);
+        if (isMouseOver()) {
+            batch.draw(this.getSlotHighlightTextureRegion(), renderX, renderY);
         }
     }
 
@@ -96,8 +91,8 @@ public class SlotUI extends UIComponent {
      * 绘制数量字体，会绘制在槽位UI的右下角
      * */
     public void drawAmount (Batch batch, UIPanel parent, float renderX, float renderY, int amount) {
-        this.textUI
-            .setPosition(renderX + getWidth() - this.textUI.getRenderWidth(), renderY + 1f)
+        this.ammountTextUI
+            .setPosition(renderX + getWidth() - this.ammountTextUI.getRenderWidth(), renderY + 1f)
             .setText(String.valueOf(amount))
             .draw(batch, parent);
     }
@@ -133,6 +128,22 @@ public class SlotUI extends UIComponent {
     @Override
     public SlotUI setPosition (Vector2 pos) {
         super.setPosition(pos);
+        return this;
+    }
+
+    /**
+     * 获取槽位高光贴图
+     * */
+    public TextureRegion getSlotHighlightTextureRegion () {
+        return this.getSlotHighlightResource().get();
+    }
+
+    public Resource<TextureRegion> getSlotHighlightResource () {
+        return this.slotHighlightResource;
+    }
+
+    public SlotUI setSlotHighlightResource (Resource<TextureRegion> slotHighlightResource) {
+        this.slotHighlightResource = slotHighlightResource;
         return this;
     }
 }

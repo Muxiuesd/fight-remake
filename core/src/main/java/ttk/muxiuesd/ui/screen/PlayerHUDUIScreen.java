@@ -1,10 +1,10 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
+import ttk.muxiuesd.ui.abs.FightUIScreen;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
 
 /**
@@ -12,7 +12,7 @@ import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
  * <p>
  * 显示玩家的快捷栏、血条等UI组件
  * */
-public class PlayerHUDUIScreen extends UIScreen {
+public class PlayerHUDUIScreen extends FightUIScreen {
     private PlayerSystem playerSystem;
     private PlayerHotbarUIPanel playerHotbarUIPanel;
 
