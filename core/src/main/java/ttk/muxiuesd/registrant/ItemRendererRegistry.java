@@ -3,6 +3,7 @@ package ttk.muxiuesd.registrant;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
@@ -17,12 +18,20 @@ public class ItemRendererRegistry extends Registries.DefaultRegistry<ItemRendere
     }
 
     /**
-     * 获取渲染器
+     * 获取物品堆叠里面的物品的渲染器
+     * */
+    public static ItemRenderer<Item> get (ItemStack stack) {
+        return get(stack.getItem());
+    }
+
+    /**
+     * 获取物品的渲染器
      * */
     public static <T extends Item> ItemRenderer<T> get (T item) {
         ItemRenderer<? extends Item> renderer = getInstance().get(item.getID());
         if (renderer == null) {
-            Log.error(ItemRendererRegistry.class.getName(), "物品：" + item.getID() + " 的渲染器不存在！！！");
+            Log.error(ItemRendererRegistry.class.getName(),
+                "物品：" + item.getID() + " 的渲染器不存在！！！");
         }
         return (ItemRenderer<T>) renderer;
     }

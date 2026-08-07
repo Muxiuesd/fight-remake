@@ -35,6 +35,7 @@ public interface ItemRenderer<T extends Item> {
      * */
     default void draw (Batch batch, Context context, ItemStack itemStack) {
         if (itemStack == ItemStack.VOID) return;
+
         batch.draw(itemStack.getItem().getTextureRegion(),
             context.x, context.y,
             context.originX, context.originY,

@@ -33,24 +33,26 @@ public class PlayerInventoryUIPanel extends PlayerItemSlotsUIPanel {
      * 初始化所有物品槽位
      * */
     private void initSlots () {
-        float trueHeight = SlotUI.SLOT_HEIGHT + 2f;
-        float trueWidth = SlotUI.SLOT_WIDTH + 2f;
+        float trueHeight = SlotUI.SLOT_HEIGHT;
+        float trueWidth = SlotUI.SLOT_WIDTH;
+        float startX = 7;
+        float startY = 7;
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {
-            addComponent(new PlayerSlotUI(getPlayerSystem(), index, 8 + (index * trueWidth), 8));
+            addComponent(new PlayerSlotUI(getPlayerSystem(), index, startX + (index * trueWidth), startY));
         }
 
         //背包内部槽位
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
                 addComponent(new PlayerSlotUI(getPlayerSystem(), x + (y * 9) + 9,
-                    8 + (x * trueWidth), 30 + y * trueHeight));
+                    startX + (x * trueWidth), 29 + y * trueHeight));
             }
         }
 
         //装备槽位
         for (int y = 0; y < 4; y++) {
-            addComponent(new EquipmentPlayerSlotUI(getPlayerSystem(), y, 8, 142 - (y * trueHeight)));
+            addComponent(new EquipmentPlayerSlotUI(getPlayerSystem(), y, startX, 141 - (y * trueHeight)));
         }
     }
 

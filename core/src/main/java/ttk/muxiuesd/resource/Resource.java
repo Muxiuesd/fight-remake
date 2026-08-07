@@ -1,6 +1,5 @@
 package ttk.muxiuesd.resource;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.util.Util;
@@ -15,17 +14,24 @@ import java.util.function.Supplier;
 public class Resource<T> {
 
     /**
-     * 贴图
+     * 创建一个贴图资源
      * <p>
      * 延迟加载：构造时只注册 id→路径 映射（无 GL 调用，线程安全），
      * 首次 get() 时才触发实际贴图加载
      * */
     public static Resource<TextureRegion> ofTextureRegion (String id, String originalPath) {
-        Identifier.checkAndThrow(id);
+        try {
+            Identifier.checkAndThrow(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         if (originalPath != null) {
             Util.registerTextureIdPath(id, originalPath);
         }
-        return new Resource<>(id, originalPath, null, () -> Util.loadTextureRegion(id, originalPath));
+        return new Resource<>(id, originalPath,
+            null, () -> Util.loadTextureRegion(id, originalPath)
+        );
     }
 
     /**

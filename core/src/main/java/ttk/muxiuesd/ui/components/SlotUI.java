@@ -7,9 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIComponent;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.ui.text.TextUI;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 最基础的物品槽位UI组件
@@ -17,17 +21,25 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 与鼠标交互
  * */
 public class SlotUI extends UIComponent {
-    public static final float SLOT_WIDTH = 16f;
-    public static final float SLOT_HEIGHT = 16f;
-    public static final float SLOT_UI_WIDTH = SLOT_WIDTH + 2f;
-    public static final float SLOT_UI_HEIGHT = SLOT_HEIGHT + 2f;
+    public static final float SLOT_WIDTH = 18f;
+    public static final float SLOT_HEIGHT = 18f;
+    public static final float SLOT_UI_WIDTH = SLOT_WIDTH;
+    public static final float SLOT_UI_HEIGHT = SLOT_HEIGHT;
+    public static final float ITEM_RENDER_WIDTH = SLOT_WIDTH - 2f;
+    public static final float ITEM_RENDER_HEIGHT = SLOT_HEIGHT - 2f;
+
 
     private TextureRegion slotHighlight;
+    private Resource<TextureRegion> slotHighlightResource;
     private TextUI textUI;
 
     public SlotUI (float x, float y, float width, float height) {
         super(x, y, width, height, new GridPoint2(1, 1));
         this.slotHighlight = Util.loadTextureRegion(
+            Fight.ID("slot_highlight"),
+            Fight.UITexturePath("slot_highlight.png")
+        );
+        this.slotHighlightResource = Resource.ofTextureRegion(
             Fight.ID("slot_highlight"),
             Fight.UITexturePath("slot_highlight.png")
         );
@@ -59,10 +71,16 @@ public class SlotUI extends UIComponent {
         //空物品槽位不绘制
         if (!this.isNullSlot()){
             ItemStack itemStack = this.getItemStack();
-            //TODO 调用物品的渲染器
-            batch.draw(itemStack.getItem().getTextureRegion(), renderX, renderY, getWidth(), getHeight());
+            //batch.draw(itemStack.getItem().getTextureRegion(), renderX, renderY, getWidth(), getHeight());
+            ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack);
+            ItemRenderer.Context context = renderer.getContext(
+                renderX + 1, renderY + 1,
+                ITEM_RENDER_WIDTH, ITEM_RENDER_HEIGHT
+            );
+            renderer.draw(batch, context, itemStack);
+            renderer.freeContext(context);
 
-            //数量大于1才绘制
+            //数量大于1才绘制数量的字体文本
             int amount = itemStack.getAmount();
             if (amount > 1) {
                 this.drawAmount(batch, parent, renderX, renderY, amount);
@@ -70,7 +88,7 @@ public class SlotUI extends UIComponent {
         }
         //绘制鼠标放在槽位上的高光
         if (this.slotHighlight != null && isMouseOver()) {
-            batch.draw(this.slotHighlight, renderX - 1, renderY - 1);
+            batch.draw(this.slotHighlight, renderX, renderY);
         }
     }
 
