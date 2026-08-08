@@ -73,9 +73,10 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     /**
      * 鼠标点击这个UI组件调用
      * @param interactPos 鼠标点击这个UI组件的交互区域的坐标位置
+     * @param button 按下的是哪个鼠标按键（Input.Buttons.LEFT / Input.Buttons.RIGHT）
      * @return 是否具有传递性，比如这个组件位于另一个组件之上，有传递性则执行完这个组件的方法后继续下一个组件的方法
      * */
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
         //默认不具有传递性
         return false;
     }

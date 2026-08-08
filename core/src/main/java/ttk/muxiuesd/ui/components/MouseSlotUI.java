@@ -5,11 +5,14 @@ import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 鼠标物品槽UI
+ * <p>
+ * 鼠标上持有的物品
  * */
 public class MouseSlotUI extends PlayerSlotUI {
     //单例模式
@@ -62,9 +65,48 @@ public class MouseSlotUI extends PlayerSlotUI {
         return instance;
     }
 
+    /**
+     * 如果鼠标槽位在指定的屏幕上激活且持有物品，就把物品丢出来并清空槽位
+     * @param screen 要检查的UI屏幕
+     * @param player 丢弃物品的玩家
+     * @return 是否丢弃了物品
+     * */
+    public static boolean dropItemIfActiveOn (UIScreen screen, Player player) {
+        MouseSlotUI instance = getInstance();
+        if (instance.isActive() && instance.curScreen == screen && !instance.isNullSlot()) {
+            ItemStack itemStack = instance.getItemStack();
+            instance.clearItem();
+            player.dropItem(itemStack);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 如果鼠标槽位在指定的屏幕上激活且持有物品，就从槽位里分离出1个物品丢出来
+     * <p>
+     * 槽位里只剩1个物品时，丢出后槽位会被清空
+     * @param screen 要检查的UI屏幕
+     * @param player 丢弃物品的玩家
+     * @return 是否丢弃了物品
+     * */
+    public static boolean dropOneIfActiveOn (UIScreen screen, Player player) {
+        MouseSlotUI instance = getInstance();
+        if (instance.isActive() && instance.curScreen == screen && !instance.isNullSlot()) {
+            ItemStack itemStack = instance.getItemStack();
+            ItemStack one = itemStack.split(1);
+            player.dropItem(one);
+            if (itemStack.getAmount() <= 0) {
+                instance.clearItem();
+            }
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean isNullSlot () {
-        return this.getItemStack() == null;
+        return this.getItemStack() == ItemStack.VOID || this.getItemStack() == null;
     }
 
     @Override

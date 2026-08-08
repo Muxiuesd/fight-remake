@@ -134,7 +134,7 @@ public abstract class UIScreen
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                     uiComponent
                         .setClicked(true)
-                        .click(this.interactGrid);
+                        .click(this.interactGrid, Input.Buttons.LEFT);
                     clickFlag = true;
                     dragHandled = true;
                     //记录拖拽起点：按住左键后即使移出组件矩形也继续拖拽
@@ -153,6 +153,10 @@ public abstract class UIScreen
                     if (this.getFocusComponent() != null && this.getFocusComponent() != uiComponent) {
                         this.setFocusComponent(null);
                     }
+                }else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+                    //右键点击组件，由组件自己在click方法里判断左右键
+                    uiComponent.click(this.interactGrid, Input.Buttons.RIGHT);
+                    clickFlag = true;
                 }
                 //这个ui屏幕的状态变成被鼠标覆盖
                 this.setMouseOver(true);
@@ -187,6 +191,15 @@ public abstract class UIScreen
             }
         }
 
+        if (!clickFlag) {
+            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                //本帧点击了屏幕上没有任何UI组件的空白区域
+                this.onClickBlank(Input.Buttons.LEFT);
+            }else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+                this.onClickBlank(Input.Buttons.RIGHT);
+            }
+        }
+
         if (!clickFlag
             && (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.LEFT))
         ) {
@@ -196,6 +209,15 @@ public abstract class UIScreen
 
         //还原
         this.rectangle.set(0, 0, 0, 0);
+    }
+
+    /**
+     * 点击了屏幕上没有任何UI组件的空白区域时调用
+     * <p>
+     * 只有按下鼠标左键或右键的那一帧才会调用，按住不放不会重复调用
+     * @param button 按下的是哪个鼠标按键（Input.Buttons.LEFT / Input.Buttons.RIGHT）
+     * */
+    protected void onClickBlank (int button) {
     }
 
     /**

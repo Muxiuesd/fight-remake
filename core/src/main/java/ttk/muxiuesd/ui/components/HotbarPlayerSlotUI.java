@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
@@ -33,7 +34,9 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
     }
 
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键点击切换选中的快捷栏槽位
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         getPlayerSystem().getPlayer().setHandIndex(this.getIndex());
 
         return false;

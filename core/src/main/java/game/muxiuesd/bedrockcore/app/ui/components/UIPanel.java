@@ -1,5 +1,6 @@
 package game.muxiuesd.bedrockcore.app.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -136,12 +137,13 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
     }
 
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
         if (! this.getComponents().isEmpty()) {
             //面板内部坐标
             Vector2 internalPos = new Vector2(interactPos.x, interactPos.y);
             PoolableRectangle rectangle = Pools.RECT.obtain();
 
+            boolean clickedAnyChild = false;   //是否点击到了任意一个子组件
             //遍历面板里面的组件，用内部坐标来检测
             for (UIComponent component : this.getComponents()) {
                 component.setClicked(false);
@@ -160,15 +162,27 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
                         component.getSize(),
                         interactGridSize
                     );
-                    //设置被点击
-                    component.setClicked(true);
-                    if (! component.click(interactGridPos)) break;
+                    //设置被点击（只有左键会显示点击态）
+                    if (button == Input.Buttons.LEFT) component.setClicked(true);
+                    clickedAnyChild = true;
+                    if (! component.click(interactGridPos, button)) break;
                 }
             }
 
+            //点击到了面板但没有点到任何子组件
+            if (!clickedAnyChild) this.onClickBlank(interactPos, button);
+
             Pools.RECT.free(rectangle);
         }
-        return super.click(interactPos);
+        return super.click(interactPos, button);
+    }
+
+    /**
+     * 点击到了这个面板，但是面板里的任意子组件都没有被点击到时调用
+     * @param panelPos 点击位置相对于这个面板的坐标
+     * @param button 按下的是哪个鼠标按键（Input.Buttons.LEFT / Input.Buttons.RIGHT）
+     * */
+    protected void onClickBlank (GridPoint2 panelPos, int button) {
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
@@ -50,7 +51,9 @@ public class TabButtonUI extends UIComponent {
     }
 
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键点击切换选中的物品组页面
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         //设置这个物品组页面按钮是被选中的
         this.createTabUIPanel.setSelectedTabButton(this);
 
@@ -59,7 +62,7 @@ public class TabButtonUI extends UIComponent {
             Sounds.ITEM_CLICK,
             () -> pos
         );
-        return super.click(interactPos);
+        return super.click(interactPos, button);
     }
 
     @Override

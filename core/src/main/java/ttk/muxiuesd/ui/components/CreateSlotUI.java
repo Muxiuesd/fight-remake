@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
@@ -22,7 +23,9 @@ public class CreateSlotUI extends SlotUI {
      * 点击创造物品槽位获取物品
      * */
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键点击获取物品，右键由子类自行判断
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         if (!isNullSlot()) {
             //如果是有物品的槽位
             if (MouseSlotUI.getInstance().isNullSlot()) {

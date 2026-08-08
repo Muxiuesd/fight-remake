@@ -148,7 +148,7 @@ public class UITextField extends UIComponent {
      * 鼠标点击：获得焦点，定位光标（交互网格左下角为原点）
      * */
     @Override
-    public boolean click(GridPoint2 interactPos) {
+    public boolean click(GridPoint2 interactPos, int button) {
         if (!isEnabled() || !isVisible()) return false;
 
         //让ui屏幕设置这个组件是焦点

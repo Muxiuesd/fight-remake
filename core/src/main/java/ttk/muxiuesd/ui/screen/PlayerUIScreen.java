@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.screen;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
@@ -13,7 +14,6 @@ import ttk.muxiuesd.ui.abs.FightUIScreen;
 import ttk.muxiuesd.ui.components.MouseSlotUI;
 import ttk.muxiuesd.ui.components.TooltipUI;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 玩家相关的界面屏幕，持有各种玩家相关的UI面板
@@ -79,19 +79,25 @@ public class PlayerUIScreen extends FightUIScreen {
     @Override
     public void hide () {
         //如果鼠标上还有物品的时候关闭玩家背包界面，就自动把鼠标上的物品丢出来
-        MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
-        if (mouseSlotUI.isActive() && mouseSlotUI.curScreen == this && !mouseSlotUI.isNullSlot()) {
-            ItemStack itemStack = mouseSlotUI.getItemStack();
-            mouseSlotUI.clearItem();
-            this.playerSystem.getPlayer().dropItem(itemStack);
-        }
+        MouseSlotUI.dropItemIfActiveOn(this, this.playerSystem.getPlayer());
         //鼠标槽位从本屏幕移除，防止残留到下次显示
-        if (mouseSlotUI.curScreen == this) {
+        if (MouseSlotUI.getInstance().curScreen == this) {
             MouseSlotUI.deactivate();
         }
 
         //用一下父类的调用
         super.hide();
+    }
+
+    @Override
+    protected void onClickBlank (int button) {
+        if (button == Input.Buttons.RIGHT) {
+            //右键：从鼠标槽位丢出1个物品
+            MouseSlotUI.dropOneIfActiveOn(this, this.playerSystem.getPlayer());
+        }else {
+            //左键：鼠标槽位的物品全部丢出
+            MouseSlotUI.dropItemIfActiveOn(this, this.playerSystem.getPlayer());
+        }
     }
 
     @Override

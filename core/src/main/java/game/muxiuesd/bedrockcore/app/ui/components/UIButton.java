@@ -1,5 +1,6 @@
 package game.muxiuesd.bedrockcore.app.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -71,11 +72,13 @@ public class UIButton extends UIComponent {
     }
 
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键点击才触发按钮的点击事件，其他按键由子类自行判断
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         //AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
         this.playClickSound();
 
-        if (this.clickEvent == null) return super.click(interactPos);
+        if (this.clickEvent == null) return super.click(interactPos, button);
 
         return this.clickEvent.handle(this, interactPos);
     }
