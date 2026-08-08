@@ -32,6 +32,9 @@ public abstract class UIScreen
     private final LinkedHashSet<UIComponent> delayAddComponents = new LinkedHashSet<>();
     private final LinkedHashSet<UIComponent> delayRemoveComponents = new LinkedHashSet<>();
     private final Rectangle rectangle = new Rectangle();  ///重复利用的矩形区域
+    private final Vector2 mouseUIPosition = new Vector2();   ///重复利用的鼠标坐标
+    private final GridPoint2 interactGrid = new GridPoint2();   ///重复利用的交互网格坐标
+    private UIComponent dragComponent;   ///当前正在拖拽的组件（拖拽捕获）
 
     private boolean mouseOver = false;  ///当鼠标指针在任意的可交互的组件上就标记为true，否则为false
     private UIComponent focusComponent; ///焦点组件，当有焦点组件时，键盘输入只在焦点组件里生效
@@ -53,6 +56,9 @@ public abstract class UIScreen
             uiComponent.setMouseOver(false);
             uiComponent.setClicked(false);
         });
+        //隐藏屏幕时清空焦点，防止焦点组件残留
+        this.setFocusComponent(null);
+        this.dragComponent = null;
     }
 
     @Override
@@ -78,46 +84,71 @@ public abstract class UIScreen
         //没东西就直接返回
         if (getComponents().isEmpty()) return;
         boolean clickFlag = false;  //没有点到任何ui组件时就是false
-        Vector2 mouseUIPosition = Util.getMouseUIPosition();
+        boolean dragHandled = false;  //本帧拖拽组件是否已经收到过拖拽事件
+        this.mouseUIPosition.set(Util.getMouseUIPosition());
 
 
         for (UIComponent uiComponent : getComponents()) {
             //更新组件
             uiComponent.update(delta);
-            //不可交互状态的组件就直接跳过交互计算
-            if (!uiComponent.isEnabled()) continue;
-
             //记录这个ui上一个状态是否被鼠标覆盖
             boolean uiComponentMouseOver = uiComponent.isMouseOver();
+            //不可交互状态或不可见的组件就直接跳过交互计算
+            if (!uiComponent.isEnabled() || !uiComponent.isVisible()) {
+                //跳过前先清空状态，防止残留hover/clicked
+                if (uiComponentMouseOver) {
+                    uiComponent.setMouseOver(false);
+                    uiComponent.mouseDown();
+                }
+                uiComponent.setClicked(false);
+                continue;
+            }
+
             this.rectangle.set(uiComponent.getX(), uiComponent.getY(), uiComponent.getWidth(), uiComponent.getHeight());
             //鼠标坐标在ui的区域上
-            if (this.rectangle.contains(mouseUIPosition)) {
+            if (this.rectangle.contains(this.mouseUIPosition)) {
                 //计算交互区域坐标
-                GridPoint2 interactGrid = uiComponent.getInteractGridSize();
-                Vector2 position = uiComponent.getPosition();
+                GridPoint2 interactGridSize = uiComponent.getInteractGridSize();
+                if (interactGridSize == null) {
+                    //没有定义交互网格的组件不参与交互
+                    if (uiComponentMouseOver) {
+                        uiComponent.setMouseOver(false);
+                        uiComponent.mouseDown();
+                    }
+                    uiComponent.setClicked(false);
+                    continue;
+                }
+                //用标量getter避免每帧new Vector2
+                float compX = uiComponent.getX();
+                float compY = uiComponent.getY();
+                float compWidth = uiComponent.getWidth();
+                float compHeight = uiComponent.getHeight();
                 //计算鼠标相对于UI组件的坐标
-                Vector2 relativePos = new Vector2((mouseUIPosition.x - position.x), (mouseUIPosition.y - position.y));
-                Vector2 size = uiComponent.getSize();
-                int xn = (int) (relativePos.x / size.x * interactGrid.x);
-                int yn = (int) (relativePos.y / size.y * interactGrid.y);
-                GridPoint2 grid = new GridPoint2(xn, yn);
+                int xn = (int) ((this.mouseUIPosition.x - compX) / compWidth * interactGridSize.x);
+                int yn = (int) ((this.mouseUIPosition.y - compY) / compHeight * interactGridSize.y);
+                this.interactGrid.set(xn, yn);
                 uiComponent.setMouseOver(true);
-                uiComponent.mouseOver(grid);
+                uiComponent.mouseOver(this.interactGrid);
 
                 //如果鼠标在组件的交互区域上并且点击了鼠标左键，就是点击了组件
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                     uiComponent
                         .setClicked(true)
-                        .click(grid);
+                        .click(this.interactGrid);
                     clickFlag = true;
+                    dragHandled = true;
+                    //记录拖拽起点：按住左键后即使移出组件矩形也继续拖拽
+                    this.dragComponent = uiComponent;
                     //检查鼠标点击的组件是否是目前的焦点组件，不是就清空焦点
                     if (this.getFocusComponent() != null && this.getFocusComponent() != uiComponent) {
                         this.setFocusComponent(null);
                     }
                 }else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     //如果是按住鼠标左键，就是拖拽
-                    uiComponent.mouseDrag(relativePos.x, relativePos.y);
+                    uiComponent.mouseDrag(this.mouseUIPosition.x - compX, this.mouseUIPosition.y - compY);
                     clickFlag = true;
+                    dragHandled = true;
+                    this.dragComponent = uiComponent;
                     //检查鼠标点击的组件是否是目前的焦点组件，不是就清空焦点
                     if (this.getFocusComponent() != null && this.getFocusComponent() != uiComponent) {
                         this.setFocusComponent(null);
@@ -127,13 +158,32 @@ public abstract class UIScreen
                 this.setMouseOver(true);
             }else {
                 //鼠标不在ui的区域上
-                uiComponent
-                    .setClicked(false)
-                    .setMouseOver(false);
+                if (this.dragComponent != uiComponent) {
+                    //没有拖拽这个组件的就清除状态
+                    uiComponent
+                        .setClicked(false)
+                        .setMouseOver(false);
+                }
             }
             //鼠标上一个状态是被鼠标覆盖的，但是此时的状态不是，就调用方法
             if (uiComponentMouseOver && !uiComponent.isMouseOver()) {
                 uiComponent.mouseDown();
+            }
+        }
+
+        //拖拽捕获：正在拖拽的组件即使鼠标移出矩形区域也继续拖拽
+        if (this.dragComponent != null) {
+            if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                //松开左键，结束拖拽
+                this.dragComponent = null;
+            }else if (!dragHandled) {
+                //鼠标已移出组件矩形（本帧未通过矩形检测触发拖拽），直接用相对组件的坐标继续拖拽
+                this.dragComponent.mouseDrag(
+                    this.mouseUIPosition.x - this.dragComponent.getX(),
+                    this.mouseUIPosition.y - this.dragComponent.getY()
+                );
+                clickFlag = true;
+                this.setMouseOver(true);
             }
         }
 
@@ -165,6 +215,14 @@ public abstract class UIScreen
             this.delayRemoveComponents.forEach(delayRemoveComponent -> {
                 delayRemoveComponent.setScreen(null);
                 this.components.remove(delayRemoveComponent);
+                //如果移除的是焦点组件，就清空焦点
+                if (this.getFocusComponent() == delayRemoveComponent) {
+                    this.setFocusComponent(null);
+                }
+                //如果移除的是正在拖拽的组件，就结束拖拽
+                if (this.dragComponent == delayRemoveComponent) {
+                    this.dragComponent = null;
+                }
             });
             this.delayRemoveComponents.clear();
         }
@@ -173,7 +231,9 @@ public abstract class UIScreen
     @Override
     public void draw (Batch batch) {
         if (getComponents().isEmpty()) return;
-        getComponents().forEach(uiComponent -> uiComponent.draw(batch, null));
+        getComponents().forEach(uiComponent -> {
+            if (uiComponent.isVisible()) uiComponent.draw(batch, null);
+        });
     }
 
     @Override

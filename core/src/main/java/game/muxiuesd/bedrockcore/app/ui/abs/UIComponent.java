@@ -219,16 +219,32 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     /**
      * 根据指定的父组件来获取x
+     * <p>
+     * 递归累加所有父级的偏移，与 {@link #getAbsX()} 语义一致
      * */
     public float getX (UIComponent component) {
-        return component != null ? this.getX() + component.getX() : this.getX();
+        float x = this.getX();
+        UIComponent parent = component;
+        while (parent != null && parent != UIPanel.VOID_INSTANCE) {
+            x += parent.getX();
+            parent = parent.getParentPanel();
+        }
+        return x;
     }
 
     /**
      * 根据指定的父组件来获取y
+     * <p>
+     * 递归累加所有父级的偏移，与 {@link #getAbsY()} 语义一致
      * */
     public float getY (UIComponent component) {
-        return component != null ? this.getY() + component.getY() : this.getY();
+        float y = this.getY();
+        UIComponent parent = component;
+        while (parent != null && parent != UIPanel.VOID_INSTANCE) {
+            y += parent.getY();
+            parent = parent.getParentPanel();
+        }
+        return y;
     }
 
     public Vector2 getSize() {

@@ -117,12 +117,16 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
 
     @Override
     public void update (float delta) {
-        this.getComponents().forEach(component -> component.update(delta));
+        this.getComponents().forEach(component -> {
+            if (component.isVisible()) component.update(delta);
+        });
     }
 
     @Override
     public void draw (Batch batch, UIPanel parent) {
-        this.getComponents().forEach(component -> component.draw(batch, this));
+        this.getComponents().forEach(component -> {
+            if (component.isVisible()) component.draw(batch, this);
+        });
     }
 
     @Override
@@ -141,18 +145,20 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
             //遍历面板里面的组件，用内部坐标来检测
             for (UIComponent component : this.getComponents()) {
                 component.setClicked(false);
-                //如果是不可交互状态的组件就直接跳过
-                if (!component.isEnabled()) continue;
+                //如果是不可交互状态或不可见的组件就直接跳过
+                if (!component.isEnabled() || !component.isVisible()) continue;
 
                 rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
                 if (rectangle.contains(internalPos)) {
+                    //计算交互区域坐标（未定义交互网格的组件不参与交互）
+                    GridPoint2 interactGridSize = component.getInteractGridSize();
+                    if (interactGridSize == null) continue;
 
-                    //计算交互区域坐标
                     GridPoint2 interactGridPos = Util.getInteractGridPos(
                         component.getPosition(),
                         internalPos,
                         component.getSize(),
-                        component.getInteractGridSize()
+                        interactGridSize
                     );
                     //设置被点击
                     component.setClicked(true);
@@ -177,17 +183,25 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
                 //记录这个ui上一个状态是否被鼠标覆盖
                 boolean uiComponentMouseOver = component.isMouseOver();
                 component.setMouseOver(false);
-                //如果是不可交互状态的组件就直接跳过
-                if (!component.isEnabled()) continue;
+                //如果是不可交互状态或不可见的组件就直接跳过
+                if (!component.isEnabled() || !component.isVisible()) {
+                    //跳过前清空状态
+                    if (uiComponentMouseOver) component.mouseDown();
+                    component.setClicked(false);
+                    continue;
+                }
 
                 rectangle.set(component.getX(), component.getY(), component.getWidth(), component.getHeight());
                 if (rectangle.contains(internalPos)) {
-                    //计算交互区域坐标
+                    //计算交互区域坐标（未定义交互网格的组件不参与交互）
+                    GridPoint2 interactGridSize = component.getInteractGridSize();
+                    if (interactGridSize == null) continue;
+
                     GridPoint2 interactGridPos = Util.getInteractGridPos(
                         component.getPosition(),
                         internalPos,
                         component.getSize(),
-                        component.getInteractGridSize()
+                        interactGridSize
                     );
                     component.setMouseOver(true);
                     component.mouseOver(interactGridPos);

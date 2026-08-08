@@ -119,6 +119,9 @@ public class EffectUI extends UIComponent {
             textRenderX + ICON_WIDTH,
             textRenderY + TRUE_FONT_SIZE - 2
         );
+
+        //恢复共享字体的缩放，防止影响其他使用同一字体的组件
+        font.getData().setScale(1f);
     }
 
     public NinePatch getBackground () {

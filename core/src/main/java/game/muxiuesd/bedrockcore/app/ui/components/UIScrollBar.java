@@ -76,11 +76,14 @@ public class UIScrollBar extends UIComponent {
         this.type = type;
         switch (this.type) {
             case VERTICAL: {
+                //补齐滑块另一维尺寸，防止默认构造出隐形滑块
                 this.setSliderWidth(width);
+                if (this.getSliderHeight() <= 0) this.setSliderHeight(DEFAULT_SLIDER_HEIGHT);
                 break;
             }
             case HORIZONTAL: {
                 this.setSliderHeight(height);
+                if (this.getSliderWidth() <= 0) this.setSliderWidth(DEFAULT_SLIDER_WIDTH);
                 break;
             }
             default: {
@@ -99,11 +102,16 @@ public class UIScrollBar extends UIComponent {
         float value = 0f;
         switch (this.getType()) {
             case VERTICAL: {
-                value = 1f - (this.getSliderY()) / (getHeight() - this.getSliderHeight()) ;
+                float pathway = getHeight() - this.getSliderHeight();
+                //轨道长度小于滑块长度时视为无法滚动，返回0
+                if (pathway <= 0) return 0f;
+                value = 1f - (this.getSliderY()) / pathway;
                 break;
             }
             case HORIZONTAL: {
-                value = (this.getSliderX()) / (getWidth() - this.getSliderWidth()) ;
+                float pathway = getWidth() - this.getSliderWidth();
+                if (pathway <= 0) return 0f;
+                value = (this.getSliderX()) / pathway;
                 break;
             }
         }

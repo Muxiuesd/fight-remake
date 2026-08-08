@@ -67,12 +67,15 @@ public class SlotUI extends UIComponent {
             ItemStack itemStack = this.getItemStack();
             //batch.draw(itemStack.getItem().getTextureRegion(), renderX, renderY, getWidth(), getHeight());
             ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack);
-            ItemRenderer.Context context = renderer.getContext(
-                renderX + 1, renderY + 1,
-                ITEM_RENDER_WIDTH, ITEM_RENDER_HEIGHT
-            );
-            renderer.draw(batch, context, itemStack);
-            renderer.freeContext(context);
+            //渲染器未注册（可能返回null）时不绘制该物品，避免崩溃
+            if (renderer != null) {
+                ItemRenderer.Context context = renderer.getContext(
+                    renderX + 1, renderY + 1,
+                    ITEM_RENDER_WIDTH, ITEM_RENDER_HEIGHT
+                );
+                renderer.draw(batch, context, itemStack);
+                renderer.freeContext(context);
+            }
 
             //数量大于1才绘制数量的字体文本
             int amount = itemStack.getAmount();

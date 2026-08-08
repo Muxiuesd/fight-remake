@@ -77,6 +77,9 @@ public class TabButtonUI extends UIComponent {
         //绘制当前展示物品组的图标，使用物品自己的渲染器
         ItemStack iconItemStack = this.displayItemGroup.getIconItemStack();
         ItemRenderer<Item> renderer = ItemRendererRegistry.get(iconItemStack.getItem());
+        //渲染器未注册（可能返回null）时不绘制图标，避免崩溃
+        if (renderer == null) return;
+
         ItemRenderer.Context rendererContext = renderer.getContext(
             renderX + ICON_RENDER_OFFSET.getX(), renderY + ICON_RENDER_OFFSET.getY(),
             ICON_WIDTH, ICON_HEIGHT
@@ -95,6 +98,8 @@ public class TabButtonUI extends UIComponent {
             else rendererContext.y -= SELECTED_ICON_RENDER_DELTA_Y;
         }
         renderer.draw(batch, rendererContext, iconItemStack);
+        //释放渲染上下文，防止池对象泄漏
+        renderer.freeContext(rendererContext);
     }
 
     /**

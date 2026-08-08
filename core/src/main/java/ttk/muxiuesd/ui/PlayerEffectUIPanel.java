@@ -62,11 +62,7 @@ public class PlayerEffectUIPanel extends UIPanel {
         }
 
         //检查玩家的状态是否与这里面的状态UI有对应的，没有的话就删除
-        for (StatusEffect effect: this.effectUIs.keySet()) {
-            if (!playerEffects.containsKey(effect)) {
-                this.effectUIs.remove(effect);
-            }
-        }
+        this.effectUIs.keySet().removeIf(effect -> !playerEffects.containsKey(effect));
 
         getComponents().clear();
         this.effectUIs.values().forEach(this::addComponent);

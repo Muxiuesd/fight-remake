@@ -80,10 +80,14 @@ public class PlayerUIScreen extends FightUIScreen {
     public void hide () {
         //如果鼠标上还有物品的时候关闭玩家背包界面，就自动把鼠标上的物品丢出来
         MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
-        if (this.currentTopPanel.hasComponent(mouseSlotUI) && !mouseSlotUI.isNullSlot()) {
+        if (mouseSlotUI.isActive() && mouseSlotUI.curScreen == this && !mouseSlotUI.isNullSlot()) {
             ItemStack itemStack = mouseSlotUI.getItemStack();
             mouseSlotUI.clearItem();
             this.playerSystem.getPlayer().dropItem(itemStack);
+        }
+        //鼠标槽位从本屏幕移除，防止残留到下次显示
+        if (mouseSlotUI.curScreen == this) {
+            MouseSlotUI.deactivate();
         }
 
         //用一下父类的调用

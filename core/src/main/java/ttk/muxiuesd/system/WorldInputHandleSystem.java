@@ -107,8 +107,10 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
             }
         }
 
-        //需要玩家的鼠标不指向UI组件才能与世界交互
-        if (!GUISystem.getInstance().mouseOverUI()) {
+        //需要玩家当前的GUIScreen是HUD界面，并且鼠标不在UI组件上，防止同时操作两者
+        //（背包/创造界面打开时禁止与世界交互，无论鼠标是否在组件上）
+        if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN
+            && !GUISystem.getInstance().mouseOverUI()) {
             this.playerInteractWithWorld(player, cs);
         }
     }
@@ -255,6 +257,9 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
 
     @Override
     public boolean scrolled (float amountX, float amountY) {
+        //背包/创造界面打开时滚轮不切换快捷栏，防止误操作
+        if (GUISystem.getInstance().getCurScreen() != PlayerSystem.PLAYER_HUD_SCREEN) return false;
+
         //玩家快捷栏指针循环
         Player player = playerSystem.getPlayer();
         int newIndex = player.getHandIndex() + (int) amountY;

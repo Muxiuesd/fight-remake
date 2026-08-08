@@ -161,9 +161,14 @@ public class Backpack implements Inventory, Updateable {
 
     @Override
     public void update (float delta) {
-        this.itemStacks.forEach((index, itemStack) -> {
-            if (itemStack != null) itemStack.update(delta);
-            else this.itemStacks.remove(index);
+        //遍历时用 removeIf（迭代器安全），null 槽位清理，非 null 槽位更新
+        this.itemStacks.entrySet().removeIf(entry -> {
+            ItemStack itemStack = entry.getValue();
+            if (itemStack != null) {
+                itemStack.update(delta);
+                return false;
+            }
+            return true;
         });
     }
 }

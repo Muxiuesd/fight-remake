@@ -82,7 +82,10 @@ public class UIButton extends UIComponent {
 
     @Override
     public void mouseOver (GridPoint2 interactPos) {
-        if (this.mouseOverEvent == null) super.mouseOver(interactPos);
+        if (this.mouseOverEvent == null) {
+            super.mouseOver(interactPos);
+            return;
+        }
         this.mouseOverEvent.handle(this, interactPos);
     }
 

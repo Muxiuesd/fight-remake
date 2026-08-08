@@ -128,6 +128,9 @@ public class UITextField extends UIComponent {
 
         TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY, displayColor);
 
+        //恢复共享字体的缩放，防止影响其他使用同一字体的组件
+        bitmapFont.getData().setScale(1f);
+
         /// 绘制光标（仅聚焦且可见）
         if (isFocused() && this.cursorVisible) {
             float cursorX = renderX + this.getTextWidthBeforeIndex(this.cursorIndex) + 0.5f;
@@ -177,19 +180,24 @@ public class UITextField extends UIComponent {
         final int length = this.textStringBuilder.length();
         BitmapFont font = this.getFont();
         font.getData().setScale(FontHolder.FONT_SCALE);
-        //字符之间的组合可能会导致宽度计算有差异，这个算法才是对的，非必要勿动
-        float prevPrefixWidth = 0f;
-        for (int i = 0; i < length; i++) {
-            String prefix = this.textStringBuilder.substring(0, i + 1);
-            float prefixWidth = TextUtil.getTextRenderWidth(font, prefix);
-            float charWidth = prefixWidth - prevPrefixWidth;
-            if (prevPrefixWidth + (charWidth / 2f) >= clickX) {
-                this.cursorIndex = i;
-                return;
+        try {
+            //字符之间的组合可能会导致宽度计算有差异，这个算法才是对的，非必要勿动
+            float prevPrefixWidth = 0f;
+            for (int i = 0; i < length; i++) {
+                String prefix = this.textStringBuilder.substring(0, i + 1);
+                float prefixWidth = TextUtil.getTextRenderWidth(font, prefix);
+                float charWidth = prefixWidth - prevPrefixWidth;
+                if (prevPrefixWidth + (charWidth / 2f) >= clickX) {
+                    this.cursorIndex = i;
+                    return;
+                }
+                prevPrefixWidth = prefixWidth;
             }
-            prevPrefixWidth = prefixWidth;
+            this.cursorIndex = length;
+        }finally {
+            //恢复共享字体的缩放，防止影响其他使用同一字体的组件
+            font.getData().setScale(1f);
         }
-        this.cursorIndex = length;
     }
 
     /**

@@ -64,6 +64,8 @@ public class PlayerInventoryUIPanel extends PlayerItemSlotsUIPanel {
         //绘制玩家布娃娃
         Player player = getPlayerSystem().getPlayer();
         EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(player.getID());
+        //渲染器未注册时跳过绘制，避免崩溃
+        if (renderer == null) return;
         EntityRenderer.Context context = renderer.getContext();
         context.x = getX() + 50f;
         context.y = getY() + 125f;

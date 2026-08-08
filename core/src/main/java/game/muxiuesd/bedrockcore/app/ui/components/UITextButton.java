@@ -67,6 +67,9 @@ public class UITextButton extends UIButton {
             //font.draw(batch, this.getText(), renderX, y + renderSize + DEFAULT_EDGE);
 
             TextUtil.draw(batch, bitmapFont, this.getText().getString(), renderX, y + renderSize + DEFAULT_EDGE);
+
+            //恢复共享字体的缩放，防止影响其他使用同一字体的组件
+            bitmapFont.getData().setScale(1f);
         }
     }
 

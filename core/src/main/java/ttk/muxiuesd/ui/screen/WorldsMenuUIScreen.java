@@ -37,30 +37,49 @@ public class WorldsMenuUIScreen extends FightUIScreen {
         //获取世界名称、种子
         String worldName = this.worldNameTextField.getTextStringBuilder().toString();
         String worldSeed = this.worldSeedTextField.getTextStringBuilder().toString();
+
         //两者都不得为空或者空白字符
         if (worldName.isEmpty() || worldSeed.isEmpty()
             || worldName.isBlank() || worldSeed.isBlank()) return false;
+
+        //过滤世界名称中的非法字符，防止路径穿越/非法路径导致存档损坏或写出目录
+        String filterWorldName = filterWorldName(worldName);
+        if (filterWorldName.isEmpty()) return false;
+
         //编写基础的世界json数据
         JsonDataWriter worldJsonDataWriter = new JsonDataWriter();
         worldJsonDataWriter
             .objStart()
                 .objStart(WorldInfoTypes.STRING.getId())
-                    .writeString(Fight.WORLD_NAME.getKey(), worldName)
+                    .writeString(Fight.WORLD_NAME.getKey(), filterWorldName)
                 .objEnd()
                 .objStart(WorldInfoTypes.LONG.getId())
                     .writeLong(Fight.WORLD_SEED.getKey(), Util.stringToLongHash(worldSeed))
                 .objEnd()
             .objEnd();
         //写入文件
-        String worldDirPath = Fight.PATH_SAVE + worldName + "/" + Fight.PATH_SAVE_WORLD;
+        String worldDirPath = Fight.PATH_SAVE + filterWorldName + "/" + Fight.PATH_SAVE_WORLD;
         UnifiedFileUtil.createDir(worldDirPath);
-        UnifiedFileUtil.createFile(worldDirPath, WorldInfo.FILE_NAME)
-            .writeString(worldJsonDataWriter.getResult(),false);
+        //原子写入，防止中途崩溃留下半截存档
+        UnifiedFileUtil.writeFileAtomic(worldDirPath, WorldInfo.FILE_NAME, worldJsonDataWriter.getResult());
         //刷新列表
         this.flashSaveList();
 
         return false;
     };
+
+    /**
+     * 过滤世界名称中的非法字符
+     * <p>
+     * 世界名称会作为存档文件夹的名称，需要过滤掉文件系统不允许的字符和路径分隔符
+     * */
+    private static String filterWorldName (String worldName) {
+        //替换 Windows 不允许的字符和路径分隔符
+        String filtered = worldName.replaceAll("[\\\\/:*?\"<>|\\s]", "_");
+        //去除开头可能造成隐藏目录/路径穿越的点号
+        filtered = filtered.replaceAll("^\\.+", "_");
+        return filtered;
+    }
 
     public WorldsMenuUIScreen() {
         this.savesList = new SavesListUI();
@@ -143,30 +162,42 @@ public class WorldsMenuUIScreen extends FightUIScreen {
             //如果不存在世界信息文件就跳过这个目录
             if (! UnifiedFileUtil.fileExists(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME)) continue;
 
-            //有世界信息文件就读取
-            JsonValue worldInfoJsonFile = UnifiedFileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
-            JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
-
-            JsonValue stringValues = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
-            JsonValue longValues = jsonDataReader.readObj(WorldInfoTypes.LONG.getId());
-            if (!stringValues.has(Fight.WORLD_NAME.getKey())) {
-                Log.error(TAG, "世界存档信息缺失世界名称，跳过读取！！！");
-                continue;
-            }
-            if (!longValues.has(Fight.WORLD_SEED.getKey())) {
-                Log.error(TAG, "世界存档信息缺失世界种子，跳过读取！！！");
+            JsonValue worldInfoJsonFile;
+            try {
+                //有世界信息文件就读取（损坏的 JSON 会在这里抛异常，捕获后跳过）
+                worldInfoJsonFile = UnifiedFileUtil.readJsonFile(saveDir, Fight.PATH_SAVE_WORLD + WorldInfo.FILE_NAME);
+            }catch (Exception e) {
+                Log.error(TAG, "世界存档信息文件损坏，跳过读取：" + saveDir.name() + " 错误：" + e.getMessage());
                 continue;
             }
 
-            //读取世界名称
-            String worldName = stringValues.getString(Fight.WORLD_NAME.getKey());
-            //读取世界种子
-            long worldSeed = longValues.getLong(Fight.WORLD_SEED.getKey());
+            try {
+                JsonDataReader jsonDataReader = new JsonDataReader(worldInfoJsonFile);
 
-            //添加存档按钮UI
-            WorldSaveButtonUI worldButton = new WorldSaveButtonUI(worldName, worldSeed);
-            worldButton.setText(new Text().add(worldName).build());
-            this.getSavesList().addItem(worldButton);
+                JsonValue stringValues = jsonDataReader.readObj(WorldInfoTypes.STRING.getId());
+                JsonValue longValues = jsonDataReader.readObj(WorldInfoTypes.LONG.getId());
+                if (!stringValues.has(Fight.WORLD_NAME.getKey())) {
+                    Log.error(TAG, "世界存档信息缺失世界名称，跳过读取！！！");
+                    continue;
+                }
+                if (!longValues.has(Fight.WORLD_SEED.getKey())) {
+                    Log.error(TAG, "世界存档信息缺失世界种子，跳过读取！！！");
+                    continue;
+                }
+
+                //读取世界名称
+                String worldName = stringValues.getString(Fight.WORLD_NAME.getKey());
+                //读取世界种子
+                long worldSeed = longValues.getLong(Fight.WORLD_SEED.getKey());
+
+                //添加存档按钮UI
+                WorldSaveButtonUI worldButton = new WorldSaveButtonUI(worldName, worldSeed);
+                worldButton.setText(new Text().add(worldName).build());
+                this.getSavesList().addItem(worldButton);
+            }catch (Exception e) {
+                //结构不完整（缺少 STRING/LONG 组等）时跳过，保证其他存档可正常显示
+                Log.error(TAG, "世界存档信息结构不完整，跳过读取：" + saveDir.name() + " 错误：" + e.getMessage());
+            }
         }
     }
 
