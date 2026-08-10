@@ -1,7 +1,6 @@
 package ttk.muxiuesd.registrant;
 
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
@@ -103,11 +102,7 @@ public class Registries {
         @Override
         public T register (Identifier identifier, T value) {
             if (this.contains(identifier.getID()) || this.contains(identifier)) {
-                Identifier oldId = this.idMap.get(identifier.getID());
-                T oldValue = this.regedit.get(oldId);
-                Log.print(this.getClass().getName(),
-                    "覆盖旧的注册元素：" + identifier.getID() + "@@" + oldValue
-                    + " 新的值为：" + value);
+                throw new RuntimeException("注册Id：" + identifier.getID() + " 重复！！！");
             }
             this.idMap.put(identifier.getID(), identifier);
             this.regedit.put(identifier, value);

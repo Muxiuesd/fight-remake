@@ -24,16 +24,16 @@ public class CraftingRecipes {
         "GGG",
         "GGG",
         "SSS",
-        PatternPair.of('G', Items.GRASS),
-        PatternPair.of('S', Items.STONE)
-        );
+        Pattern.of('G', Items.GRASS),
+        Pattern.of('S', Items.STONE)
+    );
 
-    public static final CraftingTableRecipe B = registerShaped("a", new ItemStack(Items.IRON_SWORD, 1),
-        "  G",
-        " G ",
+    public static final CraftingTableRecipe IRON_SWORD = registerShaped("iron_sword", new ItemStack(Items.IRON_SWORD, 1),
+        "  I",
+        " I ",
         "S  ",
-        PatternPair.of('G', Items.GRASS),
-        PatternPair.of('S', Items.STONE)
+        Pattern.of('G', Items.IRON_INGOT),
+        Pattern.of('S', Items.STICK)
     );
 
     /**
@@ -43,9 +43,9 @@ public class CraftingRecipes {
                                                       String pattern1,
                                                       String pattern2,
                                                       String pattern3,
-                                                      PatternPair... pairs) {
+                                                      Pattern... pairs) {
         HashMap<Character, Item> keys = new HashMap<>();
-        for (PatternPair pair : pairs) {
+        for (Pattern pair : pairs) {
             keys.put(pair.getKey(), pair.getValue());
         }
         return registerShaped(name, pattern1, pattern2, pattern3, keys, output);
@@ -87,15 +87,15 @@ public class CraftingRecipes {
     /**
      * 工具类：字符与物品映射类
      * */
-    public static class PatternPair implements ttk.muxiuesd.interfaces.util.Pair<Character, Item> {
+    public static class Pattern implements ttk.muxiuesd.interfaces.util.Pair<Character, Item> {
         private Character character;
         private Item item;
 
-        public static PatternPair of (Character key, Item value) {
-            return new PatternPair(key, value);
+        public static Pattern of (Character key, Item value) {
+            return new Pattern(key, value);
         }
 
-        public PatternPair(Character character, Item item) {
+        public Pattern (Character character, Item item) {
             this.character = character;
             this.item = item;
         }

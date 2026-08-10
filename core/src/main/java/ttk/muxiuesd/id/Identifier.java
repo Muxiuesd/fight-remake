@@ -15,8 +15,8 @@ public class Identifier implements Codecable<Identifier> {
     public static final String REGEX = "^[a-z]+:[a-z0-9_]+$";
 
     public static final Codec<Identifier> CODEC = CodecBuilder.<Identifier>create()
-        .field("id", Identifier::getID, Identifier::setID, Codec.STRING)
-        .noArgFactory(Identifier::new);
+        .paramField("id", Identifier::getID, Codec.STRING)
+        .factory(Identifier::new);
 
     public static Identifier of (String id) {
         return new Identifier(id);
@@ -44,12 +44,8 @@ public class Identifier implements Codecable<Identifier> {
 
 
 
-    private String id;
+    private final String id;
 
-    /**
-     * 用于编解码的空参
-     * */
-    public Identifier () {}
     public Identifier (String namespace, String name) {
         this(namespace + ":" + name);
     }
@@ -62,10 +58,6 @@ public class Identifier implements Codecable<Identifier> {
 
     public String getID () {
         return this.id;
-    }
-
-    public void setID (String id) {
-        if (check(id)) this.id = id;
     }
 
     /**
