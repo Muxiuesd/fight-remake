@@ -28,13 +28,13 @@ public class CraftingRecipes {
         Pattern.of('S', Items.STONE)
     );
 
-    public static final CraftingTableRecipe WOOD_SWORD = registerShaped("wood_sword", Items.WOOD_SWORD,
+    /*public static final CraftingTableRecipe WOOD_SWORD = registerShaped("wood_sword", Items.WOOD_SWORD,
         "  W",
         " W ",
         "S  ",
         Pattern.of('W', Items.WOOD_SWORD),
         Pattern.of('S', Items.STICK)
-    );
+    );*/
 
     public static final CraftingTableRecipe STONE_SWORD = registerShaped("stone_sword", Items.STONE_SWORD,
         "  T",
@@ -49,6 +49,14 @@ public class CraftingRecipes {
         " I ",
         "S  ",
         Pattern.of('I', Items.IRON_INGOT),
+        Pattern.of('S', Items.STICK)
+    );
+
+    public static final CraftingTableRecipe GOLD_SWORD = registerShaped("gold_sword", Items.GOLD_SWORD,
+        "  G",
+        " G ",
+        "S  ",
+        Pattern.of('G', Items.GOLD_INGOT),
         Pattern.of('S', Items.STICK)
     );
 

@@ -14,7 +14,10 @@ public class WeaponItemGroup {
         .build()
         .selfAction(group -> {
         group
+            .add(Items.WOOD_SWORD)
+            .add(Items.STONE_SWORD)
             .add(Items.IRON_SWORD)
+            .add(Items.GOLD_SWORD)
             .add(Items.TEST_WEAPON)
             ;
     });
