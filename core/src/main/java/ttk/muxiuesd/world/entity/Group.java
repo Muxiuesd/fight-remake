@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.entity;
 /**
  * 实体组
  * */
+@Deprecated
 public enum Group {
 
     player(1),      //玩家相关的实体

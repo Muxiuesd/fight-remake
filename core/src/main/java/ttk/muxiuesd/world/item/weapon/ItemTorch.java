@@ -3,6 +3,7 @@ package ttk.muxiuesd.world.item.weapon;
 import com.badlogic.gdx.graphics.Color;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.world.item.weapon.sword.Sword;
 
 /**
  * 火把物品

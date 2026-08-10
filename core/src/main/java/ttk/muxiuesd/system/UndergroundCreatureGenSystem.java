@@ -9,9 +9,9 @@ import ttk.muxiuesd.registry.EntityTypes;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.genfactory.PufferFishGenFactory;
+import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.concurrent.ConcurrentHashMap;
 

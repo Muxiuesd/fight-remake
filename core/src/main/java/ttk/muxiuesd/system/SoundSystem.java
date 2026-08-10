@@ -10,8 +10,8 @@ import ttk.muxiuesd.system.game.SpatialAudioSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Objects;

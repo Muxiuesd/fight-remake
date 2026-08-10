@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.util.Util;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 

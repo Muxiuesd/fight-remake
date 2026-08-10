@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.entity;
+package ttk.muxiuesd.world.entity.player;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -7,12 +7,13 @@ import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
@@ -51,7 +52,7 @@ public class Player extends LivingEntity<Player> {
         setSpeed(3.3f);
         setCurSpeed(getSpeed());
         setBodyTextureRegionResource(Fight.ID("player"), "player/player.png");
-        setShieldTextureRegionResource(Fight.ID("player_shield"), "player/shield.png");
+        this.setShieldTextureRegionResource(Fight.ID("player_shield"), "player/shield.png");
 
         this.defendCDTimer = Pools.TASK_TIMER.obtain()
             .setMaxSpan(2f)
@@ -66,7 +67,7 @@ public class Player extends LivingEntity<Player> {
             });
         fastAddBodyHitBox();
 
-        backpack.setItemStack(0, new ItemStack(Items.IRON_SWORD));
+        /*backpack.setItemStack(0, new ItemStack(Items.IRON_SWORD));
         backpack.setItemStack(1, new ItemStack(Items.TEST_WEAPON));
         backpack.setItemStack(2, new ItemStack(Items.STICK));
         backpack.setItemStack(3, new ItemStack(Items.FURNACE));
@@ -84,7 +85,7 @@ public class Player extends LivingEntity<Player> {
         backpack.setItemStack(31, new ItemStack(Items.DIAMOND_CHESTPLATE));
         backpack.setItemStack(32, new ItemStack(Items.DIAMOND_LEGGINGS));
         backpack.setItemStack(33, new ItemStack(Items.DIAMOND_BOOTS));
-        backpack.setItemStack(35, new ItemStack(Items.TORCH));
+        backpack.setItemStack(35, new ItemStack(Items.TORCH));*/
 
         //setEffect(StatusEffects.HEALING, 500f, 2);
         //setEffect(StatusEffects.POISON, 500f, 1);

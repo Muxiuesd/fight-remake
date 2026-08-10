@@ -11,7 +11,7 @@ import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
 import ttk.muxiuesd.ui.components.PlayerHealthBarUIPanel;
 import ttk.muxiuesd.ui.components.SlotUI;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 
 
 /**

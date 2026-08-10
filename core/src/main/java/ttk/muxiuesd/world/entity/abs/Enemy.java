@@ -12,8 +12,8 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 敌人实体抽象类

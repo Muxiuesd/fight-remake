@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**

@@ -10,8 +10,8 @@ import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.player.Player;
 
 public class CameraFollowSystem extends WorldSystem {
     public static final float MAX_ZOOM = 10.0f;

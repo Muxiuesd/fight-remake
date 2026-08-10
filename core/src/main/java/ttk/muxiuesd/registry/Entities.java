@@ -7,7 +7,6 @@ import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.entity.*;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -16,6 +15,7 @@ import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
 import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 所有实体的注册

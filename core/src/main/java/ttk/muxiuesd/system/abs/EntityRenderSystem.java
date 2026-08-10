@@ -10,8 +10,8 @@ import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 实体渲染抽象类

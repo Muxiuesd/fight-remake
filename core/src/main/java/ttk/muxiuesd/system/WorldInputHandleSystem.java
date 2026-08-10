@@ -32,8 +32,8 @@ import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -164,7 +164,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                     InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid);
                     if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
                         //使用成功就检测手持物品是否用完，用完就清除
-                        player.backpack.clear(player.getHandIndex());
+                        player.getBackpack().clear(player.getHandIndex());
                     }
                     //TODO 手持物品交互事件
                 }

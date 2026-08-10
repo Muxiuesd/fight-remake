@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.weapon;
+package ttk.muxiuesd.world.item.weapon.sword;
 
 import com.badlogic.gdx.utils.Array;
 import ttk.muxiuesd.audio.AudioHolder;

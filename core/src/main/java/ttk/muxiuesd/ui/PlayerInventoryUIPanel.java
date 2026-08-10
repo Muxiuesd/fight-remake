@@ -11,8 +11,8 @@ import ttk.muxiuesd.ui.abs.PlayerItemSlotsUIPanel;
 import ttk.muxiuesd.ui.components.EquipmentPlayerSlotUI;
 import ttk.muxiuesd.ui.components.PlayerSlotUI;
 import ttk.muxiuesd.ui.components.SlotUI;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 玩家背包容器UI面板

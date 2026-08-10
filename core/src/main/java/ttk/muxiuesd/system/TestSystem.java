@@ -17,7 +17,7 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
 import java.util.Optional;

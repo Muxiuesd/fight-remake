@@ -10,7 +10,7 @@ import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**

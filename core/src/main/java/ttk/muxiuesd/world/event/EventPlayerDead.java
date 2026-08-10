@@ -3,7 +3,7 @@ package ttk.muxiuesd.world.event;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.event.abs.PlayerDeathEvent;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 玩家死亡事件

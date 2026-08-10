@@ -9,9 +9,9 @@ import ttk.muxiuesd.interfaces.world.entity.EnemyGenFactory;
 import ttk.muxiuesd.system.abs.EntityGenSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.genfactory.SlimeGenFactory;
+import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.concurrent.ConcurrentHashMap;
 

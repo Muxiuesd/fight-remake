@@ -32,7 +32,8 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
+import ttk.muxiuesd.world.entity.player.PlayerDebugger;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -43,6 +44,8 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
+
+    public static boolean debugMode = true; //是否启用debug模式
 
     //玩家相关的GUIScreen
     public static PlayerHUDUIScreen PLAYER_HUD_SCREEN;
@@ -69,14 +72,14 @@ public class PlayerSystem extends WorldSystem {
     public void initialize () {
         //有玩家数据就读取
         if (UnifiedFileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
-            this.player = this.readPlayerData();
+            this.setPlayer(this.readPlayerData());
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
-            this.player = Entities.PLAYER.create(getWorld());
+            this.setPlayer(Entities.PLAYER.create(getWorld()));
             Log.print(TAG(), "未探查到玩家数据文件，新建玩家实体");
         }
 
-        this.playerLastPosition = this.player.getPosition();
+        this.playerLastPosition = this.getPlayer().getPosition();
 
         GUISystem.getInstance().setCurScreen(PLAYER_HUD_SCREEN);
 
@@ -194,7 +197,7 @@ public class PlayerSystem extends WorldSystem {
         String[] parts = itemId.split(":");
         Registrant<Item> itemReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
         ItemStack stack = new ItemStack(itemReg.get(parts[1]));
-        this.player.backpack.setItemStack(index, stack);
+        this.getPlayer().getBackpack().setItemStack(index, stack);
     }
 
     /**
@@ -202,23 +205,26 @@ public class PlayerSystem extends WorldSystem {
      * */
     private void remakePlayer () {
         //移除旧的玩家实体
+        Player oldPlayer = this.getPlayer();
         EntitySystem es = getManager().getSystem(EntitySystem.class);
-        es.remove(this.player);
+        es.remove(oldPlayer);
 
         //生成新的玩家实体
-        this.player = Entities.PLAYER.create(getWorld());
-        this.player.setEntitySystem(es);
+        Player newPlayer = Entities.PLAYER.create(getWorld());
+        newPlayer.setEntitySystem(es);
+        this.setPlayer(newPlayer);
+
         //重生位置安全检查：出生点被墙/水占据时向上搜索安全位置（防止卡墙/溺水）
         this.ensureSafeSpawnPosition();
-        this.playerLastPosition = this.player.getPosition();
-        es.add(player);
+        this.playerLastPosition = newPlayer.getPosition();
+        es.add(newPlayer);
 
         //更新其他与玩家有关的配置
         CameraFollowSystem cfs = getManager().getSystem(CameraFollowSystem.class);
-        cfs.setFollower(this.player);
+        cfs.setFollower(newPlayer);
 
         //播放复活音频
-        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
+        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, newPlayer);
     }
 
     /**
@@ -280,6 +286,20 @@ public class PlayerSystem extends WorldSystem {
      * */
     public Player getPlayer () {
         return this.player;
+    }
+
+    /**
+     * 设置玩家实体
+     * <p>
+     * 不支持外部随意设置玩家实体，防止出问题，所以是私有方法
+     * */
+    private void setPlayer (Player newPlayer) {
+        if (newPlayer != null) {
+            this.player = newPlayer;
+            if (debugMode) {
+                PlayerDebugger.items(newPlayer);
+            }
+        }
     }
 
     /**

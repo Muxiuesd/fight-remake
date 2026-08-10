@@ -10,7 +10,6 @@ import ttk.muxiuesd.world.item.common.ItemRubbish;
 import ttk.muxiuesd.world.item.common.ItemStick;
 import ttk.muxiuesd.world.item.consumption.ItemBait;
 import ttk.muxiuesd.world.item.food.ItemFish;
-import ttk.muxiuesd.world.item.weapon.IronSword;
 import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
 
 import java.util.function.Supplier;
@@ -18,10 +17,11 @@ import java.util.function.Supplier;
 /**
  * 所有物品的注册
  * */
+@Deprecated
 public class ItemsReg {
     public static final Registrant<Item> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Item.class);
 
-    public static final Item TEST_ITEM = register("test_item", IronSword::new);
+    //public static final Item TEST_ITEM = register("test_item", IronSword::new);
     public static final Item STICK = register("stick", ItemStick::new);
     public static final Item TEST_WEAPON = register("test_weapon", WeaponDiamondSword::new);
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new);

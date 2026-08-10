@@ -28,13 +28,42 @@ public class CraftingRecipes {
         Pattern.of('S', Items.STONE)
     );
 
-    public static final CraftingTableRecipe IRON_SWORD = registerShaped("iron_sword", new ItemStack(Items.IRON_SWORD, 1),
+    public static final CraftingTableRecipe WOOD_SWORD = registerShaped("wood_sword", Items.WOOD_SWORD,
+        "  W",
+        " W ",
+        "S  ",
+        Pattern.of('W', Items.WOOD_SWORD),
+        Pattern.of('S', Items.STICK)
+    );
+
+    public static final CraftingTableRecipe STONE_SWORD = registerShaped("stone_sword", Items.STONE_SWORD,
+        "  T",
+        " T ",
+        "S  ",
+        Pattern.of('T', Items.STONE),
+        Pattern.of('S', Items.STICK)
+    );
+
+    public static final CraftingTableRecipe IRON_SWORD = registerShaped("iron_sword", Items.IRON_SWORD,
         "  I",
         " I ",
         "S  ",
-        Pattern.of('G', Items.IRON_INGOT),
+        Pattern.of('I', Items.IRON_INGOT),
         Pattern.of('S', Items.STICK)
     );
+
+
+
+    /**
+     * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
+     * */
+    public static CraftingTableRecipe registerShaped (String name, Item item,
+                                                      String pattern1,
+                                                      String pattern2,
+                                                      String pattern3,
+                                                      Pattern... pairs) {
+        return registerShaped(name, new ItemStack(item, 1), pattern1, pattern2, pattern3, pairs);
+    }
 
     /**
      * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
@@ -50,6 +79,7 @@ public class CraftingRecipes {
         }
         return registerShaped(name, pattern1, pattern2, pattern3, keys, output);
     }
+
     /**
      * 注册有序的工作台配方表,拆分了形状模板的字符串数组
      * */

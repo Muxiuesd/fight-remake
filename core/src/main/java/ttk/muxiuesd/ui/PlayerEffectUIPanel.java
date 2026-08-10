@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.components.EffectUI;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
+import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.LinkedHashMap;
 

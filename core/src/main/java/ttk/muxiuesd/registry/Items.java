@@ -23,9 +23,10 @@ import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondLeggings;
 import ttk.muxiuesd.world.item.food.ItemFish;
 import ttk.muxiuesd.world.item.food.ItemPufferFish;
-import ttk.muxiuesd.world.item.weapon.IronSword;
 import ttk.muxiuesd.world.item.weapon.ItemTorch;
 import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
+import ttk.muxiuesd.world.item.weapon.sword.Sword;
+import ttk.muxiuesd.world.item.weapon.sword.SwordBuilder;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.function.Supplier;
@@ -57,8 +58,21 @@ public final class Items {
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new, FishPoleRenderer::new);
 
     /// 武器类的物品
-    public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
+    public static final Item WOOD_SWORD = registerSword("wood_sword",
+        SwordBuilder.create().setAttackRange(2.5f).setDamage(1f).setUseSpan(1f).setDuration(50)
+    );
+    public static final Item STONE_SWORD = registerSword("stone_sword",
+        SwordBuilder.create().setAttackRange(2.5f).setDamage(1.5f).setUseSpan(1f).setDuration(100)
+    );
+    public static final Item IRON_SWORD = registerSword("iron_sword",
+        SwordBuilder.create().setAttackRange(3f).setDamage(3.5f).setUseSpan(0.5f).setDuration(345)
+    );
+    public static final Item GOLD_SWORD = registerSword("gold_sword",
+        SwordBuilder.create().setAttackRange(3f).setDamage(4.5f).setUseSpan(0.5f).setDuration(555)
+    );
+    //远程类武器
     public static final Item TEST_WEAPON = register("diamond_sword", WeaponDiamondSword::new);
+    //火把也能用来攻击
     public static final Item TORCH = register("torch", ItemTorch::new, TorchRenderer::new);
 
     /// 装备物品
@@ -109,6 +123,20 @@ public final class Items {
 
     /// 墙体物品
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
+
+
+    /**
+     * 注册一个剑类物品（快捷方法）
+     * */
+    public static Sword registerSword (String name, SwordBuilder builder) {
+        String id = Fight.ID(name);
+        Identifier identifier = Identifier.of(id);
+        return register(
+            () -> builder.build(id, Fight.ItemTexturePath(name + ".png")),
+            new ItemRenderer.StandardRenderer<>(),
+            identifier
+        );
+    }
 
 
     /**

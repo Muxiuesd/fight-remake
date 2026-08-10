@@ -134,7 +134,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
 
         this.updateStatusEffect(delta);
 
-        this.backpack.update(delta);
+        this.getBackpack().update(delta);
         this.attackedTimer.update(delta);
         this.attackedTimer.isReady();
         this.effectPreSecondTimer.update(delta);
@@ -223,7 +223,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
      * */
     public ItemPickUpState pickUpItem (ItemStack itemStack) {
         int oldAmount = itemStack.getAmount();
-        ItemStack pickedUpItem = this.backpack.pickUpItem(itemStack);
+        ItemStack pickedUpItem = this.getBackpack().pickUpItem(itemStack);
         if (pickedUpItem == null) {
             return ItemPickUpState.WHOLE;
         }
@@ -284,11 +284,11 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     public ItemStack getHandItemStack () {
-        return this.backpack.getItemStack(this.handIndex);
+        return this.getBackpack().getItemStack(this.handIndex);
     }
 
     public T setHandItemStack (ItemStack itemStack) {
-        this.backpack.setItemStack(this.getHandIndex(), itemStack);
+        this.getBackpack().setItemStack(this.getHandIndex(), itemStack);
         return (T) this;
     }
 
@@ -297,7 +297,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     public void setHandIndex (int handIndex) {
-        if (handIndex >= 0 && handIndex < this.backpack.getSize()) {
+        if (handIndex >= 0 && handIndex < this.getBackpack().getSize()) {
             if (this.handIndex != handIndex) {
                 //放下先前的物品堆叠
                 ItemStack handItemStack = this.getHandItemStack();
@@ -409,12 +409,30 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     /**
+     * 添加一堆物品进实体的背包
+     * <p>
+     * 不保证能把所有传入的物品堆叠都添加进去
+     * @param stacks 要添加的物品堆叠
+     * */
+    public T addItemsToBackpack (ItemStack... stacks) {
+        Backpack bp = this.getBackpack();
+        for (ItemStack stack : stacks) {
+            if (bp.isFull(stack)) continue;
+            bp.addItem(stack);
+        }
+        return (T) this;
+    }
+
+    /**
      * 获取物品背包容器
      * */
     public Backpack getBackpack () {
         return this.backpack;
     }
 
+    /**
+     * 设置背包容器
+     * */
     public T setBackpack (Backpack backpack) {
         if (backpack != null) this.backpack = backpack;
         return (T) this;

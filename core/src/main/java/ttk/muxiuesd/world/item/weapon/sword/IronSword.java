@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.weapon;
+package ttk.muxiuesd.world.item.weapon.sword;
 
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -6,6 +6,7 @@ import ttk.muxiuesd.registry.PropertyTypes;
 /**
  * 铁剑
  * */
+@Deprecated
 public class IronSword extends Sword {
     public IronSword () {
         super(Sword.createDefaultProperty()

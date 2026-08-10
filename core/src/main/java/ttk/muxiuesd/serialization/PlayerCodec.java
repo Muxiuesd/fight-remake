@@ -8,9 +8,9 @@ import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
+import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
