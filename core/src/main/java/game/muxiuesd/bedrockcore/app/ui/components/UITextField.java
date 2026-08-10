@@ -128,8 +128,6 @@ public class UITextField extends UIComponent {
 
         TextUtil.draw(batch, bitmapFont, displayText, renderX, renderY, displayColor);
 
-        //恢复共享字体的缩放，防止影响其他使用同一字体的组件
-        bitmapFont.getData().setScale(1f);
 
         /// 绘制光标（仅聚焦且可见）
         if (isFocused() && this.cursorVisible) {
@@ -142,6 +140,9 @@ public class UITextField extends UIComponent {
 
         //结束裁剪
         ScissorUtil.endScissor(batch);
+
+        //恢复共享字体的缩放，防止影响其他使用同一字体的组件，要在光标绘制之后恢复，不然会导致光标位置渲染错误
+        bitmapFont.getData().setScale(1f);
     }
 
     /**
