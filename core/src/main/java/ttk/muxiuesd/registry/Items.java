@@ -50,7 +50,10 @@ public final class Items {
     public static final Item BAIT = register("bait", ItemBait::new);
     //食物类
     public static final Item FISH = register("fish", ItemFish::new);
-    public static final Item PUFFER_FISH = register("puffer_fish", ItemPufferFish::new, Fight.EntityTexturePath("fish/puffer_fish.png"));
+    public static final Item PUFFER_FISH = register("puffer_fish",
+        Fight.EntityTexturePath("fish/puffer_fish.png"),
+        ItemPufferFish::new
+    );
     //杂物类
     public static final Item RUBBISH = register("rubbish");
 
@@ -125,6 +128,7 @@ public final class Items {
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
 
+
     /**
      * 注册一个剑类物品（快捷方法）
      * */
@@ -136,7 +140,6 @@ public final class Items {
         );
     }
 
-
     /**
      * 注册农作物物品
      * */
@@ -147,7 +150,7 @@ public final class Items {
     }
 
     /**
-     * 普通物品的注册
+     * 最简单、最普通物品的注册
      * */
     public static Item register (String name) {
         return register(name, Item::new, Item.Property::new);
@@ -170,20 +173,24 @@ public final class Items {
     }
 
     /**
-     * 根据名字来创建id
+     * 根据名称来注册物品
      * <p>
      * 使用普通标准渲染器，贴图路径为 item/{name}.png
+     * @param factory 物品实例的构造工厂（物品的属性需要已创建）
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory) {
-        return register(factory, Identifier.of(Fight.ID(name)), Fight.ItemTexturePath(name + ".png"));
+        //return register(factory, Identifier.of(Fight.ID(name)), Fight.ItemTexturePath(name + ".png"));
+        return register(name, Fight.ItemTexturePath(name + ".png"), factory);
     }
 
     /**
-     * 根据名字来创建id
+     * 根据名称、贴图文件路径来注册物品
      * <p>
      * 使用普通标准渲染器，显式指定贴图路径（用于贴图不在默认 item 目录下的物品）
+     * @param texturePath   物品的贴图文件路径
+     * @param factory       物品实例的构造工厂（物品的属性需要已创建）
      * */
-    public static <T extends Item> T register (String name, Supplier<T> factory, String texturePath) {
+    public static <T extends Item> T register (String name, String texturePath, Supplier<T> factory) {
         return register(factory, Identifier.of(Fight.ID(name)), texturePath);
     }
 
@@ -192,70 +199,93 @@ public final class Items {
      * 根据名字来创建id
      * <p>
      * 使用自定义的渲染器
+     * @param name      物品的名字
+     * @param factory   物品实例的构造工厂
+     * @param rendererFactory 物品渲染器的构造工厂
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, Supplier<ItemRenderer<T>> rendererFactory) {
-        return register(factory, Identifier.of(Fight.ID(name)), rendererFactory.get(), null);
-    }
-
-    /**
-     * 根据名字来创建id
-     * <p>
-     * 使用自定义的渲染器
-     * */
-    public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<T> renderer) {
-        return register(factory, Identifier.of(Fight.ID(name)), renderer, null);
-    }
-
-    /**
-     * 注册方块的方块物品
-     * @param block 已经注册过的方块
-     * */
-    public static Item register (Block block) {
         return register(
-            () -> new BlockItem(block), //方块的贴图由方块渲染器（id→路径映射）提供
-            block.getIdentifier(),      //方块的identifier与方块物品的identifier相同
-            null
+            factory,
+            Identifier.of(Fight.ID(name)),
+            rendererFactory.get()
         );
     }
 
     /**
-     * 注册墙体的墙体物品
+     * 快捷注册物品
+     * <p>
+     * 使用自定义的渲染器
+
+     * @param renderer  物品的渲染器
+     * */
+    public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<T> renderer) {
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        return register(
+            factory,
+            identifier,
+            renderer
+        );
+    }
+
+    /**
+     * 快速注册方块的方块物品
+     * @param block 已经注册过的方块
+     * */
+    public static Item register (Block block) {
+        Identifier identifier = block.getIdentifier();
+        return register(
+            () -> new BlockItem(block), //方块的贴图由方块渲染器（id→路径映射）提供
+            identifier,      //方块的identifier与方块物品的identifier相同
+            new ItemRenderer.StandardRenderer<>(identifier.getID(), null)
+        );
+    }
+
+    /**
+     * 快速注册墙体的墙体物品
+     * @param wall 已经注册过的墙体
      * */
     public static <T extends Wall<T>> Item register (Wall<T> wall) {
+        Identifier identifier = wall.getIdentifier();
         return register(
             () -> new WallItem(wall),
-            wall.getIdentifier(),    //墙体的identifier与墙体物品的identifier相同
-            null
+            identifier,    //墙体的identifier与墙体物品的identifier相同
+            new ItemRenderer.StandardRenderer<>(identifier.getID(), null)
         );
     }
 
     /**
      * 物品注册的基本方法
+     * <p>
+     * 注册物品以及对应的渲染器
      * @param factory 物品的构造工厂
-     * @param identifier 物品的id标识
-     * @param texturePath 物品贴图的文件路径，为null时通过id从已注册的映射中获取
+     * @param identifier 物品的 id 标识
+     * @param texturePath 物品贴图的文件路径，为 null 时通过 id 从已注册的映射中获取
      * */
     public static <T extends Item> T register (Supplier<T> factory, Identifier identifier, String texturePath) {
-        return register(factory, identifier, null, texturePath);
+        return register(
+            factory,
+            identifier,
+            new ItemRenderer.StandardRenderer<>(identifier.getID(), texturePath)
+        );
     }
 
     /**
      * 物品注册的最基本方法
+     * <p>
+     * 注册物品以及对应的渲染器
      * @param factory 物品的构造工厂
      * @param identifier 物品的id标识
      * @param renderer 物品的渲染器，为null时根据贴图路径自动创建标准渲染器
-     * @param texturePath 物品贴图的文件路径，为null时通过id从已注册的映射中获取
      * */
     public static <T extends Item> T register (Supplier<T> factory,
                                                Identifier identifier,
-                                               ItemRenderer<T> renderer,
-                                               String texturePath) {
+                                               ItemRenderer<T> renderer) {
         T item = factory.get();
         item.setIdentifier(identifier);
         Registries.ITEM.register(identifier, item);
-        if (renderer == null) {
+        /*if (renderer == null) {
             renderer = new ItemRenderer.StandardRenderer<>(identifier.getID(), texturePath);
-        }
+        }*/
         ItemRendererRegistry.register(item, renderer);
         return item;
     }
