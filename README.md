@@ -77,6 +77,7 @@
 
 ## 五、特别鸣谢：
 - ### [xiaomuziftz](https://gitee.com/xiaomuziftz)（DeepSeek额度大力赞助，提供光源优化、渲染架构优化指导、MacOS平台的着色器编译适配方案）
+- ### [G0410](https://github.com/G0410)（DeepSeek额度大力赞助）
 - ### [zqll](https://gitee.com/zqll4) （优化游戏代码架构）
 - ### [wabrara](https://gitee.com/wabrara) （解决草地渲染与着色器问题、解决区块问题、解决区块方块查找问题）
 - ### 沙雕纯白（为本游戏提供贴图资源；QQ：3122702351）
