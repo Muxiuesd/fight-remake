@@ -5,6 +5,6 @@ package ttk.muxiuesd.world.item.common;
  * */
 public class ItemStick extends CommonItem {
     public ItemStick () {
-        super("stick");
+        super();
     }
 }

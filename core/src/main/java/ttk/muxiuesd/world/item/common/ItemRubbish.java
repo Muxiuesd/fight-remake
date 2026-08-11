@@ -5,6 +5,6 @@ package ttk.muxiuesd.world.item.common;
  * */
 public class ItemRubbish extends CommonItem {
     public ItemRubbish () {
-        super("rubbish");
+        super();
     }
 }

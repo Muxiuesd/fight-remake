@@ -21,8 +21,8 @@ public abstract class Weapon extends Item {
             .add(PropertyTypes.WEAPON_USE_SAPN, 1f);
     }
 
-    public Weapon (Property property, String textureId, String texturePath) {
-        super(Type.WEAPON, property, textureId, texturePath);
+    public Weapon (Property property) {
+        super(Type.WEAPON, property);
     }
 
     @Override

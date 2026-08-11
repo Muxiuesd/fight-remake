@@ -15,18 +15,19 @@ import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 方块物品
+ * <p>
+ * 贴图直接使用方块的贴图（id 与方块一致，通过已注册的 id→路径映射获取）
  * */
 public class BlockItem extends ConsumptionItem {
     final Block block;
 
-    public BlockItem(Block block, String textureId) {
-        this(block, new Property().setMaxCount(64), textureId);
+    public BlockItem(Block block) {
+        this(block, new Property().setMaxCount(64));
     }
 
-    public BlockItem(Block block, Property property, String textureId) {
-        super(property, textureId);
+    public BlockItem(Block block, Property property) {
+        super(property);
         this.block = block;
-        //this.setIdentifier(block.getIdentifier());
     }
 
     @Override

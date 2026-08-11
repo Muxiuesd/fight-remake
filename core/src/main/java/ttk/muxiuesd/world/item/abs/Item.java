@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.item.abs;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
@@ -16,7 +15,6 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
@@ -40,23 +38,18 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
     private Identifier identifier;                          //物品的id标识
     private Type type;                                      //物品的类型
     private Property property;                              //物品最原始的属性，原则上不直接对这个原始数据进行操作
-    private Resource<TextureRegion> textureRegionResource;  //物品的贴图材质资源
 
     public Item () {}
 
     /**
      * 最普通的物品的构造方法
      * */
-    public Item (Property property, String textureId, String texturePath) {
-        this(Type.COMMON, property, textureId, texturePath);
+    public Item (Property property) {
+        this(Type.COMMON, property);
     }
-    public Item (Type type, Property property, String textureId) {
-        this(type, property, textureId, null);
-    }
-    public Item (Type type, Property property, String textureId, String texturePath) {
+    public Item (Type type, Property property) {
         this.type = type;
         this.property = property;
-        this.setTextureRegionResource(Resource.ofTextureRegion(textureId, texturePath));
     }
 
     @Override
@@ -145,22 +138,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
     public Item setIdentifier (Identifier identifier) {
         this.identifier = identifier;
-        return this;
-    }
-
-    /**
-     * 获取物品贴图材质
-     * */
-    public TextureRegion getTextureRegion () {
-        return this.textureRegionResource != null ? this.textureRegionResource.get() : null;
-    }
-
-    public Resource<TextureRegion> getTextureRegionResource () {
-        return this.textureRegionResource;
-    }
-
-    public Item setTextureRegionResource (Resource<TextureRegion> textureRegionResource) {
-        this.textureRegionResource = textureRegionResource;
         return this;
     }
 

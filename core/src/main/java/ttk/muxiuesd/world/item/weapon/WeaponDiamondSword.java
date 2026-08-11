@@ -15,8 +15,6 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
 public class WeaponDiamondSword extends RangedWeapon {
     public WeaponDiamondSword () {
         super(RangedWeapon.createDefaultProperty(),
-            Fight.ID("diamond_sword"),
-            Fight.ItemTexturePath("diamond_sword.png"),
             new BulletFactory<BulletFire>() {
                 @Override
                 public BulletFire create (World world, Entity<?> owner, EntityType<?> entityType, Direction direction) {

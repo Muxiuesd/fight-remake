@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.item.consumption;
 
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -10,14 +9,11 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class ConsumptionItem extends Item {
 
-    public ConsumptionItem (String name) {
-        super(Type.CONSUMPTION, new Property(), Fight.ID(name), Fight.ItemTexturePath(name + ".png"));
+    public ConsumptionItem () {
+        super(Type.CONSUMPTION, new Property());
     }
-    public ConsumptionItem (Property property, String textureId) {
-        super(Type.CONSUMPTION, property, textureId);
-    }
-    public ConsumptionItem (Property property, String textureId, String texturePath) {
-        super(Type.CONSUMPTION, property, textureId, texturePath);
+    public ConsumptionItem (Property property) {
+        super(Type.CONSUMPTION, property);
     }
 
     @Override

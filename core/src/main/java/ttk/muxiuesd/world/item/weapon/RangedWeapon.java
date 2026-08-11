@@ -33,11 +33,11 @@ public class RangedWeapon extends Weapon {
 
     private BulletFactory<?> factory;   //子弹的工厂实现类
 
-    public RangedWeapon (Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public RangedWeapon (Property property) {
+        super(property);
     }
-    public RangedWeapon (Property property, String textureId, String texturePath, BulletFactory<?> factory) {
-        super(property, textureId, texturePath);
+    public RangedWeapon (Property property, BulletFactory<?> factory) {
+        super(property);
         this.factory = factory;
     }
 

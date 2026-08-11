@@ -1,12 +1,14 @@
 package ttk.muxiuesd.interfaces.render.world.item;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.pool.FightPool;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -16,8 +18,19 @@ import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 物品的渲染器
+ * <p>
+ * 物品的贴图资源由渲染器持有
  * */
 public interface ItemRenderer<T extends Item> {
+    /**
+     * 获取物品的贴图
+     * <p>
+     * 默认返回null，没有贴图的渲染器（如自定义渲染器）可以不实现
+     * */
+    default TextureRegion getTextureRegion () {
+        return null;
+    }
+
     /**
      * 在持有者手上持有时的绘制方法
      * TODO 不同类型的物品不同的绘制方式
@@ -36,7 +49,10 @@ public interface ItemRenderer<T extends Item> {
     default void draw (Batch batch, Context context, ItemStack itemStack) {
         if (itemStack == ItemStack.VOID) return;
 
-        batch.draw(itemStack.getItem().getTextureRegion(),
+        TextureRegion textureRegion = getTextureRegion();
+        if (textureRegion == null) return;
+
+        batch.draw(textureRegion,
             context.x, context.y,
             context.originX, context.originY,
             context.width, context.height,
@@ -179,25 +195,40 @@ public interface ItemRenderer<T extends Item> {
 
     /**
      * 普通标准的物品渲染器
+     * <p>
+     * 持有物品的贴图资源
      * */
     class StandardRenderer<T extends Item> implements ItemRenderer<T> {
+        private final Resource<TextureRegion> textureRegionResource;
+
+        /**
+         * @param textureId 贴图资源的id（一般与物品id相同，方块物品为方块的id）
+         * @param texturePath 贴图文件的路径，为null时通过id从已注册的映射中获取
+         * */
+        public StandardRenderer (String textureId, String texturePath) {
+            this.textureRegionResource = Resource.ofTextureRegion(textureId, texturePath);
+        }
+
+        @Override
+        public TextureRegion getTextureRegion () {
+            return this.textureRegionResource.get();
+        }
 
         @Override
         public void drawOnHand (Batch batch, Context context, LivingEntity<?> holder, ItemStack itemStack) {
-            Item item = itemStack.getItem();
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             float rotationOffset = holder.getSwingHandDegreeOffset();
 
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(item.getTextureRegion(),
+                batch.draw(getTextureRegion(),
                     context.x - context.width / 2, context.y - context.height / 2,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     context.rotation + 225f + rotationOffset);
             } else {
-                batch.draw(item.getTextureRegion(),
+                batch.draw(getTextureRegion(),
                     context.x - context.width / 2, context.y - context.height / 2,
                     context.originX, context.originY,
                     context.width, context.height,
@@ -208,8 +239,7 @@ public interface ItemRenderer<T extends Item> {
 
         @Override
         public void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity) {
-            Item item = itemEntity.getItemStack().getItem();
-            batch.draw(item.getTextureRegion(),
+            batch.draw(getTextureRegion(),
                 context.x, context.y + itemEntity.getPositionOffset().y,
                 context.originX, context.originY,
                 context.width, context.height,

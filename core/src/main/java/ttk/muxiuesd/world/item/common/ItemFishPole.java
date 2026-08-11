@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.item.common;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
@@ -31,21 +30,13 @@ import ttk.muxiuesd.world.loottable.FishingLootTable;
  * 能抛出的钓鱼钩
  * */
 public class ItemFishPole extends Item {
-    public TextureRegion castTexture;
     public float castSpeed = 10f;
     public float pullSpeed = castSpeed * 2;
 
     public ItemFishPole () {
         super(Type.COMMON, new Property().setMaxCount(1)
                 .add(PropertyTypes.ITEM_WITH_ENTITY, null)
-                .add(PropertyTypes.FISHING_POLE_USING, false),
-            Fight.ID("fish_pole"),
-            Fight.ItemTexturePath("fish_pole.png"));
-
-        this.castTexture = Util.loadTextureRegion(
-            Fight.ID("fish_pole_cast"),
-            Fight.ItemTexturePath("fish_pole_cast.png")
-        );
+                .add(PropertyTypes.FISHING_POLE_USING, false));
     }
 
     @Override

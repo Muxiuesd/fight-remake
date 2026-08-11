@@ -48,11 +48,11 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     }
     public ItemStack (Item item) {
         //不指定数量就默认这个物品的最大数量
-        this(item, item.property.getMaxCount());
+        this(item, item.getProperty().getMaxCount());
     }
     public ItemStack (Item item, int amount) {
         //没有指定物品属性就获取复制的
-        this(item, amount, item.getBehaviour(), item.property.copy());
+        this(item, amount, item.getBehaviour(), item.getProperty().copy());
     }
     //需要指定物品属性
     public ItemStack (Item item, int amount, Item.Property property) {

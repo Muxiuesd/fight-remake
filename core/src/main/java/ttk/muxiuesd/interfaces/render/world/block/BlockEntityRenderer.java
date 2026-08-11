@@ -3,10 +3,14 @@ package ttk.muxiuesd.interfaces.render.world.block;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.pool.FightPool;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.interact.InteractSlot;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 方块实体的渲染器接口
@@ -101,8 +105,19 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
             float slotY = y + (float) startPos.y / interactGridSize.y;
             float slotWidth  = (float) size.x / interactGridSize.x;
             float slotHeight = (float) size.y / interactGridSize.y;
-            //TODO 调用物品的渲染器
-            batch.draw(interactSlot.getItemStack().getItem().getTextureRegion(), slotX, slotY, slotWidth, slotHeight);
+
+            ItemStack itemStack = interactSlot.getItemStack();
+            Item item = itemStack.getItem();
+            ItemRenderer<Item> renderer = ItemRendererRegistry.get(item);
+            //渲染器未注册（可能返回null）时不绘制该物品，避免崩溃
+            if (renderer != null) {
+                ItemRenderer.Context context = renderer.getContext(
+                    slotX, slotY,
+                    slotWidth, slotHeight
+                );
+                renderer.draw(batch, context, itemStack);
+                renderer.freeContext(context);
+            }
         }
     }
 }

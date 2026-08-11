@@ -89,7 +89,7 @@ public class Backpack implements Inventory, Updateable {
                 /*if (stack.isFull()) continue;*/
 
                 int newAmount = stack.getAmount() + itemStack.getAmount();
-                int maxCount = stack.getItem().property.getMaxCount();
+                int maxCount = stack.getItem().getProperty().getMaxCount();
                 if (newAmount <= maxCount) {
                     stack.setAmount(newAmount);
                     return null;

@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.item.food;
 
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.StatusEffects;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -8,10 +7,12 @@ import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 物品河豚
+ * <p>
+ * 贴图路径不在默认 item 目录，注册时需显式指定（见 Items.java）
  * */
 public class ItemPufferFish extends FoodItem {
     public ItemPufferFish () {
-        super(Fight.ID("puffer_fish"), Fight.EntityTexturePath("fish/puffer_fish.png"));
+        super();
     }
 
     @Override

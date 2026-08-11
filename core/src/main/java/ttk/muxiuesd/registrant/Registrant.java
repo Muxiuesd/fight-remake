@@ -9,6 +9,7 @@ import java.util.function.Supplier;
  * 实体，方块，墙，等等游戏元素的注册
  * 为之后的MOD做准备
  * */
+@Deprecated
 public class Registrant<T extends ID> {
     private final String namespace; //命名空间
     private final HashMap<String, Supplier<? extends T>> regedit; //注册表，key为名称而不是id

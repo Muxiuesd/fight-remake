@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.item.food;
 
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.StatusEffects;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
@@ -11,7 +10,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class ItemFish extends FoodItem {
     public ItemFish () {
-        super(Fight.ID("fish"), Fight.ItemTexturePath("fish.png"));
+        super();
     }
 
     @Override

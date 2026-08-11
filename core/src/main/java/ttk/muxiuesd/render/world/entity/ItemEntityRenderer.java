@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -31,7 +33,9 @@ public class ItemEntityRenderer implements EntityRenderer<ItemEntity> {
         ItemStack stack = entity.getItemStack();
         if (stack != null) {
             Item item = stack.getItem();
-            TextureRegion textureRegion = item.getTextureRegion();
+            ItemRenderer<Item> renderer = ItemRendererRegistry.get(item);
+            if (renderer == null) return;
+            TextureRegion textureRegion = renderer.getTextureRegion();
             if (textureRegion != null) {
                 Vector2 origin = entity.getOrigin();
                 Vector2 scale = entity.getScale();

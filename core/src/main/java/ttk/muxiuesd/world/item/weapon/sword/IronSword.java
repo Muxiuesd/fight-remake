@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.item.weapon.sword;
 
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
 
 /**
@@ -11,8 +10,6 @@ public class IronSword extends Sword {
     public IronSword () {
         super(Sword.createDefaultProperty()
                 .add(PropertyTypes.WEAPON_DAMAGE, 3f)
-                .add(PropertyTypes.WEAPON_USE_SAPN, 0.2f),
-            Fight.ID("iron_sword"),
-            Fight.ItemTexturePath("iron_sword.png"));
+                .add(PropertyTypes.WEAPON_USE_SAPN, 0.2f));
     }
 }

@@ -1,7 +1,6 @@
 package ttk.muxiuesd.world.item.equipment;
 
 import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -38,12 +37,8 @@ public class EquipmentItem extends Item {
     //装备的类型
     public final EquipmentItem.Type equipmentType;
 
-    public EquipmentItem (EquipmentItem.Type equipmentType, Property property, String textureName) {
-        this(equipmentType, property, Fight.ID(textureName), Fight.ItemTexturePath(textureName + ".png"));
-    }
-
-    public EquipmentItem (EquipmentItem.Type equipmentType, Property property, String textureId, String texturePath) {
-        super(Item.Type.EQUIPMENT, property, textureId, texturePath);
+    public EquipmentItem (EquipmentItem.Type equipmentType, Property property) {
+        super(Item.Type.EQUIPMENT, property);
         this.equipmentType = equipmentType;
     }
 

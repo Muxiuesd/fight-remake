@@ -9,9 +9,7 @@ import ttk.muxiuesd.Fight;
  * */
 public class ItemBait extends ConsumptionItem {
     public ItemBait () {
-        super(new Property().setMaxCount(64),
-            Fight.ID("bait"),
-            Fight.ItemTexturePath("bait.png"));
+        super(new Property().setMaxCount(64));
     }
 
     /*@Override

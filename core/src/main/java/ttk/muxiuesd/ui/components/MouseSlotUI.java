@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -133,8 +135,17 @@ public class MouseSlotUI extends PlayerSlotUI {
         Item item = stack.getItem();
         float renderX = mouseUIPosition.x - getWidth() / 2;
         float renderY = mouseUIPosition.y - getHeight() / 2;
-        //TODO 调用物品的渲染器
-        batch.draw(item.getTextureRegion(), (int) renderX, (int) renderY, getWidth(), getHeight());
+
+        ItemRenderer<Item> renderer = ItemRendererRegistry.get(item);
+        //渲染器未注册（可能返回null）时不绘制该物品，避免崩溃
+        if (renderer != null) {
+            ItemRenderer.Context context = renderer.getContext(
+                renderX, renderY,
+                getWidth(), getHeight()
+            );
+            renderer.draw(batch, context, stack);
+            renderer.freeContext(context);
+        }
 
         int amount = stack.getAmount();
         if (amount > 1) drawAmount(batch, parent, (int) renderX, (int) renderY, amount);

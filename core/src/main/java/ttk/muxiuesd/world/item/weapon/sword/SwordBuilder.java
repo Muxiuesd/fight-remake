@@ -25,15 +25,14 @@ public class SwordBuilder {
     /**
      * 执行构建
      * */
-    public Sword build (String textureId, String texturePath) {
+    public Sword build () {
         return new Sword(
             createProperty()
                 .setUseSound(this.attackSound)
                 .add(PropertyTypes.WEAPON_ATTACK_RANGE, this.attackRange)
                 .add(PropertyTypes.WEAPON_DAMAGE, this.damage)
                 .add(PropertyTypes.WEAPON_USE_SAPN, this.useSpan)
-                .add(PropertyTypes.ITEM_DURATION, this.duration),
-            textureId, texturePath
+                .add(PropertyTypes.ITEM_DURATION, this.duration)
         );
     }
 

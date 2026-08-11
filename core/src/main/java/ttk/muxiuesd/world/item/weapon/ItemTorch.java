@@ -1,7 +1,6 @@
 package ttk.muxiuesd.world.item.weapon;
 
 import com.badlogic.gdx.graphics.Color;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.item.weapon.sword.Sword;
 
@@ -14,9 +13,7 @@ public class ItemTorch extends Sword {
     public ItemTorch () {
         super(createDefaultProperty()
                 .add(PropertyTypes.WEAPON_ATTACK_RANGE, 2f)
-                .add(PropertyTypes.ITEM_DURATION, 50),
-            Fight.ID("torch"),
-            Fight.ItemTexturePath("torch.png"));
+                .add(PropertyTypes.ITEM_DURATION, 50));
     }
 
     /*@Override

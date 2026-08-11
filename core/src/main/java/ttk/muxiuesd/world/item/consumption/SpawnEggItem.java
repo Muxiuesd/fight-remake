@@ -15,16 +15,12 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class SpawnEggItem<T extends Entity<T>> extends ConsumptionItem{
     private final EntityProvider<T> entityProvider;
 
-    public SpawnEggItem (String name, EntityProvider<T> entityProvider) {
-        super(name);
+    public SpawnEggItem (EntityProvider<T> entityProvider) {
+        super();
         this.entityProvider = entityProvider;
     }
-    public SpawnEggItem (Property property, String textureId, EntityProvider<T> entityProvider) {
-        super(property, textureId);
-        this.entityProvider = entityProvider;
-    }
-    public SpawnEggItem (Property property, String textureId, String texturePath, EntityProvider<T> entityProvider) {
-        super(property, textureId, texturePath);
+    public SpawnEggItem (Property property, EntityProvider<T> entityProvider) {
+        super(property);
         this.entityProvider = entityProvider;
     }
 

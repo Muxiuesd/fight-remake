@@ -30,8 +30,8 @@ public class Sword extends Weapon {
             .setUseSound(Sounds.ENTITY_SWEEP);
     }
 
-    public Sword (Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public Sword (Property property) {
+        super(property);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class Sword extends Weapon {
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, le));
         }
 
-        AudioHolder useSound = this.property.getUseSound();
+        AudioHolder useSound = this.getProperty().getUseSound();
         SoundSystem ses = world.getSystem(SoundSystem.class);
         ses.playSpatialSound(useSound, user);
         return true;

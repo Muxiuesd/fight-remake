@@ -23,12 +23,8 @@ public class FoodItem extends ConsumptionItem {
     }
 
 
-    public FoodItem (String textureId) {
-        super(createDefaultProperty(), textureId);
-    }
-
-    public FoodItem (String textureId, String texturePath) {
-        super(createDefaultProperty(), textureId, texturePath);
+    public FoodItem () {
+        super(createDefaultProperty());
     }
 
     @Override

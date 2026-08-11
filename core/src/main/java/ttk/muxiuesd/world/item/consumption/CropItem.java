@@ -18,17 +18,13 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class CropItem extends ConsumptionItem {
     private Botany botany;
 
-    public CropItem (String name, Botany botany) {
-        super(name);
+    public CropItem (Botany botany) {
+        super();
         this.botany = botany;
     }
 
-    public CropItem (Property property, String textureId) {
-        super(property, textureId);
-    }
-
-    public CropItem (Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public CropItem (Property property) {
+        super(property);
     }
 
     @Override

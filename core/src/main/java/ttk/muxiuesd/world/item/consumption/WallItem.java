@@ -16,16 +16,18 @@ import ttk.muxiuesd.world.wall.Wall;
 
 /**
  * 墙体物品
+ * <p>
+ * 贴图直接使用墙体的贴图（id 与墙体一致，通过已注册的 id→路径映射获取）
  * */
 public class WallItem extends ConsumptionItem {
     private final Wall<?> wall;
 
-    public WallItem(final Wall<?> wall, String textureId) {
-        this(wall, new Property().setUseSound(Sounds.STONE.put()), textureId);
+    public WallItem(final Wall<?> wall) {
+        this(wall, new Property().setUseSound(Sounds.STONE.put()));
     }
 
-    public WallItem (final Wall<?> wall, Property property, String textureId) {
-        super(property, textureId);
+    public WallItem (final Wall<?> wall, Property property) {
+        super(property);
         this.wall = wall;
     }
 
