@@ -20,8 +20,8 @@ import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondLeggings;
-import ttk.muxiuesd.world.item.food.ItemFish;
-import ttk.muxiuesd.world.item.food.ItemPufferFish;
+import ttk.muxiuesd.world.item.food.FoodItem;
+import ttk.muxiuesd.world.item.food.FoodItemBuilder;
 import ttk.muxiuesd.world.item.weapon.ItemTorch;
 import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
 import ttk.muxiuesd.world.item.weapon.sword.Sword;
@@ -46,14 +46,8 @@ public final class Items {
     public static final Item IRON_INGOT = register("iron_ingot");
     public static final Item GOLD_INGOT = register("gold_ingot");
     public static final Item COAL = register("coal");
-
     public static final Item BAIT = register("bait", ItemBait::new);
-    //食物类
-    public static final Item FISH = register("fish", ItemFish::new);
-    public static final Item PUFFER_FISH = register("puffer_fish",
-        Fight.EntityTexturePath("fish/puffer_fish.png"),
-        ItemPufferFish::new
-    );
+
     //杂物类
     public static final Item RUBBISH = register("rubbish");
 
@@ -86,9 +80,9 @@ public final class Items {
 
     /// 刷怪蛋物品
     //怪物刷怪蛋
-    public static final Item SPAWN_EGG_SLIME = register("spawn_egg_slime", Entities.SLIME);
+    public static final Item SPAWN_EGG_SLIME = registerSpawnEgg("spawn_egg_slime", Entities.SLIME);
     //生物刷怪蛋
-    public static final Item SPAWN_EGG_PUFFER_FISH = register("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
+    public static final Item SPAWN_EGG_PUFFER_FISH = registerSpawnEgg("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
 
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
@@ -123,11 +117,41 @@ public final class Items {
 
     /// 农作物物品
     public static final Item POTATO = register("potato", Blocks.POTATO);
+    //食物类
+    public static final Item FISH = register("fish", Fight.ItemTexturePath("foods/fish.png"),
+        FoodItemBuilder.create()
+            .setEatEffects(
+                FoodItem.EatEffect.of(StatusEffects.HEALING, 5f, 1),
+                FoodItem.EatEffect.of(StatusEffects.POISON, 6f, 1)
+            )
+            .build(),
+        Item.Property::new
+    );
+    public static final Item PUFFER_FISH = register("puffer_fish", Fight.EntityTexturePath("fish/puffer_fish.png"),
+        FoodItemBuilder.create()
+            .setEatEffects(FoodItem.EatEffect.of(StatusEffects.POISON, 5f, 1))
+            .build(),
+        Item.Property::new
+    );
+    public static final Item POTATO_BAKED = register("potato_baked", Fight.ItemTexturePath("foods/potato_baked.png"),
+        FoodItemBuilder.create()
+            .setEatEffects(FoodItem.EatEffect.of(StatusEffects.HEALING, 10f, 2))
+            .build(),
+        Item.Property::new
+    );
+
 
     /// 墙体物品
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
 
+
+    /**
+     * 最简单、最普通物品的注册
+     * */
+    public static Item register (String name) {
+        return register(name, Item::new, Item.Property::new);
+    }
 
     /**
      * 注册一个剑类物品（快捷方法）
@@ -150,10 +174,16 @@ public final class Items {
     }
 
     /**
-     * 最简单、最普通物品的注册
+     * 刷怪蛋物品的注册
+     * <p>
+     * 需要贴图在 item/spawn_eggs/ 目录下
      * */
-    public static Item register (String name) {
-        return register(name, Item::new, Item.Property::new);
+    public static <T extends Entity<T>> Item registerSpawnEgg (String name, EntityProvider<T> entityProvider) {
+        return register(
+            name,
+            Fight.ItemTexturePath("spawn_eggs/" + name + ".png"),
+            () -> new SpawnEggItem<>(entityProvider)
+        );
     }
 
     /**
@@ -166,10 +196,14 @@ public final class Items {
     }
 
     /**
-     * 刷怪蛋物品的注册
+     * 普通物品的注册（带有自定义物品属性）
+     * @param texturePath 自定义的物品贴图文件路径
      * */
-    public static <T extends Entity<T>> Item register (String name, EntityProvider<T> entityProvider) {
-        return register(name, () -> new SpawnEggItem<>(entityProvider));
+    public static Item register (String name,
+                                 String texturePath,
+                                 Function<Item.Property, Item> fun,
+                                 Supplier<Item.Property> propertyProvider) {
+        return register(name, texturePath, () -> fun.apply(propertyProvider.get()));
     }
 
     /**
@@ -179,7 +213,6 @@ public final class Items {
      * @param factory 物品实例的构造工厂（物品的属性需要已创建）
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory) {
-        //return register(factory, Identifier.of(Fight.ID(name)), Fight.ItemTexturePath(name + ".png"));
         return register(name, Fight.ItemTexturePath(name + ".png"), factory);
     }
 
@@ -215,7 +248,6 @@ public final class Items {
      * 快捷注册物品
      * <p>
      * 使用自定义的渲染器
-
      * @param renderer  物品的渲染器
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<T> renderer) {

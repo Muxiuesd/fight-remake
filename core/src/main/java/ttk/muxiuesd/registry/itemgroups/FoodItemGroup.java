@@ -17,6 +17,7 @@ public class FoodItemGroup {
             .add(Items.FISH)
             .add(Items.PUFFER_FISH)
             .add(Items.POTATO)
+            .add(Items.POTATO_BAKED)
         ;
     });
 }
