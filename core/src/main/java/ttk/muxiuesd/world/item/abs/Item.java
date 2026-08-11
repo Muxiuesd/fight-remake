@@ -13,6 +13,7 @@ import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.resource.Resource;
@@ -37,11 +38,18 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
 
     private Identifier identifier;                          //物品的id标识
-    public Type type;                                       //物品的类型
-    public Property property;                               //物品最原始的属性，原则上不直接对这个原始数据进行操作
+    private Type type;                                      //物品的类型
+    private Property property;                              //物品最原始的属性，原则上不直接对这个原始数据进行操作
     private Resource<TextureRegion> textureRegionResource;  //物品的贴图材质资源
 
     public Item () {}
+
+    /**
+     * 最普通的物品的构造方法
+     * */
+    public Item (Property property, String textureId, String texturePath) {
+        this(Type.COMMON, property, textureId, texturePath);
+    }
     public Item (Type type, Property property, String textureId) {
         this(type, property, textureId, null);
     }
@@ -69,7 +77,7 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * */
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放物品使用音效
-        AudioHolder useSound = this.property.getUseSound();
+        AudioHolder useSound = this.getProperty().getUseSound();
         SoundSystem ses = world.getSystem(SoundSystem.class);
         ses.playSpatialSound(useSound, user);
 
@@ -94,7 +102,8 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 没有物品行为的物品将不能正常被使用
      * */
     public IItemStackBehaviour getBehaviour () {
-        return null;
+        //默认是普通物品的物品行为
+        return ItemStackBehaviours.COMMON;
     };
 
     /**
