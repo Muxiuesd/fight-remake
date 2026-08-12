@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 /**
  * 标识符，ID的包装类
+ * <p>
+ * 构造器私有，外部只能通过 {@link #of} 创建
  * */
 public class Identifier implements Codecable<Identifier> {
     //正则表达式规则：第一部分是小写字母，第二部分是小写字母、数字或下划线
@@ -16,7 +18,7 @@ public class Identifier implements Codecable<Identifier> {
 
     public static final Codec<Identifier> CODEC = CodecBuilder.<Identifier>create()
         .paramField("id", Identifier::getID, Codec.STRING)
-        .factory(Identifier::new);
+        .factory(Identifier::of);
 
     public static Identifier of (String id) {
         return new Identifier(id);
@@ -46,11 +48,11 @@ public class Identifier implements Codecable<Identifier> {
 
     private final String id;
 
-    public Identifier (String namespace, String name) {
+    private Identifier (String namespace, String name) {
         this(namespace + ":" + name);
     }
 
-    public Identifier (String id) {
+    private Identifier (String id) {
         checkAndThrow(id);
         this.id = id;
     }
@@ -69,8 +71,7 @@ public class Identifier implements Codecable<Identifier> {
     @Override
     public boolean equals (Object o) {
         if (this == o) return true;
-        if (!(o instanceof Identifier)) return false;
-        Identifier that = (Identifier) o;
+        if (!(o instanceof Identifier that)) return false;
         return Objects.equals(this.id, that.id);
     }
 

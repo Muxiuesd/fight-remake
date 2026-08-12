@@ -40,7 +40,7 @@ public class EntityRendererRegistry extends Registries.DefaultRegistry<EntityRen
 
     public <T extends Entity<T>> EntityRenderer<T> registerRenderer (EntityProvider<T> entityProvider, EntityRenderer<T> entityRenderer) {
         if (entityProvider != null && entityRenderer != null) {
-            Identifier identifier = new Identifier(entityProvider.getID());
+            Identifier identifier = Identifier.of(entityProvider.getID());
             if (contains(identifier)) {
                 Log.print(this.getClass().getName(),
                     "已存在过实体：" + entityProvider.getID() + " 的渲染器，执行覆盖！");

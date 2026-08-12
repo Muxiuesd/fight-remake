@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;
@@ -36,7 +37,7 @@ public class WallCodec extends JsonCodec<Wall<?>> {
         String id = dataReader.readString("id");
         Wall<?> wall = Registries.WALL.get(id);
         Wall<?> self = wall.createSelf(new Vector2(dataReader.readFloat("x"), dataReader.readFloat("y")));
-        self.setID(id);
+        self.setIdentifier(Identifier.of(id));
 
         //属性解码
         JsonValue propertyValue = dataReader.readObj("property");

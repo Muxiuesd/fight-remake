@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class Registrant<T extends ID> {
             throw new RuntimeException("注册Id：" + this.getId(name) + " 不存在！！！");
         }
         T t = this.regedit.get(name).get();
-        t.setID(this.getId(name));
+        t.setIdentifier(Identifier.of(this.getId(name)));
         return t;
     }
 

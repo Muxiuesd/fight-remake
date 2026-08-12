@@ -125,18 +125,16 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
         return this.getIdentifier().getID();
     }
 
-    @Override
-    public Item setID (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
-        return this;
-    }
-
     public Identifier getIdentifier () {
         return this.identifier;
     }
 
+    @Override
     public Item setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！物品：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
         return this;
     }

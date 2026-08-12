@@ -71,6 +71,10 @@ public class BlockSounds implements Codecable<BlockSounds> {
     }
 
     public BlockSounds setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！方块音效：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
         return this;
     }

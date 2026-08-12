@@ -42,7 +42,7 @@ public class BlockRendererRegistry extends Registries.DefaultRegistry<BlockRende
      * */
     public <T extends Block> BlockRenderer<T> registerRenderer (T block, BlockRenderer<T> blockRenderer) {
         if (block != null && blockRenderer != null) {
-            Identifier identifier = new Identifier(block.getID());
+            Identifier identifier = Identifier.of(block.getID());
             if (contains(identifier)) {
                 Log.print(this.getClass().getName(),
                     "已存在过方块：" + block.getClass().getName() + " 的渲染器，执行覆盖！");

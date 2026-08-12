@@ -19,7 +19,7 @@ public final class RenderLayers {
 
 
     public static RenderLayer register(String name, Supplier<RenderLayer> supplier) {
-        Identifier identifier = new Identifier(Fight.ID(name));
+        Identifier identifier = Identifier.of(Fight.ID(name));
         return Registries.RENDER_LAYER.register(identifier, supplier.get().setIdentifier(identifier));
     }
 }

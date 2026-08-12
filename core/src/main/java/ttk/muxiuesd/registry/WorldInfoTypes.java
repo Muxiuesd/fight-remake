@@ -24,7 +24,7 @@ public final class WorldInfoTypes {
      * 注册一种信息类型的hashmap
      * */
     public static <T, V> WorldInfoHashMap<T, V> register (String name, WorldInfoHashMap<T, V> map) {
-        Identifier identifier = new Identifier(Fight.ID(name));
+        Identifier identifier = Identifier.of(Fight.ID(name));
         map.setIdentifier(identifier);
         Registries.WORLD_INFO_HASH_MAP.register(identifier, map);
         return map;

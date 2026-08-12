@@ -32,6 +32,6 @@ public final class ItemStackBehaviours {
     }
 
     public static IItemStackBehaviour register (String name, IItemStackBehaviour behaviour) {
-        return Registries.ITEM_STACK_BEHAVIOUR.register(new Identifier(Fight.NAMESPACE, name), behaviour);
+        return Registries.ITEM_STACK_BEHAVIOUR.register(Identifier.of(Fight.NAMESPACE, name), behaviour);
     }
 }

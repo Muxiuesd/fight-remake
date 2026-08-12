@@ -51,7 +51,7 @@ public class ItemRendererRegistry extends Registries.DefaultRegistry<ItemRendere
      * */
     public <T extends Item> ItemRenderer<T> registerRenderer (T item, ItemRenderer<T> itemRenderer) {
         if (item != null && itemRenderer != null) {
-            Identifier identifier = new Identifier(item.getID());
+            Identifier identifier = Identifier.of(item.getID());
             if (contains(identifier)) {
                 Log.print(this.getClass().getName(),
                     "已存在过物品：" + item.getClass().getName() + " 的渲染器，执行覆盖！");

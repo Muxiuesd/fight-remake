@@ -45,7 +45,7 @@ public class EntityProvider<T extends Entity<T>> {
      * */
     public T create (World world, EntityType<? super T> type) {
         T entity = factory.create(world, type);
-        entity.setID(this.getID());
+        entity.setIdentifier(this.getIdentifier());
         return entity;
     }
 
@@ -58,13 +58,11 @@ public class EntityProvider<T extends Entity<T>> {
     }
 
     public EntityProvider<T> setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！实体提供者：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
-        return this;
-    }
-
-    public EntityProvider<T> setID (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
         return this;
     }
 

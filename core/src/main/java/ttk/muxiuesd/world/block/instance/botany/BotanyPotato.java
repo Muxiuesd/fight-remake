@@ -30,7 +30,7 @@ public class BotanyPotato extends Botany {
         BotanyPotato instance = new BotanyPotato();
         instance
             .setDroppedItem(getDroppedItem())
-            .setID(getID());
+            .setIdentifier(getIdentifier());
         return instance;
     }
 }

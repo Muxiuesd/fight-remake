@@ -7,6 +7,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.hitbox.Hitbox;
@@ -35,7 +36,7 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
                 throw new IllegalArgumentException("墙体注册表中不存在id为：" + id + " 的墙体原型（旧存档数据）");
             }
             Wall<?> self = prototype.createSelf(new Vector2(x, y));
-            self.setID(id);
+            self.setIdentifier(Identifier.of(id));
             return self;
         });
 

@@ -25,7 +25,7 @@ public final class DamageTypes {
     public static final DamageType<StatusEffect.DamageSource, LivingEntity<?>> STATUS_EFFECT = register("status_effect", DamageTypeStatusEffect::new);
 
     public static <S, T extends LivingEntity<?>> DamageType<S, T> register (String name, Function<Identifier, DamageType<S, T>> function) {
-        Identifier identifier = new Identifier(Fight.NAMESPACE, name);
+        Identifier identifier = Identifier.of(Fight.NAMESPACE, name);
         DamageType<S, T> damageType = function.apply(identifier);
         Registries.DAMAGE_TYPE.register(identifier, damageType);
         return damageType;

@@ -34,7 +34,7 @@ public class BlockWithEntityCodecBuilder {
                 (block, id) -> {
                     //工厂创建出来的方块实例没有标识符，在这里恢复，否则getID()会空指针
                     if (id != null && Identifier.check(id)) {
-                        block.setIdentifier(new Identifier(id));
+                        block.setIdentifier(Identifier.of(id));
                     }
                 },
                 Codec.STRING)

@@ -95,7 +95,7 @@ public final class Entities {
      * 最基础的实体注册
      * */
     public static <T extends Entity<T>> EntityProvider<T> register (String name, EntityProvider<T> provider) {
-        Identifier identifier = new Identifier(Fight.NAMESPACE, name);
+        Identifier identifier = Identifier.of(Fight.NAMESPACE, name);
         Registries.ENTITY.register(identifier, provider.setIdentifier(identifier));
         EntityRendererRegistry.register(provider, provider.renderer);
         return provider;

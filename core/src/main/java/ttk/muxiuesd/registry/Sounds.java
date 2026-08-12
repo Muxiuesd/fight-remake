@@ -68,7 +68,7 @@ public final class Sounds {
             registerBlockSound(put, "put/" + soundFileName),
             registerBlockSound(destroy, "destroy/" + soundFileName)
         );
-        Identifier identifier = new Identifier(Fight.ID(name));
+        Identifier identifier = Identifier.of(Fight.ID(name));
         sounds.setIdentifier(identifier);
         return Registries.BLOCK_SOUNDS.register(identifier, sounds);
     }
@@ -105,7 +105,7 @@ public final class Sounds {
      * @param audioFileHandle   音频的文件持有
      * */
     public static AudioHolder register (String id, FileHandle audioFileHandle) {
-        Identifier identifier = new Identifier(id);
+        Identifier identifier = Identifier.of(id);
         AudioHolder audioHolder = new AudioHolder(identifier);
         audioHolder.setFileHandle(audioFileHandle);
         return Registries.AUDIOS.register(identifier, audioHolder);
