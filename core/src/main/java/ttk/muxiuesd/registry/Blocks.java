@@ -38,10 +38,10 @@ public final class Blocks {
         () -> new Block.Property().setFriction(0.9f)
     );
     public static final Block GRASS = registerCommon("grass",
-        () -> new Block.Property().setFriction(0f)
+        () -> new Block.Property().setFriction(0.05f)
     );
     public static final Block STONE = registerCommon("stone",
-        () -> new Block.Property().setFriction(0f)
+        () -> new Block.Property().setFriction(0.05f)
     );
     public static final Block SAND = registerCommon("sand",
         () -> new Block.Property().setFriction(0.06f)

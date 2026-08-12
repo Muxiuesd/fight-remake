@@ -312,11 +312,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Block block = cs.getBlock(center.x, center.y);
         if (block == null) return;
 
-        //目标速度 = 基准速度 × 摩擦系数，直接设置立即生效
+        //摩擦系数越大，移动越慢：目标速度 = 基准速度 × (1 - 摩擦系数)
         //（不能用 lerp 平滑逼近：玩家的速度矢量每帧被输入系统重置，lerp 起点每帧都是全速，
         //  导致永远无法收敛到目标速度，摩擦几乎失效）
         float friction = block.getProperty().getFriction();
-        float curSpeed = entity.getSpeed() * friction;
+        float curSpeed = entity.getSpeed() * Math.max(0f, 1f - friction);
         //速度过小直接为0
         if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);
@@ -335,11 +335,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         float curSpeed = entity.getSpeed();
         //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）
         if (!entity.isBeingAttracted() && entity.isOnGround()) {
-            //计算脚下方块摩擦对速度的影响
+            //计算脚下方块摩擦对速度的影响，摩擦系数越大减速越明显
             Vector2 center = entity.getCenterPos();
             Block block = cs.getBlock(center.x, center.y);
             if (block == null) return;
-            curSpeed *= block.getProperty().getFriction();
+            curSpeed *= Math.max(0f, 1f - block.getProperty().getFriction());
         }
         //速度过小直接为0
         if (curSpeed < MIN_SPEED) {

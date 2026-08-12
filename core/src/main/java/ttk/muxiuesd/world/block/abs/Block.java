@@ -121,7 +121,7 @@ public class Block implements ID<Block>, Disposable {
         public Property () {
             /// 这里有可能浅拷贝
             this.propertiesDataMap = new JsonPropertiesMap()
-                .add(PropertyTypes.BLOCK_FRICTON, 1f)
+                .add(PropertyTypes.BLOCK_FRICTON, 0f)   //默认无摩擦（摩擦越大移动越慢）
                 .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
                 .add(PropertyTypes.CATS, new CatsHolder());
         }
