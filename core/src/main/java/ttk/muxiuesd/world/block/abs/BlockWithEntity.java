@@ -16,12 +16,8 @@ public abstract class BlockWithEntity extends Block implements ICatData{
     //方块对应的方块实体实例
     private BlockEntity blockEntity;
 
-    public BlockWithEntity (Property property, String textureId) {
-        super(property, textureId);
-    }
-
-    public BlockWithEntity (Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public BlockWithEntity (Property property) {
+        super(property);
     }
 
     /**

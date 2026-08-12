@@ -43,8 +43,8 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
     private RectHitbox rectHitbox;  //普通墙体只有一个矩形碰撞箱，最好也只有一个
     private HitboxHolder<Wall<T>> hitboxHolder;
 
-    public Wall(Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public Wall(Property property) {
+        super(property);
 
         this.rectHitbox = new RectHitbox()
             .setStartPos(HITBOX_START_X_OFFSET, HITBOX_START_Y_OFFSET)

@@ -1,9 +1,9 @@
 package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.Fight;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Codecs;

@@ -2,9 +2,9 @@ package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.Fight;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
 import ttk.muxiuesd.serialization.abs.JsonCodec;

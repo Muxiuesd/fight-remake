@@ -1,13 +1,10 @@
 package ttk.muxiuesd.world.wall;
 
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
 
 public class WallSmoothStone extends Wall<WallSmoothStone> {
     public WallSmoothStone () {
-        super(createProperty().setFriction(1f),
-            Fight.ID("smooth_stone"),
-            Fight.BlockTexturePath("smooth_stone.png"));
+        super(createProperty().setFriction(1f));
     }
 
     @Override

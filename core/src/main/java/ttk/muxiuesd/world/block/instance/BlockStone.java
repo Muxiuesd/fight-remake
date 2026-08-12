@@ -1,7 +1,5 @@
 package ttk.muxiuesd.world.block.instance;
 
-
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.world.block.abs.Block;
 
 /**
@@ -9,8 +7,6 @@ import ttk.muxiuesd.world.block.abs.Block;
  * */
 public class BlockStone extends Block {
     public BlockStone() {
-        super(createProperty(),
-            Fight.ID("stone"),
-            Fight.BlockTexturePath("stone.png"));
+        super(createProperty());
     }
 }

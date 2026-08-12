@@ -1,16 +1,13 @@
 package ttk.muxiuesd.world.wall;
 
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
 
 /**
  * 测试用墙体
  * */
 public class WallTest extends Wall<WallTest>{
     public WallTest() {
-        super(createProperty().setFriction(1f),
-            Fight.ID("test_wall"),
-            Fight.BlockTexturePath("block_test.png"));
+        super(createProperty().setFriction(1f));
     }
 
     @Override

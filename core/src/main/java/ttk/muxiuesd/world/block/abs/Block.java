@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
@@ -12,7 +11,6 @@ import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSounds;
@@ -57,20 +55,11 @@ public class Block implements ID<Block>, Disposable {
     }
 
     private Identifier identifier;
-    private Resource<TextureRegion> textureResource;
     private Property property;
 
 
     public Block (Property property) {
         this.setProperty(property);
-    }
-    public Block (Property property, String textureId) {
-        this(property, textureId, null);
-    }
-    public Block (Property property, String textureId, String texturePath) {
-        this.setProperty(property);
-        //this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
-        this.textureResource = Resource.ofTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -85,17 +74,6 @@ public class Block implements ID<Block>, Disposable {
 
     public void setProperty (Property property) {
         this.property = property;
-    }
-
-    /**
-     * 检测方快的材质贴图是否存在
-     * */
-    public boolean textureIsValid() {
-        return this.textureResource != null && this.textureResource.get() != null;
-    }
-
-    public TextureRegion getTextureRegion () {
-        return this.textureResource != null ? this.textureResource.get() : null;
     }
 
     @Override

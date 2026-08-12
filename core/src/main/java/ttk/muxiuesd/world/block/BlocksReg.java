@@ -5,13 +5,13 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Registrant;
 import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.instance.*;
 
 import java.util.function.Supplier;
 
 /**
  * 方块注册
  * */
+@Deprecated
 public class BlocksReg {
     public static final String TAG = BlocksReg.class.getName();
     public static final Registrant<Block> registrant = RegistrantGroup.getRegistrant(Fight.NAMESPACE, Block.class);
@@ -20,14 +20,14 @@ public class BlocksReg {
         Log.print(TAG, "游戏方块注册完毕");
     }
 
-    public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
+    /*public static final Block TEST_BLOCK = register("block_test", BlockTest::new);
     public static final Block GRASS = register("grass", BlockGrass::new);
     public static final Block STONE = register("stone", BlockStone::new);
     public static final Block SAND = register("sand", BlockSand::new);
     public static final Block WATER = register("water", BlockWater::new);
 
     public static final Block CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
-    public static final Block FURNACE = register("furnace", BlockFurnace::new);
+    public static final Block FURNACE = register("furnace", BlockFurnace::new);*/
 
     public static Block register (String name, final Supplier<Block> supplier) {
         Block block = registrant.register(name, supplier);

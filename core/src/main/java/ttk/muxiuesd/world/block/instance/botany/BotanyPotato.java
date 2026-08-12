@@ -7,17 +7,13 @@ import ttk.muxiuesd.world.block.abs.Botany;
 
 /**
  * 土豆
+ * <p>
+ * 不同生长等级的贴图由植物渲染器持有（见 Blocks.registerBotany）
  * */
 public class BotanyPotato extends Botany {
 
     public BotanyPotato () {
         super(new Property());
-        setGrowLevelTextureRegions(
-            loadTextureRegion("potatoes_stage_0.png"),
-            loadTextureRegion("potatoes_stage_1.png"),
-            loadTextureRegion("potatoes_stage_2.png"),
-            loadTextureRegion("potatoes_stage_3.png")
-        );
     }
 
     @Override
