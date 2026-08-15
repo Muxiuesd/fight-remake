@@ -19,6 +19,8 @@ public class MaterialItemGroup {
             .add(Items.COAL)
             .add(Items.IRON_INGOT)
             .add(Items.GOLD_INGOT)
+            .add(Items.SPAWN_EGG_SLIME)
+            .add(Items.SPAWN_EGG_PUFFER_FISH)
             ;
     });
 }

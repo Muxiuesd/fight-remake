@@ -38,16 +38,16 @@ public final class Blocks {
         () -> new Block.Property().setFriction(0.9f)
     );
     public static final Block GRASS = registerCommon("grass",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.05f).setSounds(Sounds.GRASS)
     );
     public static final Block STONE = registerCommon("stone",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.05f).setSounds(Sounds.STONE)
     );
     public static final Block SAND = registerCommon("sand",
-        () -> new Block.Property().setFriction(0.06f)
+        () -> new Block.Property().setFriction(0.06f).setSounds(Sounds.SAND)
     );
     public static final Block FARMLAND_DRY = registerCommon("farmland_dry",
-        () -> new Block.Property().setFriction(0.1f)
+        () -> new Block.Property().setFriction(0.1f).setSounds(Sounds.GRASS)
     );
     public static final Block WATER = register("water", BlockWater::new,
         () -> new Block.Property().setFriction(0.9f).setWalkable(false),
