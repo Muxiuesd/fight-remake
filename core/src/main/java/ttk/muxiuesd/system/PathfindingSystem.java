@@ -8,6 +8,8 @@ import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.abs.PathFindingEntity;
 import ttk.muxiuesd.world.entity.pathfinding.FlowField;
 import ttk.muxiuesd.world.entity.player.Player;
 
@@ -82,13 +84,22 @@ public class PathfindingSystem extends WorldSystem {
 
     /**
      * 重新构建流场（以玩家为目标）
+     * <p>
+     * 流场按当前所有寻路实体中的最大碰撞箱半径做障碍膨胀，
+     * 保证任意大小的实体沿流场移动时碰撞箱都不会碰墙
      */
     public void rebuildFlowField () {
         Player player = this.es.getPlayer();
         if (player == null) return;
 
         Vector2 center = player.getCenterPos();
-        this.flowField.build(this.cs, center.x, center.y);
+        float maxRadius = 0f;
+        for (Entity<?> entity : this.es.getEntities()) {
+            if (entity instanceof PathFindingEntity<?> pathFindingEntity) {
+                maxRadius = Math.max(maxRadius, pathFindingEntity.getPathfindingRadius());
+            }
+        }
+        this.flowField.build(this.cs, center.x, center.y, maxRadius);
         this.lastTargetPos = center;
     }
 
@@ -109,6 +120,15 @@ public class PathfindingSystem extends WorldSystem {
     public Direction getFlowDirection (float worldX, float worldY) {
         if (!this.flowField.contains(worldX, worldY)) return null;
         return this.flowField.getDirection(worldX, worldY);
+    }
+
+    /**
+     * 获取某坐标的远离方向（指向代价最大的可达邻居，即远离流场目标）
+     * @return 可远离返回方向，否则返回 null（调用方回退原有逻辑）
+     */
+    public Direction getFlowAwayDirection (float worldX, float worldY) {
+        if (!this.flowField.contains(worldX, worldY)) return null;
+        return this.flowField.getAwayDirection(worldX, worldY);
     }
 
     /**
