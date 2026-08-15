@@ -123,6 +123,10 @@ public class KeyBindings {
         Fight.ID("key_hitbox_display"), "key_hitbox_display",
         KeyBinding.Type.Keyboard, Input.Keys.H
     ));
+    public static KeyBinding FlowFieldDisplay = InputBinding.registerBinding(new KeyBinding(
+        Fight.ID("key_flow_field_display"), "key_flow_field_display",
+        KeyBinding.Type.Keyboard, Input.Keys.F
+    ));
     public static KeyBinding PlayerPositionPrint = InputBinding.registerBinding(new KeyBinding(
         Fight.ID("key_player_position_print"), "key_player_position_print",
         KeyBinding.Type.Keyboard, Input.Keys.P

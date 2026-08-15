@@ -50,7 +50,7 @@ public final class Blocks {
         () -> new Block.Property().setFriction(0.1f)
     );
     public static final Block WATER = register("water", BlockWater::new,
-        () -> new Block.Property().setFriction(0.9f),
+        () -> new Block.Property().setFriction(0.9f).setWalkable(false),
         BlockWater.RENDERER
     );
 

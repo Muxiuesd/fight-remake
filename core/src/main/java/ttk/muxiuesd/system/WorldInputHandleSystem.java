@@ -89,6 +89,11 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         if (KeyBindings.HitboxDisplay.wasJustPressed()) {
             cs.wallHitboxRender = !cs.wallHitboxRender;
         }
+        // F键控制流场调试是否绘制
+        if (KeyBindings.FlowFieldDisplay.wasJustPressed()) {
+            PathfindingSystem ps = getManager().getSystem(PathfindingSystem.class);
+            if (ps != null) ps.flowFieldRender = !ps.flowFieldRender;
+        }
 
         if (KeyBindings.PlayerPositionPrint.wasJustPressed()) {
             BlockPosition pbp = this.getPlayerBlockPosition();

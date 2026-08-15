@@ -22,6 +22,8 @@ public class MainWorld extends World {
         addSystem("EventSystem", new EventSystem(this));
         addSystem("PlayerSystem", new PlayerSystem(this));
         addSystem("ChunkSystem", new ChunkSystem(this));
+        //寻路系统需要在实体移动前更新流场（EntitySystem 在实体状态机中查询流场方向）
+        addSystem("PathfindingSystem", new PathfindingSystem(this));
         addSystem("EntitySystem", new EntitySystem(this));
         addSystem("UndergroundEntityRenderSystem", new UndergroundEntityRenderSystem(this));
         addSystem("GroundEntityRenderSystem", new GroundEntityRenderSystem(this));

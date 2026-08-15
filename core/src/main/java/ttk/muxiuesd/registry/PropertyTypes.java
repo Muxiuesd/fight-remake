@@ -39,6 +39,7 @@ public final class PropertyTypes {
     /// 方块属性
     public static final PropertyType<Float> BLOCK_FRICTON = register("block_friction", new DefaultFloatPropertyType());
     public static final PropertyType<BlockSounds> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSounds());
+    public static final PropertyType<Boolean> BLOCK_WALKABLE = register("block_walkable", new DefaultBoolPropertyType());
 
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {

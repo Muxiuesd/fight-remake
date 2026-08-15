@@ -122,12 +122,27 @@ public class Block implements ID<Block>, Disposable {
             this.propertiesDataMap = new JsonPropertiesMap()
                 .add(PropertyTypes.BLOCK_FRICTON, 0f)   //默认无摩擦（摩擦越大移动越慢）
                 .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
+                .add(PropertyTypes.BLOCK_WALKABLE, true)    //默认可以行走（寻路用）
                 .add(PropertyTypes.CATS, new CatsHolder());
         }
 
 
         public float getFriction() {
             return this.get(PropertyTypes.BLOCK_FRICTON);
+        }
+
+        /**
+         * 方块是否可行走（寻路用）
+         * <p>
+         * 属性不存在时（旧存档/未注册）默认可行走
+         * */
+        public boolean isWalkable () {
+            Boolean walkable = this.get(PropertyTypes.BLOCK_WALKABLE);
+            return walkable == null || walkable;
+        }
+
+        public Property setWalkable (boolean walkable) {
+            return this.set(PropertyTypes.BLOCK_WALKABLE, walkable);
         }
 
         public Property setFriction(float friction) {

@@ -17,8 +17,10 @@ import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 敌人实体抽象类
+ * <p>
+ * 继承寻路实体，追击目标时通过 {@link PathFindingEntity#walkToTarget} 走流场寻路
  * */
-public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
+public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
     public static final int MAX_RANDOM_COUNT = 5;
 
     private Entity<?> curTarget;   //敌人当前需要攻击的目标
@@ -57,21 +59,6 @@ public abstract class Enemy<E extends Enemy<E>> extends LivingEntity<E> {
         //先坐标更新，再更新其他的，否则实体移动速度有bug
         // positionChange 已移至 GroundEntityCollisionSystem 统一处理
         super.update(delta);
-    }
-
-    /**
-     * 朝向目标走去
-     * */
-    public void walkToTarget (float delta) {
-        Entity<?> target = this.getCurTarget();
-        //无目标或目标死亡时不做任何移动
-        if (target == null || (target instanceof LivingEntity<?> livingEntity && livingEntity.isDeath())) {
-            this.setVelocity(0, 0);
-            return;
-        }
-        Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
-        setVelocity(direction.getX(), direction.getY());
-        setCurSpeed(getSpeed());
     }
 
     /**

@@ -485,6 +485,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         System.out.println("在区块：" + chunk.getChunkPosition().toString()
             + " 的" + chunkWallPos.toString() + "上放置墙体");
 
+        //通知寻路系统该格不可走了
+        PathfindingSystem pathfindingSystem = this.getWorld().getSystem(PathfindingSystem.class);
+        if (pathfindingSystem != null) pathfindingSystem.onWallChanged(round.x, round.y);
+
         return true;
     }
 
@@ -505,6 +509,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         GridPoint2 cp = Chunk.worldToChunk(round.x, round.y);
         Wall<?> wall = chunk.getWall(cp.x, cp.y);
         chunk.setWall(null, cp.x, cp.y);
+
+        //通知寻路系统该格可行走了
+        PathfindingSystem pathfindingSystem = this.getWorld().getSystem(PathfindingSystem.class);
+        if (pathfindingSystem != null) pathfindingSystem.onWallChanged(round.x, round.y);
+
         return wall;
     }
 
