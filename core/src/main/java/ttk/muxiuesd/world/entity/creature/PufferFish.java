@@ -34,6 +34,14 @@ public class PufferFish extends CreatureEntity<PufferFish> {
     }
 
     /**
+     * 河豚是水生生物，可以游泳（寻路时水方块视为可走）
+     */
+    @Override
+    public boolean canSwim () {
+        return true;
+    }
+
+    /**
      * 河豚的随机游走偏好：往水里面游
      */
     @Override

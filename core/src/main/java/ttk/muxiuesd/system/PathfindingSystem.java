@@ -10,7 +10,9 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.PathFindingEntity;
+import ttk.muxiuesd.world.entity.pathfinding.AStarPathfinder;
 import ttk.muxiuesd.world.entity.pathfinding.FlowField;
+import ttk.muxiuesd.world.entity.pathfinding.PathWay;
 import ttk.muxiuesd.world.entity.player.Player;
 
 /**
@@ -42,6 +44,13 @@ public class PathfindingSystem extends WorldSystem {
     private final ChunkSystem cs;
     private EntitySystem es;        //延迟到 initialize 获取（EntitySystem 注册在 PathfindingSystem 之后）
 
+    /// A* 寻路服务（供实体走独立目标用）
+    private final AStarPathfinder aStarPathfinder = new AStarPathfinder();
+    /// 每帧 A* 计算预算（防止大量实体同时寻路导致卡帧）
+    private static final int A_STAR_BUDGET_PER_FRAME = 4;
+    private int aStarUsedThisFrame = 0;    //本帧已使用的 A* 计算次数
+    private long wallVersion = 0;          //墙体版本号（墙体变更时 +1，供 A* 路径失效判断）
+
     public PathfindingSystem (World world) {
         super(world);
         this.cs = world.getSystem(ChunkSystem.class);
@@ -58,6 +67,9 @@ public class PathfindingSystem extends WorldSystem {
 
     @Override
     public void update (float delta) {
+        //每帧重置 A* 预算
+        this.aStarUsedThisFrame = 0;
+
         if (this.es == null) return;
         Player player = this.es.getPlayer();
         if (player == null) return;
@@ -111,6 +123,15 @@ public class PathfindingSystem extends WorldSystem {
         if (this.flowField.contains(wx, wy)) {
             this.dirty = true;
         }
+        //A* 路径也会受墙体影响：版本号 +1，实体检测到版本变化后自动重算路径
+        this.wallVersion++;
+    }
+
+    /**
+     * 获取墙体版本号（墙体变更时 +1，用于 A* 路径失效判断）
+     */
+    public long getWallVersion () {
+        return this.wallVersion;
     }
 
     /**
@@ -129,6 +150,32 @@ public class PathfindingSystem extends WorldSystem {
     public Direction getFlowAwayDirection (float worldX, float worldY) {
         if (!this.flowField.contains(worldX, worldY)) return null;
         return this.flowField.getAwayDirection(worldX, worldY);
+    }
+
+    /**
+     * 计算一条从起点到目标的 A* 路径（供实体走向独立目标使用）
+     * <p>
+     * 受每帧预算限制：预算耗尽时返回 null，调用方应在后续帧重试
+     * @param startX 起点世界坐标
+     * @param startY 起点世界坐标
+     * @param targetX 目标世界坐标
+     * @param targetY 目标世界坐标
+     * @param entityRadius 实体碰撞箱半径（世界单位），用于障碍膨胀
+     * @param canSwim 实体是否可游泳（可游泳则水方块可走）
+     * @return 路径；不可达/超范围/预算耗尽返回 null
+     */
+    public PathWay findPath (float startX, float startY,
+                             float targetX, float targetY,
+                             float entityRadius, boolean canSwim) {
+        //预算耗尽：本帧不再计算（调用方下帧重试）
+        if (this.aStarUsedThisFrame >= A_STAR_BUDGET_PER_FRAME) return null;
+        this.aStarUsedThisFrame++;
+        return this.aStarPathfinder.findPath(
+            this.cs,
+            startX, startY,
+            targetX, targetY,
+            entityRadius, canSwim
+        );
     }
 
     /**

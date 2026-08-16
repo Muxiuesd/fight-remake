@@ -123,6 +123,7 @@ public class Block implements ID<Block>, Disposable {
                 .add(PropertyTypes.BLOCK_FRICTON, 0f)   //默认无摩擦（摩擦越大移动越慢）
                 .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
                 .add(PropertyTypes.BLOCK_WALKABLE, true)    //默认可以行走（寻路用）
+                .add(PropertyTypes.BLOCK_SWIMMABLE, false)  //默认不可游泳（水生方块如水位 true）
                 .add(PropertyTypes.CATS, new CatsHolder());
         }
 
@@ -143,6 +144,20 @@ public class Block implements ID<Block>, Disposable {
 
         public Property setWalkable (boolean walkable) {
             return this.set(PropertyTypes.BLOCK_WALKABLE, walkable);
+        }
+
+        /**
+         * 方块是否可游泳（寻路用，供水生实体）
+         * <p>
+         * 属性不存在时默认为不可游泳
+         * */
+        public boolean isSwimmable () {
+            Boolean swimmable = this.get(PropertyTypes.BLOCK_SWIMMABLE);
+            return swimmable != null && swimmable;
+        }
+
+        public Property setSwimmable (boolean swimmable) {
+            return this.set(PropertyTypes.BLOCK_SWIMMABLE, swimmable);
         }
 
         public Property setFriction(float friction) {

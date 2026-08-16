@@ -9,6 +9,7 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.pathfinding.PathWay;
 
 /**
  * 有寻路能力的活物实体
@@ -48,6 +49,13 @@ public abstract class PathFindingEntity<T extends PathFindingEntity<T>> extends 
     private float stuckTime;            //累计卡住时间
     private float unstuckTimer;         //脱困进行时间
     private boolean unstucking;         //是否正在脱困
+
+    /// A* 路径跟随（moveToPosition 用）
+    private PathWay currentPathWay;  //当前路径（null = 无）
+    private float pathTargetX, pathTargetY;   //路径的目标坐标（判断路径是否过期）
+    private int pathIndex;                    //当前推进到的路径点索引
+    private long pathWallVersion = -1;        //路径计算时的墙体版本号（墙体变更后路径失效）
+    private float pathRetryTimer;             //寻路失败后的重试冷却计时（避免每帧浪费 A* 预算）
 
     public PathFindingEntity (World world, EntityType<?> entityType) {
         super(world, entityType);
@@ -133,11 +141,17 @@ public abstract class PathFindingEntity<T extends PathFindingEntity<T>> extends 
                 return;
             }
 
-            //沿流场方向偏移 ±45°，每半个脱困周期交替方向，试探绕开障碍
-            Direction baseDir = this.getFlowDirection();
-            if (baseDir == null) {
-                //流场不可用，保持当前速度方向并轻微偏移
+            //脱困方向：优先保持当前运动方向偏移 ±45°（不依赖玩家流场，避免生物被引导向玩家）；
+            //速度矢量为零时才用流场方向
+            Direction baseDir = null;
+            if (Math.abs(this.getVelX()) > 0.01f || Math.abs(this.getVelY()) > 0.01f) {
                 baseDir = new Direction(this.getVelX(), this.getVelY());
+            } else {
+                baseDir = this.getFlowDirection();
+            }
+            if (baseDir == null) {
+                //都没有可用方向（零速度且流场不可用），保持静止由后续帧重新采样
+                return;
             }
             float sign = ((int) (this.unstuckTimer / (UNSTUCK_DURATION / 2f))) % 2 == 0 ? 1f : -1f;
             float rad = sign * UNSTUCK_ANGLE * MathUtils.degreesToRadians;
@@ -180,6 +194,15 @@ public abstract class PathFindingEntity<T extends PathFindingEntity<T>> extends 
     }
 
     /**
+     * 实体是否可游泳（水生实体覆写为 true）
+     * <p>
+     * 可游泳的实体寻路时水方块视为可走（如河豚）；不可游泳的实体水视为障碍
+     */
+    public boolean canSwim () {
+        return false;
+    }
+
+    /**
      * 本能靠近目标（如史莱姆追玩家）
      * <p>
      * 优先走流场寻路，流场不可用时回退直线走向目标
@@ -202,6 +225,114 @@ public abstract class PathFindingEntity<T extends PathFindingEntity<T>> extends 
 
         //回退：流场不可达（被墙围死/未生成）时保持原来的直线走向目标
         Direction direction = new Direction(target.getX() - getX(), target.getY() - getY());
+        setVelocity(direction.getX(), direction.getY());
+        setCurSpeed(getSpeed());
+    }
+
+    /**
+     * 走向指定的世界坐标（A* 寻路，如走向指定方块）
+     * <p>
+     * 每个实体自己的一条路径，路径缓存复用；目标移动或墙体变更后自动重算。
+     * 与 {@link #walkToTarget} 的区别：walkToTarget 走共享流场（适合大量实体追同一目标），
+     * moveToPosition 走独立 A* 路径（适合单个实体去往任意位置）
+     * @param targetX 目标世界坐标
+     * @param targetY 目标世界坐标
+     */
+    public void moveToPosition (float targetX, float targetY) {
+        //到达目标（距离足够近）
+        if (Math.abs(getX() - targetX) < 0.3f && Math.abs(getY() - targetY) < 0.3f) {
+            this.setVelocity(0, 0);
+            this.currentPathWay = null;
+            return;
+        }
+
+        PathfindingSystem ps = this.getPathfindingSystem();
+        if (ps == null) {
+            //无寻路系统，回退直线
+            Direction direction = new Direction(targetX - getX(), targetY - getY());
+            setVelocity(direction.getX(), direction.getY());
+            setCurSpeed(getSpeed());
+            return;
+        }
+
+        //墙体变更后路径失效（可能穿过新墙）
+        if (this.pathWallVersion != ps.getWallVersion()) {
+            this.currentPathWay = null;
+            this.pathWallVersion = ps.getWallVersion();
+        }
+
+        //当前路径是否仍然有效：目标没变且路径还没走完
+        boolean pathValid = this.currentPathWay != null
+            && this.pathIndex < this.currentPathWay.getLength()
+            && Math.abs(this.pathTargetX - targetX) < 1f
+            && Math.abs(this.pathTargetY - targetY) < 1f;
+
+        if (pathValid) {
+            this.followPath();
+            return;
+        }
+
+        //寻路失败冷却：A* 失败（不可达/预算耗尽）后短暂等待再重试，避免每帧浪费预算
+        if (this.pathRetryTimer > 0) {
+            this.pathRetryTimer -= 0.05f;   //固定步长近似帧间隔
+            this.followPath();              //冷却期间继续走旧路径（若有），无路径则回退直线
+            if (this.currentPathWay == null) {
+                Direction direction = new Direction(targetX - getX(), targetY - getY());
+                setVelocity(direction.getX(), direction.getY());
+                setCurSpeed(getSpeed());
+            }
+            return;
+        }
+
+        //路径过期或没有路径：请求新路径
+        PathWay newPathWay = ps.findPath(
+            this.getX(), this.getY(),
+            targetX, targetY,
+            this.getPathfindingRadius(), this.canSwim()
+        );
+        if (newPathWay != null) {
+            this.currentPathWay = newPathWay;
+            this.pathTargetX = targetX;
+            this.pathTargetY = targetY;
+            this.pathIndex = 0;
+            this.pathWallVersion = ps.getWallVersion();
+            this.pathRetryTimer = 0;
+            this.followPath();
+            return;
+        }
+
+        //寻路失败（不可达/超范围/预算耗尽）：启动冷却，回退直线走向目标
+        this.pathRetryTimer = 0.3f;
+        Direction direction = new Direction(targetX - getX(), targetY - getY());
+        setVelocity(direction.getX(), direction.getY());
+        setCurSpeed(getSpeed());
+    }
+
+    /**
+     * 沿当前路径移动（走向下一个路径点）
+     */
+    private void followPath () {
+        if (this.currentPathWay == null || this.pathIndex >= this.currentPathWay.getLength()) {
+            this.setVelocity(0, 0);
+            this.currentPathWay = null;
+            return;
+        }
+
+        float wayX = this.currentPathWay.getWaypointX(this.pathIndex);
+        float wayY = this.currentPathWay.getWaypointY(this.pathIndex);
+        //到达当前路径点则推进到下一个
+        if (Math.abs(getX() - wayX) < 0.2f && Math.abs(getY() - wayY) < 0.2f) {
+            this.pathIndex++;
+            if (this.pathIndex >= this.currentPathWay.getLength()) {
+                this.setVelocity(0, 0);
+                this.currentPathWay = null;
+                return;
+            }
+            wayX = this.currentPathWay.getWaypointX(this.pathIndex);
+            wayY = this.currentPathWay.getWaypointY(this.pathIndex);
+        }
+
+        Direction direction = new Direction(wayX - getX(), wayY - getY());
         setVelocity(direction.getX(), direction.getY());
         setCurSpeed(getSpeed());
     }
