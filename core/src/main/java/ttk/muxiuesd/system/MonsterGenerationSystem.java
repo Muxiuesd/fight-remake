@@ -23,7 +23,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
 
     private float maxGenSpan = 8f;      //生成怪物时间间隔，现实秒
     private TaskTimer genTimer; //生成怪物计时器，到时间自动执行
-
+    private int maxCount = 30;  //玩家周围最大的怪物数量
 
     public MonsterGenerationSystem (World world) {
         super(world, new ConcurrentHashMap<>(), 12, 18);
@@ -33,21 +33,6 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     @Override
     public void initialize () {
         super.initialize();
-        PlayerSystem ps = getPlayerSystem();
-        EntitySystem es = getEntitySystem();
-
-        /*for (int i = 0; i < 5; i++) {
-            EntityTarget fish = Entities.TARGET.create(getWorld());
-            fish.setBounds(ps.getPlayer().x + 5, ps.getPlayer().y - 2 + i, 1, 1);
-            fish.setEntitySystem(es);
-            es.add(fish);
-        }*/
-
-
-        /*Slime slime = Entities.SLIME.create(getWorld());
-        slime.setBounds(ps.getPlayer().x + 10, ps.getPlayer().y + 10, 1, 1);
-        es.add(slime);*/
-
         this.addGenFactory(Fight.ID("slime"), new SlimeGenFactory());
     }
 
@@ -57,6 +42,17 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
         if (!getTimeSystem().isNight()) {
             return;
         }
+        //玩家不存在（如未初始化）不刷怪
+        Player player = getPlayerSystem().getPlayer();
+        if (player == null) return;
+
+        //附近的怪物数量超过最大值不刷怪
+        int entityCount = Util.entityCount(
+            getEntitySystem().getEnemyEntity(),
+            player.getCenterPos(),
+            getMaxGenRange()
+        );
+        if (entityCount >= maxCount) return;
 
         //更新计时器
         if (this.genTimer != null) {
@@ -72,14 +68,18 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void run () {
         EntitySystem es = getEntitySystem();
         Player player = getPlayerSystem().getPlayer();
+        if (player == null) return;
         Vector2 playerCenter = player.getCenterPos();
 
         //对每一个生成工厂执行一次生成，具体生成取决于工厂接口的实现
         for (EnemyGenFactory<?> factory : getGenFactories().values()) {
             float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());
-            float randomAngle = Util.randomAngle();
-            float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
-            float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
+            double randomRadian = Util.randomRadian();
+            float genX = (float) (playerCenter.x + randomRange * Math.cos(randomRadian));
+            float genY = (float) (playerCenter.y + randomRange * Math.sin(randomRadian));
+            //生成点不合法（区块未加载/墙内/不可走方块）则跳过本次生成
+            if (!factory.isValidGenPos(getWorld(), genX, genY)) continue;
+
             Enemy<?>[] enemies = factory.create(getWorld(), genX, genY);
             //啥也没有生成就直接跳过
             if (enemies == null) continue;
@@ -100,13 +100,12 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void setMaxGenSpan (float maxGenSpan) {
         this.maxGenSpan = maxGenSpan;
     }
+
+    public int getMaxCount () {
+        return this.maxCount;
+    }
+
+    public void setMaxCount (int maxCount) {
+        if (maxCount >= 0) this.maxCount = maxCount;
+    }
 }
-
-
-
-
-
-
-
-
-

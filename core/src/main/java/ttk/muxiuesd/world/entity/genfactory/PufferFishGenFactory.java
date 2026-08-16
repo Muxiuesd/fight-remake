@@ -6,7 +6,6 @@ import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
 
 /**
@@ -14,13 +13,20 @@ import ttk.muxiuesd.world.entity.creature.PufferFish;
  * */
 public class PufferFishGenFactory implements CreatureGenFactory<PufferFish> {
     public static final int ONCE_MAX_GAN = 3;
+
+    /**
+     * 河豚只能生成在水里（必须站在水方块上；水中无墙，无需膨胀）
+     */
+    @Override
+    public boolean isValidGenPos (World world, float genX, float genY) {
+        ChunkSystem cs = world.getSystem(ChunkSystem.class);
+        //区块已加载 + 方块是水（河豚可游泳）
+        return cs.getChunk(genX, genY) != null
+            && cs.getBlock(genX, genY) == Blocks.WATER;
+    }
+
     @Override
     public PufferFish[] create (World world, float genX, float genY) {
-        ChunkSystem cs = world.getSystem(ChunkSystem.class);
-        Block block = cs.getBlock(genX, genY);
-        //生成的位置不是水就直接跳过
-        if (block != Blocks.WATER) return null;
-
         PufferFish[] fish = new PufferFish[MathUtils.random(1, ONCE_MAX_GAN)];
         for (int i = 0; i < fish.length; i++) {
             PufferFish pufferFish = Entities.PUFFER_FISH.create(world);

@@ -39,11 +39,14 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
     public void update (float delta) {
         //非白天不刷生物
         if (!getTimeSystem().isDay()) return;
+        //玩家不存在（如未初始化）不刷生物
+        Player player = getPlayerSystem().getPlayer();
+        if (player == null) return;
 
         //附近的生物数量超过最大值不刷生物
         int entityCount = Util.entityCount(
             getEntitySystem().getEntityArray(EntityTypes.CREATURE),
-            getPlayerSystem().getPlayer().getCenterPos(),
+            player.getCenterPos(),
             getMaxGenRange()
         );
         if (entityCount >= maxCount) return;
@@ -57,20 +60,23 @@ public class UndergroundCreatureGenSystem extends EntityGenSystem<CreatureGenFac
     @Override
     public void run () {
         Player player = getPlayerSystem().getPlayer();
+        if (player == null) return;
         Vector2 playerCenter = player.getCenterPos();
 
         for (CreatureGenFactory<?> factory: getGenFactories().values()) {
             float randomRange = MathUtils.random(getMinGenRange(), getMaxGenRange());
-            float randomAngle = Util.randomAngle();
-            float genX = (float) (playerCenter.x + randomRange * Math.cos(randomAngle));
-            float genY = (float) (playerCenter.y + randomRange * Math.sin(randomAngle));
+            double randomRadian = Util.randomRadian();
+            float genX = (float) (playerCenter.x + randomRange * Math.cos(randomRadian));
+            float genY = (float) (playerCenter.y + randomRange * Math.sin(randomRadian));
+            //生成点不合法（区块未加载/环境不符）则跳过本次生成
+            if (!factory.isValidGenPos(getWorld(), genX, genY)) continue;
+
             LivingEntity<?>[] entities = factory.create(getWorld(), genX, genY);
             //啥也没有生成就直接跳过
             if (entities == null) continue;
             //防止没添加进实体系统，统一执行一遍。一般来说工厂里只管生成，不管添加最好
             for (LivingEntity<?> e : entities) {
                 if (e == null) continue;
-                //e.setEntitySystem(getEntitySystem());
                 getEntitySystem().add(e);
             }
         }
