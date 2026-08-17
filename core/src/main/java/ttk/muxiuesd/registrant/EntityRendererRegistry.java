@@ -18,10 +18,12 @@ public class EntityRendererRegistry extends Registries.DefaultRegistry<EntityRen
     }
 
     /**
-     * 获取渲染器
-     * */
+     * 获取渲染器（安全版）
+     * <p>
+     * 渲染器未注册时返回 null 而不是抛异常（供渲染循环判空跳过，避免崩溃）
+     */
     public static <T extends Entity<?>> EntityRenderer<T> getRenderer (String id) {
-        EntityRenderer<? extends Entity<?>> renderer = getInstance().get(id);
+        EntityRenderer<? extends Entity<?>> renderer = getInstance().getOrNull(id);
         if (renderer == null) {
             Log.error(EntityRendererRegistry.class.getName(), "实体：" + id + " 的渲染器不存在！！！");
         }

@@ -36,6 +36,8 @@ public abstract class EntityRenderSystem extends WorldSystem {
             if (Util.getDistance(entity, player) > Fight.ENTITY_RENDER_RANGE.getValue()) continue;
             //获取实体的渲染器进行渲染
             EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(entity.getID());
+            //渲染器未注册（返回null）时不绘制该实体，避免崩溃
+            if (renderer == null) continue;
             //直接使用实体的参数渲染
             EntityRenderer.Context context = renderer.getContext(entity);
             renderer.draw(batch, entity, context);
@@ -51,6 +53,8 @@ public abstract class EntityRenderSystem extends WorldSystem {
             if (Util.getDistance(entity, player) > Fight.ENTITY_RENDER_RANGE.getValue()) continue;
             //获取实体的渲染器进行渲染
             EntityRenderer<Entity<?>> renderer = EntityRendererRegistry.getRenderer(entity.getID());
+            //渲染器未注册（返回null）时不绘制该实体，避免崩溃
+            if (renderer == null) continue;
             EntityRenderer.Context context = renderer.getContext(entity);
             //直接使用实体的参数渲染
             renderer.drawShape(batch, entity, context);

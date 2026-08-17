@@ -72,10 +72,14 @@ public class RenderProcessorManager {
 
     /**
      * 交换，每一帧渲染前调用
-     * */
+     * <p>
+     * 与 register/unregister 共用同一把锁，防止并发修改 orderList 时 CME
+     */
     public static void swap () {
-        sortedList.clear();
-        sortedList.addAll(orderList);
+        synchronized (orderList) {
+            sortedList.clear();
+            sortedList.addAll(orderList);
+        }
     }
 
     /**
@@ -110,23 +114,41 @@ public class RenderProcessorManager {
 
     /**
      * 交叉渲染
-     * */
+     * <p>
+     * 每个处理器独立 begin/end（保持处理器之间的 GL 状态隔离），
+     * 单个处理器渲染失败时记录日志并继续后续处理器，
+     * 且无论成败都保证 begin/end 配对，防止渲染管线永久损坏
+     */
     public static void handleRender (Batch batch, ShapeRenderer shapeRenderer) {
         // 按照排序后的顺序执行渲染
         for (Map.Entry<String, Integer> entry : sortedList) {
             String key = entry.getKey();
             RenderProcessor processor = processors.get(key);
-            if (processor != null) {
-                batch.begin();
-                shapeRenderer.begin();
+            if (processor == null) continue;
 
+            batch.begin();
+            shapeRenderer.begin();
+            try {
                 processor.beginShader(batch);
                 processor.handleBatchRender(batch);
                 processor.handleShapeRender(shapeRenderer);
-                processor.endShader();
-
-                batch.end();
-                shapeRenderer.end();
+            } catch (Exception e) {
+                Log.error(TAG, "渲染处理器：" + key + " 渲染时出错！", e);
+            } finally {
+                //着色器无论成败都结束，防止 activeShaders 残留导致后续渲染异常
+                try {
+                    processor.endShader();
+                } catch (Exception ignored) {
+                }
+                //批次无论成败都结束，防止渲染管线永久损坏（begin 后必须 end）
+                try {
+                    batch.end();
+                } catch (Exception ignored) {
+                }
+                try {
+                    shapeRenderer.end();
+                } catch (Exception ignored) {
+                }
             }
         }
     }
@@ -136,10 +158,15 @@ public class RenderProcessorManager {
      */
     public static void addRenderTask (IRenderTask task) {
         // 识别系统所在的渲染处理器
+        boolean recognized = false;
         for (RenderProcessor processor : processors.values()) {
             if (processor.recognize(task)) {
+                recognized = true;
                 break;
             }
+        }
+        if (!recognized) {
+            Log.error(TAG, "渲染任务：" + task + " 没有被任何渲染处理器识别，该任务将不会被渲染！");
         }
     }
 

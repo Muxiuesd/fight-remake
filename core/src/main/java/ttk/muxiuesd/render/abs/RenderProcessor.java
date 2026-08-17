@@ -73,10 +73,11 @@ public abstract class RenderProcessor implements Comparable<RenderProcessor>, IR
 
     /**
      * 开始着色器
-     * */
+     * @return 使用的着色器；没有设置着色器（shaderId 为 null）时返回 null 且不启用着色器
+     */
     public ShaderProgram beginShader (Batch batch) {
         if (this.getShaderId() == null) {
-            throw new IllegalStateException("Shader ID 不存在！！！");
+            return null;
         }
         return ShaderScheduler.getInstance().begin(this.getShaderId(), batch);
     }

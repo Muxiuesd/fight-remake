@@ -17,8 +17,9 @@ public class WorldChunkRenderProcessor extends WorldRenderProcessor {
     public ShaderProgram beginShader (Batch batch) {
         //这里开始日夜着色
         ShaderProgram shaderProgram = super.beginShader(batch);
-        shaderProgram.setUniformMatrix("u_projTrans", getCamera().combined);
-
+        if (shaderProgram != null) {
+            shaderProgram.setUniformMatrix("u_projTrans", getCamera().combined);
+        }
         return shaderProgram;
     }
 
