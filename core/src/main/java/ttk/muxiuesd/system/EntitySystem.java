@@ -51,6 +51,8 @@ import java.util.concurrent.*;
  * */
 public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender, Tickable {
     public static final float MIN_SPEED = 0.0000001f;
+    /// 摩擦缩放因子的平滑半衰期（秒）：跨方块变速时，缩放因子向目标逼近一半所需的时间
+    public static final float FRICTION_SMOOTH_HALF_LIFE = 0.05f;
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -200,11 +202,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         //先把所有实体更新一次
         for (Entity entity : this.updatableEntity) {
-
-            if (!(entity instanceof ItemEntity)) {
-                //对于非物品实体进行当前速度更新
-                this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
-            }
             //细化实体更新
             //对于活物实体
             if (entity instanceof LivingEntity livingEntity) {
@@ -216,6 +213,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
 
             entity.update(delta);
+
+            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦（击退中的实体不受摩擦影响）
+            if (!(entity instanceof ItemEntity) && !entity.isKnockback()) {
+                this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
+            }
         }
 
 
@@ -307,16 +309,19 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
 
-        //计算脚下方块摩擦对速度的影响
-        Vector2 center = entity.getCenterPos();
-        Block block = cs.getBlock(center.x, center.y);
+        //计算脚下方块摩擦对速度的影响（取样点与游泳判定一致，都用实体底部）
+        Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
         if (block == null) return;
 
         //摩擦系数越大，移动越慢：目标速度 = 基准速度 × (1 - 摩擦系数)
-        //（不能用 lerp 平滑逼近：玩家的速度矢量每帧被输入系统重置，lerp 起点每帧都是全速，
-        //  导致永远无法收敛到目标速度，摩擦几乎失效）
+        //平滑过渡：缩放因子每帧向目标逼近（半衰期 FRICTION_SMOOTH_HALF_LIFE），跨方块变速不再跳变。
+        //不能直接平滑"速度"：玩家/状态机每帧都会重置速度矢量，平滑起点每帧都是全速，永远无法收敛，
+        //因此只平滑缩放因子本身（该因子不被任何系统重置）
         float friction = block.getProperty().getFriction();
-        float curSpeed = entity.getSpeed() * Math.max(0f, 1f - friction);
+        float targetScale = Math.max(0f, 1f - friction);
+        float smooth = 1f - (float) Math.pow(0.5f, delta / FRICTION_SMOOTH_HALF_LIFE);
+        entity.setFrictionScale(entity.getFrictionScale() + (targetScale - entity.getFrictionScale()) * smooth);
+        float curSpeed = entity.getSpeed() * entity.getFrictionScale();
         //速度过小直接为0
         if (curSpeed < MIN_SPEED) {
             entity.setCurSpeed(0);

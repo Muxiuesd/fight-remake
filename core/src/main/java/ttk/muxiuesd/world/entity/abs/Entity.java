@@ -70,6 +70,7 @@ public abstract class Entity<T extends Entity<T>>
     private float speed;
     private float x, y;                     //实体的世界坐标
     private float velX, velY;               //实体的速度
+    private float frictionScale = 1f;       //当前摩擦缩放因子（由摩擦系统平滑过渡，跨方块变速不跳变）
     private float width, height;            //实体的宽高（世界渲染）
     private float originX = 0f, originY = 0f;
     private float scaleX = 1f, scaleY = 1f;
@@ -284,6 +285,31 @@ public abstract class Entity<T extends Entity<T>>
      * */
     public float getCurSpeed () {
         return Vec2.len(this.getVelX(), this.getVelY());
+    }
+
+    /**
+     * 获取当前摩擦缩放因子（摩擦层平滑过渡用，速度 = 基准速度 × 该因子）
+     * */
+    public float getFrictionScale () {
+        return this.frictionScale;
+    }
+
+    /**
+     * 设置当前摩擦缩放因子（由摩擦系统每帧平滑更新）
+     * */
+    public T setFrictionScale (float frictionScale) {
+        this.frictionScale = frictionScale;
+        return (T) this;
+    }
+
+    /**
+     * 实体是否处于击退中
+     * <p>
+     * 击退中时方块摩擦不作用于该实体，速度由击退逻辑每帧覆盖。
+     * 默认未击退，由具体击退逻辑（如近战击退）覆写
+     * */
+    public boolean isKnockback () {
+        return false;
     }
 
     /**

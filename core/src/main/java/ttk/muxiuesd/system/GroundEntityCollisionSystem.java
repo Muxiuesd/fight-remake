@@ -32,8 +32,18 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     // 连续碰撞检测的最大步长（越小越精确但性能消耗略高）
     private static final float MAX_STEP = 0.5f;
 
+    /// 实体间软碰撞参数
+    //两个轴的重叠量都小于该值时不施加推开力（允许轻微贴脸重叠，如近战贴身）
+    private static final float MIN_PUSH_OVERLAP = 0.1f;
+    //推开力系数：重叠每多 1 格，推开速度增加该值（格/秒）
+    private static final float PUSH_STIFFNESS = 8f;
+    //推开速度上限（格/秒），防止推开力超过移动意图导致实体永远无法靠近
+    private static final float MAX_PUSH_SPEED = 3f;
+
     private final EntitySystem es;
     private final ChunkSystem cs;
+    /// 实体间推挤的参与者复用数组（避免每帧分配）
+    private final Array<Entity<?>> pushParticipants = new Array<>();
 
     public GroundEntityCollisionSystem(World world) {
         super(world);
@@ -43,6 +53,10 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
     @Override
     public void update (float delta) {
+        // 实体间软碰撞：重叠时向最小分离轴方向叠加推开速度（在位移之前生效，
+        // 推开速度参与本帧位移；下一帧意图层会重置速度矢量，推开力每帧重新计算）
+        this.applyPushForces();
+
         // 敌方实体与墙体的碰撞
         Array<Enemy<?>> enemies = es.getEnemyEntity();
         for (Enemy<?> enemy : enemies) {
@@ -65,6 +79,66 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         Player player = es.getPlayer();
         if (player != null) {
             this.checkEntityWithWallCollisions(player, delta);
+        }
+    }
+
+    /**
+     * 实体间软碰撞：hitbox 允许重叠，但重叠时会产生一股推开"力"（叠加到速度矢量）
+     * <p>
+     * 参与推挤的实体：敌人、生物、玩家（物品小而多，不参与，避免抖动）。
+     * 推开速度沿最小分离轴方向施加，大小与重叠量成正比（弹性推开），上限为
+     * {@link #MAX_PUSH_SPEED}。推开速度只在施加的当帧位移中生效，下一帧被
+     * 意图层重置，因此表现为"每帧重新施加的弹性力"而非速度累积
+     */
+    private void applyPushForces () {
+        Array<Entity<?>> participants = this.pushParticipants;
+        participants.clear();
+        for (Enemy<?> enemy : es.getEnemyEntity()) {
+            participants.add(enemy);
+        }
+        for (LivingEntity<?> creature : es.getEntityArray(EntityTypes.CREATURE)) {
+            participants.add(creature);
+        }
+        Player player = es.getPlayer();
+        if (player != null) {
+            participants.add(player);
+        }
+
+        for (int i = 0; i < participants.size; i++) {
+            Entity<?> a = participants.get(i);
+            for (int j = i + 1; j < participants.size; j++) {
+                Entity<?> b = participants.get(j);
+                //快速距离检查（实体碰撞箱默认以中心 ±宽高一半，用实体宽高近似）
+                float dx = a.getX() - b.getX();
+                float dy = a.getY() - b.getY();
+                float halfSumX = (a.getWidth() + b.getWidth()) / 2f;
+                float halfSumY = (a.getHeight() + b.getHeight()) / 2f;
+                if (Math.abs(dx) >= halfSumX || Math.abs(dy) >= halfSumY) {
+                    continue;
+                }
+
+                //最小分离轴：重叠量小的轴（重叠方向与移动方向垂直时可沿墙分离）
+                float overlapX = halfSumX - Math.abs(dx);
+                float overlapY = halfSumY - Math.abs(dy);
+                //轻微贴脸重叠不推（两轴重叠量都很小时允许贴身）
+                if (overlapX < MIN_PUSH_OVERLAP && overlapY < MIN_PUSH_OVERLAP) {
+                    continue;
+                }
+
+                if (overlapX < overlapY) {
+                    //沿 X 轴推开，力与重叠量成正比且封顶
+                    float push = Math.min(overlapX * PUSH_STIFFNESS, MAX_PUSH_SPEED);
+                    float sign = dx > 0 ? 1f : -1f;
+                    a.setVelX(a.getVelX() + sign * push);
+                    b.setVelX(b.getVelX() - sign * push);
+                } else {
+                    //沿 Y 轴推开
+                    float push = Math.min(overlapY * PUSH_STIFFNESS, MAX_PUSH_SPEED);
+                    float sign = dy > 0 ? 1f : -1f;
+                    a.setVelY(a.getVelY() + sign * push);
+                    b.setVelY(b.getVelY() - sign * push);
+                }
+            }
         }
     }
 

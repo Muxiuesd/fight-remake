@@ -45,6 +45,9 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
 
+    /// 玩家启动加速半衰期（秒）：从静止起步向目标速度逼近一半所需的时间
+    private static final float ACCEL_HALF_LIFE = 0.08f;
+
     public static boolean debugMode = true; //是否启用debug模式
 
     //玩家相关的GUIScreen
@@ -182,7 +185,13 @@ public class PlayerSystem extends WorldSystem {
                 float playerSpeed = curPlayer.getSpeed();
                 float velX = (inputX / length) * playerSpeed;
                 float velY = (inputY / length) * playerSpeed;
-                curPlayer.setVelocity(velX, velY);
+                //启动加速：从当前速度向目标速度平滑逼近（半衰期 ACCEL_HALF_LIFE），
+                //换向时自然先减速再转向；松键仍立即停（保持即时响应）
+                float k = 1f - (float) Math.pow(0.5f, delta / ACCEL_HALF_LIFE);
+                curPlayer.setVelocity(
+                    curPlayer.getVelX() + (velX - curPlayer.getVelX()) * k,
+                    curPlayer.getVelY() + (velY - curPlayer.getVelY()) * k
+                );
             }
             if (inputX == 0 && inputY == 0) {
                 curPlayer.setVelocity(0, 0);

@@ -32,10 +32,15 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     private float cycle;
     public boolean isReturning;
 
+    /// 抛射/回收速度（世界单位/秒）
+    private static final float THROW_SPEED = 6f;
+
 
     public EntityFishingHook(World world, EntityType<?> entityType) {
         super(world, entityType);
-        setSpeed(0);
+        //抛射速度：throwMovement/returningMovement 用 setCurSpeed/getSpeed 按此缩放方向矢量
+        //（之前为 0 导致鱼钩抛射速度被 setCurSpeed(getSpeed()) 归零，鱼钩原地不动）
+        setSpeed(THROW_SPEED);
         setSize(0.7f, 0.7f);
         setBodyTextureRegionResource(
             Fight.ID("fishing_hook"),
