@@ -17,6 +17,9 @@ import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.wall.Wall;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 地面的实体的碰撞系统
  * <p>
@@ -36,14 +39,16 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     //两个轴的重叠量都小于该值时不施加推开力（允许轻微贴脸重叠，如近战贴身）
     private static final float MIN_PUSH_OVERLAP = 0.1f;
     //推开力系数：重叠每多 1 格，推开速度增加该值（格/秒）
-    private static final float PUSH_STIFFNESS = 8f;
+    private static final float PUSH_STIFFNESS = 4f;
     //推开速度上限（格/秒），防止推开力超过移动意图导致实体永远无法靠近
-    private static final float MAX_PUSH_SPEED = 3f;
+    private static final float MAX_PUSH_SPEED = 2f;
 
     private final EntitySystem es;
     private final ChunkSystem cs;
     /// 实体间推挤的参与者复用数组（避免每帧分配）
     private final Array<Entity<?>> pushParticipants = new Array<>();
+    /// 本帧每个实体收到的推开速度分量（位移后清零，保证分离后无排斥残留）
+    private final HashMap<Entity<?>, Vector2> pushVelocities = new HashMap<>();
 
     public GroundEntityCollisionSystem(World world) {
         super(world);
@@ -54,7 +59,7 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     @Override
     public void update (float delta) {
         // 实体间软碰撞：重叠时向最小分离轴方向叠加推开速度（在位移之前生效，
-        // 推开速度参与本帧位移；下一帧意图层会重置速度矢量，推开力每帧重新计算）
+        // 推开速度参与本帧位移；位移完成后立即清零，分离后不再有任何排斥作用）
         this.applyPushForces();
 
         // 敌方实体与墙体的碰撞
@@ -80,6 +85,10 @@ public class GroundEntityCollisionSystem extends WorldSystem {
         if (player != null) {
             this.checkEntityWithWallCollisions(player, delta);
         }
+
+        // 推开速度用完即清零：不影响下一帧的移动意图（尤其玩家的启动加速 lerp，
+        // 否则推开分量会以 lerp 比例残留滑行，分离后仍有"排斥"感）
+        this.clearPushForces();
     }
 
     /**
@@ -87,12 +96,13 @@ public class GroundEntityCollisionSystem extends WorldSystem {
      * <p>
      * 参与推挤的实体：敌人、生物、玩家（物品小而多，不参与，避免抖动）。
      * 推开速度沿最小分离轴方向施加，大小与重叠量成正比（弹性推开），上限为
-     * {@link #MAX_PUSH_SPEED}。推开速度只在施加的当帧位移中生效，下一帧被
-     * 意图层重置，因此表现为"每帧重新施加的弹性力"而非速度累积
+     * {@link #MAX_PUSH_SPEED}。推开速度只在施加的当帧位移中生效，位移后由
+     * {@link #clearPushForces()} 清零，表现为"每帧重新施加的弹性力"而非速度累积
      */
     private void applyPushForces () {
         Array<Entity<?>> participants = this.pushParticipants;
         participants.clear();
+        pushVelocities.clear();
         for (Enemy<?> enemy : es.getEnemyEntity()) {
             participants.add(enemy);
         }
@@ -131,15 +141,61 @@ public class GroundEntityCollisionSystem extends WorldSystem {
                     float sign = dx > 0 ? 1f : -1f;
                     a.setVelX(a.getVelX() + sign * push);
                     b.setVelX(b.getVelX() - sign * push);
+                    //记录推开分量，位移后清零
+                    this.accumulatePushVelocity(a, sign * push, 0);
+                    this.accumulatePushVelocity(b, -sign * push, 0);
                 } else {
                     //沿 Y 轴推开
                     float push = Math.min(overlapY * PUSH_STIFFNESS, MAX_PUSH_SPEED);
                     float sign = dy > 0 ? 1f : -1f;
                     a.setVelY(a.getVelY() + sign * push);
                     b.setVelY(b.getVelY() - sign * push);
+                    //记录推开分量，位移后清零
+                    this.accumulatePushVelocity(a, 0, sign * push);
+                    this.accumulatePushVelocity(b, 0, -sign * push);
                 }
             }
         }
+    }
+
+    /**
+     * 累加记录某个实体的推开速度分量（一个实体可能同时被多个实体推）
+     */
+    private void accumulatePushVelocity (Entity<?> entity, float pushX, float pushY) {
+        Vector2 pushVel = this.pushVelocities.get(entity);
+        if (pushVel == null) {
+            pushVel = new Vector2();
+            this.pushVelocities.put(entity, pushVel);
+        }
+        pushVel.x += pushX;
+        pushVel.y += pushY;
+    }
+
+    /**
+     * 位移完成后清零推开速度分量：实体不再重叠的下一帧起不再有任何排斥作用
+     */
+    private void clearPushForces () {
+        for (Map.Entry<Entity<?>, Vector2> entry : this.pushVelocities.entrySet()) {
+            Entity<?> entity = entry.getKey();
+            Vector2 pushVel = entry.getValue();
+            entity.setVelX(entity.getVelX() - pushVel.x);
+            entity.setVelY(entity.getVelY() - pushVel.y);
+        }
+        this.pushVelocities.clear();
+    }
+
+    /**
+     * 推开分量被墙碰撞清零后标记为已消耗
+     * <p>
+     * 推开速度叠加进 velocity 后，若该轴撞墙被 {@code setVelX/setVelY(0)} 清零，
+     * clearPushForces 再减去推开分量会产生反向速度（贴墙被推时反向滑）。
+     * 撞墙时把该轴推开分量置 0，清除阶段便不再减它
+     */
+    private void markPushConsumed (Entity<?> entity, boolean xAxis) {
+        Vector2 pushVel = this.pushVelocities.get(entity);
+        if (pushVel == null) return;
+        if (xAxis) pushVel.x = 0f;
+        else pushVel.y = 0f;
     }
 
     /**
@@ -186,22 +242,28 @@ public class GroundEntityCollisionSystem extends WorldSystem {
 
         // 分步移动并检测碰撞
         for (int i = 0; i < steps; i++) {
-            // X轴分步移动
+            // X/Y 轴一起分步移动，再统一做最小侵入轴修正
             if (Math.abs(stepX) > EPS) {
                 rect.x += stepX;
-                if (this.fixCollisions(rect, 1, 0, stepX)) {
-                    stepX = 0;
-                    entity.setVelX(0);
-                }
             }
-            // Y轴分步移动
             if (Math.abs(stepY) > EPS) {
                 rect.y += stepY;
-                if (this.fixCollisions(rect, 0, 1, stepY)) {
-                    stepY = 0;
-                    entity.setVelY(0);
-                }
             }
+
+            // 返回被分离的轴（位标记：1=X，2=Y）
+            int separatedAxis = this.fixCollisions(rect);
+            if ((separatedAxis & 1) != 0) {
+                stepX = 0;
+                entity.setVelX(0);
+                //推开分量也被墙清零了，标记已消耗（否则 clearPushForces 会减出反向速度）
+                this.markPushConsumed(entity, true);
+            }
+            if ((separatedAxis & 2) != 0) {
+                stepY = 0;
+                entity.setVelY(0);
+                this.markPushConsumed(entity, false);
+            }
+
             // 如果X和Y轴都发生碰撞，提前退出循环
             if (Math.abs(stepX) < EPS && Math.abs(stepY) < EPS) {
                 break;
@@ -216,69 +278,58 @@ public class GroundEntityCollisionSystem extends WorldSystem {
     }
 
     /**
-     * 修正碰撞并返回是否发生了碰撞
+     * 修正碰撞并返回被分离的轴（位标记：1=X，2=Y，0=无）
+     * <p>
+     * 对每个重叠墙取最小侵入轴分离（分离方向由侵入来源决定，把碰撞箱推出墙）：
+     * 贴墙（侧向轻微侵入）时沿侧向分离，沿墙方向的移动不受影响；
+     * 之前按"移动轴"计算重叠量，会把贴墙时"相邻包含"误判为移动轴侵入，
+     * 导致玩家贴墙沿墙移动时每帧被垂直拉走（"贴墙滑行"）
      */
-    private boolean fixCollisions (Rectangle hitbox, int axisX, int axisY, float move) {
+    private int fixCollisions (Rectangle hitbox) {
         Array<Wall<?>> collidingWalls = this.getCollidingWalls(hitbox);
         if (collidingWalls.isEmpty()) {
-            return false;
+            return 0;
         }
 
         int fixes = 0;
-        boolean collided = false;
+        int separatedAxis = 0;
 
         while (!collidingWalls.isEmpty() && fixes < MAX_FIXES) {
-            float totalSeparation = 0;
             for (Wall<?> wall : collidingWalls) {
                 Rectangle wallBox = wall.getHitboxRectangle();
-                if (hitbox.overlaps(wallBox)) {
-                    float overlap = this.calculateOverlap(hitbox, wallBox, axisX, axisY, move);
-                    totalSeparation += overlap;
-                    collided = true;
+                if (!hitbox.overlaps(wallBox)) continue;
+
+                //两轴侵入量（碰撞箱进入墙的量）
+                float overlapX = Math.min(
+                    hitbox.x + hitbox.width - wallBox.x,
+                    wallBox.x + wallBox.width - hitbox.x
+                );
+                float overlapY = Math.min(
+                    hitbox.y + hitbox.height - wallBox.y,
+                    wallBox.y + wallBox.height - hitbox.y
+                );
+                if (overlapX <= EPS && overlapY <= EPS) continue;
+
+                if (overlapX < overlapY) {
+                    //沿 X 轴分离：侵入来自右边缘（rect 在墙左侧）则向左推，反之向右推
+                    boolean enterFromLeft = (hitbox.x + hitbox.width - wallBox.x)
+                        <= (wallBox.x + wallBox.width - hitbox.x);
+                    hitbox.x += enterFromLeft ? -overlapX - EPS : overlapX + EPS;
+                    separatedAxis |= 1;
+                } else {
+                    //沿 Y 轴分离：侵入来自顶边缘（rect 在墙下方）则向下推，反之向上推
+                    boolean enterFromBottom = (hitbox.y + hitbox.height - wallBox.y)
+                        <= (wallBox.y + wallBox.height - hitbox.y);
+                    hitbox.y += enterFromBottom ? -overlapY - EPS : overlapY + EPS;
+                    separatedAxis |= 2;
                 }
-            }
-
-            if (Math.abs(totalSeparation) > EPS) {
-                float avgSeparation = totalSeparation / collidingWalls.size;
-                float separation = (move > 0) ? -avgSeparation : avgSeparation;
-                separation += (separation > 0) ? EPS : -EPS;
-
-                hitbox.x += axisX * separation;
-                hitbox.y += axisY * separation;
             }
 
             collidingWalls = this.getCollidingWalls(hitbox);
             fixes++;
         }
 
-        return collided;
-    }
-
-    /**
-     * 计算精确的重叠量
-     */
-    private float calculateOverlap (Rectangle rect, Rectangle wall, int axisX, int axisY, float move) {
-        if (axisX == 1) {
-            float rectRight = rect.x + rect.width;
-            float wallLeft = wall.x;
-            float wallRight = wall.x + wall.width;
-
-            if (move > 0) {
-                return Math.max(0, rectRight - wallLeft);
-            } else {
-                return Math.max(0, wallRight - rect.x);
-            }
-        } else {
-            float rectTop = rect.y + rect.height;
-            float wallBottom = wall.y;
-            float wallTop = wall.y + wall.height;
-
-            if (move > 0) {
-                return Math.max(0, rectTop - wallBottom);
-            } else {
-                return Math.max(0, wallTop - rect.y);
-            }
-        }
+        return separatedAxis;
     }
 
     /**

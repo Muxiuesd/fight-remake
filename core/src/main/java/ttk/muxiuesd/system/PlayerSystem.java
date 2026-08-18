@@ -186,12 +186,23 @@ public class PlayerSystem extends WorldSystem {
                 float velX = (inputX / length) * playerSpeed;
                 float velY = (inputY / length) * playerSpeed;
                 //启动加速：从当前速度向目标速度平滑逼近（半衰期 ACCEL_HALF_LIFE），
-                //换向时自然先减速再转向；松键仍立即停（保持即时响应）
+                //换向时自然先减速再转向；松键立即停（保持即时响应）
                 float k = 1f - (float) Math.pow(0.5f, delta / ACCEL_HALF_LIFE);
-                curPlayer.setVelocity(
-                    curPlayer.getVelX() + (velX - curPlayer.getVelX()) * k,
-                    curPlayer.getVelY() + (velY - curPlayer.getVelY()) * k
-                );
+                //只对仍按着的轴做加速，松开的方向立即归零（否则 lerp 指数衰减会残留速度，
+                //导致只松开一个方向键时玩家仍沿该方向滑行）
+                float curVelX = curPlayer.getVelX();
+                float curVelY = curPlayer.getVelY();
+                if (inputX != 0) {
+                    curVelX = curVelX + (velX - curVelX) * k;
+                } else {
+                    curVelX = 0;
+                }
+                if (inputY != 0) {
+                    curVelY = curVelY + (velY - curVelY) * k;
+                } else {
+                    curVelY = 0;
+                }
+                curPlayer.setVelocity(curVelX, curVelY);
             }
             if (inputX == 0 && inputY == 0) {
                 curPlayer.setVelocity(0, 0);
