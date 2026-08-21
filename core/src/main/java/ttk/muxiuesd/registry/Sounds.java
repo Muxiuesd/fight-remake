@@ -1,6 +1,7 @@
 package ttk.muxiuesd.registry;
 
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
@@ -15,9 +16,8 @@ import ttk.muxiuesd.world.block.BlockSounds;
  * */
 public final class Sounds {
     public static void init () {
+        Log.print(Sounds.class.getName(), "游戏音频注册完毕");
     }
-
-    //public static final AudioLoader LOADER = AudioLoader.getInstance();
 
     ///实体
     public static final AudioHolder ENTITY_HURT_1 = registerSound("hurt_1",  "entity/damage/hit_1.ogg");
@@ -26,6 +26,7 @@ public final class Sounds {
     public static final AudioHolder ENTITY_EAT_1  = registerSound("eat_1",  "entity/eat/eat1.ogg");
     public static final AudioHolder ENTITY_EAT_2  = registerSound("eat_2",  "entity/eat/eat2.ogg");
     public static final AudioHolder ENTITY_EAT_3  = registerSound("eat_3",  "entity/eat/eat3.ogg");
+    public static final AudioHolder ENTITY_DRINK  = registerSound("drink",  "entity/drink/drink.ogg");
 
     public static final AudioHolder ENTITY_SLIME_SMALL = registerSound("slime_small",  "entity/slime/small.ogg");
 

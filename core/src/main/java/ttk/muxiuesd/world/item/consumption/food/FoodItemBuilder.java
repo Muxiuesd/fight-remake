@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.food;
+package ttk.muxiuesd.world.item.consumption.food;
 
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.world.item.abs.Item;

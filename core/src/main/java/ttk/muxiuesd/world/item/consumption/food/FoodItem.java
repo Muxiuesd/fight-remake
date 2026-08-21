@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.item.food;
+package ttk.muxiuesd.world.item.consumption.food;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.audio.AudioHolder;

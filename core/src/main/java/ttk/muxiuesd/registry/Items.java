@@ -16,12 +16,14 @@ import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.ItemFishPole;
 import ttk.muxiuesd.world.item.common.ItemStick;
 import ttk.muxiuesd.world.item.consumption.*;
+import ttk.muxiuesd.world.item.consumption.food.FoodItem;
+import ttk.muxiuesd.world.item.consumption.food.FoodItemBuilder;
+import ttk.muxiuesd.world.item.consumption.potion.PotionItem;
+import ttk.muxiuesd.world.item.consumption.potion.PotionItemBuilder;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
 import ttk.muxiuesd.world.item.equipment.EquipmentDiamondLeggings;
-import ttk.muxiuesd.world.item.food.FoodItem;
-import ttk.muxiuesd.world.item.food.FoodItemBuilder;
 import ttk.muxiuesd.world.item.weapon.ItemTorch;
 import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
 import ttk.muxiuesd.world.item.weapon.sword.Sword;
@@ -47,7 +49,7 @@ public final class Items {
     public static final Item GOLD_INGOT = register("gold_ingot");
     public static final Item COAL = register("coal");
     public static final Item BAIT = register("bait", ItemBait::new);
-
+    public static final Item POTION_BOTTLE = register("potion_bottle", Fight.ItemTexturePath("potion/potion_bottle_empty.png"));
     //杂物类
     public static final Item RUBBISH = register("rubbish");
 
@@ -127,13 +129,15 @@ public final class Items {
             .build(),
         Item.Property::new
     );
-    public static final Item PUFFER_FISH = register("puffer_fish", Fight.EntityTexturePath("fish/puffer_fish.png"),
+    public static final Item PUFFER_FISH = register("puffer_fish",
+        Fight.EntityTexturePath("fish/puffer_fish.png"),
         FoodItemBuilder.create()
             .setEatEffects(FoodItem.EatEffect.of(StatusEffects.POISON, 5f, 1))
             .build(),
         Item.Property::new
     );
-    public static final Item POTATO_BAKED = register("potato_baked", Fight.ItemTexturePath("foods/potato_baked.png"),
+    public static final Item POTATO_BAKED = register("potato_baked",
+        Fight.ItemTexturePath("foods/potato_baked.png"),
         FoodItemBuilder.create()
             .setEatEffects(FoodItem.EatEffect.of(StatusEffects.HEALING, 10f, 2))
             .build(),
@@ -144,13 +148,41 @@ public final class Items {
     /// 墙体物品
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
-
+    /// 药水物品
+    public static final Item POTION_HEAL_LEVEL_1 = register("potion_heal_level_1",
+        Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
+        PotionItemBuilder.create()
+            .setDrinkEffects(PotionItem.DrinkEffect.of(StatusEffects.HEALING, 10f, 1))
+            .build(),
+        Item.Property::new
+    );
+    public static final Item POTION_HEAL_LEVEL_2 = register("potion_heal_level_2",
+        Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
+        PotionItemBuilder.create()
+            .setDrinkEffects(PotionItem.DrinkEffect.of(StatusEffects.HEALING, 30f, 2))
+            .build(),
+        Item.Property::new
+    );
+    public static final Item POTION_HEAL_LEVEL_3 = register("potion_heal_level_3",
+        Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
+        PotionItemBuilder.create()
+            .setDrinkEffects(PotionItem.DrinkEffect.of(StatusEffects.HEALING, 60f, 3))
+            .build(),
+        Item.Property::new
+    );
 
     /**
      * 最简单、最普通物品的注册
      * */
     public static Item register (String name) {
         return register(name, Item::new, Item.Property::new);
+    }
+
+    /**
+     * 最简单的物品注册，显式指定贴图文件路径
+     * */
+    public static Item register (String name, String texturePath) {
+        return register(name, texturePath, Item::new, Item.Property::new);
     }
 
     /**

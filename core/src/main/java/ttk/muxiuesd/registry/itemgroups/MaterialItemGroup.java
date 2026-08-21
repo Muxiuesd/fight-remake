@@ -16,9 +16,13 @@ public class MaterialItemGroup {
         group
             .add(Items.STICK)
             .add(Items.SLIME_BALL)
+
             .add(Items.COAL)
             .add(Items.IRON_INGOT)
             .add(Items.GOLD_INGOT)
+
+            .add(Items.POTION_BOTTLE)
+
             .add(Items.SPAWN_EGG_SLIME)
             .add(Items.SPAWN_EGG_PUFFER_FISH)
             ;
