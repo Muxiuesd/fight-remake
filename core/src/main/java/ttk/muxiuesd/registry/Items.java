@@ -58,20 +58,36 @@ public final class Items {
 
     /// 武器类的物品
     public static final Item WOOD_SWORD = registerSword("wood_sword",
-        SwordBuilder.create().setAttackRange(2.5f).setDamage(1f).setUseSpan(1f).setDuration(50)
-            .setKnockback(2f)
+        SwordBuilder.create()
+            .setAttackRange(2.5f)
+            .setDamage(1f)
+            .setUseSpan(1f)
+            .setDuration(50)
+            .setKnockback(0f)
     );
     public static final Item STONE_SWORD = registerSword("stone_sword",
-        SwordBuilder.create().setAttackRange(2.5f).setDamage(1.5f).setUseSpan(1f).setDuration(100)
-            .setKnockback(2.5f)
+        SwordBuilder.create()
+            .setAttackRange(2.5f)
+            .setDamage(1.5f)
+            .setUseSpan(1f)
+            .setDuration(100)
+            .setKnockback(1.0f)
     );
     public static final Item IRON_SWORD = registerSword("iron_sword",
-        SwordBuilder.create().setAttackRange(3f).setDamage(3.5f).setUseSpan(0.5f).setDuration(345)
-            .setKnockback(3f)
+        SwordBuilder.create()
+            .setAttackRange(3f)
+            .setDamage(3.5f)
+            .setUseSpan(0.5f)
+            .setDuration(345)
+            .setKnockback(1.5f)
     );
     public static final Item GOLD_SWORD = registerSword("gold_sword",
-        SwordBuilder.create().setAttackRange(3f).setDamage(4.5f).setUseSpan(0.5f).setDuration(555)
-            .setKnockback(4f)
+        SwordBuilder.create()
+            .setAttackRange(3f)
+            .setDamage(4.5f)
+            .setUseSpan(0.5f)
+            .setDuration(555)
+            .setKnockback(2f)
     );
     //远程类武器
     public static final Item TEST_WEAPON = register("diamond_sword", WeaponDiamondSword::new);
