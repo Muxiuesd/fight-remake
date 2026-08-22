@@ -83,6 +83,7 @@ public final class Items {
     /// 刷怪蛋物品
     //怪物刷怪蛋
     public static final Item SPAWN_EGG_SLIME = registerSpawnEgg("spawn_egg_slime", Entities.SLIME);
+    public static final Item SPAWN_EGG_ZOMBIE = registerSpawnEgg("spawn_egg_zombie", Entities.ZOMBIE);
     //生物刷怪蛋
     public static final Item SPAWN_EGG_PUFFER_FISH = registerSpawnEgg("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
 

@@ -15,6 +15,7 @@ import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
 import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
+import ttk.muxiuesd.world.entity.enemy.Zombie;
 import ttk.muxiuesd.world.entity.player.Player;
 
 /**
@@ -56,6 +57,15 @@ public final class Entities {
         EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
             .setDefaultType(EntityTypes.ENEMY)
             .setRenderer(() -> new EnemyRenderer<>(Fight.ID("fish"), "fish/fish.png"))
+            .setCodec(LivingEntity.CODEC)
+            .build()
+    );
+
+    public static final EntityProvider<Zombie> ZOMBIE = register(
+        "zombie",
+        EntityProvider.Builder.<Zombie>create(Zombie::new)
+            .setDefaultType(EntityTypes.ENEMY)
+            .setRenderer(() -> new EnemyRenderer<>(Fight.ID("zombie"), "enemy/zombie.png"))
             .setCodec(LivingEntity.CODEC)
             .build()
     );

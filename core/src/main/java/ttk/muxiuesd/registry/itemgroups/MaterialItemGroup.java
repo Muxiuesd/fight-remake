@@ -14,6 +14,7 @@ public class MaterialItemGroup {
         .build()
         .selfAction(group -> {
         group
+            //普通材料
             .add(Items.STICK)
             .add(Items.SLIME_BALL)
 
@@ -23,7 +24,9 @@ public class MaterialItemGroup {
 
             .add(Items.POTION_BOTTLE)
 
+            //刷怪蛋（姑且放这里）
             .add(Items.SPAWN_EGG_SLIME)
+            .add(Items.SPAWN_EGG_ZOMBIE)
             .add(Items.SPAWN_EGG_PUFFER_FISH)
             ;
     });

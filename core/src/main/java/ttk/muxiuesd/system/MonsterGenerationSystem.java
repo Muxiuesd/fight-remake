@@ -11,6 +11,7 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.genfactory.SlimeGenFactory;
+import ttk.muxiuesd.world.entity.genfactory.ZombieGenFactory;
 import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,7 @@ public class MonsterGenerationSystem extends EntityGenSystem<EnemyGenFactory<?>>
     public void initialize () {
         super.initialize();
         this.addGenFactory(Fight.ID("slime"), new SlimeGenFactory());
+        this.addGenFactory(Fight.ID("zombie"), new ZombieGenFactory());
     }
 
     @Override

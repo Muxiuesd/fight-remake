@@ -6,10 +6,15 @@ import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 伤害类型
+ * 注册类：伤害类型
+ * <p>
+ * 用来控制实体之间的伤害计算以及对应的逻辑
+ * @param <S> 伤害来源类（任意伤害来源）
+ * @param <T> 受到伤害的目标（只有活物实体才能受伤害）
  * */
 public abstract class DamageType <S, T extends LivingEntity<?>> {
-    Identifier identifier;
+    private final Identifier identifier;
+
     public DamageType (Identifier identifier) {
         this.identifier = identifier;
     }
@@ -33,4 +38,7 @@ public abstract class DamageType <S, T extends LivingEntity<?>> {
         return reduction;
     }
 
+    public Identifier getIdentifier () {
+        return this.identifier;
+    }
 }
