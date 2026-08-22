@@ -23,10 +23,10 @@ import ttk.muxiuesd.world.entity.player.Player;
 public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
     public static final int MAX_RANDOM_COUNT = 5;
 
-    private Entity<?> curTarget;   //敌人当前需要攻击的目标
+    private Entity<?> curTarget;    //敌人当前需要攻击的目标
     private TaskTimer attackTimer;  //攻击计时器
-    private float visionRange;  //视野范围
-    private float attackRange;  //攻击范围，再此范围内的会被锁定并攻击
+    private float visionRange;      //视野范围
+    private float attackRange;      //攻击范围，再此范围内的会被锁定并攻击
 
     public Enemy (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10, 10, 5, 2, 3);
@@ -47,15 +47,6 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
 
     @Override
     public void update (float delta) {
-        /*//先更新目标
-        this.updateTarget(delta, getEntitySystem());
-        //更新位置
-        this.updatePosition(delta);
-        //当前目标不是null就执行攻击方法
-        if (this.getCurTarget() != null) {
-            this.attack(delta, getEntitySystem());
-        }*/
-
         //先坐标更新，再更新其他的，否则实体移动速度有bug
         // positionChange 已移至 GroundEntityCollisionSystem 统一处理
         super.update(delta);
@@ -112,7 +103,7 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
             return;
         }
         //在攻击范围之内且攻击间隔到了就要攻击
-        Bullet bullet = this.createBullet(
+        Bullet<?> bullet = this.createBullet(
             this,
             new Direction(target.getX() - getX(), target.getY() - getY())
         );
@@ -124,7 +115,7 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
      * 自定义发射的子弹
      * @param direction 子弹的运动方向
      * */
-    public Bullet createBullet (Entity<?> owner, Direction direction) {
+    public Bullet<?> createBullet (Entity<?> owner, Direction direction) {
         BulletFire bullet = (BulletFire) Gets.BULLET(Fight.ID("bullet_fire"), owner.getEntitySystem());
         bullet.setOwner(owner);
         bullet.setSize(0.5f, 0.5f);

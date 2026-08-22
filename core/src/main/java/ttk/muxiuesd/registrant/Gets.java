@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
- * 游戏注册元素获得类
+ * 游戏注册元素获得类（快捷工具）
  * */
 public class Gets {
 
@@ -42,8 +42,8 @@ public class Gets {
         return (Enemy<?>) ENTITY(id, entitySystem);
     }
 
-    public static Bullet BULLET (String id, EntitySystem entitySystem) {
-        return (Bullet) ENTITY(id, entitySystem);
+    public static Bullet<?> BULLET (String id, EntitySystem entitySystem) {
+        return (Bullet<?>) ENTITY(id, entitySystem);
     }
 }
 
