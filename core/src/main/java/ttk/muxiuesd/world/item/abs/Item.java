@@ -251,6 +251,18 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
         }
 
         /**
+         * 获取武器的击退冲击力（0 = 不击退）
+         * */
+        public float getKnockback () {
+            return this.get(PropertyTypes.WEAPON_KNOCKBACK, 0f);
+        }
+
+        public Property setKnockback (float knockback) {
+            this.add(PropertyTypes.WEAPON_KNOCKBACK, knockback);
+            return this;
+        }
+
+        /**
          * 检查是否有这个属性
          * */
         public boolean contain (PropertyType<?> type) {

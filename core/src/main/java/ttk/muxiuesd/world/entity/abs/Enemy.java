@@ -38,6 +38,7 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
     private float visionRange;      //视野范围
     private float attackRange;      //攻击范围，再此范围内的会被锁定并攻击
     private float meleeDamage = 3f; //近战攻击的伤害值（远程攻击不适用）
+    private float meleeKnockback = 0f;  //近战攻击的击退力度（0 = 不击退）
 
     public Enemy (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10, 10, 5, 2, 3);
@@ -239,6 +240,18 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
      * */
     public Enemy<?> setMeleeDamage (float meleeDamage) {
         this.meleeDamage = meleeDamage;
+        return this;
+    }
+
+    /**
+     * 获取近战攻击的击退力度
+     * */
+    public float getMeleeKnockback () {
+        return meleeKnockback;
+    }
+
+    public Enemy<?> setMeleeKnockback (float meleeKnockback) {
+        this.meleeKnockback = meleeKnockback;
         return this;
     }
 

@@ -162,6 +162,9 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerShortcutKey_8.wasJustPressed()) curPlayer.setHandIndex(7);
             if (KeyBindings.PlayerShortcutKey_9.wasJustPressed()) curPlayer.setHandIndex(8);
 
+            //击退中不受输入控制（速度由击退物理接管，输入会覆盖击退速度）
+            if (curPlayer.isKnockback()) return;
+
             //移动方向（放在守卫内：打开GUI时不能移动）
             int inputX = 0;
             int inputY = 0;

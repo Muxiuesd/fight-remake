@@ -12,9 +12,11 @@ import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.serialization.codecs.builders.LivingEntityCodecBuilder;
+import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatInt;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -38,6 +40,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public static final Vector2 DEFAULT_SIZE = new Vector2(1f, 1f);
     public static final float ATTACK_SPAN = 0.03f;   //受攻击状态维持时间
     public static final float SWING_HAND_TIME = 0.2f; //挥手一次所用的时间
+    public static final float KNOCKBACK_DURATION = 0.4f;  //击退持续时间
+    public static final float KNOCKBACK_AIR_DRAG_PER_SECOND = 0.6f;  //空中击退每秒速度衰减到的比例
 
     /**
      * 活物实体的现代化编解码器
@@ -64,6 +68,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     private int handIndex;                  //手部物品索引
     private TaskTimer swingHandTimer;       //挥手计时器
     private float maxSwingHandDegree;       //最大挥手角度
+    private TaskTimer knockbackTimer;       //击退持续时间计时器
+    private boolean knockbackActive;        //是否处于击退中（与计时器状态解耦，isReady 的归零副作用不影响击退判定）
+    private float knockbackVelX, knockbackVelY; //击退速度向量（每帧衰减并强制写回，防止被其他系统覆盖）
 
     public LivingEntity (World world, EntityType<?> entityType) {
         this(world, entityType, 10, 10);
@@ -106,6 +113,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         this.backpack = new Backpack(backpackSize);
         this.equipmentBackpack = new Backpack(4);
         this.maxSwingHandDegree = 60f;
+        this.knockbackTimer = Pools.TASK_TIMER.obtain().setMaxSpan(KNOCKBACK_DURATION).setCurSpan(0);
+        this.knockbackActive = false;
     }
 
     @Override
@@ -142,13 +151,82 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         this.effectPreTickTimer.update(delta);
         this.effectPreTickTimer.isReady();
 
-        //处理当前状态
-        if (this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
+        //击退物理（放在状态机之前：击退结束时本帧立即恢复状态机）
+        this.updateKnockback(delta);
+
+        //处理当前状态（击退中暂停状态机，避免 AI 意图覆盖击退速度）
+        if (!this.isKnockback() && this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
 
         if (this.swingHandTimer != null) {
             this.swingHandTimer.update(delta);
             this.swingHandTimer.isReady();
         }
+    }
+
+    /**
+     * 击退物理
+     * <p>
+     * 每帧把击退速度向量按脚下方块摩擦（地面）或空气阻力（空中）衰减后强制写回速度，
+     * 任何其他系统写入的速度都会被击退覆盖（保证击退效果，如脱困/逃跑等后置逻辑）。
+     * 击退期间自身意图（状态机/玩家输入）暂停，击退结束后恢复
+     */
+    private void updateKnockback (float delta) {
+        if (!this.knockbackActive) return;
+        this.knockbackTimer.update(delta);
+        if (this.knockbackTimer.isReady()) {
+            //击退结束（isReady 到时间自动归零，供下次击退重新计时）
+            this.knockbackActive = false;
+            this.knockbackVelX = 0;
+            this.knockbackVelY = 0;
+            return;
+        }
+
+        //击退中：计算衰减（地面按脚下方块摩擦，速度每秒衰减到 1-摩擦系数；空中按空气阻力）
+        float decay;
+        if (this.getEntitySystem() == null) {
+            decay = (float) Math.pow(KNOCKBACK_AIR_DRAG_PER_SECOND, delta);
+        } else {
+            ChunkSystem cs = this.getEntitySystem().getWorld().getSystem(ChunkSystem.class);
+            Block block = cs.getBlock(this.getX(), this.getY() - this.getHeight() / 2f);
+            float friction = (block == null) ? 0f : block.getProperty().getFriction();
+            if (friction > 0f) {
+                //地面：受脚下方块摩擦力作用
+                decay = (float) Math.pow(Math.max(0f, 1f - friction), delta);
+            } else {
+                //空中：空气阻力
+                decay = (float) Math.pow(KNOCKBACK_AIR_DRAG_PER_SECOND, delta);
+            }
+        }
+        this.knockbackVelX *= decay;
+        this.knockbackVelY *= decay;
+        this.setVelocity(this.knockbackVelX, this.knockbackVelY);
+    }
+
+    /**
+     * 受到击退：方向从攻击者指向被攻击者，力度由冲击力决定
+     * <p>
+     * 一次性设置击退速度，衰减交给击退物理（地面摩擦/空中空气阻力）；
+     * 击退期间自身意图（状态机/玩家输入）暂停，击退结束后恢复
+     */
+    public T knockback (Entity<?> source, float force) {
+        if (force <= 0f || this.isDeath()) return (T) this;
+        Direction direction = new Direction(this.getX() - source.getX(), this.getY() - source.getY());
+        this.knockbackVelX = direction.getX() * force;
+        this.knockbackVelY = direction.getY() * force;
+        this.setVelocity(this.knockbackVelX, this.knockbackVelY);
+        this.knockbackTimer.setCurSpan(0f);
+        this.knockbackActive = true;
+        return (T) this;
+    }
+
+    /**
+     * 实体是否处于击退中
+     * <p>
+     * 击退中暂停自身意图（状态机/玩家输入），速度由击退物理与摩擦系统控制
+     */
+    @Override
+    public boolean isKnockback () {
+        return this.knockbackActive;
     }
 
     /**
@@ -240,6 +318,11 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         //TODO 各种判定
         damageType.apply(source, this);
         this.setAttacked(true);
+        //击退：冲击力越大的伤害源击退越远（0 = 不击退）
+        float knockback = damageType.computeKnockback(source);
+        if (knockback > 0f && !this.isDeath() && source instanceof Entity<?> sourceEntity) {
+            this.knockback(sourceEntity, knockback);
+        }
     }
 
     public boolean isDeath () {
@@ -533,6 +616,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         Pools.TASK_TIMER.free(this.attackedTimer);
         Pools.TASK_TIMER.free(this.effectPreTickTimer);
         Pools.TASK_TIMER.free(this.effectPreSecondTimer);
+        Pools.TASK_TIMER.free(this.knockbackTimer);
         if (this.swingHandTimer != null) {
             Pools.TASK_TIMER.free(this.swingHandTimer);
             this.swingHandTimer = null;

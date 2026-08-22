@@ -284,8 +284,9 @@ public abstract class Entity<T extends Entity<T>>
     /**
      * 实体是否处于击退中
      * <p>
-     * 击退中时方块摩擦不作用于该实体，速度由击退逻辑每帧覆盖。
-     * 默认未击退，由具体击退逻辑（如近战击退）覆写
+     * 击退中的实体暂停自身意图（状态机/玩家输入），
+     * 速度由击退物理与摩擦系统控制（地面受摩擦、空中受空气阻力）。
+     * 默认未击退，由活物实体（{@link LivingEntity}）覆写
      * */
     public boolean isKnockback () {
         return false;

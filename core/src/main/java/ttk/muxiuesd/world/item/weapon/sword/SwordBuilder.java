@@ -15,6 +15,7 @@ public class SwordBuilder {
     float damage        = 1.145f;   //攻击伤害
     float useSpan       = 1.145f;   //使用间隔
     int duration        = 1145;     //耐久值
+    float knockback     = 2f;   //击退冲击力
 
     private SwordBuilder() {}
 
@@ -33,6 +34,7 @@ public class SwordBuilder {
                 .add(PropertyTypes.WEAPON_DAMAGE, this.damage)
                 .add(PropertyTypes.WEAPON_USE_SAPN, this.useSpan)
                 .add(PropertyTypes.ITEM_DURATION, this.duration)
+                .add(PropertyTypes.WEAPON_KNOCKBACK, this.knockback)
         );
     }
 
@@ -64,6 +66,14 @@ public class SwordBuilder {
 
     public SwordBuilder setDuration (int duration) {
         if (duration >= 1) this.duration = duration;
+        return this;
+    }
+
+    /**
+     * 设置击退冲击力（0 = 不击退）
+     * */
+    public SwordBuilder setKnockback (float knockback) {
+        if (knockback >= 0f) this.knockback = knockback;
         return this;
     }
 }

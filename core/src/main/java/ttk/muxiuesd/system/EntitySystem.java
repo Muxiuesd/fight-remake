@@ -214,7 +214,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
             entity.update(delta);
 
-            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦（击退中的实体不受摩擦影响）
+            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦（击退中的实体衰减由击退物理负责）
             if (!(entity instanceof ItemEntity) && !entity.isKnockback()) {
                 this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
             }
@@ -339,10 +339,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         float curSpeed = entity.getSpeed();
         //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）
-        if (!entity.isBeingAttracted() && entity.isOnGround()) {
-            //计算脚下方块摩擦对速度的影响，摩擦系数越大减速越明显
-            Vector2 center = entity.getCenterPos();
-            Block block = cs.getBlock(center.x, center.y);
+        if (!entity.isBeingAttracted()) {
+            //采样点与实体摩擦一致（实体底部，不依赖 onGround 标志——该标志由 onAirTimer 维护，语义不可靠）
+            Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
             if (block == null) return;
             curSpeed *= Math.max(0f, 1f - block.getProperty().getFriction());
         }

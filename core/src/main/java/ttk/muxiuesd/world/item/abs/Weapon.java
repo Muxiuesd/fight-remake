@@ -17,6 +17,7 @@ public abstract class Weapon extends Item {
         return new Property()
             .add(PropertyTypes.ITEM_MAX_COUNT, 1)
             .add(PropertyTypes.WEAPON_DAMAGE, 1f)
+            .add(PropertyTypes.WEAPON_KNOCKBACK, 2f)
             .add(PropertyTypes.ITEM_DURATION, 100)
             .add(PropertyTypes.WEAPON_USE_SAPN, 1f);
     }

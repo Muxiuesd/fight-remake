@@ -27,4 +27,12 @@ public class DamageTypeMelee extends DamageType<Enemy<?>, LivingEntity<?>> {
 
         Log.print(this.getClass().getName(), "对：" + target + "造成伤害：" + finalDamage);
     }
+
+    /**
+     * 击退力度来自攻击者的近战击退字段
+     * */
+    @Override
+    public float computeKnockback (Enemy<?> source) {
+        return source.getMeleeKnockback();
+    }
 }

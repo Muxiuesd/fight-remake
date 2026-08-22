@@ -32,6 +32,7 @@ public final class PropertyTypes {
     public static final PropertyType<Float> WEAPON_USE_SAPN = register("weapon_use_span", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_DAMAGE = register("weapon_damage", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_ATTACK_RANGE = register("weapon_attack_range", new DefaultFloatPropertyType());
+    public static final PropertyType<Float> WEAPON_KNOCKBACK = register("weapon_knockback", new DefaultFloatPropertyType());
 
     /// 装备物品的属性
     public static final PropertyType<Float> DAMAGE_REDUCTION = register("damage_reduction", new DefaultFloatPropertyType());

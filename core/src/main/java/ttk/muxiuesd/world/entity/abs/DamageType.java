@@ -25,6 +25,15 @@ public abstract class DamageType <S, T extends LivingEntity<?>> {
     public abstract void apply (S source, T target);
 
     /**
+     * 计算该伤害造成的击退力度（0 = 不击退）
+     * <p>
+     * 默认不击退，需要击退的伤害类型覆写此方法
+     * */
+    public float computeKnockback (S source) {
+        return 0f;
+    }
+
+    /**
      * 计算被攻击者的减伤程度
      * */
     public float computeDamageReduction (S source, T target) {

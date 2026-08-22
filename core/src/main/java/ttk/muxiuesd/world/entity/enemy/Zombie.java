@@ -20,6 +20,7 @@ public class Zombie extends Enemy<Zombie> {
     public Zombie (World world, EntityType<?> entityType) {
         super(world, entityType, 20, 20, 9f, 1f, 1.5f, 1.8f);
         setMeleeDamage(5f);
+        setMeleeKnockback(2f);
 
         addState(Enemy.STATE_REST, new EnemyRestState<>());
         addState(Enemy.STATE_RANDOM_WALK, new EnemyRandomWalkState<>());

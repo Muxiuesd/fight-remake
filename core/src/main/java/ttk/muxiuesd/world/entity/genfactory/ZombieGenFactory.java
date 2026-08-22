@@ -12,8 +12,11 @@ import ttk.muxiuesd.world.entity.pathfinding.WalkAbility;
  * 僵尸生成
  * */
 public class ZombieGenFactory implements EnemyGenFactory<Zombie> {
-    /// 僵尸的碰撞箱半径
-    private static final float ZOMBIE_RADIUS = Zombie.DEFAULT_SIZE.len();
+    /// 僵尸的碰撞箱半径（宽高最大值的一半）
+    private static final float ZOMBIE_RADIUS = Math.max(
+        Zombie.DEFAULT_SIZE.getX(),
+        Zombie.DEFAULT_SIZE.getY()
+    ) / 2f;
 
     /**
      * 僵尸生成在陆地，且按实际 1×1 碰撞箱膨胀检查（周围格无墙，避免生成后碰撞箱嵌墙）
@@ -40,7 +43,8 @@ public class ZombieGenFactory implements EnemyGenFactory<Zombie> {
             if (!WalkAbility.canStand(cs, x, y, ZOMBIE_RADIUS, false)) continue;
 
             Zombie zombie = Entities.ZOMBIE.create(world);
-            zombie.setBounds(x, y, 1f, 1f);
+            //尺寸已在构造中按 DEFAULT_SIZE 设置，这里只设置位置（setBounds 会覆盖尺寸导致与碰撞箱不一致）
+            zombie.setPosition(x, y);
             zombie.fastAddBodyHitBox();
             zombies[created++] = zombie;
         }
