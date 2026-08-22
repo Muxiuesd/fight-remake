@@ -42,10 +42,6 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         //（之前为 0 导致鱼钩抛射速度被 setCurSpeed(getSpeed()) 归零，鱼钩原地不动）
         setSpeed(THROW_SPEED);
         setSize(0.7f, 0.7f);
-        setBodyTextureRegionResource(
-            Fight.ID("fishing_hook"),
-            "fish/fishing_hook.png"
-        );
         fastAddBodyHitBox();
 
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器

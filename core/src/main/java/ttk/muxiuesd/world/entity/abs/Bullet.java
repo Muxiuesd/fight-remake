@@ -5,8 +5,10 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -35,6 +37,7 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     public float damage;
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
+    private String textureId;   // 贴图id（数据，贴图资源实例由渲染器持有并按需加载）
 
     public Bullet (World world, EntityType<?> entityType) {
         super(world, entityType);
@@ -69,7 +72,11 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         setSpeed(speed);
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        setBodyTextureRegionResource(textureId, texturePath);
+        this.textureId = textureId;
+        if (textureId != null && texturePath != null) {
+            //只注册 id→路径 映射（数据），贴图资源实例由渲染器按需加载缓存
+            Util.registerTextureIdPath(textureId, Fight.EntityTexturePath(texturePath));
+        }
         //默认大小
         setSize(0.5f, 0.5f);
         fastAddBodyHitBox();
@@ -122,6 +129,13 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
 
     public float getDamage () {
         return damage;
+    }
+
+    /**
+     * 获取子弹的贴图id（贴图资源实例由渲染器持有）
+     * */
+    public String getTextureId () {
+        return this.textureId;
     }
 
     public Bullet setDamage (float damage) {

@@ -1,14 +1,11 @@
 package ttk.muxiuesd.world.entity.player;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector4;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Pools;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
@@ -36,7 +33,6 @@ public class Player extends LivingEntity<Player> {
     );
 
 
-    private Resource<TextureRegion> shieldTextureRegionResource;
     public TaskTimer defendCDTimer; //防御状态冷却计时器
     public TaskTimer defendDurationTimer; //防御状态持续计时器
     public boolean isDefend = false;
@@ -51,8 +47,6 @@ public class Player extends LivingEntity<Player> {
         renderHandItem = true;
         setSpeed(3.3f);
         setCurSpeed(getSpeed());
-        setBodyTextureRegionResource(Fight.ID("player"), "player/player.png");
-        this.setShieldTextureRegionResource(Fight.ID("player_shield"), "player/shield.png");
 
         this.defendCDTimer = Pools.TASK_TIMER.obtain()
             .setMaxSpan(2f)
@@ -176,21 +170,6 @@ public class Player extends LivingEntity<Player> {
     public Player setUsingItem (boolean usingItem) {
         this.isUsingItem = usingItem;
         return this;
-    }
-
-    /**
-     * 快捷设置玩家护盾的贴图资源
-     * */
-    public void setShieldTextureRegionResource (String id, String path) {
-        this.setShieldTextureRegionResource(Resource.ofTextureRegion(id, Fight.EntityTexturePath(path)));
-    }
-
-    public void setShieldTextureRegionResource (Resource<TextureRegion> resource) {
-        this.shieldTextureRegionResource = resource;
-    }
-
-    public TextureRegion getShieldTextureRegion () {
-        return this.shieldTextureRegionResource.get();
     }
 
     @Override

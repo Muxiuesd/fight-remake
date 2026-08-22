@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.entity.abs;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
@@ -20,11 +19,9 @@ import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
-import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
@@ -38,7 +35,7 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
 /**
  * 游戏的基础实体
  * <p>
- * 拥有游戏内的坐标、运动参数以及渲染参数
+ * 拥有游戏内的坐标、运动参数；贴图资源由对应的实体渲染器持有
  */
 public abstract class Entity<T extends Entity<T>>
     implements ID<T>, ICatData, Disposable, Updateable, Tickable {
@@ -50,17 +47,6 @@ public abstract class Entity<T extends Entity<T>>
      */
     public static final Codec<Entity<?>> CODEC = EntityCodecBuilder.<Entity<?>>create()
         .factory(EntityCodecBuilder::createEntity);
-
-    /**
-     * 加载纹理区域
-     * @param textureId 纹理材质id
-     * @param entityTexturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
-     * */
-    public static TextureRegion getTextureRegion (String textureId, String entityTexturePath) {
-        if (entityTexturePath == null) return Util.loadTextureRegion(textureId, entityTexturePath);
-        return Util.loadTextureRegion(textureId, Fight.EntityTexturePath(entityTexturePath));
-    }
-
 
     /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
@@ -77,9 +63,6 @@ public abstract class Entity<T extends Entity<T>>
     private float rotation;                 //实体的旋转角度（世界渲染）
 
     private boolean onGround = true;        //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
-
-    public TextureRegion textureRegion;
-    private Resource<TextureRegion> bodyTextureRegionResource;
 
     private EntitySystem es;                        //此实体所属的实体系统
     private EntityType<?> type;                     //实体的类型
@@ -172,10 +155,6 @@ public abstract class Entity<T extends Entity<T>>
 
     @Override
     public void dispose() {
-        if (this.textureRegion != null) {
-            this.textureRegion = null;
-        }
-        this.bodyTextureRegionResource = null;
     }
 
     /**
@@ -513,27 +492,6 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
-
-    /**
-     * 快捷设置实体身体贴图材质资源
-     * @param path 以实体材质文件夹为基准的路径
-     * */
-    public void setBodyTextureRegionResource (String id, String path) {
-        this.setBodyTextureRegionResource(Resource.ofTextureRegion(id, Fight.EntityTexturePath(path)));
-    }
-    /**
-     * 设置实体身体贴图材质资源
-     * */
-    public void setBodyTextureRegionResource (Resource<TextureRegion> resource) {
-        this.bodyTextureRegionResource = resource;
-    }
-
-    /**
-     * 获取身体的贴图材质
-     * */
-    public TextureRegion getBodyTextureRegion () {
-        return this.bodyTextureRegionResource != null ? this.bodyTextureRegionResource.get() : null;
-    }
 
     /**
      * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦

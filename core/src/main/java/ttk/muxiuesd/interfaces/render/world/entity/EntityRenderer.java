@@ -1,16 +1,30 @@
 package ttk.muxiuesd.interfaces.render.world.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.pool.FightPool;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 实体的渲染器接口
+ * <p>
+ * 实体的贴图资源由渲染器持有，实体本身不持有贴图
  * */
 public interface EntityRenderer<T extends Entity<?>> {
+    /**
+     * 获取实体的贴图
+     * <p>
+     * 默认返回null，没有贴图的渲染器（如自定义渲染器）可以不实现
+     * */
+    default TextureRegion getTextureRegion () {
+        return null;
+    }
+
     /**
      * 图像的绘制
      * */
@@ -118,6 +132,47 @@ public interface EntityRenderer<T extends Entity<?>> {
             this.scaleX = 1f;
             this.scaleY = 1f;
             this.rotation = 0f;
+        }
+    }
+
+    /**
+     * 标准实体渲染器
+     * <p>
+     * 持有实体的贴图资源
+     * */
+    class StandardRenderer<T extends Entity<?>> implements EntityRenderer<T> {
+        private final Resource<TextureRegion> textureRegionResource;
+
+        /**
+         * @param textureId 贴图资源的id（一般与实体id相同）
+         * @param texturePath 贴图文件在 texture/entity 目录下的路径
+         * */
+        public StandardRenderer (String textureId, String texturePath) {
+            this.textureRegionResource = Resource.ofTextureRegion(textureId, Fight.EntityTexturePath(texturePath));
+        }
+
+        @Override
+        public TextureRegion getTextureRegion () {
+            return this.textureRegionResource.get();
+        }
+
+        @Override
+        public void draw (Batch batch, T entity, Context context) {
+            //最基础的绘制，绘制实体的身体贴图
+            TextureRegion bodyTextureRegion = getTextureRegion();
+            if (bodyTextureRegion != null) {
+                batch.draw(bodyTextureRegion,
+                    context.x - context.width / 2, context.y - context.height / 2,
+                    context.originX, context.originY,
+                    context.width, context.height,
+                    context.scaleX, context.scaleY,
+                    context.rotation
+                );
+            }
+        }
+
+        @Override
+        public void drawShape (ShapeRenderer batch, T entity, Context context) {
         }
     }
 }

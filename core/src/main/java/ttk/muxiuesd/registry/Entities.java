@@ -46,7 +46,7 @@ public final class Entities {
         "slime",
         EntityProvider.Builder.<Slime>create(Slime::new)
             .setDefaultType(EntityTypes.ENEMY)
-            .setRenderer(EnemyRenderer::new)
+            .setRenderer(() -> new EnemyRenderer<>(Fight.ID("slime"), "enemy/slime.png"))
             .setCodec(Slime.CODEC)
             .build()
     );
@@ -55,7 +55,7 @@ public final class Entities {
         "target",
         EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
             .setDefaultType(EntityTypes.ENEMY)
-            .setRenderer(EnemyRenderer::new)
+            .setRenderer(() -> new EnemyRenderer<>(Fight.ID("fish"), "fish/fish.png"))
             .setCodec(LivingEntity.CODEC)
             .build()
     );
@@ -65,7 +65,7 @@ public final class Entities {
         "puffer_fish",
         EntityProvider.Builder.<PufferFish>create(PufferFish::new)
             .setDefaultType(EntityTypes.CREATURE)
-            .setRenderer(LivingEntityRenderer::new)
+            .setRenderer(() -> new LivingEntityRenderer<>(Fight.ID("puffer_fish"), "fish/puffer_fish.png"))
             .setCodec(LivingEntity.CODEC)
             .build()
     );

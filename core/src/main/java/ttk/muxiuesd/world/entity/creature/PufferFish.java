@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.entity.creature;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.RenderLayers;
@@ -25,8 +24,6 @@ public class PufferFish extends CreatureEntity<PufferFish> {
 
     public PufferFish (World world, EntityType<? super PufferFish> entityType) {
         super(world, entityType, 5, 5, 1);
-        //setBodyTextureRegion(getTextureRegion(Fight.ID("puffer_fish"), "fish/puffer_fish.png"));
-        setBodyTextureRegionResource(Fight.ID("puffer_fish"), "fish/puffer_fish.png");
         setSize(DEFAULT_SIZE);
         fastAddBodyHitBox();
         setSpeed(1f);

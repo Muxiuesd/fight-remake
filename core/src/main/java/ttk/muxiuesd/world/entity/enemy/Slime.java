@@ -50,7 +50,6 @@ public class Slime extends Enemy<Slime> {
         super(world, entityType, 10, 10, 10 ,10 , 1, 1.5f);
 
         this.generation = generation;
-        setBodyTextureRegionResource(Fight.ID("slime"), "enemy/slime.png");
 
         getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
         renderHandItem = false;
