@@ -87,7 +87,7 @@ public interface BlockEntityRenderer<T extends BlockEntity> {
          * */
         public void drawAllSlots (Batch batch, T blockEntity, float x, float y) {
             for (InteractSlot interactSlot : blockEntity.getSlots()) {
-                if (interactSlot.getItemStack() != null) {
+                if (!interactSlot.getItemStack().isVoid()) {
                     drawSlot(batch, blockEntity, interactSlot, x, y);
                 }
             }

@@ -43,7 +43,7 @@ public class SlotUI extends UIComponent {
 
     @Override
     public void mouseOver (GridPoint2 interactPos) {
-        if (this.getItemStack() != null) TooltipUI.activate(getScreen(), this);
+        if (!this.getItemStack().isVoid()) TooltipUI.activate(getScreen(), this);
     }
 
     @Override
@@ -116,10 +116,10 @@ public class SlotUI extends UIComponent {
     }
 
     /**
-     * 获取这个物品槽位对应的物品
+     * 获取这个物品槽位对应的物品（默认空堆叠）
      * */
     public ItemStack getItemStack () {
-        return null;
+        return ItemStack.VOID;
     }
 
     @Override

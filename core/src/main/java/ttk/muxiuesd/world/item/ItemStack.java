@@ -126,10 +126,10 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     /**
      * 分开物品堆叠
      * <p>
-     * 分离出指定数量，原物品堆叠数量会减少
+     * 分离出指定数量，原物品堆叠数量会减少；无法分离时返回空物品堆叠
      * */
     public ItemStack split (int amount) {
-        if (amount <= 0) return null;
+        if (amount <= 0) return ItemStack.VOID;
         ItemStack newStack;
         //超过或者等于最大数量，直接返回目前的数量
         if (amount >= this.getAmount()) {
@@ -169,11 +169,46 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
      * 检测两个物品堆叠是否相同，需要所持有的物品以及属性（数量，种类，值）相同
      * */
     public boolean equals (ItemStack stack) {
-        if (stack == null) return false;
+        //空堆叠（VOID/null）只与空堆叠相等
+        if (this.isVoid()) return stack == null || stack.isVoid();
+        if (stack == null || stack.isVoid()) return false;
         //物品不是一种就无需判断直接false
         if (this.getItem() != stack.getItem()) return false;
         //比较所持有的属性
         return this.getProperty().equals(stack.getProperty());
+    }
+
+    /**
+     * 覆写 Object.equals（委托给 {@link #equals(ItemStack)}），
+     * 使 List/Map 的 contains/remove 等操作遵循属性全等语义
+     * */
+    @Override
+    public boolean equals (Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof ItemStack stack) {
+            return this.equals(stack);
+        }
+        return false;
+    }
+
+    /**
+     * 与 {@link #equals(Object)} 保持契约一致
+     * <p>
+     * 基于物品实例的哈希（属性全等的堆叠物品实例相同 → 哈希相同；
+     * 属性不同但物品相同 → 哈希可相同，不违反 equals/hashCode 契约）
+     * */
+    @Override
+    public int hashCode () {
+        return this.getItem() != null ? this.getItem().hashCode() : 0;
+    }
+
+    /**
+     * 这个物品堆叠是否是空的（空物品堆叠 {@link #VOID}）
+     * <p>
+     * 空槽位/空手的统一判断，替代 null 判断
+     * */
+    public boolean isVoid () {
+        return this == VOID;
     }
 
     /**
@@ -225,8 +260,12 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     }
 
     public ItemStack setAmount (int amount) {
-        if (amount >= this.getProperty().getMaxCount()) this.amount = this.getProperty().getMaxCount();
-        if (amount >= 0) this.amount = amount;
+        //空堆叠无属性，直接返回（getProperty() 为 null）
+        if (this.isVoid()) return this;
+        //上限保护：数量不能超过堆叠上限（原两个独立 if 会让超上限值覆盖上限，堆叠数量可突破上限）；负数忽略
+        if (amount >= 0) {
+            this.amount = Math.min(amount, this.getProperty().getMaxCount());
+        }
         return this;
     }
 

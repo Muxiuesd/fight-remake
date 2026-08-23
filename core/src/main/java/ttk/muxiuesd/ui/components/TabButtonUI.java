@@ -79,6 +79,8 @@ public class TabButtonUI extends UIComponent {
 
         //绘制当前展示物品组的图标，使用物品自己的渲染器
         ItemStack iconItemStack = this.displayItemGroup.getIconItemStack();
+        //图标为空堆叠（未设置图标）时不绘制，避免 getItem() NPE
+        if (iconItemStack.isVoid()) return;
         ItemRenderer<Item> renderer = ItemRendererRegistry.get(iconItemStack.getItem());
         //渲染器未注册（可能返回null）时不绘制图标，避免崩溃
         if (renderer == null) return;

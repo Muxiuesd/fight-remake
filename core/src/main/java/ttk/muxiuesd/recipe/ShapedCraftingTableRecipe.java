@@ -36,7 +36,7 @@ public class ShapedCraftingTableRecipe extends CraftingTableRecipe {
             int r = i / 3;
             int c = i % 3;
             ItemStack stack = inputs[i];
-            grid[r][c] = (stack != null) ? stack.getItem().getIdentifier() : null;
+            grid[r][c] = (!stack.isVoid()) ? stack.getItem().getIdentifier() : null;
         }
 
         //裁剪并编码后与预存编码比较

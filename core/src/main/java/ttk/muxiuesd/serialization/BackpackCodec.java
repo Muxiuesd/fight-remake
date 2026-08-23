@@ -29,8 +29,8 @@ public class BackpackCodec extends InventoryCodec<Backpack> {
 
         for (int i = 0; i < backpack.getSize(); i++) {
             ItemStack itemStack = backpack.getItemStack(i);
-            //索引下无物品直接跳过
-            if (itemStack == null) continue;
+            //索引下无物品直接跳过（空堆叠不序列化，VOID 的 item 为 null，编码会 NPE）
+            if (itemStack.isVoid()) continue;
 
             dataWriter.objStart(String.valueOf(i));
             Codecs.ITEM_STACK.encode(itemStack, dataWriter);

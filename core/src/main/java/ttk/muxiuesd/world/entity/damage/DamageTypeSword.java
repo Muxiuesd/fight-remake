@@ -39,7 +39,8 @@ public class DamageTypeSword extends DamageType<LivingEntity<?>, LivingEntity<?>
     @Override
     public float computeKnockback (LivingEntity<?> source) {
         ItemStack handItemStack = source.getHandItemStack();
-        if (handItemStack == null) return 0f;
+        //空手无击退
+        if (handItemStack.isVoid()) return 0f;
         Float knockback = handItemStack.getProperty().get(PropertyTypes.WEAPON_KNOCKBACK);
         return knockback != null ? knockback : DEFAULT_KNOCKBACK;
     }

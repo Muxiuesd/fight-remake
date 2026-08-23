@@ -62,7 +62,7 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
 
             Backpack backpack = player.getBackpack();
             ItemStack itemStack = backpack.getItemStack(getIndex());
-            if (itemStack != null) {
+            if (!itemStack.isVoid()) {
                 Item item = itemStack.getItem();
                 ItemRenderer<Item> renderer = ItemRendererRegistry.get(item);
                 //渲染器未注册（可能返回null）时不绘制该物品，避免崩溃

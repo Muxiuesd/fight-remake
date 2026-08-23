@@ -130,7 +130,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
 
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
             //空手左键，且玩家并不是刚用完物品，就是破坏
-            if (handItemStack == null && !player.isUsingItem()) {
+            if (handItemStack.isVoid() && !player.isUsingItem()) {
                 Botany botany = cs.getBotany(mouseWorldPosition);
                 if (botany != null) {
                     //有植物就优先破坏植物
@@ -161,7 +161,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                 //System.out.println(interactGrid);
 
                 //玩家空手与方块实体交互
-                if (handItemStack == null) {
+                if (handItemStack.isVoid()) {
                     InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);
                     //TODO 空手交互事件
                 } else {
@@ -176,7 +176,7 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
             } else {
                 /// 玩家与非方块实体的东西交互
                 //玩家空手交互
-                if (handItemStack == null) {
+                if (handItemStack.isVoid()) {
                     //先检查这个坐标上面有无墙体
                     if (cs.getWall(mouseWorldPosition) != null) {
                         //有墙体就破坏墙体

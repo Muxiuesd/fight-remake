@@ -24,7 +24,7 @@ public class EquipmentItemStackBehaviour implements IItemStackBehaviour {
         equipmentBackpack.setItemStack(index, itemStack);
 
         int handIndex = user.getHandIndex();
-        if (stack != null) {
+        if (!stack.isVoid()) {
             user.getBackpack().setItemStack(handIndex, stack);
         }else {
             user.getBackpack().clear(handIndex);

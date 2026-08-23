@@ -29,13 +29,16 @@ public class Backpack implements Inventory, Updateable {
     @Override
     public ItemStack getItemStack (int index) {
         if (this.exceed(index)) throw new IndexOutOfBoundsException();
-        return this.itemStacks.get(index);
+        ItemStack itemStack = this.itemStacks.get(index);
+        //空槽统一返回空物品堆叠（内部存储仍为 null，VOID 不可被存储/序列化/更新）
+        return itemStack == null ? ItemStack.VOID : itemStack;
     }
 
     @Override
     public void setItemStack (int index, ItemStack itemStack) {
         if (this.exceed(index)) throw new IndexOutOfBoundsException();
-        this.itemStacks.put(index, itemStack);
+        //空堆叠等价清空（内部存 null，避免 VOID 被 update 调用 getItem() 而 NPE）
+        this.itemStacks.put(index, itemStack == null || itemStack == ItemStack.VOID ? null : itemStack);
     }
 
     /**
@@ -48,97 +51,26 @@ public class Backpack implements Inventory, Updateable {
             return;
         }
         this.size = size;
+        //只迁移合法索引内的非空堆叠（缩小时丢弃越界残留键，新 map 不保留空槽键）
         LinkedHashMap<Integer, ItemStack> newMap = new LinkedHashMap<>(size);
-        if (this.itemStacks != null) newMap.putAll(this.itemStacks);    //把旧的map的东西放入新的map
+        if (this.itemStacks != null) {
+            for (int i = 0; i < size; i++) {
+                ItemStack stack = this.itemStacks.get(i);
+                if (stack != null) newMap.put(i, stack);
+            }
+        }
         this.itemStacks = newMap;
     }
 
     /**
-     * 丢出物品
-     * @return 若有东西可丢则是被丢出来的物品堆叠，诺没东西可丢则是null
-     * */
-    @Override
-    public ItemStack dropItem (int index, int amount) {
-        ItemStack itemStack = this.getItemStack(index);
-        if (itemStack == null) return null;
-        if (amount <= 0) return null;
-
-        //全部数量丢出，若传的数量大于则算全部丢出
-        if (amount >= itemStack.getAmount()) {
-            return this.clear(index);
-            //return itemStack;
-        }
-        //非全部数量丢出
-        itemStack.setAmount(itemStack.getAmount() - amount);
-        //System.out.println("还剩：" + itemStack.getAmount() + " 个");
-        return new ItemStack(itemStack.getItem(), amount);
-    }
-
-    @Override
-    public ItemStack addItem (ItemStack itemStack) {
-        if (this.isFull(itemStack)) return itemStack;
-
-        //TODO 解决相同物品不能存放多个堆叠的bug
-
-        // 尝试合并到已有的堆叠
-        for (int i = 0; i < this.size; ++i) {
-            ItemStack stack = this.itemStacks.get(i);
-            /*if (stack != null && Objects.equals(stack.getItem().getID(), itemStack.getItem().getID())) {*/
-            if(stack != null && !stack.isFull() && stack.equals(itemStack)) {
-                // 堆叠数量达到上限直接跳过
-                /*if (stack.isFull()) continue;*/
-
-                int newAmount = stack.getAmount() + itemStack.getAmount();
-                int maxCount = stack.getItem().getProperty().getMaxCount();
-                if (newAmount <= maxCount) {
-                    stack.setAmount(newAmount);
-                    return null;
-                } else {
-                    stack.setAmount(maxCount);
-                    itemStack.setAmount(newAmount - maxCount);
-                }
-            }
-        }
-
-        // 查找空位，然后把物品堆叠放进去
-        for (int i = 0; i < this.size; ++i) {
-            if (this.itemStacks.get(i) == null) {
-                this.setItemStack(i, itemStack);
-                return null;
-            }
-        }
-
-        return itemStack;
-    }
-
-    /**
-     * 捡起物品
-     * <p>
-     * @return 返回被捡起来后的物品堆叠，若全部被捡起来则返回null
-     * */
-    public ItemStack pickUpItem (ItemStack itemStack) {
-        return this.addItem(itemStack);
-    }
-
-
-    /**
      * 清除某一个位置的物品堆叠
-     * @return 若被清除的位置有物品，则返回被清除的物品；若没有则返回null
+     * @return 若被清除的位置有物品，则返回被清除的物品；若没有则返回空物品堆叠
      * */
     @Override
     public ItemStack clear (int index) {
         if (this.exceed(index)) throw new IndexOutOfBoundsException();
         if (this.itemStacks.get(index) != null) return this.itemStacks.remove(index);
-        return null;
-    }
-
-    /**/
-    public ItemStack clear (ItemStack itemStack) {
-        if (this.itemStacks.containsValue(itemStack)) {
-            this.itemStacks.values().remove(itemStack);
-            return itemStack;
-        }
-        return null;
+        return ItemStack.VOID;
     }
 
     /**
@@ -156,12 +88,18 @@ public class Backpack implements Inventory, Updateable {
 
     @Override
     public int getCapacity () {
-        return this.itemStacks.size();
+        //只统计非空堆叠（map 中可能存在值为 null 的空槽键，size() 会误算）
+        int count = 0;
+        for (ItemStack stack : this.itemStacks.values()) {
+            if (stack != null) count++;
+        }
+        return count;
     }
 
     @Override
     public void update (float delta) {
-        //遍历时用 removeIf（迭代器安全），null 槽位清理，非 null 槽位更新
+        //更新堆叠并清理空槽键（setItemStack(VOID) 会留下值为 null 的键，反复放取会累积）
+        //注意：接口 default update 无法用 super 调用（父类是 Object），这里直接实现
         this.itemStacks.entrySet().removeIf(entry -> {
             ItemStack itemStack = entry.getValue();
             if (itemStack != null) {

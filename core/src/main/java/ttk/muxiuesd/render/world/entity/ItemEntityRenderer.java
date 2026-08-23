@@ -31,7 +31,7 @@ public class ItemEntityRenderer implements EntityRenderer<ItemEntity> {
 
         // 渲染物品贴图（带浮动偏移）
         ItemStack stack = entity.getItemStack();
-        if (stack != null) {
+        if (!stack.isVoid()) {
             Item item = stack.getItem();
             ItemRenderer<Item> renderer = ItemRendererRegistry.get(item);
             if (renderer == null) return;

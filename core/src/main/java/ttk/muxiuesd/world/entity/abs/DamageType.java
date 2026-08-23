@@ -41,7 +41,7 @@ public abstract class DamageType <S, T extends LivingEntity<?>> {
         float reduction = 0f;
         for (int i = 0; i < equipmentBackpack.getSize(); i++) {
             ItemStack equipmentItemStack = equipmentBackpack.getItemStack(i);
-            if (equipmentItemStack != null)
+            if (!equipmentItemStack.isVoid())
                 reduction += equipmentItemStack.getProperty().get(PropertyTypes.DAMAGE_REDUCTION);
         }
         return reduction;

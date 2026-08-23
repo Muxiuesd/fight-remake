@@ -71,7 +71,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         .field("onAirTimer", ItemEntity::getOnAirTimer, ItemEntity::setOnAirTimerFromCodec, ON_AIR_TIMER_CODEC)
         .factory(EntityCodecBuilder::createEntity);
 
-    private ItemStack itemStack;
+    private ItemStack itemStack = ItemStack.VOID;
     private Vector2 positionOffset;
     private TaskTimer onAirTimer;   //在空中的计时器，可以自定义物品实体在空中运动的时间
     private float cycle;
@@ -159,7 +159,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         setSpeed(0f);
         setPosition(0f, 0f);
         setVelocity(0f, 0f);
-        setItemStack(null);
+        setItemStack(ItemStack.VOID);
         setLivingTime(0f);
         this.cycle = 0f;    //重置悬浮动画相位
         getPositionOffset().set(0f, 0f);

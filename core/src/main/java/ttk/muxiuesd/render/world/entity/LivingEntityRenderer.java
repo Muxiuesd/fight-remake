@@ -70,7 +70,7 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
     public void drawHandItem (Batch batch, T entity, Context context) {
         //如果手上有物品，则绘制手上的物品
         ItemStack itemStack = entity.getHandItemStack();
-        if (itemStack != null) {
+        if (!itemStack.isVoid()) {
             //获取物品的渲染器来渲染
             ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack.getItem());
             if (renderer == null) return;
@@ -97,7 +97,7 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
      * */
     public void renderShapeHandItem (ShapeRenderer batch, T entity) {
         ItemStack itemStack = entity.getHandItemStack();
-        if (itemStack != null) {
+        if (!itemStack.isVoid()) {
             //获取物品的渲染器来渲染
             ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack.getItem());
             if (renderer == null) return;

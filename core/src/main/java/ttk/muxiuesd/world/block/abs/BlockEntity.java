@@ -99,7 +99,7 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
         //掉落物品
         for (int i = 0; i < size; i++) {
             ItemStack itemStack = this.getInventory().getItemStack(i);
-            if (itemStack == null) {
+            if (itemStack.isVoid()) {
                 shouldBeCleared[i] = false;
                 continue;
             }

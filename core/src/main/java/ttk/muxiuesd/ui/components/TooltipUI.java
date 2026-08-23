@@ -82,7 +82,7 @@ public class TooltipUI extends UIComponent {
         }
         if (instance.curSlotUI == slotUI) {
             instance.curSlotUI = null;
-            instance.setDisplayItemStack(null);
+            instance.setDisplayItemStack(ItemStack.VOID);
         }
 
         return instance;
@@ -92,7 +92,7 @@ public class TooltipUI extends UIComponent {
     private NinePatchResource backgroundNinePatchResource;
     private NinePatchResource frameNinePatchResource;
     private FontHolder fontHolder;          //渲染的字体
-    private ItemStack displayItemStack;     //要被展示信息数据的物品堆叠
+    private ItemStack displayItemStack = ItemStack.VOID;     //要被展示信息数据的物品堆叠
 
     public TooltipUI () {
         super(1145f, 1145f, 100, 100, new GridPoint2(10, 10));
@@ -121,7 +121,7 @@ public class TooltipUI extends UIComponent {
     @Override
     public void draw (Batch batch, UIPanel parent) {
         ItemStack itemStack = this.getDisplayItemStack();
-        if (itemStack == ItemStack.VOID || itemStack == null) return;
+        if (itemStack.isVoid()) return;
 
         //字体的真实渲染大小
         int trueFontSize = (int) (FONT_SIZE * FONT_SCALE);

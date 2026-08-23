@@ -31,7 +31,7 @@ public class MouseSlotUI extends PlayerSlotUI {
         if (instance != null) INSTANCE = instance;
     }
 
-    private ItemStack itemStack;
+    private ItemStack itemStack = ItemStack.VOID;
     //public UIPanel curPanel;
     public UIScreen curScreen; //当前鼠标物品槽UI所属的UIScreen
 
@@ -108,7 +108,7 @@ public class MouseSlotUI extends PlayerSlotUI {
 
     @Override
     public boolean isNullSlot () {
-        return this.getItemStack() == ItemStack.VOID || this.getItemStack() == null;
+        return this.getItemStack().isVoid();
     }
 
     @Override
@@ -123,7 +123,7 @@ public class MouseSlotUI extends PlayerSlotUI {
 
     @Override
     public void clearItem () {
-        this.itemStack = null;
+        this.itemStack = ItemStack.VOID;
     }
 
     @Override

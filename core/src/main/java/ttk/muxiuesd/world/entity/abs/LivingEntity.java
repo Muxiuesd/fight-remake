@@ -256,7 +256,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
      * */
     public boolean useItem (World world) {
         ItemStack itemStack = this.getHandItemStack();
-        if (itemStack != null) {
+        if (!itemStack.isVoid()) {
             return itemStack.use(world, this);
         }
         return false;
@@ -268,7 +268,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
      * */
     public ItemEntity dropItem (int index, int amount) {
         ItemStack itemStack = this.getBackpack().dropItem(index, amount);
-        if (itemStack == null) return null;
+        if (itemStack.isVoid()) return null;
 
         itemStack.getItem().beDropped(itemStack, getEntitySystem().getWorld(), this);
 
@@ -297,12 +297,12 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     /**
      * 捡起物品
      * @param itemStack 被捡起来的物品堆叠
-     * @return 若捡起物品后返回的为null说明物品被全部捡起，返回WHOLE；若不为null但数量有变化则是被部分捡起为PARTIAL，反之则为FAILURE
+     * @return 若物品被全部捡起返回WHOLE；若数量有变化则是被部分捡起为PARTIAL，反之则为FAILURE
      * */
     public ItemPickUpState pickUpItem (ItemStack itemStack) {
         int oldAmount = itemStack.getAmount();
         ItemStack pickedUpItem = this.getBackpack().pickUpItem(itemStack);
-        if (pickedUpItem == null) {
+        if (pickedUpItem.isVoid()) {
             return ItemPickUpState.WHOLE;
         }
         if (pickedUpItem.getAmount() != oldAmount) {
@@ -337,7 +337,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         Backpack bp = this.getBackpack();
         for (int i = 0; i < bp.getSize(); i++) {
             ItemStack itemStack = bp.getItemStack(i);
-            if (itemStack == null) continue;
+            if (itemStack.isVoid()) continue;
 
             //赋予随机方向的速度
             float radian = MathUtils.random() * MathUtils.PI2;
@@ -361,9 +361,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
      * */
     public boolean handIsEmpty () {
         ItemStack handItemStack = this.getHandItemStack();
-        return handItemStack == null
-            || handItemStack == ItemStack.VOID
-            || handItemStack.getAmount() == 0;
+        return handItemStack.isVoid() || handItemStack.getAmount() == 0;
     }
 
     public ItemStack getHandItemStack () {
@@ -385,7 +383,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
                 //放下先前的物品堆叠
                 ItemStack handItemStack = this.getHandItemStack();
                 //实体系统为空说明实体还未加入世界（例如解码读取数据时），不需要放下物品
-                if (handItemStack != null && this.getEntitySystem() != null) {
+                if (!handItemStack.isVoid() && this.getEntitySystem() != null) {
                     handItemStack.putDown(this.getEntitySystem().getWorld(), this);
                 }
                 this.handIndex = handIndex;

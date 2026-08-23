@@ -92,7 +92,7 @@ public class PlayerSlotUI extends SlotUI {
         Player player = getPlayerSystem().getPlayer();
         if (player == null) return true;
         ItemStack itemStack = this.getInventory().getItemStack(this.getIndex());
-        return itemStack == null;
+        return itemStack.isVoid();
     }
 
     public ItemStack getItemStack () {

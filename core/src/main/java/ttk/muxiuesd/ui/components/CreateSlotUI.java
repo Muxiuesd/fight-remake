@@ -60,7 +60,7 @@ public class CreateSlotUI extends SlotUI {
 
     @Override
     public ItemStack getItemStack () {
-        if (this.isNullSlot()) return null;
+        if (this.isNullSlot()) return ItemStack.VOID;
         return this.getItemGroup().get(this.getIndex());
     }
 
