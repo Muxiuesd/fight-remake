@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.entity.genfactory;
 
 import com.badlogic.gdx.math.Vector2;
+import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.interfaces.world.entity.EntityGenFactory;
 import ttk.muxiuesd.pool.entity.ItemEntityPool;
 import ttk.muxiuesd.system.EntitySystem;
@@ -12,6 +13,13 @@ import ttk.muxiuesd.world.item.ItemStack;
  * */
 public class ItemEntityGetter implements EntityGenFactory<ItemEntity> {
     public static ItemEntityPool POOL = new ItemEntityPool();
+
+    /**
+     * 拿取池中的实体，自动添加进实体系统 {@link EntitySystem}
+     * */
+    public static ItemEntity get (EntitySystem entitySystem, Vec2 pos, ItemStack itemStack) {
+        return get(entitySystem, itemStack).setPosition(pos.getX(), pos.getY());
+    }
 
     /**
      * 拿取池中的实体，自动添加进实体系统 {@link EntitySystem}
@@ -28,7 +36,7 @@ public class ItemEntityGetter implements EntityGenFactory<ItemEntity> {
         entity.setEntitySystem(entitySystem);
         entity.setItemStack(itemStack);
         entitySystem.add(entity);
-
-        return entity;
+        //默认大小
+        return entity.setSize(ItemEntity.DEFAULT_SIZE);
     }
 }

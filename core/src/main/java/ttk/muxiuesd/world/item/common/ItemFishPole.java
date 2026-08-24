@@ -22,7 +22,7 @@ import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.loottable.FishingLootTable;
+import ttk.muxiuesd.world.loottable.fishing.FishingLootTable;
 
 /**
  * 钓鱼竿

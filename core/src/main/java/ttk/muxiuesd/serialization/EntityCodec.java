@@ -1,9 +1,9 @@
 package ttk.muxiuesd.serialization;
 
 import com.badlogic.gdx.utils.JsonValue;
-import ttk.muxiuesd.FightCore;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
+import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Codecs;
@@ -17,6 +17,7 @@ import java.util.Optional;
 /**
  * 基础实体的编解码器
  * */
+@Deprecated
 public class EntityCodec extends JsonCodec<Entity<?>> {
     @Override
     public void encode (Entity<?> entity, JsonDataWriter dataWriter) {

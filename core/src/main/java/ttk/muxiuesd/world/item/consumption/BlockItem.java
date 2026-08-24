@@ -2,16 +2,17 @@ package ttk.muxiuesd.world.item.consumption;
 
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.registrant.Gets;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 
 /**
  * 方块物品
@@ -39,15 +40,20 @@ public class BlockItem extends ConsumptionItem {
         Block replacedBlock = cs.replaceBlock(this.block, worldPosition.x, worldPosition.y);
         //非空气方块才能掉落出来
         if (replacedBlock != Blocks.ARI) {
-            //获取方块所对应的方块物品
-            ItemStack stack = new ItemStack(Gets.ITEM(replacedBlock.getID()), 1);
-
-            //把替换下来的方块变成方块物品并且变成物品实体形式掉落在世界上
-            //ItemEntity itemEntity = (ItemEntity) Gets.ENTITY(Fight.getId("item_entity"), user.getEntitySystem());
-            ItemEntity itemEntity = ItemEntityGetter.get(user.getEntitySystem(), stack)
-                .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
-                .setPosition(worldPosition.x, worldPosition.y)
-                .setSize(0.5f, 0.5f);
+            //获取方块的掉落物表
+            BlockDropLootTable dropLootTable = Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(replacedBlock.getIdentifier());
+            if (dropLootTable != null) {
+                dropLootTable.generate(world, new BlockDropLootTable.Condition().setPos(worldPosition));
+            }else {
+                //找不到注册的战利品表就尝试找对应的方块物品
+                Item item = Registries.ITEM.getOrNull(replacedBlock.getIdentifier());
+                if (item != null) {
+                    //把替换下来的方块变成方块物品并且变成物品实体形式掉落在世界上
+                    ItemEntityGetter.get(user.getEntitySystem(), new ItemStack(item, 1))
+                        .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
+                        .setPosition(worldPosition);
+                }
+            }
         }
         return true;
     }

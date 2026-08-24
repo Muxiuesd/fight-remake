@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.loottable;
+package ttk.muxiuesd.world.loottable.fishing;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.registrant.Gets;

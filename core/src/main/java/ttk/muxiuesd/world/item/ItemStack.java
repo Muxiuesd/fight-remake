@@ -110,6 +110,12 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
         return array;
     }
 
+    /**
+     * 复制，数量跟原本的一样
+     * */
+    public ItemStack copy () {
+        return copy(this.getAmount());
+    }
 
     /**
      * 指定数量的复制，数量最少为1

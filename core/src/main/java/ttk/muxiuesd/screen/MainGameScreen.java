@@ -47,6 +47,8 @@ public class MainGameScreen implements Screen {
         WorldInfoTypes.init();
         ItemGroups.init();
         CraftingRecipes.init();
+        BlockDropLootTables.init();
+
 
         MainWorld mainWorld = new MainWorld(this);
         //游戏世界的渲染处理器注册

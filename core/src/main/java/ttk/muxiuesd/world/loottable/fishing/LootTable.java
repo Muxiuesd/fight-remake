@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.loottable;
+package ttk.muxiuesd.world.loottable.fishing;
 
 
 import ttk.muxiuesd.world.item.ItemStack;

@@ -20,6 +20,7 @@ import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
@@ -53,6 +54,7 @@ public class Registries {
 
     public static final CraftingRecipeRegistry CRAFTING_RECIPE_REGISTRY = create(RegistryKeys.CRAFTING_RECIPE_REGISTRY_KEY, new CraftingRecipeRegistry());
 
+    public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE_REGISTRY_KEY);
 
 
     public static final BlockRendererRegistry BLOCK_RENDERER = create(
@@ -133,6 +135,7 @@ public class Registries {
          * <p>
          * 用于存档解码等容错路径（未知 id 的旧数据应跳过而不是崩溃/整块重建）
          * */
+        @Override
         public T getOrNull (String id) {
             Identifier identifier = this.idMap.get(id);
             if (identifier == null) return null;

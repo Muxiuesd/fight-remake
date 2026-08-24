@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.loottable;
+package ttk.muxiuesd.world.loottable.fishing;
 
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;

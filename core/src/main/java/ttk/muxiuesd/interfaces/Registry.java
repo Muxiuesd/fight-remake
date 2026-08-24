@@ -24,6 +24,15 @@ public interface Registry<T> {
     T get(String id);
 
     /**
+     * 安全获取：id 未注册时返回 null 而不是抛异常
+     * <p>
+     * 用于存档解码等容错路径（未知 id 的旧数据应跳过而不是崩溃/整块重建）
+     * */
+    default T getOrNull (Identifier identifier) {
+        return this.getOrNull(identifier.getID());
+    }
+
+    /**
      * 安全获取：id 未注册时返回 null 而不是抛异常（存档解码等容错路径使用）
      * */
     default T getOrNull(String id) {
