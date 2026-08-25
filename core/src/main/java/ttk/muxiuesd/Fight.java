@@ -37,6 +37,8 @@ public class Fight {
     public static final Info<Float> ENTITY_RENDER_RANGE = Info.create("entity_render_range", 20f);
     //实体更新距离，与玩家距离超过这个值的实体不更新
     public static final Info<Float> ENTITY_UPDATE_RANGE = Info.create("entity_update_range", 32f);
+    //空气摩擦力
+    public static final Info<Float> AIR_FRICTION= Info.create("air_friction", 0.02f);
 
     /**
      * 存档路径常量

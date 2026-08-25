@@ -1,10 +1,12 @@
 package ttk.muxiuesd.world.loottable.entity;
 
 import game.muxiuesd.bedrockcore.math.Vec2;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.EntityLootTable;
+import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -26,8 +28,20 @@ public class EntityDeathLootTable implements EntityLootTable<EntityDeathLootTabl
         for (ItemStack itemStack : stacks) {
             //这里要用复制的，避免其他地方的修改污染战利品表的物品堆叠
             ItemStack copy = itemStack.copy();
-            ItemEntityGetter.get(es, pos, copy)
-                .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
+
+            ItemEntity itemEntity = ItemEntityGetter.getPickUpable(es, pos, copy);
+            itemEntity
+                .setSpeed(0f)
+                .setOnGround(false)
+                .setOnAirTimer(
+                    Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
+                    .setTask(() -> {
+                        Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
+                        itemEntity.setOnAirTimer(null);
+                    })
+                );
+            //随机速度
+            Util.entityRandomVelocity(itemEntity, 0.3f, 1.1f);
         }
     }
 

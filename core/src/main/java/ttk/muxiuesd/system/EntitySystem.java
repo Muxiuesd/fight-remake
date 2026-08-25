@@ -296,38 +296,54 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
         }
 
-        this.calculateItemEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
+        this.calculateEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
     }
 
     /**
-     * 对实体进行当前速度计算
+     * 对实体进行当前速度大小的计算（不改变方向）
      * */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
-        //子弹实体不受方块摩擦力影响，只受空气阻力（在 Bullet 内部处理）
-        if (entity instanceof Bullet) return;
-
         //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
+        if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
 
-        //计算脚下方块摩擦对速度的影响（取样点与游泳判定一致，都用实体底部）
-        Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
-        if (block == null) return;
+        //空气阻力的影响
+        float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);
 
-        //摩擦系数越大，移动越慢：目标速度 = 基准速度 × (1 - 摩擦系数)
-        //平滑过渡：缩放因子每帧向目标逼近（半衰期 FRICTION_SMOOTH_HALF_LIFE），跨方块变速不再跳变。
-        //不能直接平滑"速度"：玩家/状态机每帧都会重置速度矢量，平滑起点每帧都是全速，永远无法收敛，
-        //因此只平滑缩放因子本身（该因子不被任何系统重置）
-        float friction = block.getProperty().getFriction();
-        float targetScale = Math.max(0f, 1f - friction);
-        float smooth = 1f - (float) Math.pow(0.5f, delta / FRICTION_SMOOTH_HALF_LIFE);
-        entity.setFrictionScale(entity.getFrictionScale() + (targetScale - entity.getFrictionScale()) * smooth);
-        float curSpeed = entity.getSpeed() * entity.getFrictionScale();
-        //速度过小直接为0
-        if (curSpeed < MIN_SPEED) {
-            entity.setCurSpeed(0);
+        //子弹实体不受方块摩擦力影响，只受空气阻力
+        if (entity instanceof Bullet bullet) {
+            //空气阻力：子弹不受方块摩擦影响，速度只随空气阻力逐渐衰减
+            bullet.setVelX(bullet.getVelX() * airDrag);
+            bullet.setVelY(bullet.getVelY() * airDrag);
             return;
         }
+
+        float curSpeed = entity.getCurSpeed();
+
+        //如果实体在地面上
+        if (entity.isOnGround()) {
+            //计算脚下方块摩擦对速度的影响（取样点与游泳判定一致，都用实体底部）
+            Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
+            if (block != null) {
+                float friction = block.getProperty().getFriction();
+                float targetScale = Math.max(0f, 1f - friction);
+                float smooth = 1f - (float) Math.pow(0.5f, delta / FRICTION_SMOOTH_HALF_LIFE);
+                entity.setFrictionScale(entity.getFrictionScale() + (targetScale - entity.getFrictionScale()) * smooth);
+                curSpeed *= entity.getFrictionScale();
+            }
+        }
+
+        //速度过小直接为0
+        if (curSpeed < MIN_SPEED) {
+            entity.setCurSpeed(0f);
+            return;
+        }
+
+        //应用空气阻力
         entity.setCurSpeed(curSpeed);
+        entity.setVelocity(
+            entity.getVelX() * airDrag,
+            entity.getVelY() * airDrag
+        );
     }
 
     /**
@@ -335,7 +351,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * */
     private void calculateItemEntityCurSpeed (ItemEntity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0) return;
+        if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
 
         float curSpeed = entity.getSpeed();
         //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）

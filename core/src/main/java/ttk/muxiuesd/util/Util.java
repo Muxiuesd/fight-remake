@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.CameraUtil;
 import game.muxiuesd.bedrockcore.util.CoordinateUtil;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.render.camera.GUICamera;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.resource.AssetsLoader;
@@ -246,5 +247,26 @@ public class Util {
         int h1 = str.hashCode();
         int h2 = str.hashCode() ^ 0x55555555; //简单扰动
         return ((long) h1 << 32) | (h2 & 0xFFFFFFFFL);
+    }
+
+    /**
+     * 给实体一个随机方向、随机速度大小的速度矢量
+     * @param minSpeed 最小随机速度大小
+     * @param maxSpeed 最大随机速度大小
+     * */
+    public static void entityRandomVelocity (Entity<?> entity, float minSpeed, float maxSpeed) {
+        if (minSpeed > maxSpeed) {
+            Log.error(Util.class.getName(), "传入的随机速度最小值大于最大值！ " + minSpeed + " > " + maxSpeed);
+            return;
+        }
+        //随机角度
+        float radian = MathUtils.random() * MathUtils.PI2;
+        float speed = MathUtils.random(minSpeed, maxSpeed);
+        float velX = MathUtils.cos(radian);
+        float velY = MathUtils.sin(radian);
+
+        entity
+            .setVelocity(velX, velY)
+            .setCurSpeed(speed);
     }
 }

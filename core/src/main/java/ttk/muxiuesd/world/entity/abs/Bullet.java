@@ -101,11 +101,6 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
 
-        //空气阻力：子弹不受方块摩擦影响，速度只随空气阻力逐渐衰减
-        float drag = (float) Math.pow(AIR_DRAG_PER_SECOND, delta);
-        this.setVelX(this.getVelX() * drag);
-        this.setVelY(this.getVelY() * drag);
-
         // 位移由 BulletCollisionSystem 统一处理（含墙体碰撞与 CCD 分步）
         super.update(delta);
 

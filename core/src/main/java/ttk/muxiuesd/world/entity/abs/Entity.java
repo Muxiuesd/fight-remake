@@ -53,9 +53,9 @@ public abstract class Entity<T extends Entity<T>>
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
-    private float speed;
+    private float speed;                    //实体的基准速度（比如移动速度）
     private float x, y;                     //实体的世界坐标
-    private float velX, velY;               //实体的速度
+    private float velX, velY;               //实体的速度矢量
     private float frictionScale = 1f;       //当前摩擦缩放因子（由摩擦系统平滑过渡，跨方块变速不跳变）
     private float width, height;            //实体的宽高（世界渲染）
     private float originX = 0f, originY = 0f;

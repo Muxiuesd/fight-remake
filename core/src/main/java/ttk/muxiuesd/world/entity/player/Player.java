@@ -19,6 +19,7 @@ import ttk.muxiuesd.world.item.ItemStack;
  */
 public class Player extends LivingEntity<Player> {
     public static final int BACKPACK_SIZE = 36;
+    public static final float MOVE_SPEED = 5.5f;
     //碰撞箱起点（前两个值）和终点（后两个值）的偏移
     public static final Vector4 HITBOX_OFFSET = new Vector4(0.1f, 0.1f, -0.1f, -0.1f);
 
@@ -45,8 +46,8 @@ public class Player extends LivingEntity<Player> {
     public Player(World world, EntityType<? super Player> entityType, float maxHealth, float curHealth) {
         super(world, entityType, maxHealth, curHealth, BACKPACK_SIZE);
         renderHandItem = true;
-        setSpeed(3.3f);
-        setCurSpeed(getSpeed());
+        setSpeed(MOVE_SPEED);
+        //setCurSpeed(getSpeed());
 
         this.defendCDTimer = Pools.TASK_TIMER.obtain()
             .setMaxSpan(2f)
@@ -60,29 +61,6 @@ public class Player extends LivingEntity<Player> {
                 this.isDefend = false;
             });
         fastAddBodyHitBox();
-
-        /*backpack.setItemStack(0, new ItemStack(Items.IRON_SWORD));
-        backpack.setItemStack(1, new ItemStack(Items.TEST_WEAPON));
-        backpack.setItemStack(2, new ItemStack(Items.STICK));
-        backpack.setItemStack(3, new ItemStack(Items.FURNACE));
-        backpack.setItemStack(4, new ItemStack(Items.CRAFTING_TABLE));
-        backpack.setItemStack(5, new ItemStack(Items.FISH_POLE));
-        backpack.setItemStack(6, new ItemStack(Items.SMOOTH_STONE));
-        backpack.setItemStack(7, new ItemStack(Items.TORCH));
-        backpack.setItemStack(8, new ItemStack(Items.IRON_SWORD));
-        backpack.setItemStack(9, new ItemStack(Items.TEST_WEAPON));
-        backpack.setItemStack(10, new ItemStack(Items.STICK));
-        backpack.setItemStack(11, new ItemStack(Items.FURNACE));
-        backpack.setItemStack(18, new ItemStack(Items.CRAFTING_TABLE));
-        backpack.setItemStack(28, new ItemStack(Items.FISH_POLE));
-        backpack.setItemStack(30, new ItemStack(Items.DIAMOND_HELMET));
-        backpack.setItemStack(31, new ItemStack(Items.DIAMOND_CHESTPLATE));
-        backpack.setItemStack(32, new ItemStack(Items.DIAMOND_LEGGINGS));
-        backpack.setItemStack(33, new ItemStack(Items.DIAMOND_BOOTS));
-        backpack.setItemStack(35, new ItemStack(Items.TORCH));*/
-
-        //setEffect(StatusEffects.HEALING, 500f, 2);
-        //setEffect(StatusEffects.POISON, 500f, 1);
 
         Log.print(this.getClass().getName(),"Player 初始化完成");
     }
@@ -114,10 +92,11 @@ public class Player extends LivingEntity<Player> {
             Vector2 mwp = Util.getMouseWorldPosition();
             float distance = Util.getDistance(getX(), getY(), mwp.x, mwp.y);
             float v = Math.min(distance, 4f);
-            itemEntity.setSpeed(v);
+            //itemEntity.setSpeed(v);
             //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
-            itemEntity.setVelocity(getDirection().toVector2());
-            itemEntity.setCurSpeed(v);
+            itemEntity
+                .setVelocity(getDirection().toVector2())
+                .setCurSpeed(v);
         }
 
         return itemEntity;
@@ -133,9 +112,8 @@ public class Player extends LivingEntity<Player> {
         float v = Math.min(distance, 4f);
 
         return spawnItemEntity(stack)
-            .setSpeed(v)
-            .setCurSpeed(v)
-            .setVelocity(getDirection().toVector2());
+            .setVelocity(getDirection().toVector2())
+            .setCurSpeed(v);
     }
 
     /**

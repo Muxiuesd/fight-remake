@@ -281,11 +281,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
      * */
     public ItemEntity spawnItemEntity (ItemStack stack) {
         //简单的生成一个物品实体而已
-        ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), stack);
+        ItemEntity itemEntity = ItemEntityGetter.get(getEntitySystem(), getCenterPos(), stack);
         //使得物品中心与实体中心对齐
         return itemEntity
-            //.setPosition(getCenter().sub(itemEntity.getSize().scl(0.5f)))
-            .setPosition(getCenterPos())
             .setOnGround(false)
             .setOnAirTimer(Pools.TASK_TIMER.obtain().setMaxSpan(0.5f).setCurSpan(0)
             .setTask(() -> {
@@ -347,11 +345,13 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
 
             ItemEntity itemEntity = this.dropItem(i, itemStack.getAmount());
             if (itemEntity != null) {
-                itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-                itemEntity.setSpeed(speed);
-                //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
-                itemEntity.setVelocity(velX, velY);
-                itemEntity.setCurSpeed(speed);
+
+                itemEntity
+                    //实体死亡掉落的物品堆叠可以被立即捡起
+                    .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
+                    //先设置方向再设置速率（setCurSpeed 会缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
+                    .setVelocity(velX, velY)
+                    .setCurSpeed(speed);
             }
         }
     }
