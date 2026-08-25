@@ -1,8 +1,6 @@
 package ttk.muxiuesd.world.item.common;
 
 import com.badlogic.gdx.math.Vector2;
-import game.muxiuesd.bedrockcore.util.TaskTimer;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.Entities;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
@@ -19,6 +17,7 @@ import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -66,21 +65,19 @@ public class ItemFishPole extends Item {
                 //需要鱼钩在水中才能钓到鱼
                 //生成钓鱼战利品
                 FishingLootTable.fastGenerate(100, genItemStack -> {
-                    //ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
-                    ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
-                    itemEntity.setEntitySystem(user.getEntitySystem());
-                    itemEntity.setPosition(hookPos);
-                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-                    itemEntity.setItemStack(genItemStack);
-                    itemEntity.setSpeed(this.pullSpeed);
-                    itemEntity.setCurSpeed(this.pullSpeed);
-                    itemEntity.setVelocity(new Direction(hook.getCenterPos(), hook.getOwner().getCenterPos()).toVector2());
-                    itemEntity.setOnGround(false);
-                    itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
-                        itemEntity.setOnAirTimer(null);
-                    }));
-
-                    user.getEntitySystem().add(itemEntity);
+                    ItemEntity itemEntity = ItemEntityGetter.getPickUpable(user.getEntitySystem(), hookPos, genItemStack)
+                        .setVelocity(new Direction(hook.getCenterPos(), hook.getOwner().getCenterPos()).toVector2())
+                        .setCurSpeed(this.pullSpeed)
+                        .setOnGround(false);
+                    itemEntity.setOnAirTimer(
+                        Pools.TASK_TIMER.obtain()
+                            .setMaxSpan(1.8f)
+                            .setCurSpan(0)
+                            .setTask(() -> {
+                                Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
+                                itemEntity.setOnAirTimer(null);
+                            })
+                    );
                 });
             }
 

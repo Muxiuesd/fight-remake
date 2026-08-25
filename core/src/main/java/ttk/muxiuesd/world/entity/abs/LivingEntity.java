@@ -230,6 +230,14 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     /**
+     * 活物实体是受控运动体：每帧由状态机（或玩家输入）写入速度意图
+     */
+    @Override
+    public boolean hasIntent () {
+        return true;
+    }
+
+    /**
      * 更新状态效果
      * */
     private void updateStatusEffect (float delta) {

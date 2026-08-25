@@ -43,7 +43,6 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         setSpeed(THROW_SPEED);
         setSize(0.7f, 0.7f);
         fastAddBodyHitBox();
-
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
@@ -57,6 +56,14 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
 
         this.positionOffset = new Vector2(0, 0);
         this.isReturning = false;
+    }
+
+    /**
+     * 鱼钩是受控运动体：抛射/回收时每帧由自身逻辑写入速度意图
+     */
+    @Override
+    public boolean hasIntent () {
+        return true;
     }
 
     @Override

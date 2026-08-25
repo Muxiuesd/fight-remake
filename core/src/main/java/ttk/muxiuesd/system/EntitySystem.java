@@ -306,15 +306,21 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //this.calculateEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
     }
 
+    /// 无意图实体摩擦衰减的参考帧率：等效"该帧率下运行帧级衰减"的表现（数值与运行帧率无关，delta 自动补偿）
+    private static final float REFERENCE_FPS = 60f;
+
     /**
      * 对实体进行当前速度大小的计算（不改变方向）
+     * <p>
+     * 意图实体（{@link Entity#hasIntent()}）：每帧重置意图 → 帧级缩放（稳定速度 = 意图 × (1-摩擦)，帧率无关）；
+     * 无意图实体（物品等）：秒级衰减 ×(1-摩擦)^(delta×参考帧率)（等效参考帧率下的帧级表现，帧率无关、快速停止）。
+     * 空气阻力（秒级）对所有实体生效；击退中实体由击退物理负责，跳过本方法
      */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
 
         float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);    //空气阻力的影响（秒级）
-        //float airDrag = 1f - Fight.AIR_FRICTION.getValue();
 
         //子弹实体不受方块摩擦力影响，只受空气阻力
         if (entity instanceof Bullet bullet) {
@@ -331,9 +337,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
             if (block != null) {
                 float scale = Math.max(0f, 1f - block.getProperty().getFriction());
-
-                //curSpeed *= (float) Math.pow(scale, delta); //秒级指数衰减：速度每秒衰减到 scale（帧率无关）
-                curSpeed *= scale;  //直接与摩擦缩放相乘
+                if (entity.hasIntent()) {
+                    //意图实体：帧级缩放（意图每帧重置 → 稳定速度 = 意图 × scale，帧率无关）
+                    curSpeed *= scale;
+                } else {
+                    //无意图实体：秒级衰减（等效参考帧率下的帧级表现，帧率无关）
+                    curSpeed *= (float) Math.pow(scale, delta * REFERENCE_FPS);
+                }
             }
         }
 
