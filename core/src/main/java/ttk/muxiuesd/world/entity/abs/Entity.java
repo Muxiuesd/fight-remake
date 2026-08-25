@@ -261,7 +261,7 @@ public abstract class Entity<T extends Entity<T>>
 
     /**
      * 获取当前速率
-     * */
+     */
     public float getCurSpeed () {
         return Vec2.len(this.getVelX(), this.getVelY());
     }

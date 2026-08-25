@@ -308,17 +308,13 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
     /**
      * 对实体进行当前速度大小的计算（不改变方向）
-     * <p>
-     * 速度衰减统一为秒级指数（帧率无关）：速度每秒衰减到 (1-摩擦系数)。
-     * 意图实体（玩家/敌人/状态机）每帧重置意图 → 稳定速度 = 意图 × 每秒衰减率；
-     * 无意图实体（物品等）→ 真正的每秒衰减。与击退/空气阻力粒度一致
      */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
 
-        //空气阻力的影响（秒级）
-        float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);
+        float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);    //空气阻力的影响（秒级）
+        //float airDrag = 1f - Fight.AIR_FRICTION.getValue();
 
         //子弹实体不受方块摩擦力影响，只受空气阻力
         if (entity instanceof Bullet bullet) {
@@ -335,8 +331,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
             if (block != null) {
                 float scale = Math.max(0f, 1f - block.getProperty().getFriction());
-                //秒级指数衰减：速度每秒衰减到 scale（帧率无关）
-                curSpeed *= (float) Math.pow(scale, delta);
+
+                //curSpeed *= (float) Math.pow(scale, delta); //秒级指数衰减：速度每秒衰减到 scale（帧率无关）
+                curSpeed *= scale;  //直接与摩擦缩放相乘
             }
         }
 
@@ -348,10 +345,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         entity.setCurSpeed(curSpeed);
         //应用空气阻力
-        entity.setVelocity(
-            entity.getVelX() * airDrag,
-            entity.getVelY() * airDrag
-        );
+        entity.setVelocity(entity.getVelX() * airDrag, entity.getVelY() * airDrag);
+
+        if (entity == getPlayer()) {
+            Log.print(TAG(), "玩家当前速度：" + entity.getCurSpeed());
+        }
     }
 
     /**

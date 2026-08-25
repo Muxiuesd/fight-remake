@@ -205,7 +205,10 @@ public class PlayerSystem extends WorldSystem {
                 } else {
                     curVelY = 0;
                 }
-                curPlayer.setVelocity(curVelX, curVelY);
+                //这里要设置一遍速度不然后续的应用摩擦计算速度出问题
+                curPlayer
+                    .setVelocity(curVelX, curVelY)
+                    .setCurSpeed(playerSpeed);
             }
             if (inputX == 0 && inputY == 0) {
                 curPlayer.setVelocity(0, 0);

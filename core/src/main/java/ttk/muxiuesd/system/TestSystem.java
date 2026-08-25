@@ -34,8 +34,22 @@ public class TestSystem extends WorldSystem {
     public void update (float delta) {
         super.update(delta);
 
-        Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
+        //this.codecTest();
+        this.speedTest();
+    }
 
+    private void speedTest () {
+        Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
+        if (KeyBindings.PlayerShift.wasJustPressed()) {
+            Log.print(TAG(),
+                "玩家当前速度：" + player.getCurSpeed() + " blocks/s"
+                    +"  基准速度：" + player.getSpeed() + " blocks/s");
+        }
+
+    }
+
+    private void codecTest () {
+        Player player = getWorld().getSystem(PlayerSystem.class).getPlayer();
         if (!player.handIsEmpty() && KeyBindings.PlayerShift.wasJustPressed()) {
             ItemStack handItemStack = player.getHandItemStack();
             RawObject rawObject = ItemStack.CODEC.encode(handItemStack);
