@@ -38,80 +38,80 @@ public final class Blocks {
         () -> new Block.Property().setFriction(0.9f)
     );
     public static final Block GRASS = registerCommon("grass",
-        () -> new Block.Property().setFriction(0.05f).setSounds(Sounds.GRASS)
+        () -> new Block.Property().setFriction(0.6f).setSounds(Sounds.GRASS)
     );
     public static final Block STONE = registerCommon("stone",
-        () -> new Block.Property().setFriction(0.05f).setSounds(Sounds.STONE)
+        () -> new Block.Property().setFriction(0.6f).setSounds(Sounds.STONE)
     );
     public static final Block SAND = registerCommon("sand",
-        () -> new Block.Property().setFriction(0.06f).setSounds(Sounds.SAND)
+        () -> new Block.Property().setFriction(0.7f).setSounds(Sounds.SAND)
     );
     public static final Block FARMLAND_DRY = registerCommon("farmland_dry",
-        () -> new Block.Property().setFriction(0.08f).setSounds(Sounds.GRASS)
+        () -> new Block.Property().setFriction(0.65f).setSounds(Sounds.GRASS)
     );
     public static final Block WATER = register("water", BlockWater::new,
-        () -> new Block.Property().setFriction(0.7f).setWalkable(false).setSwimmable(true),
+        () -> new Block.Property().setFriction(0.9f).setWalkable(false).setSwimmable(true),
         BlockWater.RENDERER
     );
 
     //建筑方块
     public static final Block GLASS = registerCommon("glass",
-        () -> new Block.Property().setFriction(0.02f)
+        () -> new Block.Property().setFriction(0.5f)
     );
 
     //矿物方块
     public static final Block COAL_ORE = registerCommon("coal_ore",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
 
     //颜色方块
     public static final Block WOOL_BLACK = register("wool_colored_black", "wool/wool_colored_black",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_BLUE = register("wool_colored_blue", "wool/wool_colored_blue",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_BROWN = register("wool_colored_brown", "wool/wool_colored_brown",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_CYAN = register("wool_colored_cyan", "wool/wool_colored_cyan",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_GRAY = register("wool_colored_gray", "wool/wool_colored_gray",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_GREEN = register("wool_colored_green", "wool/wool_colored_green",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_LIGHT_BLUE = register("wool_colored_light_blue", "wool/wool_colored_light_blue",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_LIME = register("wool_colored_lime", "wool/wool_colored_lime",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_MAGENTA = register("wool_colored_magenta", "wool/wool_colored_magenta",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_ORANGE = register("wool_colored_orange", "wool/wool_colored_orange",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_PINK = register("wool_colored_pink", "wool/wool_colored_pink",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_PURPLE = register("wool_colored_purple", "wool/wool_colored_purple",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_RED = register("wool_colored_red", "wool/wool_colored_red",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_SILVER = register("wool_colored_silver", "wool/wool_colored_silver",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_WHITE = register("wool_colored_white", "wool/wool_colored_white",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
     public static final Block WOOL_YELLOW = register("wool_colored_yellow", "wool/wool_colored_yellow",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> new Block.Property().setFriction(0.5f)
     );
 
     /// 植物

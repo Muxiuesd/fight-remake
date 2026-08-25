@@ -51,8 +51,6 @@ import java.util.concurrent.*;
  * */
 public class EntitySystem extends WorldSystem implements IWorldGroundEntityRender, Tickable {
     public static final float MIN_SPEED = 0.0000001f;
-    /// 摩擦缩放因子的平滑半衰期（秒）：跨方块变速时，缩放因子向目标逼近一半所需的时间
-    public static final float FRICTION_SMOOTH_HALF_LIFE = 0.05f;
     private boolean renderHitbox = false;
 
     private final Array<Entity<?>> _delayAdd = new Array<>();
@@ -200,6 +198,24 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             _delayAdd.clear();
         }
 
+        this.updateEntities(delta);
+    }
+
+    @Override
+    public void tick (World world, float delta) {
+        //每一个可更新实体的tick更新
+        this.updatableEntity.forEach(entity -> entity.tick(world, delta));
+
+        this.calculateNeedActiveEntity();
+        this.calculateInactionEntity();
+
+        this.checkTasks();
+    }
+
+    /**
+     * 更新所有可更新实体的总入口方法
+     * */
+    private void updateEntities (float delta) {
         //先把所有实体更新一次
         for (Entity entity : this.updatableEntity) {
             //细化实体更新
@@ -215,25 +231,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             entity.update(delta);
 
             //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦（击退中的实体衰减由击退物理负责）
-            if (!(entity instanceof ItemEntity) && !entity.isKnockback()) {
+            if (!entity.isKnockback()) {
                 this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
             }
         }
-
-
-        /*this.updatableEntity.clear();
-        this.incationEntity.clear();*/
-    }
-
-    @Override
-    public void tick (World world, float delta) {
-        //每一个可更新实体的tick更新
-        this.updatableEntity.forEach(entity -> entity.tick(world, delta));
-
-        this.calculateNeedActiveEntity();
-        this.calculateInactionEntity();
-
-        this.checkTasks();
     }
 
     private void updateLivingEntity(LivingEntity livingEntity, float delta) {
@@ -271,9 +272,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     itemEntity.setLivingTime(0);
                 }
                 //捡起失败则什么也没发生（速度与基准速度都清零，防止残留速度）
-                itemEntity.setBeingAttracted(false);
-                itemEntity.setVelocity(0, 0);
-                itemEntity.setSpeed(0);
+                itemEntity
+                    .setBeingAttracted(false)
+                    .setOnGround(true)
+                    .setVelocity(0, 0)
+                    .setCurSpeed(0);
             }
 
             float distance = Util.getDistance(itemEntity, player);
@@ -282,36 +285,43 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 && !player.getBackpack().isFull(itemEntity.getItemStack());
             if (inRange) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
-                itemEntity.setBeingAttracted(true);
                 Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
-                itemEntity.setVelocity(direction.getX(), direction.getY());
                 //吸引速度随距离衰减：远处快、近处慢（避免物品在玩家周围环绕抖动）
                 float speed = Math.min(12f, distance * 4f);
-                itemEntity.setSpeed(speed);
+                itemEntity
+                    .setBeingAttracted(true)
+                    .setOnGround(false)
+                    .setVelocity(direction.getX(), direction.getY())
+                    .setCurSpeed(speed);
             } else if (itemEntity.isBeingAttracted()) {
                 //离开了吸引范围：停止朝向玩家移动（不再保留残留速度）
-                itemEntity.setBeingAttracted(false);
-                itemEntity.setVelocity(0, 0);
-                itemEntity.setSpeed(0);
+                itemEntity
+                    .setBeingAttracted(false)
+                    .setOnGround(true)
+                    .setVelocity(0, 0)
+                    .setCurSpeed(0);
             }
         }
 
-        this.calculateEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
+        //this.calculateEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
     }
 
     /**
      * 对实体进行当前速度大小的计算（不改变方向）
-     * */
+     * <p>
+     * 速度衰减统一为秒级指数（帧率无关）：速度每秒衰减到 (1-摩擦系数)。
+     * 意图实体（玩家/敌人/状态机）每帧重置意图 → 稳定速度 = 意图 × 每秒衰减率；
+     * 无意图实体（物品等）→ 真正的每秒衰减。与击退/空气阻力粒度一致
+     */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
 
-        //空气阻力的影响
+        //空气阻力的影响（秒级）
         float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);
 
         //子弹实体不受方块摩擦力影响，只受空气阻力
         if (entity instanceof Bullet bullet) {
-            //空气阻力：子弹不受方块摩擦影响，速度只随空气阻力逐渐衰减
             bullet.setVelX(bullet.getVelX() * airDrag);
             bullet.setVelY(bullet.getVelY() * airDrag);
             return;
@@ -324,11 +334,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             //计算脚下方块摩擦对速度的影响（取样点与游泳判定一致，都用实体底部）
             Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
             if (block != null) {
-                float friction = block.getProperty().getFriction();
-                float targetScale = Math.max(0f, 1f - friction);
-                float smooth = 1f - (float) Math.pow(0.5f, delta / FRICTION_SMOOTH_HALF_LIFE);
-                entity.setFrictionScale(entity.getFrictionScale() + (targetScale - entity.getFrictionScale()) * smooth);
-                curSpeed *= entity.getFrictionScale();
+                float scale = Math.max(0f, 1f - block.getProperty().getFriction());
+                //秒级指数衰减：速度每秒衰减到 scale（帧率无关）
+                curSpeed *= (float) Math.pow(scale, delta);
             }
         }
 
@@ -338,38 +346,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             return;
         }
 
-        //应用空气阻力
         entity.setCurSpeed(curSpeed);
+        //应用空气阻力
         entity.setVelocity(
             entity.getVelX() * airDrag,
             entity.getVelY() * airDrag
         );
-    }
-
-    /**
-     * 对物品实体进行当前速度计算
-     * */
-    @Deprecated
-    private void calculateItemEntityCurSpeed (ItemEntity entity, ChunkSystem cs, float delta) {
-        //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
-
-        float curSpeed = entity.getSpeed();
-        //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）
-        if (!entity.isBeingAttracted()) {
-            //采样点与实体摩擦一致（实体底部，不依赖 onGround 标志——该标志由 onAirTimer 维护，语义不可靠）
-            Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
-            if (block == null) return;
-            curSpeed *= Math.max(0f, 1f - block.getProperty().getFriction());
-        }
-        //速度过小直接为0
-        if (curSpeed < MIN_SPEED) {
-            entity.setCurSpeed(0);
-            return;
-        }
-        entity.setCurSpeed(curSpeed);
-        //物品实体的基准速度逐渐下降
-        entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
     }
 
     /**
