@@ -35,7 +35,7 @@ public class TestSystem extends WorldSystem {
         super.update(delta);
 
         //this.codecTest();
-        this.speedTest();
+        //this.speedTest();
     }
 
     private void speedTest () {
