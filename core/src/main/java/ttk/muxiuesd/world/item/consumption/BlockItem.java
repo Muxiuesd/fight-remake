@@ -43,7 +43,7 @@ public class BlockItem extends ConsumptionItem {
             //获取方块的掉落物表
             BlockDropLootTable dropLootTable = Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(replacedBlock.getIdentifier());
             if (dropLootTable != null) {
-                dropLootTable.generate(world, new BlockDropLootTable.Condition().setPos(worldPosition));
+                dropLootTable.generate(world, new BlockDropLootTable.Conditions().setPos(worldPosition));
             }else {
                 //找不到注册的战利品表就尝试找对应的方块物品
                 Item item = Registries.ITEM.getOrNull(replacedBlock.getIdentifier());

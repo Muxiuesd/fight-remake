@@ -118,7 +118,7 @@ public class CraftingRecipes {
      * @param recipe 注册表
      * */
     public static CraftingTableRecipe register (Identifier identifier, CraftingTableRecipe recipe) {
-        return Registries.CRAFTING_RECIPE_REGISTRY.register(identifier, recipe);
+        return Registries.CRAFTING_RECIPE.register(identifier, recipe);
     }
 
 

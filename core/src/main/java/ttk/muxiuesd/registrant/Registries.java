@@ -21,6 +21,7 @@ import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
+import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
@@ -52,9 +53,10 @@ public class Registries {
     public static final Registry<BlockSounds> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
-    public static final CraftingRecipeRegistry CRAFTING_RECIPE_REGISTRY = create(RegistryKeys.CRAFTING_RECIPE_REGISTRY_KEY, new CraftingRecipeRegistry());
+    public static final CraftingRecipeRegistry CRAFTING_RECIPE = create(RegistryKeys.CRAFTING_RECIPE, new CraftingRecipeRegistry());
 
-    public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE_REGISTRY_KEY);
+    public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE      = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE);
+    public static final Registry<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE  = create(RegistryKeys.ENTITY_DEATH_LOOT_TABLE);
 
 
     public static final BlockRendererRegistry BLOCK_RENDERER = create(

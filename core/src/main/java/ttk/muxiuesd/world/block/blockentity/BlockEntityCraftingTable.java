@@ -143,7 +143,7 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
             inventory.getItemStack(3), inventory.getItemStack(4), inventory.getItemStack(5),
             inventory.getItemStack(0), inventory.getItemStack(1), inventory.getItemStack(2),
         };
-        CraftingTableRecipe recipe = Registries.CRAFTING_RECIPE_REGISTRY.findRecipe(itemStacks);
+        CraftingTableRecipe recipe = Registries.CRAFTING_RECIPE.findRecipe(itemStacks);
         if (recipe != null) {
             ItemStack output = recipe.getOutput();
             //在输出槽位放对应的输出物品

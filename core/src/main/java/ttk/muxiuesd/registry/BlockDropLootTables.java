@@ -48,7 +48,7 @@ public class BlockDropLootTables {
     }
 
     /**
-     * 只掉落自己对应的方块物品的快捷注册
+     * 只掉落自己对应的方块物品的快捷注册（需要对应的方块物品已注册）
      * */
     public static BlockDropLootTable registerDropSelf (Block block) {
         return register(
@@ -59,11 +59,11 @@ public class BlockDropLootTables {
         );
     }
 
-    public static BlockDropLootTable register (String name, BlockDropLootTable blockDropLootTable) {
-        return register(Identifier.of(Fight.ID(name)), blockDropLootTable);
+    public static BlockDropLootTable register (String name, BlockDropLootTable lootTable) {
+        return register(Identifier.of(Fight.ID(name)), lootTable);
     }
 
-    public static BlockDropLootTable register (Identifier identifier, BlockDropLootTable blockDropLootTable) {
-        return Registries.BLOCK_DROP_LOOT_TABLE.register(identifier, blockDropLootTable);
+    public static BlockDropLootTable register (Identifier identifier, BlockDropLootTable lootTable) {
+        return Registries.BLOCK_DROP_LOOT_TABLE.register(identifier, lootTable);
     }
 }

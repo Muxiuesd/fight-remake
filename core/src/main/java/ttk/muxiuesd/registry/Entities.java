@@ -19,7 +19,9 @@ import ttk.muxiuesd.world.entity.enemy.Zombie;
 import ttk.muxiuesd.world.entity.player.Player;
 
 /**
- * 所有实体的注册
+ * 游戏内所有实体的注册
+ * <p>
+ * 实体的注册是以它的Provider形式注册，相当于注册了它的工厂，工厂内的属性在注册阶段写定
  * */
 public final class Entities {
     public static void init () {}

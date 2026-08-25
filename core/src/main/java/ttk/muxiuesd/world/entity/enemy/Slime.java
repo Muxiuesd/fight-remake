@@ -1,12 +1,10 @@
 package ttk.muxiuesd.world.entity.enemy;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.EntityTypes;
-import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.serialization.codecs.builders.LivingEntityCodecBuilder;
 import ttk.muxiuesd.util.Direction;
@@ -21,7 +19,6 @@ import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.entity.state.instance.SlimeAttackTargetState;
 import ttk.muxiuesd.world.entity.state.instance.SlimeRandomWalkState;
 import ttk.muxiuesd.world.entity.state.instance.SlimeRestState;
-import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 敌人：史莱姆
@@ -40,6 +37,7 @@ public class Slime extends Enemy<Slime> {
         .field("generation", Slime::getGeneration, Slime::setGeneration, Codec.INT)
         .factory(EntityCodecBuilder::createEntity);
 
+
     public int generation;  //史莱姆的代数，用于控制史莱姆的分裂次数，分裂次数越多，代数越高
     public float factor = 0.7f;    //分裂时的缩放因子
 
@@ -51,7 +49,7 @@ public class Slime extends Enemy<Slime> {
 
         this.generation = generation;
 
-        getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
+        //getBackpack().addItem(new ItemStack(Items.SLIME_BALL, MathUtils.random(1,3)));
         renderHandItem = false;
 
         addState(STATE_REST, new SlimeRestState());

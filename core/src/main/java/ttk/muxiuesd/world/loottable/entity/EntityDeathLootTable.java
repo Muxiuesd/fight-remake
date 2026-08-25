@@ -1,26 +1,20 @@
-package ttk.muxiuesd.world.loottable.block;
+package ttk.muxiuesd.world.loottable.entity;
 
 import game.muxiuesd.bedrockcore.math.Vec2;
 import ttk.muxiuesd.Fight;
-import ttk.muxiuesd.interfaces.world.block.BlockLootTable;
-import ttk.muxiuesd.interfaces.world.loottable.LootTable;
-import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.interfaces.world.entity.EntityLootTable;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
 /**
- * 方块的掉落战利品表
+ * 实体死亡的战利品表
  * */
-public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Conditions> {
+public class EntityDeathLootTable implements EntityLootTable<EntityDeathLootTable.Conditions> {
     private ItemStack[] dropItems;
 
-    /**
-     * 根据条件生成掉落战利品
-     * */
     @Override
     public void generate (World world, Conditions conditions) {
         //TODO 根据条件的复杂掉落生成机制
@@ -41,16 +35,14 @@ public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Con
         return this.dropItems;
     }
 
-    public BlockDropLootTable setDropItems (ItemStack[] dropItems) {
+    public EntityDeathLootTable setDropItems (ItemStack[] dropItems) {
         this.dropItems = dropItems;
         return this;
     }
 
-    /**
-     * 具体的条件类
-     * */
-    public static class Conditions extends LootTable.Conditions<Conditions> {
-        //TODO 额外条件
+
+    public static class Conditions extends EntityLootTable.Conditions<Conditions> {
+
     }
 
     /**
@@ -63,22 +55,14 @@ public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Con
         /**
          * 创建
          * */
-        public static Builder create () {
-            return new Builder();
-        }
-
-        /**
-         * 掉落方块自己的方块物品（需要对应的方块物品已注册）
-         * */
-        public Builder dropSelf (Block block) {
-            Item blockItem = Registries.ITEM.get(block.getIdentifier());
-            return this.setDropItems(blockItem);
+        public static EntityDeathLootTable.Builder create () {
+            return new EntityDeathLootTable.Builder();
         }
 
         /**
          * 添加指定的掉落物（快捷方法）
          * */
-        public Builder setDropItems (Item... dropItems) {
+        public EntityDeathLootTable.Builder setDropItems (Item... dropItems) {
             this.dropItemStacks = new ItemStack[dropItems.length];
             for (int i = 0; i < dropItems.length; i++) {
                 this.dropItemStacks[i] = new ItemStack(dropItems[i], 1);
@@ -87,9 +71,9 @@ public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Con
         }
 
         /**
-         * 添加指定的掉落物的堆栈（可以指定一些属性之类的）
+         * 添加指定的掉落物的堆栈（可以指定一些属性与具体数量之类的）
          * */
-        public Builder setDropItems (ItemStack... dropItemStacks) {
+        public EntityDeathLootTable.Builder setDropItems (ItemStack... dropItemStacks) {
             this.dropItemStacks = dropItemStacks;
             return this;
         }
@@ -97,8 +81,8 @@ public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Con
         /**
          * 构建出来
          * */
-        public BlockDropLootTable build () {
-            return new BlockDropLootTable()
+        public EntityDeathLootTable build () {
+            return new EntityDeathLootTable()
                 .setDropItems(this.dropItemStacks);
         }
     }
