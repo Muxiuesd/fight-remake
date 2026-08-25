@@ -45,7 +45,7 @@ public class EntityProvider<T extends Entity<T>> {
      * */
     public T create (World world, EntityType<? super T> type) {
         T entity = factory.create(world, type);
-        entity.setIdentifier(this.getIdentifier());
+        entity.setProvider(this);
         return entity;
     }
 

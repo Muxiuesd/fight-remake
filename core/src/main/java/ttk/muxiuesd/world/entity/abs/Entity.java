@@ -15,6 +15,7 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
@@ -51,7 +52,6 @@ public abstract class Entity<T extends Entity<T>>
     /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
-    private Identifier identifier;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
     private float speed;
     private float x, y;                     //实体的世界坐标
@@ -69,6 +69,7 @@ public abstract class Entity<T extends Entity<T>>
     private Property property;                      //实体的属性
     private HitboxHolder<Entity<T>> hitboxHolder;   //实体的碰撞箱持有者
     private EntitySounder sounder;                  //实体的音频发声者
+    private EntityProvider<?> provider;             //实体的提供者（持有实体的注册信息与 Identifier）
 
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
@@ -521,17 +522,37 @@ public abstract class Entity<T extends Entity<T>>
         return this.getIdentifier() == null ? null : this.getIdentifier().getID();
     }
 
+    /**
+     * 获取实体的标识符（由 {@link #getProvider()} 间接持有，实体自身不持有 Identifier）
+     * */
     public Identifier getIdentifier () {
-        return this.identifier;
+        return this.provider == null ? null : this.provider.getIdentifier();
     }
 
-    public T setIdentifier (Identifier identifier) {
-        //Identifier 只在注册阶段给定，注册过后不允许修改
-        if (this.identifier != null && !this.identifier.equals(identifier)) {
-            throw new IllegalStateException("Identifier 已设置，禁止修改！实体：" + this.identifier.getID() + " -> " + identifier.getID());
+    /**
+     * 获取实体的提供者（注册信息与 Identifier 的单一持有者）
+     * */
+    public EntityProvider<?> getProvider () {
+        return this.provider;
+    }
+
+    /**
+     * 设置实体的提供者（注册阶段由 {@link EntityProvider#create} 给定，注册过后不允许修改）
+     * */
+    public T setProvider (EntityProvider<?> provider) {
+        if (this.provider != null && this.provider != provider) {
+            throw new IllegalStateException("EntityProvider 已设置，禁止修改！实体：" + this.getID());
         }
-        this.identifier = identifier;
+        this.provider = provider;
         return (T) this;
+    }
+
+    /**
+     * 实体的 Identifier 只能通过 {@link #setProvider} 间接设置，禁止直接设置
+     * */
+    @Override
+    public T setIdentifier (Identifier identifier) {
+        throw new IllegalStateException("实体的 Identifier 不能直接设置，应通过 EntityProvider 间接持有！实体：" + this.getID());
     }
 
     /**

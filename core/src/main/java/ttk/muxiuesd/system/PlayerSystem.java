@@ -300,7 +300,8 @@ public class PlayerSystem extends WorldSystem {
             return playerResult.result().get();
         }
         Log.error(TAG(), "玩家读取失败！json原文：" + playerJson);
-        return new Player(getWorld(), EntityTypes.PLAYER);
+        //必须经 EntityProvider 创建（实体持有 provider，直接 new 会导致 provider 为 null）
+        return Entities.PLAYER.create(getWorld());
     }
 
 
