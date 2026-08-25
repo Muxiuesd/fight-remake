@@ -349,6 +349,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 对物品实体进行当前速度计算
      * */
+    @Deprecated
     private void calculateItemEntityCurSpeed (ItemEntity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;

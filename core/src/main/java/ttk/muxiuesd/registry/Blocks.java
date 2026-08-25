@@ -47,10 +47,10 @@ public final class Blocks {
         () -> new Block.Property().setFriction(0.06f).setSounds(Sounds.SAND)
     );
     public static final Block FARMLAND_DRY = registerCommon("farmland_dry",
-        () -> new Block.Property().setFriction(0.1f).setSounds(Sounds.GRASS)
+        () -> new Block.Property().setFriction(0.08f).setSounds(Sounds.GRASS)
     );
     public static final Block WATER = register("water", BlockWater::new,
-        () -> new Block.Property().setFriction(0.9f).setWalkable(false).setSwimmable(true),
+        () -> new Block.Property().setFriction(0.7f).setWalkable(false).setSwimmable(true),
         BlockWater.RENDERER
     );
 
