@@ -38,7 +38,7 @@ public class EquipmentItem extends Item {
     public final EquipmentItem.Type equipmentType;
 
     public EquipmentItem (EquipmentItem.Type equipmentType, Property property) {
-        super(Item.Type.EQUIPMENT, property);
+        super(property);
         this.equipmentType = equipmentType;
     }
 

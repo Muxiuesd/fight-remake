@@ -36,7 +36,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
 
     private Identifier identifier;                          //物品的id标识
-    private Type type;                                      //物品的类型
     private Property property;                              //物品最原始的属性，原则上不直接对这个原始数据进行操作
 
     public Item () {}
@@ -45,10 +44,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 最普通的物品的构造方法
      * */
     public Item (Property property) {
-        this(Type.COMMON, property);
-    }
-    public Item (Type type, Property property) {
-        this.type = type;
         this.property = property;
     }
 
@@ -111,15 +106,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
         return this;
     }
 
-    public Type getType () {
-        return this.type;
-    }
-
-    public Item setType (Type type) {
-        this.type = type;
-        return this;
-    }
-
     @Override
     public String getID () {
         return this.getIdentifier().getID();
@@ -142,16 +128,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
     @Override
     public Codec<Item> getCodec () {
         return CODEC;
-    }
-
-    /**
-     * 枚举：物品的类型
-     * */
-    public enum Type {
-        COMMON,         //普通物品
-        CONSUMPTION,    //消耗品
-        WEAPON,         //武器
-        EQUIPMENT       //装备
     }
 
     /**

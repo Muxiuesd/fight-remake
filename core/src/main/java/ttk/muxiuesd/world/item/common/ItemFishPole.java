@@ -33,7 +33,7 @@ public class ItemFishPole extends Item {
     public float pullSpeed = castSpeed * 2;
 
     public ItemFishPole () {
-        super(Type.COMMON, new Property().setMaxCount(1)
+        super(new Property().setMaxCount(1)
                 .add(PropertyTypes.ITEM_WITH_ENTITY, null)
                 .add(PropertyTypes.FISHING_POLE_USING, false));
     }

@@ -20,17 +20,6 @@ public final class ItemStackBehaviours {
     public static final IItemStackBehaviour RANGED_WEAPON = register("ranged_weapon", new RangedWeaponItemStackBehaviour());
     public static final IItemStackBehaviour EQUIPMENT = register("equipment", new EquipmentItemStackBehaviour());
 
-
-    public static IItemStackBehaviour create (Item.Type type) {
-        //判断不同的物品类型来注入行为
-        if (type == Item.Type.CONSUMPTION) return CONSUMPTION;
-        else if (type == Item.Type.WEAPON) return SWORD;
-        else if (type == Item.Type.EQUIPMENT) return EQUIPMENT;
-
-        //默认为普通物品
-        return COMMON;
-    }
-
     public static IItemStackBehaviour register (String name, IItemStackBehaviour behaviour) {
         return Registries.ITEM_STACK_BEHAVIOUR.register(Identifier.of(Fight.NAMESPACE, name), behaviour);
     }

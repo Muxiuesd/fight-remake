@@ -23,7 +23,7 @@ public abstract class Weapon extends Item {
     }
 
     public Weapon (Property property) {
-        super(Type.WEAPON, property);
+        super(property);
     }
 
     @Override

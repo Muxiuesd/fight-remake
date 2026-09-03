@@ -10,10 +10,10 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class ConsumptionItem extends Item {
 
     public ConsumptionItem () {
-        super(Type.CONSUMPTION, new Property());
+        super(new Property());
     }
     public ConsumptionItem (Property property) {
-        super(Type.CONSUMPTION, property);
+        super(property);
     }
 
     @Override

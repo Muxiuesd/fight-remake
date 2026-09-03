@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class CommonItem extends Item {
     public CommonItem () {
-        super(Type.COMMON, new Property());
+        super(new Property());
     }
 
     @Override
