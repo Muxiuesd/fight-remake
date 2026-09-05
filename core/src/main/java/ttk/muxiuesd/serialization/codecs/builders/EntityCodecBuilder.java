@@ -53,7 +53,7 @@ public class EntityCodecBuilder {
                 (entity, cats) -> {
                     if (cats != null) {
                         entity.getProperty().setCatsHolder(cats);
-                        entity.readCatData(CodecCatsHolder.toJsonValue(cats));
+                        entity.readCatData(cats);
                     }
                 },
                 CodecCatsHolder.CODEC);

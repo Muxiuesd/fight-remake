@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.entity.abs;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
@@ -118,11 +117,11 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.handIndex = values.getInt("handIndex", 0);
-        this.maxHealth = values.getFloat("maxHealth", 10f);
-        this.curHealth = values.getFloat("curHealth", 10f);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.handIndex = holder.getInt("handIndex", 0);
+        this.maxHealth = holder.getFloat("maxHealth", 10f);
+        this.curHealth = holder.getFloat("curHealth", 10f);
     }
 
     @Override

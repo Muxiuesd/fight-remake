@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
@@ -66,7 +65,7 @@ public abstract class BlockEntity implements Updateable, Tickable, ICatData {
      * 由所属方块调用的cat读取
      * */
     @Override
-    public void readCatData (JsonValue values) {
+    public void readCatData (CatsHolder holder) {
     }
 
     /**

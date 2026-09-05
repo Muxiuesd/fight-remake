@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.entity;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Pool;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.DataResult;
@@ -104,20 +103,17 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.cycle = values.getFloat("cycle", 0f);
-        this.livingTime = values.getFloat("livingTime", 0f);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.cycle = holder.getFloat("cycle", 0f);
+        this.livingTime = holder.getFloat("livingTime", 0f);
 
-
-        if (values.has("on_air")) {
-            if (values.getBoolean("on_air")) {
-                this.onAirTimer = new TaskTimer(
-                    values.getFloat("on_air_max_span", 0f),
-                    values.getFloat("on_air_cur_span", 0f),
-                    () -> this.setOnAirTimer(null)
-                );
-            }
+        if (holder.getBoolean("on_air", false)) {
+            this.onAirTimer = new TaskTimer(
+                holder.getFloat("on_air_max_span", 0f),
+                holder.getFloat("on_air_cur_span", 0f),
+                () -> this.setOnAirTimer(null)
+            );
         }
     }
 

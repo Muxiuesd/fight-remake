@@ -5,7 +5,6 @@ import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import game.muxiuesd.bedrockcore.serialization.builders.CodecBuilder0;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.serialization.codecs.CodecCatsHolder;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;

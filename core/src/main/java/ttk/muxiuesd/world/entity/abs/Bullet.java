@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
@@ -84,10 +83,10 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.maxLiveTime = values.getFloat("maxLiveTime", this.maxLiveTime);
-        this.liveTime = values.getFloat("liveTime", this.liveTime);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.maxLiveTime = holder.getFloat("maxLiveTime", this.maxLiveTime);
+        this.liveTime = holder.getFloat("liveTime", this.liveTime);
     }
 
     @Override

@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.math.Vec2;
@@ -81,22 +80,22 @@ public abstract class Entity<T extends Entity<T>>
      * 读取自定义属性标签数据
      * */
     @Override
-    public void readCatData (JsonValue values) {
-        this.speed = values.getFloat("speed", 1.145f);
-        this.x = values.getFloat("x", 1.145f);
-        this.y = values.getFloat("y", 1.145f);
-        this.velX = values.getFloat("velX", 0);
-        this.velY = values.getFloat("velY", 0);
+    public void readCatData (CatsHolder holder) {
+        this.speed = holder.getFloat("speed", 1.145f);
+        this.x = holder.getFloat("x", 1.145f);
+        this.y = holder.getFloat("y", 1.145f);
+        this.velX = holder.getFloat("velX", 0);
+        this.velY = holder.getFloat("velY", 0);
         //curSpeed 在速度矢量之后设置（setCurSpeed 缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
-        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
-        this.width = values.getFloat("width", 1f);
-        this.height = values.getFloat("height", 1f);
-        this.originX = values.getFloat("originX", 0);
-        this.originY = values.getFloat("originY", 0);
-        this.scaleX = values.getFloat("scaleX", 1f);
-        this.scaleY = values.getFloat("scaleY", 1f);
-        this.rotation = values.getFloat("rotation", 0);
-        this.onGround = values.getBoolean("onGround", true);
+        this.setCurSpeed(holder.getFloat("curSpeed", 1.145f));
+        this.width = holder.getFloat("width", 1f);
+        this.height = holder.getFloat("height", 1f);
+        this.originX = holder.getFloat("originX", 0);
+        this.originY = holder.getFloat("originY", 0);
+        this.scaleX = holder.getFloat("scaleX", 1f);
+        this.scaleY = holder.getFloat("scaleY", 1f);
+        this.rotation = holder.getFloat("rotation", 0);
+        this.onGround = holder.getBoolean("onGround", true);
 
         this.updateHitboxCenterPos(this.x, this.y);
     }

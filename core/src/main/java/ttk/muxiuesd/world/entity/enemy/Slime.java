@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.entity.enemy;
 
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.registrant.Gets;
@@ -66,9 +65,9 @@ public class Slime extends Enemy<Slime> {
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.generation = values.getInt("generation", 1);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.generation = holder.getInt("generation", 1);
     }
 
     @Override
