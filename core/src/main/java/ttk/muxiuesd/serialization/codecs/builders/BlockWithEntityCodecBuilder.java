@@ -55,10 +55,10 @@ public class BlockWithEntityCodecBuilder {
                 (block, property) -> {
                     //设置属性
                     block.setProperty(property);
-                    //把属性中保存的cats数据读取到方块和方块实体上
+                    //把属性中保存的cats数据读取到方块和方块实体上（直接传 CatsHolder，省 JsonValue 中间转换）
                     CatsHolder cats = property.get(PropertyTypes.CATS);
                     if (cats != null) {
-                        block.readCatData(CodecCatsHolder.toJsonValue(cats));
+                        block.readCatData(cats);
                     }
                 },
                 Block.Property.CODEC

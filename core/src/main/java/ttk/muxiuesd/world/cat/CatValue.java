@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.cat;
 
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
-import game.muxiuesd.bedrockcore.util.Log;
 
 /**
  * 用于存储cat值的包装类
@@ -43,14 +42,15 @@ public abstract class CatValue<T> implements Cloneable{
 
     /**
      * 重写克隆方法
+     * <p>
+     * 基本类型值（CatInt/CatFloat/CatBoolean/CatString/CatLong 等，值非 {@link CatCopyable}）
+     * 直接用 {@link #newSelf()} 值复制（不再抛异常）；复杂对象值走 CatCopyable 深拷贝
      * */
     @Override
-    public CatValue<T> clone () throws CloneNotSupportedException {
-        super.clone();
+    public CatValue<T> clone () {
         if (this.value instanceof CatCopyable<?> copyable){
             return this.newSelf().set((T) copyable.copySelf());
         }
-        Log.error(this.getClass().getName(), "这个cat的值无法克隆！！！");
-        throw new CloneNotSupportedException();
+        return this.newSelf();
     }
 }

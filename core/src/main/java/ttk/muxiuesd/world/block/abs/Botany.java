@@ -2,7 +2,6 @@ package ttk.muxiuesd.world.block.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
@@ -31,10 +30,9 @@ public abstract class Botany extends Block implements Tickable, ICatData {
      * 植物的现代化编解码器
      * <p>
      * 解码时通过方块注册表拿到原型，再调用{@link #createSelf}创建一个新的实例
-     * */
+     */
     public static final Codec<Botany> CODEC = CodecBuilder.<Botany>create()
         .paramField("id", Botany::getID, Codec.STRING)
-        .field("growLevel", Botany::getGrowLevel, Botany::setGrowLevel, Codec.INT)
         .field("property",
             botany -> {
                 //把当前的cats数据写入属性，保证保存的数据是最新的
@@ -44,7 +42,15 @@ public abstract class Botany extends Block implements Tickable, ICatData {
                 }
                 return botany.getProperty();
             },
-            Botany::setProperty,
+            (botany, property) -> {
+                //设置属性
+                botany.setProperty(property);
+                //把属性中保存的cats数据读取到植物上
+                CatsHolder cats = property.get(PropertyTypes.CATS);
+                if (cats != null) {
+                    botany.readCatData(cats);
+                }
+            },
             Block.Property.CODEC)
         .factory(id -> {
             Block block = Registries.BLOCK.getOrNull(id);
@@ -66,8 +72,8 @@ public abstract class Botany extends Block implements Tickable, ICatData {
     public abstract Botany createSelf ();
 
     @Override
-    public void readCatData (JsonValue values) {
-        this.setGrowLevel(values.getInt("growLevel"));
+    public void readCatData (CatsHolder holder) {
+        this.setGrowLevel(holder.getInt("growLevel", 0));
     }
 
     @Override

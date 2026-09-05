@@ -37,6 +37,12 @@ public abstract class BlockWithEntity extends Block implements ICatData{
     }
 
     @Override
+    public void readCatData (CatsHolder holder) {
+        //让方块实体读取属性
+        this.getBlockEntity().readCatData(holder);
+    }
+
+    @Override
     public void readCatData (JsonValue values) {
         //让方块实体读取属性
         this.getBlockEntity().readCatData(values);

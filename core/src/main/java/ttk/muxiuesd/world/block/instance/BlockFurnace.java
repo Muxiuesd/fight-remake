@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.block.instance;
 
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.serialization.codecs.builders.BlockWithEntityCodecBuilder;
@@ -21,7 +20,6 @@ public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurn
         BlockFurnace::new,
         BlockEntityFurnace.CODEC,
         builder -> builder
-                .field("is_working", BlockFurnace::isWorking, BlockFurnace::setWorking, Codec.BOOL)
     );
 
 
@@ -39,9 +37,9 @@ public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurn
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.isWorking = values.getBoolean("is_working", false);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.isWorking = holder.getBoolean("is_working", false);
     }
 
     @Override

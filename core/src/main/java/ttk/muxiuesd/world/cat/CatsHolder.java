@@ -28,6 +28,34 @@ public class CatsHolder implements ShallowCopyable<CatsHolder> {
         return this.getMap().get(key);
     }
 
+    /**
+     * 类型化便捷读取（供 {@code readCatData} 直接使用，缺省返回默认值）
+     * */
+    public int getInt (String key, int def) {
+        CatValue<?> v = this.get(key);
+        return v instanceof CatInt ci ? ci.get() : def;
+    }
+
+    public float getFloat (String key, float def) {
+        CatValue<?> v = this.get(key);
+        return v instanceof CatFloat cf ? cf.get() : def;
+    }
+
+    public boolean getBoolean (String key, boolean def) {
+        CatValue<?> v = this.get(key);
+        return v instanceof CatBoolean cb ? cb.get() : def;
+    }
+
+    public String getString (String key, String def) {
+        CatValue<?> v = this.get(key);
+        return v instanceof CatString cs ? cs.get() : def;
+    }
+
+    public long getLong (String key, long def) {
+        CatValue<?> v = this.get(key);
+        return v instanceof CatLong cl ? cl.get() : def;
+    }
+
     public HashMap<String, CatValue<?>> getMap () {
         return this.entries;
     }
@@ -36,11 +64,7 @@ public class CatsHolder implements ShallowCopyable<CatsHolder> {
     public CatsHolder copy () {
         CatsHolder newInstance = new CatsHolder();
         this.getMap().forEach((key, catValue) -> {
-            try {
-                newInstance.put(key, catValue.clone());
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
+            newInstance.put(key, catValue.clone());
         });
         return newInstance;
     }

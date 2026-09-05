@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.interfaces.Inventory;
@@ -35,23 +34,8 @@ import ttk.muxiuesd.world.particle.ParticleEmittersReg;
  * 熔炉
  * */
 public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEntityFurnace> {
-    /*public static final Codec<BlockEntityFurnace> CODEC1 = CodecBuilder.<BlockEntityFurnace>create()
-        .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
-        .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
-        .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC)
-        .factory((blockPos, id) -> {
-            //从注册表拿到方块实体的提供者
-            BlockEntityProvider<?> provider = Registries.BLOCK_ENTITY.get(id);
-            BlockEntity blockEntity = provider.create(blockPos);
-            blockEntity.setProvider(provider);
-            return (BlockEntityFurnace) blockEntity;
-        });*/
-
     public static final Codec<BlockEntityFurnace> CODEC = BlockEntityCodecBuilder
-        .create(builder ->
-            builder
-                .field("curEnergy", BlockEntityFurnace::getCurEnergy, BlockEntityFurnace::setCurEnergy, Codec.INT)
-                .field("curTick", BlockEntityFurnace::getCurTick, BlockEntityFurnace::setCurTick, Codec.INT)
+        .create(builder -> builder
     );
 
 
@@ -82,10 +66,10 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.curEnergy = values.getInt("curEnergy", 0);
-        this.curTick = values.getInt("curTick", 0);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.curEnergy = holder.getInt("curEnergy", 0);
+        this.curTick = holder.getInt("curTick", 0);
     }
 
 
