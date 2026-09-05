@@ -28,7 +28,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.light.PointLight;
-import ttk.muxiuesd.world.particle.ParticleEmittersReg;
+import ttk.muxiuesd.registry.ParticleEmitters;
 
 /**
  * 熔炉
@@ -229,7 +229,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
         if (this.isWorking() && MathUtils.random() < 0.07f) {
             ParticleSystem ps = world.getSystemManager().getSystem(ParticleSystem.class);
             //TODO 有些常量可以提出，减少new的次数
-            ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
+            ps.emitParticle(ParticleEmitters.FURNACE_FIRE, MathUtils.random(1, 3),
                 new Vector2(getBlockPos()).add(0, -0.42f), new Vector2(0, 0.6f), new Vector2(),
                 new Vector2(0.2f, 0.2f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
                 0f, 2.2f);

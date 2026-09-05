@@ -14,6 +14,7 @@ public class Fight {
     public static final String ENTITY_TEXTURE_ROOT  = TEXTURE_ROOT + "entity/";
     public static final String ITEM_TEXTURE_ROOT    = TEXTURE_ROOT + "item/";
     public static final String UI_TEXTURE_ROOT      = TEXTURE_ROOT + "ui/";
+    public static final String PARTICLE_TEXTURE_ROOT = TEXTURE_ROOT + "particle/";
     public static final String FONT_ROOT = "font/";
     public static final String LANG_ROOT = "lang/";
 
@@ -110,6 +111,13 @@ public class Fight {
     }
 
     public static String UITexturePath (String path) { return UI_TEXTURE_ROOT + path; }
+
+    /**
+     * 从粒子的材质根路径中获取粒子的材质
+     * */
+    public static String ParticleTexturePath (String path) {
+        return PARTICLE_TEXTURE_ROOT + path;
+    }
 
     public static String FontPath (String path) {
         if (path.endsWith(".ttf")) return FONT_ROOT + path;

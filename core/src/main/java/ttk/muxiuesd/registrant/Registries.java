@@ -22,6 +22,7 @@ import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
+import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
@@ -57,6 +58,8 @@ public class Registries {
 
     public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE      = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE);
     public static final Registry<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE  = create(RegistryKeys.ENTITY_DEATH_LOOT_TABLE);
+
+    public static final Registry<ParticleEmitter<?>> PARTICLE_EMITTER = create(RegistryKeys.PARTICLE_EMITTER);
 
 
     public static final BlockRendererRegistry BLOCK_RENDERER = create(

@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import game.muxiuesd.bedrockcore.util.Timer;
-import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registry.ParticleEmitters;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
@@ -46,7 +46,8 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
-            this.pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(2, 5),
+            this.pts.emitParticle(ParticleEmitters.ENTITY_SWIMMING,
+                MathUtils.random(2, 5),
                 getCenterPos().add(0, - getHeight() / 2),
                 new Vector2(MathUtils.random(0.5f, 1.2f), 0),
                 getOrigin(),

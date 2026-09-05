@@ -26,6 +26,7 @@ import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
+import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.wall.Wall;
 
 /**
@@ -61,6 +62,9 @@ public class RegistryKeys {
 
     public static final RegistryKey<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE = new RegistryKey<>();
     public static final RegistryKey<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE = new RegistryKey<>();
+
+    public static final RegistryKey<ParticleEmitter<?>> PARTICLE_EMITTER = new RegistryKey<>();
+
 
     public static final RegistryKey<FightPool<?>> POOL = new RegistryKey<>();
     public static final RegistryKey<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = new RegistryKey<>();

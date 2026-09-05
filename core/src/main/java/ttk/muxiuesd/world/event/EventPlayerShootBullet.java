@@ -1,9 +1,9 @@
 package ttk.muxiuesd.world.event;
 
 import com.badlogic.gdx.math.MathUtils;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.event.abs.BulletShootEvent;
 import ttk.muxiuesd.registry.EntityTypes;
+import ttk.muxiuesd.registry.ParticleEmitters;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.ParticleSystem;
 import ttk.muxiuesd.system.SoundSystem;
@@ -23,7 +23,8 @@ public class EventPlayerShootBullet extends BulletShootEvent {
 
             ParticleSystem pts = world.getSystem(ParticleSystem.class);
 
-            pts.emitParticle(Fight.ID("player_shoot"), MathUtils.random(7, 15),
+            pts.emitParticle(ParticleEmitters.PLAYER_SHOOT,
+                MathUtils.random(7, 15),
                 bullet.getPosition(), bullet.getVelocity().scl(0.3f),
                 bullet.getOrigin(),
                 bullet.getSize().scl(0.9f), bullet.getSize().scl(0.1f),
