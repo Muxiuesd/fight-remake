@@ -27,9 +27,8 @@ public class LivingEntityCodecBuilder {
      * */
     public static <T extends LivingEntity<?>> CodecBuilder2<T, String, String> create () {
         return EntityCodecBuilder.<T>create()
-            .field("handIndex", LivingEntity::getHandIndex, LivingEntity::setHandIndex, Codec.INT)
-            .field("maxHealth", LivingEntity::getMaxHealth, LivingEntity::setMaxHealth, Codec.FLOAT)
-            .field("curHealth", LivingEntity::getCurHealth, LivingEntity::setCurHealth, Codec.FLOAT)
+            //handIndex/maxHealth/curHealth 为活物特有字段，由 cats 序列化（writeCatData/readCatData）；
+            //容器类数据（backpack/equipment/effects）留 codec 顶层
             .field("backpack", LivingEntity::getBackpack, LivingEntity::setBackpack, BACKPACK_CODEC)
             .field("equipment", LivingEntity::getEquipmentBackpack, LivingEntity::setEquipmentBackpack, BACKPACK_CODEC)
             .field("effects", LivingEntity::getEffects, LivingEntity::setEffects, CodecStatusEffects.CODEC);

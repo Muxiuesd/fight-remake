@@ -78,48 +78,25 @@ public abstract class Entity<T extends Entity<T>>
 
     /**
      * 读取自定义属性标签数据
-     * */
+     * <p>
+     * 基础字段（坐标/速度/尺寸/渲染参数）由 codec 顶层字段恢复；
+     * 这里只读派生值 curSpeed（必须等 velX/velY 恢复后设置，setCurSpeed 缩放已有速度矢量）
+     */
     @Override
     public void readCatData (CatsHolder holder) {
-        this.speed = holder.getFloat("speed", 1.145f);
-        this.x = holder.getFloat("x", 1.145f);
-        this.y = holder.getFloat("y", 1.145f);
-        this.velX = holder.getFloat("velX", 0);
-        this.velY = holder.getFloat("velY", 0);
-        //curSpeed 在速度矢量之后设置（setCurSpeed 缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
-        this.setCurSpeed(holder.getFloat("curSpeed", 1.145f));
-        this.width = holder.getFloat("width", 1f);
-        this.height = holder.getFloat("height", 1f);
-        this.originX = holder.getFloat("originX", 0);
-        this.originY = holder.getFloat("originY", 0);
-        this.scaleX = holder.getFloat("scaleX", 1f);
-        this.scaleY = holder.getFloat("scaleY", 1f);
-        this.rotation = holder.getFloat("rotation", 0);
-        this.onGround = holder.getBoolean("onGround", true);
-
-        this.updateHitboxCenterPos(this.x, this.y);
+        this.setCurSpeed(holder.getFloat("curSpeed", this.getCurSpeed()));
     }
 
     /**
      * 写入自定义属性标签数据
-     * */
+     * <p>
+     * 基础字段（坐标/速度/尺寸/渲染参数）由 codec 顶层字段序列化；
+     * 这里只写派生值 curSpeed（顶层无此字段，用于按速度矢量缩放恢复）
+     */
     @Override
     public void writeCatData (CatsHolder holder) {
         holder
-            .put("speed", new CatFloat(this.speed))
-            .put("curSpeed", new CatFloat(this.getCurSpeed()))
-            .put("x", new CatFloat(this.x))
-            .put("y", new CatFloat(this.y))
-            .put("velX", new CatFloat(this.velX))
-            .put("velY", new CatFloat(this.velY))
-            .put("width", new CatFloat(this.width))
-            .put("height", new CatFloat(this.height))
-            .put("originX", new CatFloat(this.originX))
-            .put("originY", new CatFloat(this.originY))
-            .put("scaleX", new CatFloat(this.scaleX))
-            .put("scaleY", new CatFloat(this.scaleY))
-            .put("rotation", new CatFloat(this.rotation))
-            .put("onGround", new CatBoolean(this.onGround));
+            .put("curSpeed", new CatFloat(this.getCurSpeed()));
     }
 
     /**

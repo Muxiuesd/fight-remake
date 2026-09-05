@@ -4,8 +4,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.serialization.DataResult;
-import game.muxiuesd.bedrockcore.serialization.RawObject;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.interfaces.world.entity.PoolableEntity;
 import ttk.muxiuesd.registry.EntityTypes;
@@ -18,8 +16,6 @@ import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.item.ItemStack;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * 物品实体
@@ -30,44 +26,13 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     public static final Vector2 DEFAULT_SIZE = new Vector2(0.5f, 0.5f);
 
     /**
-     * 空中计时器的编解码器
-     * <p>
-     * 有计时器时编码为 {active: true, max_span, cur_span}，没有时编码为 {active: false}
-     */
-    private static final Codec<TaskTimer> ON_AIR_TIMER_CODEC = new Codec<>() {
-        @Override
-        public RawObject encode (TaskTimer timer) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("active", timer != null);
-            if (timer != null) {
-                map.put("max_span", Codec.FLOAT.encode(timer.getMaxSpan()).unwrap());
-                map.put("cur_span", Codec.FLOAT.encode(timer.getCurSpan()).unwrap());
-            }
-            return RawObject.ofMap(map);
-        }
-
-        @Override
-        public DataResult<TaskTimer> decode (RawObject input) {
-            if (!input.isMap()) return DataResult.error("Expected a map");
-            Map<String, Object> rawMap = input.asMap().get();
-            boolean active = Codec.BOOL.decode(Codec.wrap(rawMap.get("active"))).result().orElse(false);
-            if (!active) return DataResult.success(null);
-            float maxSpan = Codec.FLOAT.decode(Codec.wrap(rawMap.get("max_span"))).result().orElse(0f);
-            float curSpan = Codec.FLOAT.decode(Codec.wrap(rawMap.get("cur_span"))).result().orElse(0f);
-            return DataResult.success(new TaskTimer(maxSpan, curSpan, () -> {}));
-        }
-    };
-
-    /**
      * 物品实体的现代化编解码器
      * <p>
      * 解码时通过实体注册表创建实例，编码时编码基础实体与物品实体的全部字段
      */
     public static final Codec<ItemEntity> CODEC = EntityCodecBuilder.<ItemEntity>create()
+        //itemStack 为物品数据留 codec 顶层；livingTime/cycle/onAirTimer 为物品实体特有字段走 cats（writeCatData/readCatData）
         .field("itemStack", ItemEntity::getItemStack, ItemEntity::setItemStack, ItemStack.CODEC)
-        .field("livingTime", ItemEntity::getLivingTime, ItemEntity::setLivingTime, Codec.FLOAT)
-        .field("cycle", ItemEntity::getCycle, ItemEntity::setCycle, Codec.FLOAT)
-        .field("onAirTimer", ItemEntity::getOnAirTimer, ItemEntity::setOnAirTimerFromCodec, ON_AIR_TIMER_CODEC)
         .factory(EntityCodecBuilder::createEntity);
 
     private ItemStack itemStack = ItemStack.VOID;
@@ -216,22 +181,5 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
     public ItemEntity setCycle (float cycle) {
         this.cycle = cycle;
         return this;
-    }
-
-    /**
-     * 从编解码器解码出空中计时器时使用
-     * <p>
-     * 直接使用解码出来的计时器不便于对象池管理，因此将其数据搬到对象池中取出的计时器上
-     */
-    private static void setOnAirTimerFromCodec (ItemEntity entity, TaskTimer timer) {
-        if (timer == null) return;
-        TaskTimer pooled = Pools.TASK_TIMER.obtain()
-            .setMaxSpan(timer.getMaxSpan())
-            .setCurSpan(timer.getCurSpan())
-            .setTask(() -> {
-                Pools.TASK_TIMER.free(entity.getOnAirTimer());
-                entity.setOnAirTimer(null);
-            });
-        entity.setOnAirTimer(pooled);
     }
 }

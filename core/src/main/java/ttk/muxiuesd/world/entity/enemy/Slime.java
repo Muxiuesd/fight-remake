@@ -33,7 +33,6 @@ public class Slime extends Enemy<Slime> {
      * 在活物实体的字段之上又声明了史莱姆自身的字段（代数）
      */
     public static final Codec<Slime> CODEC = LivingEntityCodecBuilder.<Slime>create()
-        .field("generation", Slime::getGeneration, Slime::setGeneration, Codec.INT)
         .factory(EntityCodecBuilder::createEntity);
 
 

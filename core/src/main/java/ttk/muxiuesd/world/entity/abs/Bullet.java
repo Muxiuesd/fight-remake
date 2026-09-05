@@ -27,8 +27,6 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
      */
     public static final Codec<Bullet<?>> CODEC = EntityCodecBuilder.<Bullet<?>>create()
         .field("damage", Bullet::getDamage, Bullet::setDamage, Codec.FLOAT)
-        .field("maxLiveTime", Bullet::getMaxLiveTime, Bullet::setMaxLiveTime, Codec.FLOAT)
-        .field("liveTime", Bullet::getLiveTime, Bullet::setLiveTime, Codec.FLOAT)
         .factory(EntityCodecBuilder::createEntity);
 
     public Entity<?> owner;
