@@ -26,6 +26,7 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
     private Array<ParticleMotionComp> motionComps;
 
     private Resource<TextureRegion> textureRegionResource;   //粒子贴图资源（懒加载，贴图由发射器持有）
+    private TextureRegion summonRegion;                      //本次召唤用贴图（破坏粒子等动态贴图，优先于固定贴图）
 
     public ParticleEmitter () {
         this.activeParticles = new Array<>();
@@ -167,5 +168,19 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
      * */
     public void setTextureRegion (String textureId, String texturePath) {
         this.textureRegionResource = Resource.ofTextureRegion(textureId, texturePath);
+    }
+
+    /**
+     * 获取本次召唤用贴图（未设置时为 null，使用固定贴图）
+     * */
+    public TextureRegion getSummonRegion () {
+        return this.summonRegion;
+    }
+
+    /**
+     * 设置本次召唤用贴图（动态贴图，如方块破坏残渣按方块贴图裁剪；使用完应复位为 null）
+     */
+    public void setSummonRegion (TextureRegion summonRegion) {
+        this.summonRegion = summonRegion;
     }
 }

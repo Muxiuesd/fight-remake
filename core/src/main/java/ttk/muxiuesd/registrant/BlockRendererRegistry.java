@@ -27,6 +27,14 @@ public class BlockRendererRegistry extends Registries.DefaultRegistry<BlockRende
         return (BlockRenderer<T>) renderer;
     }
 
+    /**
+     * 安全获取渲染器（未注册时返回 null 而不抛异常）
+     */
+    public static <T extends Block> BlockRenderer<T> getOrNull (T block) {
+        if (block == null) return null;
+        return (BlockRenderer<T>) getInstance().getOrNull(block.getID());
+    }
+
     /// 单例模式
     private static BlockRendererRegistry INSTANCE;
     public static BlockRendererRegistry getInstance () {

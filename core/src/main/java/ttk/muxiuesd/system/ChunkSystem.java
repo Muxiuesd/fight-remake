@@ -342,6 +342,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         //用空气方块占位（不能直接 setBlock(null)，会触发 addBlock(null) NPE）
         chunk.setBlock(Blocks.ARI, chunkBlockPos.x, chunkBlockPos.y);
 
+        //破坏方块粒子：被移除的非空气方块生成残渣粒子
+        if (removed != Blocks.ARI) {
+            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(removed, round);
+        }
+
         return removed;
     }
 
@@ -458,6 +463,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
+        //破坏方块粒子：被替换下来的非空气方块生成残渣粒子
+        if (oldBlock != Blocks.ARI) {
+            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(oldBlock, round);
+        }
+
         return oldBlock;
     }
 
@@ -564,6 +574,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             chunk.setBotany(null, chunkPos.x, chunkPos.y);
             //调用被破坏方法
             botanyInstance.beDestroyed(getWorld(), roundPos);
+            //破坏植物粒子：生成残渣粒子
+            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(botanyInstance, roundPos);
             return botanyInstance;
         }
 
