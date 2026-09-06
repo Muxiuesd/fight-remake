@@ -4,6 +4,8 @@ import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.world.loottable.common.LootEntry;
+import ttk.muxiuesd.world.loottable.common.LootGroup;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
 
 /**
@@ -17,19 +19,33 @@ public class EntityDeathLootTables {
     /// 敌人实体
     public static final EntityDeathLootTable SLIME = register(Entities.SLIME,
         EntityDeathLootTable.Builder.create()
-            .setDropItems(Items.SLIME_BALL)
+            .setGroups(
+                LootGroup.of("material",
+                    LootEntry.of(Items.SLIME_BALL, 1, 3, 1f)
+                )
+            )
             .build()
     );
     public static final EntityDeathLootTable ZOMBIE = register(Entities.ZOMBIE,
         EntityDeathLootTable.Builder.create()
-            .setDropItems(Items.RUBBISH, Items.STICK, Items.POTATO)
+            .setGroups(
+                LootGroup.of("loot",
+                    LootEntry.of(Items.RUBBISH, 1, 3, 50f),
+                    LootEntry.of(Items.STICK, 1, 2, 49f),
+                    LootEntry.of(Items.POTATO, 1, 2,  1f)
+                )
+            )
             .build()
     );
 
     /// 生物实体
     public static final EntityDeathLootTable PUFFER_FISH = register(Entities.PUFFER_FISH,
         EntityDeathLootTable.Builder.create()
-            .setDropItems(Items.PUFFER_FISH)
+            .setGroups(
+                LootGroup.of("food",
+                    LootEntry.of(Items.PUFFER_FISH, 1f)
+                )
+            )
             .build()
     );
 
