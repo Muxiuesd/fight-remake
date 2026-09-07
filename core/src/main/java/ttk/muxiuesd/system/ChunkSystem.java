@@ -17,14 +17,12 @@ import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.WorldMapNoise;
-import ttk.muxiuesd.util.pool.PoolableRectangle;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.Block;
@@ -193,24 +191,22 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     @Override
     public void draw(Batch batch) {
         //区块绘制，看不见的区块将会被剔除
-        PoolableRectangle chunkEdgeRect = Pools.RECT.obtain();
+        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
+        //区块的世界尺寸 = 格子数 × 单格子世界尺寸（Block.WIDTH/HEIGHT = 1，故 = ChunkWidth）
+        float halfW = Chunk.ChunkWidth * Block.WIDTH / 2f;
+        float halfH = Chunk.ChunkHeight * Block.HEIGHT / 2f;
         for (Chunk chunk : this.activeChunks) {
-            chunkEdgeRect.set(
-                chunk.getWorldX(0) - Block.WIDTH / 2f,
-                chunk.getWorldY(0) - Block.HEIGHT / 2f,
-                Chunk.ChunkWidth, Chunk.ChunkHeight
-            );
-            //判断这个区块是否可以被看见
-            OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
-            //如果这个区块的边界矩形与相机视野相交，就调用区块的渲染
+            //区块左下角世界坐标（getWorldX(0) 是最左格中心，需回退半格到边界）
+            float leftBottomX = chunk.getWorldX(0) - Block.WIDTH / 2f;
+            float leftBottomY = chunk.getWorldY(0) - Block.HEIGHT / 2f;
+            //boundsInFrustum 期望"中心点 + 半宽半高"，z 维度在 2D 正交相机中恒可见，传 0
             if (camera.frustum.boundsInFrustum(
-                chunkEdgeRect.x, chunkEdgeRect.y, 0,
-                chunkEdgeRect.width, chunkEdgeRect.height, 0
+                leftBottomX + halfW, leftBottomY + halfH, 0,
+                halfW, halfH, 0
             )) {
                 chunk.draw(batch);
             }
         }
-        Pools.RECT.free(chunkEdgeRect);
 
         //绘制方块实体
         this.getBlockEntities().forEach((block, blockEntity) -> {
