@@ -282,7 +282,10 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             Block block = chunk.getBlock(x, y);
             if (block instanceof BlockWithEntity blockWithEntity) {
                 this.removeBlockInstance(blockWithEntity);
-                this.removeBlockEntity(blockWithEntity);
+                //区块卸载：只从系统移除，不掉包。
+                //方块实体的完整内容物已由 ChunkUnloadTask 随区块存档写盘保留，
+                //若这里再走 beDestroyed 掉包会使内容物复制（同批物品既在存档又掉一份进世界）。
+                this.removeBlockEntity(blockWithEntity, false);
             }
         });
     }
@@ -407,12 +410,25 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 移除方块实体
      * */
     private BlockEntity removeBlockEntity (BlockWithEntity block) {
+        return this.removeBlockEntity(block, true);
+    }
+
+    /**
+     * 从系统中移除一个方块实体
+     * @param block 带方块实体的方块
+     * @param dropItems 是否把方块实体的内容物全部掉落进世界
+     *                  <p>方块被玩家破坏时传 true（行为等同被摧毁，掉包）；
+     *                  区块正常卸载传 false（内容物由 {@link ChunkUnloadTask} 随存档保留，绝不能再掉包，否则复制物品）
+     * */
+    private BlockEntity removeBlockEntity (BlockWithEntity block, boolean dropItems) {
         BlockEntity removed = this.getBlockEntities().remove(block);
         if (removed == null) return null;
 
         TimeSystem ts = getWorld().getSystem(TimeSystem.class);
         ts.remove(removed);
-        removed.beDestroyed(getWorld(), this.player);
+        if (dropItems) {
+            removed.beDestroyed(getWorld(), this.player);
+        }
 
         return removed;
     }

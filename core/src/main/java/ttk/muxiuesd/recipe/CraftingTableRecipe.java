@@ -1,6 +1,5 @@
 package ttk.muxiuesd.recipe;
 
-import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -20,6 +19,9 @@ public abstract class CraftingTableRecipe {
      * */
     public abstract boolean matches (ItemStack[] inputs);
 
+    /**
+     * 获取配对输入的物品堆叠（原始数据），对于这个的直接修改相当于修改配方（非必要不修改）
+     * */
     public ItemStack[] getInputs() {
         return this.inputs;
     }
@@ -28,6 +30,9 @@ public abstract class CraftingTableRecipe {
         this.inputs = inputs;
     }
 
+    /**
+     * 获取输出的物品堆叠（原始数据）。如果是要应用输出物品，记得 {@link ItemStack#copy()} 防止污染原始数据
+     * */
     public ItemStack getOutput () {
         return this.output;
     }

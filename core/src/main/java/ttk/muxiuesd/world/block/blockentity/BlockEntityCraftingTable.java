@@ -147,7 +147,9 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
         if (recipe != null) {
             ItemStack output = recipe.getOutput();
             //在输出槽位放对应的输出物品
-            this.setOutputItemStack(output);
+            //必须复制：配方表的输出是全局共享的唯一实例，不能把它的引用直接放进工作台，
+            //否则工作台的输出槽会与配方共享实例互相污染（取出/破坏一个工作台会篡改所有工作台及配方）
+            this.setOutputItemStack(output.copy());
         }else {
             //没有对应的配方，就清空输出槽位
             this.setOutputItemStack(ItemStack.VOID);
