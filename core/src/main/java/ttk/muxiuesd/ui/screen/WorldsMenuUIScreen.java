@@ -1,6 +1,7 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import game.muxiuesd.bedrockcore.app.ui.components.UITextField;
@@ -20,6 +21,9 @@ import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.WorldInfo;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 世界存档选择菜单UIScreen
  * <p>
@@ -32,6 +36,8 @@ public class WorldsMenuUIScreen extends FightUIScreen {
     private CreateNewWorldButtonUI createNewWorldButton;
     private UITextField worldNameTextField;
     private UITextField worldSeedTextField;
+    //已存在的有效世界名称集合（用于创建世界时检查重名）
+    private final Set<String> existingWorldNames = new HashSet<>();
 
     private final UIButton.ClickEvent CreateNewWorldButtonClickEvent = (button, interactPos) -> {
         //获取世界名称、种子
@@ -45,6 +51,15 @@ public class WorldsMenuUIScreen extends FightUIScreen {
         //过滤世界名称中的非法字符，防止路径穿越/非法路径导致存档损坏或写出目录
         String filterWorldName = filterWorldName(worldName);
         if (filterWorldName.isEmpty()) return false;
+
+        //检查世界名称是否与已存在的世界重复（原始名称精确匹配）
+        if (this.existingWorldNames.contains(worldName)) {
+            //重复则提示玩家，不创建世界
+            this.worldNameTextField
+                .setTipText("该名称已被使用，请更换名称！")
+                .setTipTextColor(Color.RED);
+            return false;
+        }
 
         //编写基础的世界json数据
         JsonDataWriter worldJsonDataWriter = new JsonDataWriter();
@@ -64,6 +79,10 @@ public class WorldsMenuUIScreen extends FightUIScreen {
         UnifiedFileUtil.writeFileAtomic(worldDirPath, WorldInfo.FILE_NAME, worldJsonDataWriter.getResult());
         //刷新列表
         this.flashSaveList();
+        //恢复世界名称输入框的提示（创建成功，重置重名提示状态）
+        this.worldNameTextField
+            .setTipText("请输入世界名称（50字符以内）")
+            .setTipTextColor(Color.YELLOW);
 
         return false;
     };
@@ -128,6 +147,7 @@ public class WorldsMenuUIScreen extends FightUIScreen {
      * */
     public void flashSaveList () {
         //清理旧的
+        this.existingWorldNames.clear();
         this.getSavesList().clearItems();
         this.readSavesDir();
     }
@@ -189,6 +209,9 @@ public class WorldsMenuUIScreen extends FightUIScreen {
                 String worldName = stringValues.getString(Fight.WORLD_NAME.getKey());
                 //读取世界种子
                 long worldSeed = longValues.getLong(Fight.WORLD_SEED.getKey());
+
+                //收集已存在的世界名称（用于创建世界时检查重名）
+                this.existingWorldNames.add(worldName);
 
                 //添加存档按钮UI
                 WorldSaveButtonUI worldButton = new WorldSaveButtonUI(worldName, worldSeed);
