@@ -5,10 +5,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.components.InfoEntry;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryFPS;
+import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.TextUtil;
 import ttk.muxiuesd.util.Util;
 
@@ -49,10 +51,9 @@ public class InfoPanel extends UIPanel {
 
     private InfoPanel () {
         super(0, 0, 0, 0, new GridPoint2(1, 1));
-        //默认附带一条 FPS 信息（每秒刷新，显示上一秒平均帧率）
-        //this.addEntry(InfoEntry.of("FPS", () -> String.valueOf(this.getLastSecondAvgFps())));
 
-        this.addEntry(new InfoEntryFPS());
+        this.addEntry(new InfoEntry(Text.ofText(Fight.ID("info_entry_game_name"))))
+            .addEntry(new InfoEntryFPS());//默认附带一条 FPS 信息（每秒刷新，显示上一秒平均帧率）
 
         //信息面板只展示、不参与交互，禁用交互避免干扰鼠标点击与命中检测
         this.setEnabled(false);
