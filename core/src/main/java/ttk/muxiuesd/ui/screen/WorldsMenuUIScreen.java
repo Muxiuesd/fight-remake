@@ -36,6 +36,9 @@ public class WorldsMenuUIScreen extends FightUIScreen {
     private CreateNewWorldButtonUI createNewWorldButton;
     private UITextField worldNameTextField;
     private UITextField worldSeedTextField;
+    private String worldNameTextFieldDefaultText = "请输入世界名称（50字符以内）";
+    private String worldSeedTextFieldDefaultText = "请输入世界种子（50字符以内）";
+
     //已存在的有效世界名称集合（用于创建世界时检查重名）
     private final Set<String> existingWorldNames = new HashSet<>();
 
@@ -50,10 +53,18 @@ public class WorldsMenuUIScreen extends FightUIScreen {
 
         //过滤世界名称中的非法字符，防止路径穿越/非法路径导致存档损坏或写出目录
         String filterWorldName = filterWorldName(worldName);
-        if (filterWorldName.isEmpty()) return false;
+        if (filterWorldName.isEmpty()) {
+            Log.error(TAG, "世界名称非法：" + worldName + " 不可创建！");
+            this.worldNameTextField
+                .setTipText("别让名称空白！")
+                .setTipTextColor(Color.RED);
+            return false;
+        }
 
         //检查世界名称是否与已存在的世界重复（原始名称精确匹配）
         if (this.existingWorldNames.contains(worldName)) {
+            //清空输入的文本
+            this.worldNameTextField.getTextStringBuilder().setLength(0);
             //重复则提示玩家，不创建世界
             this.worldNameTextField
                 .setTipText("该名称已被使用，请更换名称！")
@@ -79,9 +90,10 @@ public class WorldsMenuUIScreen extends FightUIScreen {
         UnifiedFileUtil.writeFileAtomic(worldDirPath, WorldInfo.FILE_NAME, worldJsonDataWriter.getResult());
         //刷新列表
         this.flashSaveList();
+
         //恢复世界名称输入框的提示（创建成功，重置重名提示状态）
         this.worldNameTextField
-            .setTipText("请输入世界名称（50字符以内）")
+            .setTipText(this.worldNameTextFieldDefaultText)
             .setTipTextColor(Color.YELLOW);
 
         return false;
@@ -118,7 +130,7 @@ public class WorldsMenuUIScreen extends FightUIScreen {
             this.savesList.getWidth(), this.createNewWorldButton.getHeight(), Fonts.MC
         );
         this.worldNameTextField
-            .setTipText("请输入世界名称（50字符以内）")
+            .setTipText(this.worldNameTextFieldDefaultText)
             .setMaxLength(50)
             .setPosition(
                 - this.worldNameTextField.getWidth() / 2f,
@@ -129,7 +141,7 @@ public class WorldsMenuUIScreen extends FightUIScreen {
             this.savesList.getWidth(), this.createNewWorldButton.getHeight(), Fonts.MC
         );
         this.worldSeedTextField
-            .setTipText("请输入世界种子（50字符以内）")
+            .setTipText(this.worldSeedTextFieldDefaultText)
             .setMaxLength(50)
             .setPosition(
                 - this.worldSeedTextField.getWidth() / 2f,
@@ -175,7 +187,6 @@ public class WorldsMenuUIScreen extends FightUIScreen {
                 System.out.print(" | ");
             }
         }
-
 
         //读取目录中的世界信息
         for (FileHandle saveDir : saveDirs) {

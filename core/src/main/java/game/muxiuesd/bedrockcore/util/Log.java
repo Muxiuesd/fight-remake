@@ -11,7 +11,7 @@ public class Log {
     }
 
     public static void error(String tag, String message) {
-        Gdx.app.error(tag, message);
+        Gdx.app.error(tag, "[!错误!]" + message);
     }
 
     public static void error(String tag, String message, Throwable error) {
