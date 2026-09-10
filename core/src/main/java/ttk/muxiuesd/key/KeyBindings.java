@@ -131,4 +131,10 @@ public class KeyBindings {
         Fight.ID("key_player_position_print"), "key_player_position_print",
         KeyBinding.Type.Keyboard, Input.Keys.P
     ));
+
+    /// 信息面板（仿 Minecraft F3 调试信息，按 I 开关）
+    public static KeyBinding InfoPanelToggle = InputBinding.registerBinding(new KeyBinding(
+        Fight.ID("key_info_panel_toggle"), "key_info_panel_toggle",
+        KeyBinding.Type.Keyboard, Input.Keys.I
+    ));
 }

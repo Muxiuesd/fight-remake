@@ -1,6 +1,7 @@
 package ttk.muxiuesd.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
@@ -20,6 +21,26 @@ import ttk.muxiuesd.world.entity.abs.Entity;
  */
 public class Util {
     public static final double PI2 = Math.PI * 2;
+
+    /// 1×1 白色像素纹理（方案A：用 batch 绘制纯色/半透明矩形）
+    private static TextureRegion whitePixelTextureRegion;   //懒加载，仅渲染线程首次使用时创建
+
+    /**
+     * 获取 1×1 白色像素纹理区域
+     * <p>
+     * 用于 batch 绘制纯色/半透明矩形（配合 {@link com.badlogic.gdx.graphics.g2d.Batch#setColor(float,float,float,float)} 可画出任意颜色、任意透明度的填充矩形）。
+     * 懒加载：仅在首次调用时用 Pixmap 生成（含 GL 调用，必须在渲染线程）。
+     * */
+    public static TextureRegion getWhitePixel () {
+        if (whitePixelTextureRegion == null) {
+            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            pixmap.setColor(1f, 1f, 1f, 1f);
+            pixmap.fill();
+            whitePixelTextureRegion = new TextureRegion(new Texture(pixmap));
+            pixmap.dispose();
+        }
+        return whitePixelTextureRegion;
+    }
 
     /**
      * 获取鼠标指向的游戏世界坐标

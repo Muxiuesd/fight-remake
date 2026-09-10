@@ -6,6 +6,7 @@ import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.ui.abs.FightUIScreen;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
+import ttk.muxiuesd.ui.panel.InfoPanel;
 
 /**
  * 玩家的HUD屏幕
@@ -27,6 +28,10 @@ public class PlayerHUDUIScreen extends FightUIScreen {
         this.playerHotbarUIPanel = new PlayerHotbarUIPanel(playerSystem, - width / 2, - viewportHeight / 2);
         addComponent(this.playerHotbarUIPanel.auto());
 
+
+        //信息面板（仿 Minecraft F3），默认停靠屏幕左上角，按 I 键开关
+        InfoPanel.getInstance().resize(camera.viewportWidth, camera.viewportHeight);
+        addComponent(InfoPanel.getInstance());
 
         //addComponent(this.playerHealthBar);
     }

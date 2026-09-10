@@ -6,6 +6,8 @@
   "text.fight:button_exit_game":     "退出游戏",
   "text.fight:button_create_new_world":     "新建世界",
 
+  "text.fight:info_entry_fps":      "当前帧率: {0} fps",
+
   "text.fight:weapon_use_span":     "&&a攻击间隔：{0}",
   "text.fight:weapon_damage":       "&&a武器伤害：{0}",
   "text.fight:weapon_attack_range": "&&a攻击范围：{0}",
