@@ -20,8 +20,6 @@ import java.util.List;
  * <p>
  * 显示若干条信息条目，至上而下排列。每一条目占一行，行背景为半透明黑色框，文字用游戏字体渲染。
  * 按 I 键开关本面板。
- * <p>
- * FPS 信息：每帧累计帧数与耗时，每秒结算一次，显示"上一秒的平均帧率"（而非瞬时 FPS）。
  */
 public class InfoPanel extends UIPanel {
     /// 行相关尺寸

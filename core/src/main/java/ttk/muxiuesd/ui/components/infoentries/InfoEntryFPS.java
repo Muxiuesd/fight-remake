@@ -4,6 +4,11 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.ui.components.InfoEntry;
 import ttk.muxiuesd.ui.text.Text;
 
+/**
+ * 显示FPS信息
+ * <p>
+ * 每帧累计帧数与耗时，每秒结算一次，显示"上一秒的平均帧率"（而非瞬时 FPS）。
+ * */
 public class InfoEntryFPS extends InfoEntry {
     /// FPS 累计（每秒结算一次，显示上一秒平均帧率）
     private int frameCount = 0;      //本秒已累计的帧数
