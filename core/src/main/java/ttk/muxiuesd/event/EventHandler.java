@@ -6,7 +6,7 @@ import java.util.HashSet;
  * 事件处理组，同一种事件放在一起
  * */
 public abstract class EventHandler<T extends Event, P extends EventPoster> {
-    private final HashSet<T> events = new HashSet<>();;
+    private final HashSet<T> events = new HashSet<>();
 
     /**
      * 实现调用事件的逻辑

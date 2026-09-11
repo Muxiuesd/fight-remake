@@ -30,9 +30,9 @@ public class EntityDeathLootTables {
         EntityDeathLootTable.Builder.create()
             .setGroups(
                 LootGroup.of("loot",
-                    LootEntry.of(Items.RUBBISH, 1, 3, 50f),
-                    LootEntry.of(Items.STICK, 1, 2, 49f),
-                    LootEntry.of(Items.POTATO, 1, 2,  1f)
+                    LootEntry.of(Items.RUBBISH, 0, 2, 50f),
+                    LootEntry.of(Items.STICK, 0, 2, 49f),
+                    LootEntry.of(Items.POTATO, 0, 1,  1f)
                 )
             )
             .build()
@@ -43,7 +43,7 @@ public class EntityDeathLootTables {
         EntityDeathLootTable.Builder.create()
             .setGroups(
                 LootGroup.of("food",
-                    LootEntry.of(Items.PUFFER_FISH, 1f)
+                    LootEntry.of(Items.PUFFER_FISH, 0, 1, 1f)
                 )
             )
             .build()

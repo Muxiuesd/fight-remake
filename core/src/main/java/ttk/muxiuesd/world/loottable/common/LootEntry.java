@@ -60,12 +60,17 @@ public class LootEntry implements Supplier<ItemStack> {
 
     /**
      * 获取物品堆叠（copy过的副本）
+     * <p>
+     * 随机到的最小数量可能为 0，此时返回空堆叠 {@link ItemStack#VOID} 表示不掉落该物品。
+     * 不能直接调用 {@link ItemStack#copy(int)}——它会把数量 0 强制抬升为 1
      * */
     @Override
     public ItemStack get () {
         int amount = this.minAmount == this.maxAmount
             ? this.itemStack.getAmount()
             : MathUtils.random(this.minAmount, this.maxAmount);
+        //数量为 0：不掉落该物品
+        if (amount <= 0) return ItemStack.VOID;
         //复制模板（含属性），避免生成物之间的互相污染，也避免污染战利品表本身
         return this.itemStack.copy(amount);
     }

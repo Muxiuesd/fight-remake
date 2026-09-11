@@ -38,6 +38,9 @@ public class EntityDeathLootTable implements EntityLootTable<EntityDeathLootTabl
         Vec2 pos = conditions.getPos();
         EntitySystem es = world.getSystem(EntitySystem.class);
         for (ItemStack itemStack : stacks) {
+            //跳过空堆叠（数量随机为 0 的条目不掉落）
+            if (itemStack.isVoid()) continue;
+
             ItemEntity itemEntity = ItemEntityGetter.getPickUpable(es, pos, itemStack);
             itemEntity
                 .setSpeed(0f)

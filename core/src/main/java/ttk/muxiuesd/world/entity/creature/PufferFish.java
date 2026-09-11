@@ -3,7 +3,6 @@ package ttk.muxiuesd.world.entity.creature;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.Items;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -11,7 +10,6 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.CreatureEntity;
-import ttk.muxiuesd.world.item.ItemStack;
 
 /**
  * 河豚
@@ -27,7 +25,6 @@ public class PufferFish extends CreatureEntity<PufferFish> {
         setSize(DEFAULT_SIZE);
         fastAddBodyHitBox();
         setSpeed(1f);
-        getBackpack().addItem(new ItemStack(Items.PUFFER_FISH, 1));
     }
 
     /**

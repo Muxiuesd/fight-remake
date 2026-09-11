@@ -37,6 +37,7 @@ import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.PathFindingEntity;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
@@ -319,6 +320,12 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
         if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
+
+        //水生生物（如河豚）在水中完全不受摩擦影响：不应用方块摩擦力，也不受空气阻力
+        //（水中应无阻力地游动，避免被水的高摩擦属性（如 0.77）错误地当地面摩擦减速）
+        if (entity instanceof PathFindingEntity pathEntity && pathEntity.canSwim()) {
+            return;
+        }
 
         float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);    //空气阻力的影响（秒级）
 
