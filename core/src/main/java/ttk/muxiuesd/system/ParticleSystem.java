@@ -16,6 +16,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.particle.BlockBreakParticle;
 import ttk.muxiuesd.world.particle.ParticleDefaultConfig;
+import ttk.muxiuesd.world.particle.ParticleFootstep;
 import ttk.muxiuesd.world.particle.abs.Particle;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 
@@ -162,6 +163,37 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
                 new Vector2(0.2f, 0.2f), new Vector2(0.02f, 0.02f),
                 Vector2.One,
                 MathUtils.random(0, 360), MathUtils.random(0.4f, 0.7f));
+        }
+        emitter.setSummonRegion(null);   //用完复位（发射器是共享单例）
+    }
+
+
+    /**
+     * 发射玩家行走脚下粒子
+     * <p>
+     * 根据脚下方块贴图生成若干碎片粒子，向行走方向的反方向发出，
+     * 只受空气阻力、绕中心滚动旋转、尺寸由大到小渐变
+     * @param block 玩家脚下的方块（取其渲染器贴图作为碎片贴图）
+     * @param footPosition 脚部位置
+     * @param reverseVelocity 行走方向的反方向速度矢量（粒子向玩家身后扬起）
+     * @param count 本次发射的粒子数量
+     * @param duration 粒子存活时长
+     */
+    public void footstepParticle (Block block, Vector2 footPosition, Vector2 reverseVelocity,
+                                  int count, float duration) {
+        BlockRenderer<? extends Block> renderer = BlockRendererRegistry.getOrNull(block);
+        if (renderer == null) return;
+        TextureRegion region = renderer.getTextureRegion();
+        if (region == null) return;
+
+        ParticleEmitter<ParticleFootstep> emitter = ParticleEmitters.FOOTSTEP;
+        emitter.setSummonRegion(region);
+        this.activateEmitter(emitter);
+        for (int i = 0; i < count; i++) {
+            emitter.summon(footPosition, reverseVelocity, new Vector2(0.05f, 0.05f),
+                new Vector2(0.12f, 0.12f), new Vector2(0.03f, 0.03f),
+                Vector2.One,
+                MathUtils.random(0, 360), duration);
         }
         emitter.setSummonRegion(null);   //用完复位（发射器是共享单例）
     }

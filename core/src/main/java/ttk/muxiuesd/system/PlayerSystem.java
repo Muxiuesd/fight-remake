@@ -17,8 +17,6 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.registrant.Registrant;
-import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -35,7 +33,6 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.entity.player.PlayerDebugger;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 玩家系统
@@ -47,6 +44,9 @@ public class PlayerSystem extends WorldSystem {
 
     /// 玩家启动加速半衰期（秒）：从静止起步向目标速度逼近一半所需的时间
     private static final float ACCEL_HALF_LIFE = 0.08f;
+
+    /// 脚步粒子同一时间最多存在的数量
+    private static final int MAX_FOOTSTEP_PARTICLES = 16;
 
     public static boolean debugMode = true; //是否启用debug模式
 
@@ -122,8 +122,47 @@ public class PlayerSystem extends WorldSystem {
 
         this.handleInput(delta);
 
+        //玩家行走脚下粒子（移速越快脚步越密集、粒子越多）
+        this.emitFootstepParticle(player, cs);
+
         //实时更新立体音效的接听者坐标为玩家的坐标
         SpatialAudioSystem.getInstance().getAudioListener().setPos(this.player.getX(), this.player.getY(), 0f);
+    }
+
+    /**
+     * 玩家行走脚下粒子
+     * <p>
+     * 玩家移动（且脚部接触方块）时，周期性向行走方向的反方向发出脚下碎片粒子。
+     * 脚步间隔与每次粒子数量随移动速度变化：移速越快间隔越短、粒子越多
+     * */
+    private void emitFootstepParticle (Player player, ChunkSystem cs) {
+        //只要玩家在移动（速度>0）就产生脚步粒子
+        float curSpeed = player.getCurSpeed();
+        if (curSpeed <= 0f) return;
+
+        //脚部位置：实体坐标是碰撞箱中心，脚底 = 中心 - 半高
+        Block underFoot = cs.getBlock(player.getX(), player.getY() - player.getHeight() / 2f);
+        //空气方块与水方块不可产生脚步粒子
+        if (underFoot == null || underFoot == Blocks.ARI || underFoot instanceof BlockWater) return;
+
+        //移速挂钩：0~1 归一化（Player.MOVE_SPEED 为最大移速）
+        float speedRatio = MathUtils.clamp(curSpeed / Player.MOVE_SPEED, 0f, 1f);
+
+        //每次粒子数量：慢速 4~6 → 全速 7~9（移速越快越多）
+        int count = MathUtils.round(MathUtils.lerp(4, 8, speedRatio)) + MathUtils.random(-1, 1);
+        count = MathUtils.clamp(count, 4, 9);
+
+        //上限控制：同一时间存在的脚步粒子最多 16 个，达到上限则不再发射（避免过量堆积）
+        int activeCount = ParticleEmitters.FOOTSTEP.getActiveParticlesCount();
+        if (activeCount >= MAX_FOOTSTEP_PARTICLES) return;
+        count = Math.min(count, MAX_FOOTSTEP_PARTICLES - activeCount);
+
+        //粒子向行走方向的反方向发出（玩家向前走，碎片向后扬起）
+        Vector2 footPos = new Vector2(player.getX(), player.getY() - player.getHeight() / 2f);
+        Vector2 reverseVel = new Vector2(-player.getVelX(), -player.getVelY());
+
+        ParticleSystem pts = getManager().getSystem(ParticleSystem.class);
+        pts.footstepParticle(underFoot, footPos, reverseVel, count, 0.5f);
     }
 
     /**
@@ -217,13 +256,6 @@ public class PlayerSystem extends WorldSystem {
             //GUI 打开时玩家不能移动，停止速度（否则残留速度会继续滑行）
             curPlayer.setVelocity(0, 0);
         }
-    }
-
-    public void setItemStack (int index, String itemId) {
-        String[] parts = itemId.split(":");
-        Registrant<Item> itemReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
-        ItemStack stack = new ItemStack(itemReg.get(parts[1]));
-        this.getPlayer().getBackpack().setItemStack(index, stack);
     }
 
     /**
