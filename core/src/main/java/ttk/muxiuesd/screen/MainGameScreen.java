@@ -143,6 +143,12 @@ public class MainGameScreen implements Screen {
     public void dispose() {
         this.unregisterWorldRenderProcessors();
         this.world.dispose();
+
+        //清除 GUI 渲染处理器对本世界的引用（P-C14）：
+        //GUI 处理器是全局常驻的渲染处理器，若不清理，回主菜单后每帧仍会对已 dispose 的世界
+        //执行 LightSystem.afterProcess()（用退出时世界的夜晚环境色做乘法混合），
+        //导致主菜单背景被染成"世界夜晚亮度"
+        FightCore.getInstance().guiRenderProcessor.setMainGameScreen(null);
     }
 
     public World getWorld() {
