@@ -57,11 +57,19 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
     public JsonPropertiesMap copy () {
         JsonPropertiesMap map = new JsonPropertiesMap();
         this.propertiesMap.forEach((key, value) -> {
-            //如果是可浅拷贝的值就调用浅拷贝（只复制值，是不同的实例对象）
-            if (value instanceof ShallowCopyable<?> shallowCopyableValue) {
+            if (value == null) {
+                map.add(key, null);
+            } else if (value instanceof ShallowCopyable<?> shallowCopyableValue) {
+                //可浅拷贝的值调用 copy() 生成新实例
                 map.add(key, shallowCopyableValue.copy());
-            }else {
-                //不是浅拷贝的值就直接添加（相同的实例）
+            } else if (value instanceof Number || value instanceof Boolean || value instanceof String) {
+                //不可变类型直接共享引用（Integer/Float/Double/Boolean/String 等天生线程安全）
+                map.add(key, value);
+            } else {
+                //非浅拷贝、非不可变类型直接共享引用，存在潜在的别名问题
+                game.muxiuesd.bedrockcore.util.Log.error(this.getClass().getName(),
+                    "属性 " + key + " 的值类型 " + value.getClass().getName()
+                    + " 未实现 ShallowCopyable，copy() 共享同一实例，可能存在别名问题");
                 map.add(key, value);
             }
         });

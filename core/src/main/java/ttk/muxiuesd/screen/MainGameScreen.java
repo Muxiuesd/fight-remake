@@ -34,16 +34,18 @@ public class MainGameScreen implements Screen {
     @Override
     public void show() {
         //初始化注册游戏世界内的元素
+        //注意：Items 的静态字段引用了 Blocks、Walls、Entities、StatusEffects、Sounds，
+        //必须确保这些注册表在 Items 之前完成类加载（init 触发类加载 → 静态字段初始化）
         Pools.init();
         EventTypes.init();
         Sounds.init();
         BlockEntities.init();
         Blocks.init();
         Walls.init();
-        Items.init();
         EntityTypes.init();
         Entities.init();
         StatusEffects.init();
+        Items.init();
         WorldInfoTypes.init();
         ItemGroups.init();
         CraftingRecipes.init();

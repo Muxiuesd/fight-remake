@@ -196,15 +196,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
             return this;
         }
 
-        public float getDamage () {
-            return get(PropertyTypes.WEAPON_DAMAGE);
-        }
-
-        public Property setDamage (float damage) {
-            add(PropertyTypes.WEAPON_DAMAGE, damage);
-            return this;
-        }
-
         /**
          * 获取物品耐久
          * */
@@ -214,27 +205,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
         public Property setDuration (int duration) {
             this.add(PropertyTypes.ITEM_DURATION, duration);
-            return this;
-        }
-
-        public float getUseSpan () {
-            return this.get(PropertyTypes.WEAPON_USE_SAPN, 0f);
-        }
-
-        public Property setUseSpan (float useSpan) {
-            this.add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
-            return this;
-        }
-
-        /**
-         * 获取武器的击退冲击力（0 = 不击退）
-         * */
-        public float getKnockback () {
-            return this.get(PropertyTypes.WEAPON_KNOCKBACK, 0f);
-        }
-
-        public Property setKnockback (float knockback) {
-            this.add(PropertyTypes.WEAPON_KNOCKBACK, knockback);
             return this;
         }
 
