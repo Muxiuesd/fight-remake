@@ -16,8 +16,8 @@ public final class ItemStackBehaviours {
 
     public static final IItemStackBehaviour COMMON = register("common", new CommonItemStackBehaviour());
     public static final IItemStackBehaviour CONSUMPTION = register("consumption", new ConsumptionItemStackBehaviour());
-    public static final IItemStackBehaviour SWORD = register("sword", new SwordItemStackBehaviour());
-    public static final IItemStackBehaviour RANGED_WEAPON = register("ranged_weapon", new RangedWeaponItemStackBehaviour());
+    public static final IItemStackBehaviour SWORD = register("sword", new WeaponItemStackBehaviour(true));
+    public static final IItemStackBehaviour RANGED_WEAPON = register("ranged_weapon", new WeaponItemStackBehaviour(false));
     public static final IItemStackBehaviour EQUIPMENT = register("equipment", new EquipmentItemStackBehaviour());
 
     public static IItemStackBehaviour register (String name, IItemStackBehaviour behaviour) {
