@@ -257,7 +257,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             return;
         }
         Player player = this.getPlayer();
-        //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
+        //需要被丢弃物品实体存在时间超过两秒（ITEM_ENTITY_PICKUP_SPAN），防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN.getValue()) {
             //当物品实体与玩家的碰撞箱相碰就是捡起
             if (itemEntity.getBodyHitbox().checkCollision(player.getBodyHitbox())) {
