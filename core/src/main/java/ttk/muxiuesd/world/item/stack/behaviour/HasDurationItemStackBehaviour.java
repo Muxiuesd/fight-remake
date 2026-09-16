@@ -14,6 +14,16 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public abstract class HasDurationItemStackBehaviour implements IItemStackBehaviour {
     /**
+     * 默认使用流程：根据耐久情况分别处理
+     * <p>
+     * 子类可按需覆盖 {@link #hasDuration}/{@link #noDuration}，无需再重复覆盖本方法。
+     */
+    @Override
+    public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
+        return handle(world, user, itemStack);
+    }
+
+    /**
      * 对于两种情况的处理
      * */
     public boolean handle (World world, LivingEntity<?> user, ItemStack itemStack) {

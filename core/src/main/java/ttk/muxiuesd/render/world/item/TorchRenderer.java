@@ -11,13 +11,13 @@ import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.weapon.ItemTorch;
+import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.light.PointLight;
 
 /**
  * 物品火把的渲染器
  * */
-public class TorchRenderer extends ItemRenderer.StandardRenderer<ItemTorch> {
+public class TorchRenderer extends ItemRenderer.StandardRenderer<Item> {
     public TorchRenderer () {
         super(Fight.ID("torch"), Fight.ItemTexturePath("torch.png"));
     }

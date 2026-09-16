@@ -4,11 +4,12 @@ import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.item.builder.ItemBuilder;
 
 /**
  * 构建一个剑类武器
  * */
-public class SwordBuilder {
+public class SwordBuilder implements ItemBuilder<Sword> {
     /// 预先填一些默认值，防止null
     AudioHolder attackSound = Sounds.ENTITY_SWEEP;
     float attackRange   = 1.145f;   //攻击距离

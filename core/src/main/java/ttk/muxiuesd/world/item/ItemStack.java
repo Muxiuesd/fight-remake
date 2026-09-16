@@ -14,7 +14,6 @@ import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.abs.Weapon;
 
 /**
  * 物品堆栈
@@ -239,8 +238,9 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
         this.behaviour = item.getBehaviour();
         this.setProperty(item.getProperty().copy());
 
-        if (item instanceof Weapon weapon) {
-            this.useTimer = new Timer<>(weapon.getProperty().getUseSpan());
+        //有使用间隔属性的物品就创建 CD 计时器（不再绑死 Weapon 类型）
+        if (item.getProperty().contain(PropertyTypes.WEAPON_USE_SAPN)) {
+            this.useTimer = new Timer<>(item.getProperty().get(PropertyTypes.WEAPON_USE_SAPN, 0f));
         }
         return this;
     }

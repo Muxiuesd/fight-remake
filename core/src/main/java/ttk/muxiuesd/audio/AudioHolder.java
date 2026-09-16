@@ -1,6 +1,7 @@
 package ttk.muxiuesd.audio;
 
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.app.interfaces.ShallowCopyable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.id.Identifier;
@@ -9,7 +10,7 @@ import ttk.muxiuesd.registrant.Registries;
 /**
  * 游戏的音效持有类
  * */
-public class AudioHolder implements Codecable<AudioHolder> {
+public class AudioHolder implements Codecable<AudioHolder>, ShallowCopyable<AudioHolder> {
     public static final Codec<AudioHolder> CODEC = Codec.STRING.xmap(
         Registries.AUDIOS::get,
         AudioHolder::getID
@@ -41,6 +42,11 @@ public class AudioHolder implements Codecable<AudioHolder> {
     public AudioHolder setFileHandle (FileHandle filehandle) {
         this.fileHandle = filehandle;
         return this;
+    }
+
+    @Override
+    public AudioHolder copy () {
+        return new AudioHolder(this.identifier).setFileHandle(this.fileHandle);
     }
 
     @Override

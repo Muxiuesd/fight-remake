@@ -5,6 +5,7 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.Backpack;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.equipment.EquipmentItem;
 
 /**
@@ -16,7 +17,11 @@ public class EquipmentItemStackBehaviour implements IItemStackBehaviour {
      * */
     @Override
     public boolean use (World world, LivingEntity<?> user, ItemStack itemStack) {
-        EquipmentItem equipment = (EquipmentItem) itemStack.getItem();
+        Item item = itemStack.getItem();
+        if (!(item instanceof EquipmentItem equipment)) {
+            throw new IllegalStateException(
+                "EQUIPMENT behaviour 绑定的物品不是 EquipmentItem，实际类型：" + item.getClass().getName());
+        }
         int index = equipment.equipmentType.ordinal();
         Backpack equipmentBackpack = user.getEquipmentBackpack();
         ItemStack stack = equipmentBackpack.getItemStack(index);
