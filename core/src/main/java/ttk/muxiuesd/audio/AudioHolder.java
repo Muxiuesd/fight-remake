@@ -14,7 +14,7 @@ public class AudioHolder implements Codecable<AudioHolder>, ShallowCopyable<Audi
     public static final Codec<AudioHolder> CODEC = Codec.STRING.xmap(
         Registries.AUDIOS::get,
         AudioHolder::getID
-        );
+    );
 
 
     private final Identifier identifier;    //音效的id包装类
@@ -47,6 +47,25 @@ public class AudioHolder implements Codecable<AudioHolder>, ShallowCopyable<Audi
     @Override
     public AudioHolder copy () {
         return new AudioHolder(this.identifier).setFileHandle(this.fileHandle);
+    }
+
+    /**
+     * 值语义：两个音效持有者只要 id 相同即视为相等
+     * <p>
+     * {@code copy()} 会生成新实例（不同的对象引用），若不覆写 equals/hashCode，
+     * 两个由 {@code Item.Property.copy()} 产生的属性（如 ITEM_USE_SOUND）会被判为不等，
+     * 导致 {@code ItemStack.equals} 返回 false，同种物品的堆叠无法合并。
+     */
+    @Override
+    public boolean equals (Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof AudioHolder other)) return false;
+        return this.identifier.equals(other.identifier);
+    }
+
+    @Override
+    public int hashCode () {
+        return this.identifier.hashCode();
     }
 
     @Override

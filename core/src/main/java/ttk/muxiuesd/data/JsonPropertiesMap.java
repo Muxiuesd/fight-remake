@@ -10,6 +10,7 @@ import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -84,8 +85,14 @@ public class JsonPropertiesMap extends PropertiesDataMap<JsonPropertiesMap, Json
         if (this.getCount() != other.getCount()) return false;
         AtomicBoolean result = new AtomicBoolean(true);
         this.propertiesMap.forEach((key, value) -> {
-            //如果没有这个属性或者有这个属性的相等判断对不上（最好对于传入的属性值的类单独实现equals）
-            if (!other.contain(key) || !other.get(key).equals(value)) result.set(false);
+            //没有这个属性就不相等
+            if (!other.contain(key)) {
+                result.set(false);
+                return;
+            }
+            //属性值的 null 安全比较：都为 null 视为相等（避免 null.equals(...) 抛 NPE）
+            Object otherValue = other.get(key);
+            if (!Objects.equals(value, otherValue)) result.set(false);
         });
 
         return result.get();

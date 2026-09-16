@@ -171,7 +171,7 @@ public final class Items {
             )
     );
     public static final Item PUFFER_FISH = register("puffer_fish",
-        Fight.ItemTexturePath("fish/puffer_fish.png"),
+        Fight.EntityTexturePath("fish/puffer_fish.png"),
         EffectItemBuilder.create()
             .setSounds(EffectItem.EAT_SOUNDS)
             .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 5f, 1))

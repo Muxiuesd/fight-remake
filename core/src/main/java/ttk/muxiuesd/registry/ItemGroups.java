@@ -23,7 +23,7 @@ public final class ItemGroups {
     public static final ItemGroup TOOL_BLOCK_ITEM = register(BlockItemGroups.TOOL_GROUP);
 
 
-    public static final ItemGroup COMMON_ITEM = register("common_item").selfAction((self) -> {
+    /*public static final ItemGroup COMMON_ITEM = register("common_item").selfAction((self) -> {
         self
             .add(Items.SLIME_BALL)
             .add(Items.COAL)
@@ -64,7 +64,7 @@ public final class ItemGroups {
 
             .add(Items.POTATO)
         ;
-        });
+        });*/
 
 
     public static ItemGroup register (String name) {
