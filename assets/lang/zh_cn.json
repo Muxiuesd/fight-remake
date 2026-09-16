@@ -8,6 +8,7 @@
 
   "text.fight:info_entry_game_name":      "Fight:战斗爽！",
   "text.fight:info_entry_fps":            "当前帧率: {0} fps",
+  "text.fight:info_entry_memory":         "已使用: {0} MB / 分配: {1} MB",
 
   "text.fight:weapon_use_span":     "&&a攻击间隔：{0}",
   "text.fight:weapon_damage":       "&&a武器伤害：{0}",

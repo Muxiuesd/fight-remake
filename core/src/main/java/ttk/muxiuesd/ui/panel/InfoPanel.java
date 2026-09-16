@@ -10,6 +10,7 @@ import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.components.InfoEntry;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryFPS;
+import ttk.muxiuesd.ui.components.infoentries.InfoEntryMemory;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.TextUtil;
 import ttk.muxiuesd.util.Util;
@@ -52,8 +53,9 @@ public class InfoPanel extends UIPanel {
     private InfoPanel () {
         super(0, 0, 0, 0, new GridPoint2(1, 1));
 
-        this.addEntry(new InfoEntry(Text.ofText(Fight.ID("info_entry_game_name"))))
-            .addEntry(new InfoEntryFPS());//默认附带一条 FPS 信息（每秒刷新，显示上一秒平均帧率）
+        this.addEntry(new InfoEntry(Text.ofText(Fight.ID("info_entry_game_name")))) //游戏名称
+            .addEntry(new InfoEntryFPS())       //FPS 信息（每秒刷新，显示上一秒平均帧率）
+            .addEntry(new InfoEntryMemory());   //内存使用信息（每秒刷新，显示已使用/分配内存 MB）
 
         //信息面板只展示、不参与交互，禁用交互避免干扰鼠标点击与命中检测
         this.setEnabled(false);
