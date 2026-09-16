@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.equipment;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -44,7 +45,7 @@ public class EquipmentItem extends Item {
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.of("减伤度：" + itemStack.getProperty().get(PropertyTypes.DAMAGE_REDUCTION)));
+        array.add(Text.ofText(Fight.ID("damage_reduction")).set(0, itemStack.getProperty().get(PropertyTypes.DAMAGE_REDUCTION)));
         return super.getTooltips(array, itemStack);
     }
 

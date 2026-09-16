@@ -15,6 +15,7 @@
   "text.fight:effect_duration":     "&&a持续时间：{0}",
   "text.fight:item_duration":       "&&a剩余耐久：{0} / {1}",
   "text.fight:shoot_bullet":        "&&a发射子弹：{0}",
+  "text.fight:damage_reduction":    "&&a减伤度：{0}",
 
 
   "item.fight:diamond_sword":       "&&m钻石剑",

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.item.weapon.sword;
 
 import com.badlogic.gdx.utils.Array;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
@@ -69,7 +70,7 @@ public class Sword extends Weapon {
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.ofText("fight:weapon_attack_range").set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE)));
+        array.add(Text.ofText(Fight.ID("weapon_attack_range")).set(0, itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE)));
         return super.getTooltips(array, itemStack);
     }
 
