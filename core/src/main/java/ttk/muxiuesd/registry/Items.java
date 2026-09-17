@@ -9,6 +9,7 @@ import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.item.FishPoleRenderer;
+import ttk.muxiuesd.render.world.item.SwordRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
@@ -58,7 +59,8 @@ public final class Items {
             .setDamage(1f)
             .setUseSpan(1f)
             .setDuration(50)
-            .setKnockback(0f)
+            .setKnockback(0.5f),
+        new SwordRenderer("wood_sword")
     );
     public static final Item STONE_SWORD = register("stone_sword",
         SwordBuilder.create()
@@ -66,7 +68,8 @@ public final class Items {
             .setDamage(1.5f)
             .setUseSpan(1f)
             .setDuration(100)
-            .setKnockback(1.0f)
+            .setKnockback(1.0f),
+        new SwordRenderer("stone_sword")
     );
     public static final Item IRON_SWORD = register("iron_sword",
         SwordBuilder.create()
@@ -74,7 +77,8 @@ public final class Items {
             .setDamage(3.5f)
             .setUseSpan(0.5f)
             .setDuration(345)
-            .setKnockback(1.5f)
+            .setKnockback(1.5f),
+        new SwordRenderer("iron_sword")
     );
     public static final Item GOLD_SWORD = register("gold_sword",
         SwordBuilder.create()
@@ -82,7 +86,8 @@ public final class Items {
             .setDamage(4.5f)
             .setUseSpan(0.5f)
             .setDuration(555)
-            .setKnockback(2f)
+            .setKnockback(2f),
+        new SwordRenderer("gold_sword")
     );
     //远程类武器
     public static final Item TEST_WEAPON = register("diamond_sword",
@@ -106,7 +111,7 @@ public final class Items {
                 }
             })
     );
-    //火把也能用来攻击（近战武器 + 自定义渲染器）
+    //火把也能用来攻击
     public static final Item TORCH = register(
         "torch",
         SwordBuilder.create()
