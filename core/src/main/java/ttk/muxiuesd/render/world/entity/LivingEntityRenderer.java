@@ -5,13 +5,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.world.entity.EntityRenderer;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.resource.Resource;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -65,7 +64,7 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
     }
 
     /**
-     * 手上持有的物品绘制
+     * 手上持有的物品绘制，普通的手上持有物品的实体，物品渲染方向朝向它的运动方向
      * */
     public void drawHandItem (Batch batch, T entity, Context context) {
         //如果手上有物品，则绘制手上的物品
@@ -77,10 +76,11 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
 
             ItemRenderer.Context itemContext = renderer.getContextByEntityContext(context);
             //物品渲染起点基于实体中心
-            itemContext.x += context.width / 2;
-            itemContext.y += context.height / 2;
-            Vector2 mousePos = Util.getMouseWindowPos();
-            itemContext.rotation = MathUtils.atan2Deg360(mousePos.y - itemContext.y, mousePos.x - itemContext.x);
+            itemContext.x += context.width / 2f;
+            itemContext.y += context.height / 2f;
+            //获取实体的指向方向
+            Direction direction = entity.getDirection();
+            itemContext.rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             renderer.drawOnHand(batch, itemContext, entity, itemStack);
             renderer.freeContext(itemContext);
         }

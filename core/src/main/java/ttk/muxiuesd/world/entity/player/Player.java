@@ -135,6 +135,9 @@ public class Player extends LivingEntity<Player> {
         return this;
     }
 
+    /**
+     * 玩家实体的方向是玩家鼠标指向的方向
+     * */
     @Override
     public Direction getDirection () {
         //以玩家位置为起点瞄准鼠标，而不是窗口中心（相机带偏移时两者不同）
