@@ -78,7 +78,7 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
             //物品渲染起点基于实体中心
             itemContext.x += context.width / 2f;
             itemContext.y += context.height / 2f;
-            //获取实体的指向方向
+            //获取实体的指向方向（玩家实体的方向为玩家在世界上的坐标指向鼠标在世界上的坐标的向量）
             Direction direction = entity.getDirection();
             itemContext.rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             renderer.drawOnHand(batch, itemContext, entity, itemStack);
