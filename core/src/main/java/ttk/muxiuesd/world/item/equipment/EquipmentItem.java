@@ -5,7 +5,6 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -23,18 +22,6 @@ public class EquipmentItem extends Item {
         BOOTS,      //靴子
         OTHERS      //其他类型
     }
-
-    /**
-     * 创建默认的装备属性类
-     * */
-    public static Property createDefaultProperty () {
-        return new Property()
-            .add(PropertyTypes.ITEM_MAX_COUNT, 1)
-            .add(PropertyTypes.ITEM_ON_USING, false)
-            .add(PropertyTypes.ITEM_USE_SOUND, Sounds.EQUIP)
-            .add(PropertyTypes.DAMAGE_REDUCTION, 1.145f);
-    }
-
     //装备的类型
     public final EquipmentItem.Type equipmentType;
 

@@ -17,10 +17,13 @@ import java.util.function.Supplier;
  */
 public interface ItemBuilder<T extends Item> extends Supplier<T> {
     /**
-     * 用默认属性构建一个全新的物品实例
+     * 构建一个全新的物品实例
      */
     T build ();
 
+    /**
+     * 调用构建方法
+     * */
     @Override
     default T get () {
         return build();

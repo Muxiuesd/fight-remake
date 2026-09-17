@@ -116,10 +116,32 @@ public final class Items {
     );
 
     /// 装备物品
-    public static final Item DIAMOND_HELMET = register("diamond_helmet", EquipmentItemBuilder.of(EquipmentItem.Type.HELMET));
-    public static final Item DIAMOND_CHESTPLATE = register("diamond_chestplate", EquipmentItemBuilder.of(EquipmentItem.Type.CHESTPLATE));
-    public static final Item DIAMOND_LEGGINGS = register("diamond_leggings", EquipmentItemBuilder.of(EquipmentItem.Type.LEGGINGS));
-    public static final Item DIAMOND_BOOTS = register("diamond_boots", EquipmentItemBuilder.of(EquipmentItem.Type.BOOTS));
+    public static final Item IRON_HELMET        = register("iron_helmet",
+        EquipmentItemBuilder.create(EquipmentItem.Type.HELMET).setDamageReduction(4.5f)
+    );
+    public static final Item IRON_CHESTPLATE    = register("iron_chestplate",
+        EquipmentItemBuilder.create(EquipmentItem.Type.CHESTPLATE).setDamageReduction(5f)
+    );
+    public static final Item IRON_LEGGINGS      = register("iron_leggings",
+        EquipmentItemBuilder.create(EquipmentItem.Type.LEGGINGS).setDamageReduction(5.5f)
+    );
+    public static final Item IRON_BOOTS         = register("iron_boots",
+        EquipmentItemBuilder.create(EquipmentItem.Type.BOOTS).setDamageReduction(4f)
+    );
+
+    public static final Item DIAMOND_HELMET     = register("diamond_helmet",
+        EquipmentItemBuilder.create(EquipmentItem.Type.HELMET).setDamageReduction(5.5f)
+    );
+    public static final Item DIAMOND_CHESTPLATE = register("diamond_chestplate",
+        EquipmentItemBuilder.create(EquipmentItem.Type.CHESTPLATE).setDamageReduction(6.5f)
+    );
+    public static final Item DIAMOND_LEGGINGS   = register("diamond_leggings",
+        EquipmentItemBuilder.create(EquipmentItem.Type.LEGGINGS).setDamageReduction(6f)
+    );
+    public static final Item DIAMOND_BOOTS      = register("diamond_boots",
+        EquipmentItemBuilder.create(EquipmentItem.Type.BOOTS).setDamageReduction(5f)
+    );
+
 
     /// 刷怪蛋物品
     //怪物刷怪蛋
