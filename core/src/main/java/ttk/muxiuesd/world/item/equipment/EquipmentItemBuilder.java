@@ -56,6 +56,9 @@ public class EquipmentItemBuilder implements ItemBuilder<EquipmentItem> {
         return this.damageReduction;
     }
 
+    /**
+     * 设置减伤度
+     * */
     public EquipmentItemBuilder setDamageReduction (float damageReduction) {
         this.damageReduction = damageReduction;
         return this;

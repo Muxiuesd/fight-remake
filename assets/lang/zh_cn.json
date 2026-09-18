@@ -23,13 +23,17 @@
 
   "item.fight:stone_sword": "&&a石剑",
 
-  "item.fight:iron_sword":       "&&c铁剑",
-  "item.fight:iron_helmet":      "&&c铁头盔",
-  "item.fight:iron_chestplate":  "&&c铁胸甲",
-  "item.fight:iron_leggings":    "&&c铁裤腿",
-  "item.fight:iron_boots":       "&&c铁靴子",
+  "item.fight:iron_sword":          "&&c铁剑",
+  "item.fight:iron_helmet":         "&&c铁头盔",
+  "item.fight:iron_chestplate":     "&&c铁胸甲",
+  "item.fight:iron_leggings":       "&&c铁裤腿",
+  "item.fight:iron_boots":          "&&c铁靴子",
 
-  "item.fight:gold_sword":  "&&c金剑",
+  "item.fight:gold_sword":          "&&c金剑",
+  "item.fight:gold_helmet":         "&&c金头盔",
+  "item.fight:gold_chestplate":     "&&c金胸甲",
+  "item.fight:gold_leggings":       "&&c金裤腿",
+  "item.fight:gold_boots":          "&&c金靴子",
 
   "item.fight:diamond_sword":       "&&m钻石剑",
   "item.fight:diamond_helmet":      "&&m钻石头盔",

@@ -28,13 +28,12 @@ public class CraftingRecipes {
         Pattern.of('S', Items.STONE)
     );
 
-    /*public static final CraftingTableRecipe WOOD_SWORD = registerShaped("wood_sword", Items.WOOD_SWORD,
-        "  W",
-        " W ",
+    public static final CraftingTableRecipe WOOD_SWORD = registerShaped("wood_sword", Items.WOOD_SWORD,
+        "  S",
+        " S ",
         "S  ",
-        Pattern.of('W', Items.WOOD_SWORD),
         Pattern.of('S', Items.STICK)
-    );*/
+    );
 
     public static final CraftingTableRecipe STONE_SWORD = registerShaped("stone_sword", Items.STONE_SWORD,
         "  T",
@@ -60,17 +59,69 @@ public class CraftingRecipes {
         Pattern.of('S', Items.STICK)
     );
 
+    /// 铁质装备合成表
+    public static final CraftingTableRecipe IRON_HELMET = registerShaped("iron_helmet", Items.IRON_HELMET,
+        "III",
+        "I I",
+        "   ",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+    public static final CraftingTableRecipe IRON_CHESTPLATE = registerShaped("iron_chestplate", Items.IRON_CHESTPLATE,
+        "I I",
+        "III",
+        "III",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+    public static final CraftingTableRecipe IRON_LEGGINGS = registerShaped("iron_leggings", Items.IRON_LEGGINGS,
+        "III",
+        "I I",
+        "I I",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+    public static final CraftingTableRecipe IRON_BOOTS = registerShaped("iron_boots", Items.IRON_BOOTS,
+        "I I",
+        "I I",
+        "   ",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+
+    /// 金质装备合成表
+    public static final CraftingTableRecipe GOLD_HELMET = registerShaped("gold_helmet", Items.GOLD_HELMET,
+        "GGG",
+        "G G",
+        "   ",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+    public static final CraftingTableRecipe GOLD_CHESTPLATE = registerShaped("gold_chestplate", Items.GOLD_CHESTPLATE,
+        "G G",
+        "GGG",
+        "GGG",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+    public static final CraftingTableRecipe GOLD_LEGGINGS = registerShaped("gold_leggings", Items.GOLD_LEGGINGS,
+        "GGG",
+        "G G",
+        "G G",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+    public static final CraftingTableRecipe GOLD_BOOTS = registerShaped("gold_boots", Items.GOLD_BOOTS,
+        "G G",
+        "G G",
+        "   ",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+
 
 
     /**
      * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
      * */
-    public static CraftingTableRecipe registerShaped (String name, Item item,
+    public static CraftingTableRecipe registerShaped (String name, Item outputItem,
                                                       String pattern1,
                                                       String pattern2,
                                                       String pattern3,
                                                       Pattern... pairs) {
-        return registerShaped(name, new ItemStack(item, 1), pattern1, pattern2, pattern3, pairs);
+        return registerShaped(name, new ItemStack(outputItem, 1), pattern1, pattern2, pattern3, pairs);
     }
 
     /**
