@@ -39,6 +39,7 @@ public class Sword extends Weapon {
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         Float range = itemStack.getProperty().get(PropertyTypes.WEAPON_ATTACK_RANGE);
         EntitySystem es = world.getSystem(EntitySystem.class);
+        boolean hitAnything = false;   //是否至少命中一个目标（命中才扣耐久，空挥不扣）
         //检测剑的伤害区域内的敌人实体
         Array<Enemy<?>> entities = Util.sectorArea(
             es.getEnemyEntity(),
@@ -49,6 +50,7 @@ public class Sword extends Weapon {
             enemy.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, enemy));
+            hitAnything = true;
         }
         //检测剑的伤害区域内的生物实体
         Array<LivingEntity<?>> livingEntities = Util.sectorArea(
@@ -60,12 +62,14 @@ public class Sword extends Weapon {
             le.applyDamage(DamageTypes.SWORD, user);
             //发送事件
             EventBus.post(EventTypes.ENTITY_HURT, new EventPosterEntityHurt(world, user, le));
+            hitAnything = true;
         }
 
         AudioHolder useSound = this.getProperty().getUseSound();
         SoundSystem ses = world.getSystem(SoundSystem.class);
         ses.playSpatialSound(useSound, user);
-        return true;
+        //命中才返回 true（空挥返回 false → 上层不扣耐久）
+        return hitAnything;
     }
 
     @Override
