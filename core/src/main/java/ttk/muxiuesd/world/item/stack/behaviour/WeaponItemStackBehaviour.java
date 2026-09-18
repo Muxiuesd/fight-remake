@@ -26,14 +26,16 @@ public class WeaponItemStackBehaviour extends HasDurationItemStackBehaviour {
         boolean used = itemStack.getItem().use(itemStack, world, user);
         if (this.swingOnUse) {
             //近战：攻击动作（挥手）无论是否命中都表现（空挥也挥手，手感保留）；
-            //只有命中（use 返回 true）才扣耐久，见下方 used 判断
-            user.swingHand(itemStack.useTimer.getMaxSpan());
+            //只有命中（use 返回 true）才扣耐久并标记使用中，见下方 used 判断
+            user.swingHand(itemStack.getUseTimer().getMaxSpan());
         }
         if (!used) {
-            //近战空挥（未命中）/远程发射失败：不扣耐久
+            //近战空挥（未命中）/远程发射失败：不标记使用中、不扣耐久
             return false;
         }
-        //命中（近战）或发射成功（远程）：扣耐久
+        //命中（近战）或发射成功（远程）：标记为使用中（ITEM_ON_USING=true，CD 结束后由 ItemStack.update 自动复位 false）
+        itemStack.setOnUsing(true);
+        //扣耐久
         return super.hasDuration(world, user, itemStack);
     }
 }

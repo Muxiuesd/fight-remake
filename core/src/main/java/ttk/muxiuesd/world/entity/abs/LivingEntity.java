@@ -387,6 +387,11 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public void setHandIndex (int handIndex) {
         if (handIndex >= 0 && handIndex < this.getBackpack().getSize()) {
             if (this.handIndex != handIndex) {
+                //正在使用中的物品不可切换（静默拦截）：
+                //当前手持物品若在使用（ITEM_ON_USING 为 true，或 useTimer 冷却未结束）则不允许切换
+                ItemStack curHand = this.getHandItemStack();
+                if (!curHand.isVoid() && curHand.isUsing()) return;
+
                 //放下先前的物品堆叠
                 ItemStack handItemStack = this.getHandItemStack();
                 //实体系统为空说明实体还未加入世界（例如解码读取数据时），不需要放下物品

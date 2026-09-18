@@ -36,7 +36,7 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     private IItemStackBehaviour behaviour;//物品堆叠所用的行为，一般来说根据物品的类型来判断
     private Item.Property property;//物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
     private int amount;         //数量
-    public Timer<?> useTimer;   //使用时间计时器
+    private Timer<?> useTimer;  //使用时间计时器
 
     /**
      * 给空物品使用的构造方法，啥也没有
@@ -83,7 +83,16 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     public void update (float delta) {
         //更新物品
         this.getItem().update(delta, this);
-        if (this.useTimer != null) this.useTimer.update(delta);
+        if (this.useTimer != null) {
+            //检测使用完成：useTimer 的 curSpan 从"未到最大"推进到"达到最大"（冷却结束）
+            float prev = this.useTimer.getCurSpan();
+            float max = this.useTimer.getMaxSpan();
+            this.useTimer.update(delta);
+            //使用完成 → 及时复位 ITEM_ON_USING = false
+            if (prev < max && this.useTimer.getCurSpan() >= max) {
+                this.setOnUsing(false);
+            }
+        }
     }
 
     /**
@@ -218,9 +227,43 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
 
     /**
      * 物品是否在使用中
-     * */
+     */
     public boolean onUsing () {
         return this.getProperty().get(PropertyTypes.ITEM_ON_USING, false);
+    }
+
+    /**
+     * 设置物品是否在使用中（写入 ITEM_ON_USING 属性）
+     */
+    public ItemStack setOnUsing (boolean onUsing) {
+        this.getProperty().add(PropertyTypes.ITEM_ON_USING, onUsing);
+        return this;
+    }
+
+    /**
+     * 物品是否正在使用中
+     * <p>
+     * 满足任一即为正在使用：① {@link #onUsing()} 为 true（如鱼竿抛竿的持续状态）；
+     * ② useTimer 存在且未冷却完（未 ready，如武器攻击后的 CD）。
+     */
+    public boolean isUsing () {
+        if (this.onUsing()) return true;
+        return this.useTimer != null && !this.useTimer.isReady();
+    }
+
+    /**
+     * 获取使用计时器（无使用间隔属性的物品为 null）
+     */
+    public Timer<?> getUseTimer () {
+        return this.useTimer;
+    }
+
+    /**
+     * 设置使用计时器
+     */
+    public ItemStack setUseTimer (Timer<?> useTimer) {
+        this.useTimer = useTimer;
+        return this;
     }
 
     /**
