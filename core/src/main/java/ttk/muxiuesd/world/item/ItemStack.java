@@ -244,11 +244,16 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
      * 物品是否正在使用中
      * <p>
      * 满足任一即为正在使用：① {@link #onUsing()} 为 true（如鱼竿抛竿的持续状态）；
-     * ② useTimer 存在且未冷却完（未 ready，如武器攻击后的 CD）。
+     * ② useTimer 存在且仍处于冷却中（curSpan < maxSpan，如武器攻击后的 CD）。
      */
     public boolean isUsing () {
         if (this.onUsing()) return true;
-        return this.useTimer != null && !this.useTimer.isReady();
+        if (this.useTimer == null) return false;
+        //注意：不能调用 useTimer.isReady() 来判断——isReady() 到点会归零 curSpan（Timer 设计），
+        //在"检查切换是否允许"这种只读场景调用会污染 useTimer 状态（冷却完的被归零后，
+        //下次切回该武器被误判为使用中，须再等一个 CD 周期才能切换）。
+        //此处只读比较 curSpan 与 maxSpan，无副作用。
+        return this.useTimer.getCurSpan() < this.useTimer.getMaxSpan();
     }
 
     /**
@@ -283,7 +288,10 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
 
         //有使用间隔属性的物品就创建 CD 计时器（不再绑死 Weapon 类型）
         if (item.getProperty().contain(PropertyTypes.WEAPON_USE_SAPN)) {
-            this.useTimer = new Timer<>(item.getProperty().get(PropertyTypes.WEAPON_USE_SAPN, 0f));
+            float span = item.getProperty().get(PropertyTypes.WEAPON_USE_SAPN, 0f);
+            //初始化为"已冷却完毕"（curSpan = maxSpan，isReady() 为 true）：
+            //物品刚获得/切换到时未使用即可立即使用，也可立即切换手持（避免 isUsing() 把未使用误判为使用中）
+            this.useTimer = new Timer<>(span, span);
         }
         return this;
     }
