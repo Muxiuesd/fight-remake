@@ -111,6 +111,32 @@ public class CraftingRecipes {
         Pattern.of('G', Items.GOLD_INGOT)
     );
 
+    /// 钻石装备合成表
+    public static final CraftingTableRecipe DIAMOND_HELMET = registerShaped("diamond_helmet", Items.DIAMOND_HELMET,
+        "DDD",
+        "D D",
+        "   ",
+        Pattern.of('D', Items.DIAMOND)
+    );
+    public static final CraftingTableRecipe DIAMOND_CHESTPLATE = registerShaped("diamond_chestplate", Items.DIAMOND_CHESTPLATE,
+        "D D",
+        "DDD",
+        "DDD",
+        Pattern.of('D', Items.DIAMOND)
+    );
+    public static final CraftingTableRecipe DIAMOND_LEGGINGS = registerShaped("diamond_leggings", Items.DIAMOND_LEGGINGS,
+        "DDD",
+        "D D",
+        "D D",
+        Pattern.of('D', Items.DIAMOND)
+    );
+    public static final CraftingTableRecipe DIAMOND_BOOTS = registerShaped("diamond_boots", Items.DIAMOND_BOOTS,
+        "D D",
+        "D D",
+        "   ",
+        Pattern.of('D', Items.DIAMOND)
+    );
+
 
 
     /**

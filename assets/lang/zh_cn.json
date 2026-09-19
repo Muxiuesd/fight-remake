@@ -42,21 +42,22 @@
   "item.fight:diamond_boots":       "&&m钻石靴子",
 
 
-  "item.fight:torch": "火把",
-  "item.fight:stick": "木棍",
+  "item.fight:torch":     "火把",
+  "item.fight:stick":     "木棍",
   "item.fight:fish_pole": "钓鱼竿",
 
-  "item.fight:fish": "鱼",
+  "item.fight:fish":        "鱼",
   "item.fight:puffer_fish": "河豚",
 
-  "item.fight:rubbish": "垃圾",
+  "item.fight:rubbish":     "垃圾",
 
-  "item.fight:coal": "煤炭",
-  "item.fight:raw_iron":   "粗铁矿",
-  "item.fight:raw_gold":   "粗金矿",
-  "item.fight:iron_ingot": "铁锭",
-  "item.fight:gold_ingot": "金锭",
+  "item.fight:coal":        "煤炭",
+  "item.fight:raw_iron":    "粗铁矿",
+  "item.fight:raw_gold":    "粗金矿",
+  "item.fight:iron_ingot":  "&&c铁锭",
+  "item.fight:gold_ingot":  "&&c金锭",
+  "item.fight:diamond":     "&&m钻石",
 
-  "effect.fight:healing": "治疗 等级：{0}",
-  "effect.fight:poison": "中毒 等级：{0}"
+  "effect.fight:healing":   "治疗 等级：{0}",
+  "effect.fight:poison":    "中毒 等级：{0}"
 }
