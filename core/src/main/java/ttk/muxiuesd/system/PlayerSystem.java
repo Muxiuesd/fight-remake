@@ -171,9 +171,11 @@ public class PlayerSystem extends WorldSystem {
     private void handleInput (float delta) {
         Player curPlayer = this.getPlayer();
 
-        //需要玩家当前的GUIScreen是HUD界面，并且鼠标不在UI组件上，防止同时操作两者
-        if (GUISystem.getInstance().getCurScreen() == PLAYER_HUD_SCREEN
-            && !GUISystem.getInstance().mouseOverUI()) {
+        //当前必须是 HUD 屏幕才处理玩家输入（背包/菜单打开时不处理）
+        boolean isHUD = GUISystem.getInstance().getCurScreen() == PLAYER_HUD_SCREEN;
+
+        //鼠标操作：悬停 HUD 的 UI 组件时禁用，避免既操作 UI 又触发玩家操作/与世界交互
+        if (isHUD && !GUISystem.getInstance().mouseOverUI()) {
             //玩家右键防御
             if (KeyBindings.PlayerShield.wasJustPressed()) {
                 curPlayer.defendCDTimer.isReady();
@@ -183,11 +185,15 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerUseItem.wasJustPressed()) {
                 curPlayer.setUsingItem(curPlayer.useItem(getWorld()));
             }
-            //头两个物品槽（0号和1号）快捷循环
+            //头两个物品槽（0号和1号）快捷循环（鼠标中键，属鼠标操作）
             if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
                 if (curPlayer.getHandIndex() == 0) curPlayer.setHandIndex(1);
                 else if (curPlayer.getHandIndex() == 1) curPlayer.setHandIndex(0);
             }
+        }
+
+        //键盘操作：只要在 HUD 屏幕就可执行（不受鼠标是否悬停 UI 影响，保证移动等键盘操作不被 UI 阻塞）
+        if (isHUD) {
             if (KeyBindings.PlayerDropItem.wasJustPressed()) {
                 curPlayer.dropItem(curPlayer.getHandIndex(), 1);
             }
@@ -204,7 +210,7 @@ public class PlayerSystem extends WorldSystem {
             //击退中不受输入控制（速度由击退物理接管，输入会覆盖击退速度）
             if (curPlayer.isKnockback()) return;
 
-            //移动方向（放在守卫内：打开GUI时不能移动）
+            //移动方向（放在 HUD 守卫内：打开GUI时不能移动）
             int inputX = 0;
             int inputY = 0;
             if (KeyBindings.PlayerWalkUp.wasPressed()) {

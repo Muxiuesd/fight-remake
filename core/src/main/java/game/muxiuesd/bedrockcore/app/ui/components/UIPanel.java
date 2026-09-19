@@ -266,6 +266,10 @@ public class UIPanel extends UIComponent implements UIComponentsHolder, Voidable
 
     @Override
     public void removeComponent (UIComponent component) {
+        //防御：移除按钮时取消其待确认的点击状态，防止状态残留导致复用后误触发
+        if (component instanceof UIButton uiButton) {
+            uiButton.cancelPendingClick();
+        }
         UIComponentsHolder.super.removeComponent(component);
         component.setScreen(null);
         component.setParentPanel(VOID_INSTANCE);

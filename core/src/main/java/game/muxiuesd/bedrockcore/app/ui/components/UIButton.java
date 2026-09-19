@@ -1,5 +1,6 @@
 package game.muxiuesd.bedrockcore.app.ui.components;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -28,6 +29,10 @@ public class UIButton extends UIComponent {
     private NinePatch mouseOverBackgroundPatch;
     private ClickEvent clickEvent;
     private MouseOverEvent mouseOverEvent;
+
+    /// 按钮点击状态（方案 B：按下→松开才触发）
+    private boolean pendingClick;                 //左键是否已按下、等待松开确认
+    private GridPoint2 pendingInteractPos;        //按下时的交互坐标（松开触发时使用）
 
     /**
      * @param background 背景的材质贴图
@@ -73,14 +78,67 @@ public class UIButton extends UIComponent {
 
     @Override
     public boolean click (GridPoint2 interactPos, int button) {
-        //只有左键点击才触发按钮的点击事件，其他按键由子类自行判断
+        //只有左键点击才走方案B（按下标记、松开确认触发），其他按键（右键等）由子类自行判断
         if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
-        //AudioPlayer.getInstance().playMusic(Sounds.ITEM_CLICK);
-        this.playClickSound();
 
-        if (this.clickEvent == null) return super.click(interactPos, button);
+        //方案 B：左键按下仅记录待确认状态，不立即执行点击事件；
+        //松开时（且鼠标仍在按钮上）才真正触发，见 {@link #update(float)}
+        this.pendingClick = true;
+        this.pendingInteractPos = interactPos;
+        return false;
+    }
 
-        return this.clickEvent.handle(this, interactPos);
+    /**
+     * 按钮点击状态的推进（方案 B）
+     * <p>
+     * 每帧检测：左键按下待确认期间——
+     * ① 松开且鼠标仍在按钮上：触发点击事件 + 结束按下态；
+     * ② 按住但鼠标移出按钮：取消点击（结束按下态，不触发）。
+     * ③ 按钮不可见/不可交互：立即取消（防止隐藏/移除时残留误触发）。
+     */
+    @Override
+    public void update (float delta) {
+        //防御：不可见或不可交互时取消待确认的点击，避免隐藏/禁用状态下误触发
+        if (!this.isVisible() || !this.isEnabled()) {
+            this.endPendingClick();
+            super.update(delta);
+            return;
+        }
+        if (this.pendingClick) {
+            boolean leftPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+            if (!leftPressed) {
+                //左键已松开
+                if (this.isMouseOver()) {
+                    //松开时鼠标仍在按钮上：触发点击事件 + 播放点击音效
+                    this.playClickSound();
+                    if (this.clickEvent != null) {
+                        this.clickEvent.handle(this, this.pendingInteractPos);
+                    }
+                }
+                //无论是否在按钮上松开，都结束按下态
+                this.endPendingClick();
+            } else if (!this.isMouseOver()) {
+                //按住但鼠标移出按钮：取消本次点击（不触发）
+                this.endPendingClick();
+            }
+        }
+        super.update(delta);
+    }
+
+    /**
+     * 取消待确认的点击状态（外部移除/隐藏组件时可调用，防止状态残留）
+     */
+    public void cancelPendingClick () {
+        this.endPendingClick();
+    }
+
+    /**
+     * 结束待确认的点击状态：清除标记与按下态
+     */
+    private void endPendingClick () {
+        this.pendingClick = false;
+        this.pendingInteractPos = null;
+        this.setClicked(false);
     }
 
     @Override

@@ -12,6 +12,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 import game.muxiuesd.bedrockcore.app.interfaces.ui.GUIResize;
+import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.gui.UIComponentsHolder;
 import ttk.muxiuesd.util.Util;
@@ -235,6 +236,10 @@ public abstract class UIScreen
         }
         if (!this.delayRemoveComponents.isEmpty()) {
             this.delayRemoveComponents.forEach(delayRemoveComponent -> {
+                //防御：移除按钮时取消其待确认的点击状态，防止状态残留导致复用后误触发
+                if (delayRemoveComponent instanceof UIButton uiButton) {
+                    uiButton.cancelPendingClick();
+                }
                 delayRemoveComponent.setScreen(null);
                 this.components.remove(delayRemoveComponent);
                 //如果移除的是焦点组件，就清空焦点
