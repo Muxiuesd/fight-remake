@@ -18,6 +18,10 @@ public final class FurnaceRecipes {
     public static final CookingRecipe RUBBISH = register("recipe_rubbish", Items.STICK, Items.RUBBISH);
     public static final CookingRecipe GLASS = register("recipe_glass", Items.SAND, Items.GLASS);
     public static final CookingRecipe COAL = register("recipe_coal", Items.COAL_ORE, Items.COAL);
+    public static final CookingRecipe IRON = register("recipe_iron", Items.RAW_IRON, Items.IRON_INGOT);
+    public static final CookingRecipe GOLD = register("recipe_gold", Items.RAW_GOLD, Items.GOLD_INGOT);
+
+
 
     /**
      * 普通的配方注册，输入一个就输出一个

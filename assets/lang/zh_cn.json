@@ -19,9 +19,9 @@
   "text.fight:damage_reduction":    "&&a减伤度：{0}",
 
 
-  "item.fight:wood_sword":  "&&a木剑",
+  "item.fight:wood_sword":  "木剑",
 
-  "item.fight:stone_sword": "&&a石剑",
+  "item.fight:stone_sword": "石剑",
 
   "item.fight:iron_sword":          "&&c铁剑",
   "item.fight:iron_helmet":         "&&c铁头盔",
@@ -52,6 +52,8 @@
   "item.fight:rubbish": "垃圾",
 
   "item.fight:coal": "煤炭",
+  "item.fight:raw_iron":   "粗铁矿",
+  "item.fight:raw_gold":   "粗金矿",
   "item.fight:iron_ingot": "铁锭",
   "item.fight:gold_ingot": "金锭",
 

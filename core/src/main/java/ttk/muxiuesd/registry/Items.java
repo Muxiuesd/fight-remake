@@ -41,8 +41,11 @@ public final class Items {
     //材料类
     public static final Item STICK = register("stick");
     public static final Item SLIME_BALL = register("slime_ball");
+    public static final Item RAW_IRON = register("raw_iron");
+    public static final Item RAW_GOLD = register("raw_gold");
     public static final Item IRON_INGOT = register("iron_ingot");
     public static final Item GOLD_INGOT = register("gold_ingot");
+    public static final Item DIAMOND = register("diamond");
     public static final Item COAL = register("coal");
     public static final Item BAIT = register("bait");
     public static final Item POTION_BOTTLE = register("potion_bottle", Fight.ItemTexturePath("potion/potion_bottle_empty.png"));

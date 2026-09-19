@@ -19,8 +19,11 @@ public class MaterialItemGroup {
             .add(Items.SLIME_BALL)
 
             .add(Items.COAL)
+            .add(Items.RAW_IRON)
+            .add(Items.RAW_GOLD)
             .add(Items.IRON_INGOT)
             .add(Items.GOLD_INGOT)
+            .add(Items.DIAMOND)
 
             .add(Items.POTION_BOTTLE)
 
