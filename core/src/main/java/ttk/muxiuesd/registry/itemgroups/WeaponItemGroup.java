@@ -19,6 +19,8 @@ public class WeaponItemGroup {
             .add(Items.IRON_SWORD)
             .add(Items.GOLD_SWORD)
             .add(Items.TEST_WEAPON)
+
+            .add(Items.WOOD_LONG_SWORD)
             ;
     });
 }

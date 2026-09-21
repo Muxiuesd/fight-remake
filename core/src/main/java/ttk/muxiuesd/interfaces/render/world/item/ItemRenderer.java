@@ -165,7 +165,7 @@ public interface ItemRenderer<T extends Item> {
         });
 
         public float
-            x , y,
+            x, y,
             width, height,
             originX = 0f, originY = 0f,
             scaleX = 1f, scaleY = 1f,

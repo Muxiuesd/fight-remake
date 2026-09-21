@@ -9,6 +9,7 @@ import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.item.FishPoleRenderer;
+import ttk.muxiuesd.render.world.item.LongSwordRenderer;
 import ttk.muxiuesd.render.world.item.SwordRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
 import ttk.muxiuesd.util.Direction;
@@ -64,6 +65,15 @@ public final class Items {
             .setDuration(50)
             .setKnockback(0.5f),
         new SwordRenderer("wood_sword")
+    );
+    public static final Item WOOD_LONG_SWORD = register("wood_long_sword",
+        SwordBuilder.create()
+            .setAttackRange(4.5f)
+            .setDamage(1.5f)
+            .setUseSpan(2.5f)
+            .setDuration(90)
+            .setKnockback(2.5f),
+        new LongSwordRenderer("wood_long_sword")
     );
     public static final Item STONE_SWORD = register("stone_sword",
         SwordBuilder.create()

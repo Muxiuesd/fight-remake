@@ -71,18 +71,18 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
         ItemStack itemStack = entity.getHandItemStack();
         if (!itemStack.isVoid()) {
             //获取物品的渲染器来渲染
-            ItemRenderer<Item> renderer = ItemRendererRegistry.get(itemStack.getItem());
-            if (renderer == null) return;
+            ItemRenderer<Item> itemRenderer = ItemRendererRegistry.get(itemStack.getItem());
+            if (itemRenderer == null) return;
 
-            ItemRenderer.Context itemContext = renderer.getContextByEntityContext(context);
+            ItemRenderer.Context itemContext = itemRenderer.getContextByEntityContext(context);
             //物品渲染起点基于实体中心
             itemContext.x += context.width / 2f;
             itemContext.y += context.height / 2f;
             //获取实体的指向方向（玩家实体的方向为玩家在世界上的坐标指向鼠标在世界上的坐标的向量）
             Direction direction = entity.getDirection();
             itemContext.rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
-            renderer.drawOnHand(batch, itemContext, entity, itemStack);
-            renderer.freeContext(itemContext);
+            itemRenderer.drawOnHand(batch, itemContext, entity, itemStack);
+            itemRenderer.freeContext(itemContext);
         }
     }
 
