@@ -17,7 +17,9 @@ public class BlockItemGroups {
                 .add(Items.GRASS)
                 .add(Items.FARMLAND_DRY)
                 .add(Items.STONE)
+                .add(Items.SNOW)
                 .add(Items.SAND)
+                .add(Items.WATER)
             ;
         });
 

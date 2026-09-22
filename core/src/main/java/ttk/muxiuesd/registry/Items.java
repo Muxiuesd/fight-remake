@@ -186,6 +186,7 @@ public final class Items {
     public static final Item GRASS = register(Blocks.GRASS);
     public static final Item FARMLAND_DRY = register(Blocks.FARMLAND_DRY);
     public static final Item STONE = register(Blocks.STONE);
+    public static final Item SNOW = register(Blocks.SNOW);
     public static final Item SAND = register(Blocks.SAND);
     public static final Item WATER = register(Blocks.WATER);
     public static final Item GLASS = register(Blocks.GLASS);

@@ -43,6 +43,9 @@ public final class Blocks {
     public static final Block STONE = registerCommon("stone",
         () -> new Block.Property().setFriction(0.06f).setSounds(Sounds.STONE)
     );
+    public static final Block SNOW = registerCommon("snow",
+        () -> new Block.Property().setFriction(0.15f).setSounds(Sounds.STONE) //后面改
+    );
     public static final Block SAND = registerCommon("sand",
         () -> new Block.Property().setFriction(0.1f).setSounds(Sounds.SAND)
     );
