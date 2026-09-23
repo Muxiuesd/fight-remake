@@ -50,6 +50,10 @@ public class Fight {
     public static final String PATH_SAVE_ENTITIES = "entities/";
     public static final String PATH_SAVE_PLAYER = "player/";
 
+    /// 玩家出生点（世界坐标，作为存档属性；随世界信息读写，可后续修改）
+    public static final Info<Float> SPAWN_X = Info.create("spawn_x", 0f);
+    public static final Info<Float> SPAWN_Y = Info.create("spawn_y", 0f);
+
     /**
      *  获取玩家数据保存的路径
      * */

@@ -18,6 +18,7 @@ import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
+import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -62,6 +63,8 @@ public class RegistryKeys {
 
     public static final RegistryKey<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE = new RegistryKey<>();
     public static final RegistryKey<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE = new RegistryKey<>();
+
+    public static final RegistryKey<Biome> BIOME = new RegistryKey<>();
 
     public static final RegistryKey<ParticleEmitter<?>> PARTICLE_EMITTER = new RegistryKey<>();
 

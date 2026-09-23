@@ -278,8 +278,8 @@ public class PlayerSystem extends WorldSystem {
         newPlayer.setEntitySystem(es);
         this.setPlayer(newPlayer);
 
-        //重生位置安全检查：出生点被墙/水占据时向上搜索安全位置（防止卡墙/溺水）
-        this.ensureSafeSpawnPosition();
+        //复活到出生点（出生点是存档属性，已在世界信息中记录）
+        this.teleportToSpawnPoint(newPlayer);
         this.playerLastPosition = newPlayer.getPosition();
         es.add(newPlayer);
 
@@ -289,6 +289,20 @@ public class PlayerSystem extends WorldSystem {
 
         //播放复活音频
         getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, newPlayer);
+    }
+
+    /**
+     * 把玩家传送到出生点（世界信息中记录的世界坐标）
+     */
+    private void teleportToSpawnPoint (Player player) {
+        float sx = WorldInfoTypes.FLOAT.get(Fight.SPAWN_X);
+        float sy = WorldInfoTypes.FLOAT.get(Fight.SPAWN_Y);
+        player.setPosition(sx, sy);
+        //确保出生点所在区块已加载
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
+        cs.loadChunkBlocking(cs.getChunkPos(sx, sy));
+        //防御：万一出生点不在可站立位置，向上找安全处兜底
+        this.ensureSafeSpawnPosition();
     }
 
     /**

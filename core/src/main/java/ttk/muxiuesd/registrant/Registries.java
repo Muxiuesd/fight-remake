@@ -15,6 +15,7 @@ import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
+import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
@@ -58,6 +59,8 @@ public class Registries {
 
     public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE      = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE);
     public static final Registry<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE  = create(RegistryKeys.ENTITY_DEATH_LOOT_TABLE);
+
+    public static final Registry<Biome> BIOME = create(RegistryKeys.BIOME);
 
     public static final Registry<ParticleEmitter<?>> PARTICLE_EMITTER = create(RegistryKeys.PARTICLE_EMITTER);
 

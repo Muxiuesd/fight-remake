@@ -61,6 +61,7 @@ public class CodecChunk {
             root.put("walls", walls);
             root.put("botany", botanys);
             root.put("heights", heights);
+            root.put("canSpawn", Codec.BOOL.encode(chunk.getCanSpawn()).unwrap());
             return RawObject.ofMap(root);
         }
 
@@ -138,6 +139,12 @@ public class CodecChunk {
                     }
                 }
             });
+
+            //出生点属性：旧存档缺失时默认为 false
+            Object canSpawnRaw = rawMap.get("canSpawn");
+            if (canSpawnRaw != null) {
+                chunk.setCanSpawn(rawMap.get("canSpawn") instanceof Boolean b ? b : false);
+            }
 
             if (errors.length() > 0) return DataResult.error(errors.toString(), chunk);
             return DataResult.success(chunk);

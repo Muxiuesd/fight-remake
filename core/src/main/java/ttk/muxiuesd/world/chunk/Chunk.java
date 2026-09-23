@@ -21,6 +21,7 @@ import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.serialization.codecs.CodecChunk;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.wall.Wall;
@@ -64,8 +65,13 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     public static final int ChunkWidth = 16;
     public static final int ChunkHeight = 16;
-    public static final int LowestHeight = 0;
-    public static final int HighestHeight = 7;
+    /// 高度（z）范围与层级常量
+    public static final int LowestHeight = -128;      // 水下最低
+    public static final int HighestHeight = 128;      // 地上最高
+    public static final int SEA_LEVEL = 0;            // 海平面
+    public static final int BEACH_MAX = 4;            // 过渡带上限（1~4 → 沙滩）
+    public static final int CHUNK_LOW_TOP = 16;       // 低海拔上限（区块总体高度 ≤16 → 湿地）
+    public static final int CHUNK_HIGH_BOTTOM = 96;   // 高海拔下限（区块总体高度 ≥96 → 山地）
 
     //区块分区
     public static final Vector2 ZONE_RECTANGLE_OFFSET = new Vector2(- Block.WIDTH / 2, - Block.HEIGHT / 2);
@@ -87,6 +93,9 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private final Wall<?>[][]  walls;
     private final Botany[][]  botanys;
     private final int[][] heights;
+
+    private Biome biome;   //该区块所属的群系（生成时确定，供渲染/判定复用）
+    private boolean canSpawn;   //该区块是否可作为玩家出生点（由群系注册阶段确定，随存档保存）
 
 
     public Chunk(ChunkSystem chunkSystem) {
@@ -235,6 +244,24 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     public int getHeight (int cx, int cy) {
         return this.heights[cy][cx];
+    }
+
+    public Biome getBiome () {
+        return this.biome;
+    }
+
+    public Chunk setBiome (Biome biome) {
+        this.biome = biome;
+        return this;
+    }
+
+    public boolean getCanSpawn () {
+        return this.canSpawn;
+    }
+
+    public Chunk setCanSpawn (boolean canSpawn) {
+        this.canSpawn = canSpawn;
+        return this;
     }
 
     /**

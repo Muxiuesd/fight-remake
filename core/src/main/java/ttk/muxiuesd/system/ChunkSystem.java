@@ -17,13 +17,17 @@ import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.Biomes;
 import ttk.muxiuesd.registry.WorldInfoTypes;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.biome.Biome;
+import ttk.muxiuesd.world.biome.BiomeSampler;
 import ttk.muxiuesd.world.block.BlockPos;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
@@ -37,6 +41,7 @@ import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.chunk.MainWorldChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.entity.player.Player;
+import ttk.muxiuesd.world.spawn.SpawnPointFinder;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.ArrayList;
@@ -58,6 +63,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     private Player player;
     private Vector2 playerLastPosition;
     private WorldMapNoise worldNoise;
+    private BiomeSampler biomeSampler;   //群系采样器（Voronoi 海陆 + 温度湿度高度查表 + 河流湖泊）
     private Timer<?> chunkLoadTimer = new Timer<>(0.5f, 0.5f);
 
     //方块实例，不带有方块实体的同一种方块在world里只有一个实例，带有方块实体的方块都是单独一个实例
@@ -84,6 +90,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     public void initialize () {
         Long seed = WorldInfoTypes.LONG.get(Fight.WORLD_SEED);
         this.worldNoise = new WorldMapNoise(seed);
+        //触发 Biomes 类静态初始化（注册全部群系到 Registries.BIOME），再建采样器
+        Biomes.init();
+        this.biomeSampler = new BiomeSampler(seed, Registries.BIOME.getMap().values());
 
         PlayerSystem ps = getWorld().getSystem(PlayerSystem.class);
         this.player = ps.getPlayer();
@@ -91,9 +100,36 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         this.initPool();
 
-        // 预加载一次
+        //确定出生点：存档无出生点数据时，用种子计算并保存到世界信息，再把玩家放到出生点
+        ensurePlayerSpawnPoint(seed);
+
+        // 预加载一次（基于玩家所在位置 = 出生点）
         this.update(-1.2f);
         Log.print(TAG, "ChunkSystem初始化完成！");
+    }
+
+    /**
+     * 确保玩家出生点存在（出生点是存档属性，随世界信息读写）
+     * <p>
+     * 存档无出生点时，用种子计算一个合法的陆地出生点（非海洋/河流/湖泊、方块非水）并保存；
+     * 之后把玩家实体放到出生点坐标，使预加载与后续生成都基于出生区块。
+     */
+    private void ensurePlayerSpawnPoint (long seed) {
+        float spawnX, spawnY;
+        if (!WorldInfoTypes.FLOAT.containsKey(Fight.SPAWN_X.getKey())) {
+            //存档无出生点 → 计算并保存
+            Vector2 spawn = new SpawnPointFinder(seed, this).findLandSpawn();
+            spawnX = spawn.x;
+            spawnY = spawn.y;
+            WorldInfoTypes.FLOAT.put(Fight.SPAWN_X.getKey(), spawnX);
+            WorldInfoTypes.FLOAT.put(Fight.SPAWN_Y.getKey(), spawnY);
+        } else {
+            //有出生点 → 读取
+            spawnX = WorldInfoTypes.FLOAT.get(Fight.SPAWN_X.getKey());
+            spawnY = WorldInfoTypes.FLOAT.get(Fight.SPAWN_Y.getKey());
+        }
+        //把玩家放到出生点
+        this.player.setPosition(spawnX, spawnY);
     }
 
     @Override
@@ -794,6 +830,17 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
+     * 同步加载并激活一个区块（主线程）
+     * <p>
+     * 供出生点查找等需要在加载后立即用 {@link #getBlock} 校验方块的场景。
+     */
+    public void loadChunkBlocking (ChunkPosition chunkPosition) {
+        if (this.getChunk(chunkPosition) != null) return;   //已加载
+        Chunk chunk = this.initChunk(chunkPosition.getX(), chunkPosition.getY());
+        if (chunk != null) this.addChunk(chunk);
+    }
+
+    /**
      * 获取方块
      * @param position 世界坐标
      */
@@ -977,6 +1024,70 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public WorldMapNoise getWorldNoise () {
         return this.worldNoise;
+    }
+
+    /* ==================== 群系相关（委托 BiomeSampler） ==================== */
+
+    public BiomeSampler getBiomeSampler () {
+        return this.biomeSampler;
+    }
+
+    /**
+     * 获取海洋群系（OCEAN）
+     */
+    public Biome getOceanBiome () {
+        return Biomes.OCEAN;
+    }
+
+    /**
+     * 某世界坐标是否海洋（Voronoi 概率）
+     */
+    public boolean isOcean (float wx, float wy) {
+        return this.biomeSampler.isOcean(wx, wy);
+    }
+
+    public double sampleTemp (float wx, float wy) {
+        return this.biomeSampler.sampleTemp(wx, wy);
+    }
+
+    public double sampleHumidity (float wx, float wy) {
+        return this.biomeSampler.sampleHumidity(wx, wy);
+    }
+
+    /**
+     * 陆地群系查表（温度+湿度+区块总体高度）
+     */
+    public Biome lookupLandBiome (double temp, double humid, int chunkHeight) {
+        return this.biomeSampler.lookupLandBiome(temp, humid, chunkHeight);
+    }
+
+    public boolean isRiverCell (float wx, float wy) {
+        return this.biomeSampler.isRiverCell(wx, wy);
+    }
+
+    public boolean isLakeCell (float wx, float wy) {
+        return this.biomeSampler.isLakeCell(wx, wy);
+    }
+
+    /**
+     * 获取某世界坐标的群系（供刷怪/渲染等使用）
+     * <p>
+     * 与区块生成的判定一致：Voronoi 海陆 → 海洋；陆地按"中心高度+温度+湿度"查表。
+     */
+    public Biome getBiomeAt (float wx, float wy) {
+        if (this.isOcean(wx, wy)) return this.getOceanBiome();
+        int chunkHeight = this.landHeight(wx, wy);   // 陆地高度 [0,128]，与区块生成一致
+        double temp  = this.sampleTemp(wx, wy);
+        double humid = this.sampleHumidity(wx, wy);
+        return this.lookupLandBiome(temp, humid, chunkHeight);
+    }
+
+    /**
+     * 采样某世界坐标的陆地高度 [0, 128]（陆地地形，与区块生成的陆地高度算法一致）
+     */
+    public int landHeight (float wx, float wy) {
+        double v = this.worldNoise.noise(wx / Slope, wy / Slope);
+        return (int) WorldMapNoise.map(v, -1f, 1f, Chunk.SEA_LEVEL + 1, Chunk.HighestHeight);
     }
 
     /**
