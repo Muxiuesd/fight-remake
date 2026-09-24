@@ -1040,10 +1040,24 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 某世界坐标是否海洋（Voronoi 概率）
+     * 某世界坐标是否海洋：内部用该坐标所在区块的 3×3 平滑高度与海平面(179)比较
      */
     public boolean isOcean (float wx, float wy) {
         return this.biomeSampler.isOcean(wx, wy);
+    }
+
+    /**
+     * 逐格地形高度 [0,256]（纯噪声，与海陆解耦）
+     */
+    public int sampleHeight (float wx, float wy) {
+        return this.biomeSampler.sampleHeight(wx, wy);
+    }
+
+    /**
+     * 区块级 3×3 平滑高度（该区块与其 8 邻区块中心高度平均），用于判定区块海陆归属
+     */
+    public int smoothedChunkHeight (int chunkX, int chunkY) {
+        return this.biomeSampler.smoothedChunkHeight(chunkX, chunkY);
     }
 
     public double sampleTemp (float wx, float wy) {
@@ -1055,7 +1069,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 陆地群系查表（温度+湿度+区块总体高度）
+     * 连续沙漠强度 [0,1]（温度高+湿度低→接近1），用于沙漠与草原等群系渐变过渡
+     */
+    public double desertStrength (float wx, float wy) {
+        return this.biomeSampler.desertStrength(wx, wy);
+    }
+
+    /**
+     * 陆地群系查表（高度分段 + 温度 + 湿度）
      */
     public Biome lookupLandBiome (double temp, double humid, int chunkHeight) {
         return this.biomeSampler.lookupLandBiome(temp, humid, chunkHeight);
@@ -1070,24 +1091,49 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 获取某世界坐标的群系（供刷怪/渲染等使用）
-     * <p>
-     * 与区块生成的判定一致：Voronoi 海陆 → 海洋；陆地按"中心高度+温度+湿度"查表。
+     * 湿地水塘判定（湿地专属，比普通湖泊更密）
      */
-    public Biome getBiomeAt (float wx, float wy) {
-        if (this.isOcean(wx, wy)) return this.getOceanBiome();
-        int chunkHeight = this.landHeight(wx, wy);   // 陆地高度 [0,128]，与区块生成一致
-        double temp  = this.sampleTemp(wx, wy);
-        double humid = this.sampleHumidity(wx, wy);
-        return this.lookupLandBiome(temp, humid, chunkHeight);
+    public boolean isWetlandPondCell (float wx, float wy) {
+        return this.biomeSampler.isWetlandPondCell(wx, wy);
     }
 
     /**
-     * 采样某世界坐标的陆地高度 [0, 128]（陆地地形，与区块生成的陆地高度算法一致）
+     * 连续湿地强度 [0,1]（基于该坐标所在区块的平滑高度 + 湿度），用于控制湿地水塘密度渐变
+     */
+    public double wetlandStrength (float wx, float wy) {
+        ChunkPosition cp = this.getChunkPosition(new Vector2(wx, wy));
+        int smoothed = this.smoothedChunkHeight(cp.getX(), cp.getY());
+        double humid = this.sampleHumidity(wx, wy);
+        return this.biomeSampler.wetlandStrength(smoothed, humid);
+    }
+
+    /**
+     * 获取某世界坐标的群系（供刷怪/渲染/信息面板等使用）
+     * <p>
+     * 优先取该坐标所在已加载区块的群系实例（与存档一致）。
+     * 区块未加载或无群系时，按该区块中心的高度/温度/湿度重新判定兜底（与生成一致）。
+     */
+    public Biome getBiomeAt (float wx, float wy) {
+        Chunk chunk = this.getChunk(wx, wy);
+        if (chunk != null && chunk.getBiome() != null) return chunk.getBiome();
+
+        //取该坐标所在区块，用其 3×3 平滑高度判定海陆，再查陆地群系（与区块生成一致）
+        ChunkPosition cp = this.getChunkPosition(new Vector2(wx, wy));
+        float centerX = cp.getX() * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f;
+        float centerY = cp.getY() * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f;
+        int smoothed = this.smoothedChunkHeight(cp.getX(), cp.getY());
+
+        if (smoothed < Chunk.SEA_LEVEL) return this.getOceanBiome();
+        double temp  = this.sampleTemp(centerX, centerY);
+        double humid = this.sampleHumidity(centerX, centerY);
+        return this.lookupLandBiome(temp, humid, smoothed);
+    }
+
+    /**
+     * 采样某世界坐标的地形高度 [0, 256]（纯噪声，与区块生成的逐格高度一致）
      */
     public int landHeight (float wx, float wy) {
-        double v = this.worldNoise.noise(wx / Slope, wy / Slope);
-        return (int) WorldMapNoise.map(v, -1f, 1f, Chunk.SEA_LEVEL + 1, Chunk.HighestHeight);
+        return this.biomeSampler.sampleHeight(wx, wy);
     }
 
     /**

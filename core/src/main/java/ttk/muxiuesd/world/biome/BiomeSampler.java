@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.biome;
 
 import ttk.muxiuesd.registry.Biomes;
+import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.chunk.Chunk;
 
@@ -9,22 +10,17 @@ import java.util.Collection;
 /**
  * 群系采样器
  * <p>
- * 负责：① Voronoi 近邻划分判定海陆（概率权重控海陆比例）；② 河流/湖泊格子级判定；
- * ③ 温度/湿度采样；④ 陆地群系查表（温度+湿度+区块总体高度）。
+ * 负责：① 地形高度采样（海陆由高度判定，非 Voronoi）；② 区块级 3×3 平滑高度判定海陆归属；
+ * ③ 温度/湿度采样；④ 陆地群系查表（高度分段 + 温度 + 湿度）。
  * 全部基于世界种子，确定性可复现。
  */
 public class BiomeSampler {
     private final long seed;
     private final WorldMapNoise noise;   //复用世界种子的噪声
 
-    // Voronoi 群系块密度（平均约 64 区块）
-    private final float clusterSize = 128f;
-    // 海陆权重：海洋占比（0.7 = 海 70%、陆 30%）
-    private static final double OCEAN_WEIGHT = 0.7;
-
-    // 温度/湿度/河流/湖泊 的采样频率与偏移（不同频率×偏移 → 多个互不相关的连续场）
-    private static final float TEMP_FREQ = 0.004f, TEMP_OFFSET = 0f;
-    private static final float HUMID_FREQ = 0.004f, HUMID_OFFSET = 100f;
+// 温度/湿度/河流/湖泊 的采样频率与偏移
+private static final float TEMP_LOW_FREQ = 0.0006f, TEMP_HIGH_FREQ = 0.002f, TEMP_OFFSET = 0f;
+    private static final float HUMID_LOW_FREQ = 0.0006f, HUMID_HIGH_FREQ = 0.002f, HUMID_OFFSET = 100f;
     private static final float RIVER_FREQ = 0.002f, RIVER_OFFSET = 200f, RIVER_BAND = 0.85f;
     private static final float LAKE_FREQ = 0.01f, LAKE_OFFSET = 300f, LAKE_THRESHOLD = 0.75f;
 
@@ -34,10 +30,51 @@ public class BiomeSampler {
     }
 
     /**
-     * 海陆判定：Voronoi 最近种子点是否海洋
+     * 逐格地形高度 [0, 256]（纯噪声标量，与海陆解耦，可先于群系独立算）
+     */
+    public int sampleHeight (float wx, float wy) {
+        double v = this.noise.noise(wx / ChunkSystem.Slope, wy / ChunkSystem.Slope);
+        return (int) Math.round(WorldMapNoise.map(v, -1, 1, Chunk.LowestHeight, Chunk.HighestHeight));
+    }
+
+    /**
+     * 某世界坐标是否海洋：取该坐标所在区块，用 3×3 邻域区块的<b>中心高度</b>平滑后与海平面阈值比较。
+     * <p>
+     * 3×3 平滑让海陆分界（SEA_LEVEL 等高线）平滑连续，避免单区块平均导致的锯齿破碎。
      */
     public boolean isOcean (float wx, float wy) {
-        return this.nearestSeed(wx, wy).isOcean;
+        int chunkX = chunkIndex(wx);
+        int chunkY = chunkIndex(wy);
+        return smoothedChunkHeight(chunkX, chunkY) < Chunk.SEA_LEVEL;
+    }
+
+    /**
+     * 区块中心高度（该区块中心格的地形高度）
+     */
+    public int chunkCenterHeight (int chunkX, int chunkY) {
+        float cx = chunkX * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f;
+        float cy = chunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f;
+        return this.sampleHeight(cx, cy);
+    }
+
+    /**
+     * 区块级 3×3 平滑高度：该区块与其 8 个邻区块的中心高度平均。
+     * 用于判定区块海陆归属（决定 biome 标签 / canSpawn）。
+     */
+    public int smoothedChunkHeight (int chunkX, int chunkY) {
+        long sum = 0;
+        int count = 0;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                sum += this.chunkCenterHeight(chunkX + dx, chunkY + dy);
+                count++;
+            }
+        }
+        return (int) Math.round(sum / (double) count);
+    }
+
+    private static int chunkIndex (float worldCoord) {
+        return (int) Math.floor(worldCoord / Chunk.ChunkWidth);
     }
 
     /**
@@ -57,94 +94,88 @@ public class BiomeSampler {
     }
 
     /**
-     * 温度采样 [0,1]
+     * 湿地水塘判定：比普通湖泊更易触发（阈值更低、斑块更密），让湿地呈现"低地草地 + 散布浅水塘"。
+     */
+    public boolean isWetlandPondCell (float wx, float wy) {
+        double v = this.noise.noise(wx * 0.02f + 400f, wy * 0.02f + 400f);
+        return v > 0.35;
+    }
+
+    /**
+     * 温度采样 [0,1]（FBM 多层：低频定大块生态，高频扰动使边界自然弯曲、格子级渐变）
      */
     public double sampleTemp (float wx, float wy) {
-        return this.noise.getNorNoise(wx * TEMP_FREQ + TEMP_OFFSET, wy * TEMP_FREQ + TEMP_OFFSET, TEMP_FREQ);
+        double low  = this.noise.getNorNoise(wx + TEMP_OFFSET, wy + TEMP_OFFSET, TEMP_LOW_FREQ);
+        double high = this.noise.getNorNoise(wx + TEMP_OFFSET, wy + TEMP_OFFSET, TEMP_HIGH_FREQ);
+        return low * 0.6 + high * 0.4;
     }
 
     /**
-     * 湿度采样 [0,1]
+     * 湿度采样 [0,1]（FBM 多层）
      */
     public double sampleHumidity (float wx, float wy) {
-        return this.noise.getNorNoise(wx * HUMID_FREQ + HUMID_OFFSET, wy * HUMID_FREQ + HUMID_OFFSET, HUMID_FREQ);
+        double low  = this.noise.getNorNoise(wx + HUMID_OFFSET, wy + HUMID_OFFSET, HUMID_LOW_FREQ);
+        double high = this.noise.getNorNoise(wx + HUMID_OFFSET, wy + HUMID_OFFSET, HUMID_HIGH_FREQ);
+        return low * 0.6 + high * 0.4;
     }
 
     /**
-     * 陆地群系查表：温度 + 湿度 + 区块总体高度
+     * 连续"沙漠强度" [0,1]：温度越高、湿度越低 → 越接近 1（纯沙漠）。
      * <p>
-     * ① 低海拔（≤CHUNK_LOW_TOP）→ 湿地；高海拔（≥CHUNK_HIGH_BOTTOM）→ 山地；
-     * ② 中海拔 → 按温度湿度细分（雪原/沙漠/森林/平原）。
+     * 用连续插值而非硬阈值，配合噪声抖动让沙漠与其他群系（尤其草原）的边界渐变过渡、斑驳自然，
+     * 避免"区块级全沙 vs 全草"的硬切。阈值与 {@link #lookupLandBiome} 的 DESERT 判定一致
+     * （temp≥0.65 且 humid≤0.4 附近为沙漠核心）。
+     */
+    public double desertStrength (float wx, float wy) {
+        double temp  = this.sampleTemp(wx, wy);
+        double humid = this.sampleHumidity(wx, wy);
+        //温度：0.55 → 0，0.72 → 1（核心 0.65 时 ≈0.59）
+        double t = clamp01((temp - 0.55) / (0.72 - 0.55));
+        //湿度：0.50 → 0，0.28 → 1（核心 0.40 时 ≈0.45）
+        double h = clamp01((0.50 - humid) / (0.50 - 0.28));
+        return Math.min(t, h);
+    }
+
+    private static double clamp01 (double v) {
+        return v < 0 ? 0 : (v > 1 ? 1 : v);
+    }
+
+    /**
+     * 陆地群系查表：区块级平滑高度分段 + 连续生态强度场（温度 + 湿度）
+     * <p>
+     * 低地、高地不再用硬高度门槛切分，而是并入统一的<b>连续生态强度场</b>：
+     * 湿地靠"低海拔 + 湿润"得分、山地靠"高海拔"得分、雪原/沙漠/森林/平原靠温度湿度得分，
+     * 取各群系强度最大者。如此相邻群系在交界处由强度相对大小自然渐变切换，避免硬切。
      */
     public Biome lookupLandBiome (double temp, double humid, int chunkHeight) {
-        if (chunkHeight <= Chunk.CHUNK_LOW_TOP) return Biomes.WETLAND;
-        if (chunkHeight >= Chunk.CHUNK_HIGH_BOTTOM) return Biomes.MOUNTAIN;
+        //连续生态强度（0~1），边界由强度相对大小自然切换
+        double wetland = wetlandStrength(chunkHeight, humid);                    //低海拔且湿润 → 湿地
+        double mountain = clamp01((chunkHeight - Chunk.HIGH_BAND_BOTTOM) / 30.0); //高海拔 → 山地
+        double snowy  = clamp01((0.45 - temp) / 0.25);                          //温度越低越强（雪原）
+        double desert = clamp01((temp - 0.50) / 0.20)                           //高温主导
+                        * (0.6 + 0.4 * clamp01((0.58 - humid) / 0.35));         //低湿加强，高湿减弱
+        double forest = clamp01((humid - 0.55) / 0.20);                         //湿度越高越强（森林）
+        double plains = 0.34 * clamp01((0.45 - Math.abs(temp - 0.5)) / 0.45);   //温湿适中的平原兜底偏置
 
-        if (temp < 0.35) return Biomes.SNOWY;
-        if (temp > 0.65 && humid < 0.4) return Biomes.DESERT;
-        if (humid > 0.6) return Biomes.FOREST;
+        //取强度最大者（湿地、山地在交界处与生态群系自然竞争）
+        if (wetland >= mountain && wetland >= snowy && wetland >= desert && wetland >= forest && wetland >= plains) return Biomes.WETLAND;
+        if (mountain >= snowy && mountain >= desert && mountain >= forest && mountain >= plains) return Biomes.MOUNTAIN;
+        if (snowy >= desert && snowy >= forest && snowy >= plains) return Biomes.SNOWY;
+        if (desert >= forest && desert >= plains) return Biomes.DESERT;
+        if (forest >= plains) return Biomes.FOREST;
         return Biomes.PLAINS;
     }
 
     /**
-     * Voronoi 种子点：位置在 cell 内随机偏移，isOcean 由概率权重决定
-     */
-    private VoronoiSeed nearestSeed (float wx, float wy) {
-        int cx = (int) Math.floor(wx / this.clusterSize);
-        int cy = (int) Math.floor(wy / this.clusterSize);
-        VoronoiSeed best = null;
-        float bestDist = Float.MAX_VALUE;
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                VoronoiSeed s = this.seedAt(cx + dx, cy + dy);
-                float d = (s.x - wx) * (s.x - wx) + (s.y - wy) * (s.y - wy);
-                if (d < bestDist) {
-                    bestDist = d;
-                    best = s;
-                }
-            }
-        }
-        return best;
-    }
-
-    private VoronoiSeed seedAt (int cx, int cy) {
-        float x = (float) ((cx + hash01(cx, cy, this.seed)) * this.clusterSize);
-        float y = (float) ((cy + hash01(cx, cy, this.seed + 1)) * this.clusterSize);
-        // 概率权重：hash(0~1) < 海洋权重(0.7) → 海洋种子点
-        boolean isOcean = hash01(cx, cy, this.seed + 2) < OCEAN_WEIGHT;
-        return new VoronoiSeed(x, y, isOcean);
-    }
-
-    /**
-     * 由坐标+种子生成确定性 [0,1) 哈希（均匀分布）
+     * 连续"湿地强度" [0,1]（低海拔且湿润 → 接近 1）。
      * <p>
-     * 用 splitmix64 高质量散列：对 x、y、seed 的变化产生均匀的伪随机数。
-     * 不能用 longBitsToDouble（把 long 位模式解释为 double 会产生 NaN/极大值，破坏 Voronoi 判定）。
+     * 高度从 180 向下渐变（跨度 20，聚焦近海低地），湿度升高增强；
+     * 强度随高度/湿度连续变化，使湿地与相邻群系（平原/森林）边界渐变过渡而非硬切。
      */
-    private double hash01 (int x, int y, long seed) {
-        long h = seed ^ Long.rotateLeft(x * 0x9E3779B97F4A7C15L, 32)
-                      ^ Long.rotateLeft(y * 0xBF58476D1CE4E5B9L, 32);
-        // splitmix64 混淆
-        h ^= h >>> 33;
-        h *= 0xFF51AFD7ED558CCDL;
-        h ^= h >>> 33;
-        h *= 0xC4CEB9FE1A85EC53L;
-        h ^= h >>> 33;
-        // 取高 53 位映射到 [0,1)
-        return (h >>> 11) * (1.0 / 9007199254740992.0);
+    public double wetlandStrength (int chunkHeight, double humid) {
+        double h = clamp01((180 - chunkHeight) / 20.0);          //180→0, 160→1（跨20，聚焦近海低地）
+        double w = 0.45 + 0.55 * clamp01((humid - 0.50) / 0.25); //湿润增强，湿润低地占优
+        return h * w;
     }
 
-    /**
-     * Voronoi 种子点：位置 + 是否海洋
-     */
-    private static class VoronoiSeed {
-        final float x, y;
-        final boolean isOcean;
-
-        VoronoiSeed (float x, float y, boolean isOcean) {
-            this.x = x;
-            this.y = y;
-            this.isOcean = isOcean;
-        }
-    }
 }

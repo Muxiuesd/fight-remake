@@ -65,13 +65,16 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     public static final int ChunkWidth = 16;
     public static final int ChunkHeight = 16;
-    /// 高度（z）范围与层级常量
-    public static final int LowestHeight = -128;      // 水下最低
-    public static final int HighestHeight = 128;      // 地上最高
-    public static final int SEA_LEVEL = 0;            // 海平面
-    public static final int BEACH_MAX = 4;            // 过渡带上限（1~4 → 沙滩）
-    public static final int CHUNK_LOW_TOP = 16;       // 低海拔上限（区块总体高度 ≤16 → 湿地）
-    public static final int CHUNK_HIGH_BOTTOM = 96;   // 高海拔下限（区块总体高度 ≥96 → 山地）
+    /// 高度（地形强度标量）范围与层级常量
+    public static final int LowestHeight = 0;         // 地形最低（最深的海洋）
+    public static final int HighestHeight = 256;      // 地形最高（最高山峰）
+    public static final int SEA_LEVEL = 150;          // 海平面/海陆分界阈值（区块平滑高度 ≥ 150 → 陆地）
+    public static final int BEACH_MAX = 156;          // 沙滩带上限（150~156 → 海岸过渡/沙滩）
+    public static final int GRASS_TOP = 200;          // 统一高程带：草地带顶（>BEACH_MAX 且 ≤200 → 草地）
+    public static final int STONE_TOP = 235;          // 统一高程带：石头带顶（>200 且 ≤235 → 石头）
+    public static final int SNOWLINE = 236;           // 统一高程带：雪带底（≥236 → 雪方块）
+    public static final int LOW_BAND_TOP = 165;       // 低地分段上限（区块高度 <165 → 湿地，紧贴海岸）
+    public static final int HIGH_BAND_BOTTOM = 220;   // 高地分段下限（区块高度 ≥220 → 山地）
 
     //区块分区
     public static final Vector2 ZONE_RECTANGLE_OFFSET = new Vector2(- Block.WIDTH / 2, - Block.HEIGHT / 2);

@@ -32,7 +32,7 @@ public class Fight {
     //掉落物可以被捡起来的cd，单位：秒
     public static final Info<Float> ITEM_ENTITY_PICKUP_SPAN = Info.create("item_entity_pickup_span", 2f);
     //玩家视野，单位：区块
-    public static final Info<Integer> PLAYER_VISUAL_RANGE = Info.create("player_vision", 4);
+    public static final Info<Integer> PLAYER_VISUAL_RANGE = Info.create("player_vision", 16);
 
     //实体渲染距离，与玩家距离超过这个值的实体不渲染
     public static final Info<Float> ENTITY_RENDER_RANGE = Info.create("entity_render_range", 20f);

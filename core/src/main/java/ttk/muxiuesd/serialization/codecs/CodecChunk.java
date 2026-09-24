@@ -4,6 +4,7 @@ import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.DataResult;
 import game.muxiuesd.bedrockcore.serialization.RawObject;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.chunk.Chunk;
@@ -62,6 +63,9 @@ public class CodecChunk {
             root.put("botany", botanys);
             root.put("heights", heights);
             root.put("canSpawn", Codec.BOOL.encode(chunk.getCanSpawn()).unwrap());
+            //群系id（null 时存 null，解码端跳过）
+            Biome biome = chunk.getBiome();
+            root.put("biome", biome != null ? Codec.STRING.encode(biome.getId().getID()).unwrap() : null);
             return RawObject.ofMap(root);
         }
 
@@ -144,6 +148,12 @@ public class CodecChunk {
             Object canSpawnRaw = rawMap.get("canSpawn");
             if (canSpawnRaw != null) {
                 chunk.setCanSpawn(rawMap.get("canSpawn") instanceof Boolean b ? b : false);
+            }
+
+            //群系：由 id 反查注册表单例（已放弃旧存档，缺失时保持 null）
+            if (rawMap.get("biome") instanceof String biomeId) {
+                Biome biome = Biome.byId(biomeId);
+                if (biome != null) chunk.setBiome(biome);
             }
 
             if (errors.length() > 0) return DataResult.error(errors.toString(), chunk);

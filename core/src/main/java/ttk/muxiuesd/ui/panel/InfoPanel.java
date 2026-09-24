@@ -9,8 +9,10 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Fonts;
 import ttk.muxiuesd.ui.components.InfoEntry;
+import ttk.muxiuesd.ui.components.infoentries.InfoEntryBiome;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryFPS;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryMemory;
+import ttk.muxiuesd.ui.components.infoentries.InfoEntryPosition;
 import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.util.TextUtil;
 import ttk.muxiuesd.util.Util;
@@ -55,7 +57,9 @@ public class InfoPanel extends UIPanel {
 
         this.addEntry(new InfoEntry(Text.ofText(Fight.ID("info_entry_game_name")))) //游戏名称
             .addEntry(new InfoEntryFPS())       //FPS 信息（每秒刷新，显示上一秒平均帧率）
-            .addEntry(new InfoEntryMemory());   //内存使用信息（每秒刷新，显示已使用/分配内存 MB）
+            .addEntry(new InfoEntryMemory())    //内存使用信息（每秒刷新，显示已使用/分配内存 MB）
+            .addEntry(new InfoEntryPosition())  //玩家坐标与高度（实时刷新）
+            .addEntry(new InfoEntryBiome());    //玩家当前所在区块的群系（实时刷新）
 
         //信息面板只展示、不参与交互，禁用交互避免干扰鼠标点击与命中检测
         this.setEnabled(false);

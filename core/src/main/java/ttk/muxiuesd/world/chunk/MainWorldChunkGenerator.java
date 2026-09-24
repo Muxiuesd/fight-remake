@@ -1,10 +1,10 @@
 package ttk.muxiuesd.world.chunk;
 
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Walls;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
-import ttk.muxiuesd.util.WorldMapNoise;
 import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
@@ -16,8 +16,9 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * 主世界区块生成器
  * <p>
- * 区块生成流程：Voronoi 判海陆 → 海为 OCEAN；陆则按"区块总体高度 + 温度 + 湿度"查表得陆地群系。
- * 区块内每个格子按其高度在群系内决定方块，河流/湖泊压成水域。
+ * 区块生成流程：先由真实噪声逐格生成地形高度 [0,256]；区块级海陆归属用"3×3 平滑高度"与海平面(150)
+ * 比较判定（非 Voronoi）；陆地具体群系按"区块平滑高度分段 + 温度 + 湿度"查表；
+ * 最后每个格子用该区块群系按该格实际高度决定方块（150 以下水、150~156 沙滩、更高按统一高程带），海陆交界自然过渡。
  */
 public class MainWorldChunkGenerator extends ChunkGenerator {
     public MainWorldChunkGenerator (ChunkSystem chunkSystem) {
@@ -27,42 +28,50 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
     @Override
     public Chunk generate (ChunkPosition chunkPosition) {
         ChunkSystem cs = getChunkSystem();
-        //区块中心世界坐标（用中心高度代表区块总体高度）
-        float centerX = chunkPosition.x * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f;
-        float centerY = chunkPosition.y * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f;
+        int chunkX = chunkPosition.x;
+        int chunkY = chunkPosition.y;
+        //区块中心世界坐标（用于定位区块与采样）
+        float centerX = chunkX * Chunk.ChunkWidth + Chunk.ChunkWidth / 2f;
+        float centerY = chunkY * Chunk.ChunkHeight + Chunk.ChunkHeight / 2f;
 
-        //① 判定区块群系：海陆 → 陆地查表
-        Biome biome;
-        if (cs.isOcean(centerX, centerY)) {
-            biome = cs.getOceanBiome();
-        } else {
-            int chunkHeight = landHeight(centerX, centerY);   //区块总体高度（陆地高度，0~128）
-            double temp  = cs.sampleTemp(centerX, centerY);
-            double humid = cs.sampleHumidity(centerX, centerY);
-            biome = cs.lookupLandBiome(temp, humid, chunkHeight);
-        }
+        //① 区块级海陆归属：3×3 平滑高度 < 海平面 → 海洋
+        int smoothedHeight = cs.smoothedChunkHeight(chunkX, chunkY);
+        boolean ocean = smoothedHeight < Chunk.SEA_LEVEL;
+        //陆地具体群系：区块平滑高度分段 + 温度湿度（预先算好，供本区块所有格子共用）
+        double temp  = cs.sampleTemp(centerX, centerY);
+        double humid = cs.sampleHumidity(centerX, centerY);
+        Biome chunkBiome = ocean ? cs.getOceanBiome() : cs.lookupLandBiome(temp, humid, smoothedHeight);
 
         Chunk chunk = new Chunk(cs);
         chunk.setChunkPosition(chunkPosition);
-        chunk.setBiome(biome);
-        chunk.setCanSpawn(biome.getCanSpawn());   //出生能力来自群系注册阶段确定
+        chunk.setBiome(chunkBiome);
+        chunk.setCanSpawn(chunkBiome.getCanSpawn());   //出生能力来自群系注册阶段确定
 
-        //② 遍历区块内每个格子：按高度 + 群系决定方块
+        //② 遍历区块内每个格子：按该格实际高度决定方块（海陆交界由 150 等高线逐格过渡）
         chunk.traversal((x, y) -> {
             float wx = chunk.getWorldX(x);
             float wy = chunk.getWorldY(y);
-            //区分海陆的地形高度：
-            //海洋区块高度 map 到 [-128, 0]（全水下）；陆地区块高度 map 到 [0, 128]（非负，陆地不积水）
-            int height = biome.isOcean()
-                ? this.oceanHeight(wx, wy)
-                : this.landHeight(wx, wy);
-            //河流/湖泊（陆地内）压成水下
-            if (!biome.isOcean()) {
-                if (cs.isRiverCell(wx, wy)) height = Chunk.SEA_LEVEL - 5;
-                else if (cs.isLakeCell(wx, wy)) height = Chunk.SEA_LEVEL - 6;
-            }
+            int height = cs.sampleHeight(wx, wy);       //逐格纯噪声高度 [0,256]
+            //河流/湖泊（陆地内）压成水下（高度压到海平面以下深处）
+            if (cs.isRiverCell(wx, wy)) height = Chunk.SEA_LEVEL - 30;
+            else if (cs.isLakeCell(wx, wy)) height = Chunk.SEA_LEVEL - 35;
+            //湿地：用连续湿地强度（低海拔+湿润）控制水塘，边缘水塘随强度渐少，
+            //而非区块级硬判定，保证湿地与相邻群系边界的水塘渐变过渡。
+            else if (cs.wetlandStrength(wx, wy) > 0.5 && cs.isWetlandPondCell(wx, wy)) height = Chunk.SEA_LEVEL - 8;
 
-            Block block = biome.decideBlock(height);
+            //方块决定：统一用陆地群系查表（参数取区块平滑高度带）按该格高度 decideBlock，
+            //decideBlock 内部处理：<海平面→水、海平面~BEACH_MAX→沙、更高→分层地表。
+            //这样即便区块被标为海洋(Ocean)，靠岸的较高格也会因高度≥海平面 而上沙/陆，海陆在海平面(150)等高线处自然过渡。
+            Block block = cs.lookupLandBiome(temp, humid, smoothedHeight).decideBlock(height);
+            //沙漠渐变：在草地带（沙滩之上、雪线之下）用连续沙漠强度 + 噪声抖动铺沙，
+            //沙漠中心(强度≈1)几乎全沙，沙漠边缘(强度渐降)沙草斑驳过渡，与其他群系柔和相连。
+            //低门槛(0.3)+抖动使过渡带更宽缓，避免生硬切变。
+            if (height > Chunk.BEACH_MAX && height < Chunk.SNOWLINE) {
+                double desert = cs.desertStrength(wx, wy);
+                if (desert > 0.3 && desert > this.dither01(wx, wy)) {
+                    block = Blocks.SAND;
+                }
+            }
             chunk.setBlock(block, x, y);
             chunk.setHeight(x, y, height);
         });
@@ -70,7 +79,6 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
         //③ 墙体（水上不生成，其余地格低概率）
         chunk.traversal((x, y) -> {
             if (chunk.getBlock(x, y) instanceof BlockWater) return;
-            //使用 ThreadLocalRandom：区块生成在线程池并发执行，MathUtils.random 内部共享 Random 非线程安全
             int random = ThreadLocalRandom.current().nextInt(0, 16);
             if (random < 1) {
                 Wall<?> wall = Walls.SMOOTH_STONE.createSelf(new Vector2(chunk.getWorldX(x), chunk.getWorldY(y)));
@@ -83,31 +91,14 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
 
     @Override
     public String chooseBlock (int height) {
-        //已废弃：方块选择改由 Biome.decideBlock 按群系+高度决定
         return null;
     }
 
     /**
-     * 海洋地形高度：map 到 [LowestHeight, SEA_LEVEL]（即 [-128, 0]），全水下
+     * 确定性逐格抖动值 [0,1)：用世界噪声高频采样产生，用于沙漠沙/草过渡的噪声抖动，
+     * 使沙漠边缘沙草斑驳而非硬切（同一种子跨区块可复现）。
      */
-    private int oceanHeight (float wx, float wy) {
-        double v = this.baseNoise(wx, wy);
-        return (int) WorldMapNoise.map(v, -1f, 1f, Chunk.LowestHeight, Chunk.SEA_LEVEL - 1);
-    }
-
-    /**
-     * 陆地地形高度：map 到 [SEA_LEVEL, HighestHeight]（即 [0, 128]），陆地不积水
-     */
-    private int landHeight (float wx, float wy) {
-        double v = this.baseNoise(wx, wy);
-        return (int) WorldMapNoise.map(v, -1f, 1f, Chunk.SEA_LEVEL + 1, Chunk.HighestHeight);
-    }
-
-    /**
-     * 地形基础噪声值（复用 generateTerrain 的采样频率）
-     */
-    private double baseNoise (float wx, float wy) {
-        WorldMapNoise noise = getChunkSystem().getWorldNoise();
-        return noise.noise(wx / ChunkSystem.Slope, wy / ChunkSystem.Slope);
+    private double dither01 (float wx, float wy) {
+        return getChunkSystem().getWorldNoise().getNorNoise(wx * 0.4f, wy * 0.4f);
     }
 }
