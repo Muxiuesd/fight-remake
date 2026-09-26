@@ -36,13 +36,13 @@ public final class Biomes {
         .tint(new Color(0.4f, 0.5f, 0.4f, 1f))
         .build());
 
-    /// 山地（高海拔）：低位石、峰顶雪
+    /// 山地/山丘（高海拔）：绝大部分石头，少部分极高的地方是雪，山脚有沙过渡
     public static final Biome MOUNTAIN = register("mountain", Biome.builder()
         .water(Blocks.WATER).surface(Blocks.STONE)
         .bands(
-            BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SAND),
-            BiomeBand.of(Chunk.SEA_LEVEL + 7, Blocks.STONE),
-            BiomeBand.of(Chunk.SNOWLINE, Blocks.SNOW))
+            BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SAND),      //150 山脚沙（海岸过渡）
+            BiomeBand.of(Chunk.SEA_LEVEL + 7, Blocks.STONE), //157 大部分石头
+            BiomeBand.of(244, Blocks.SNOW))                  //244 极高峰才雪（少部分高处）
         .tint(new Color(0.6f, 0.6f, 0.65f, 1f))
         .build());
 
@@ -69,10 +69,14 @@ public final class Biomes {
         .tint(new Color(0.2f, 0.5f, 0.2f, 1f))
         .build());
 
-    /// 平原（温和，生态群系均不达标时兜底）：走默认模板
+    /// 平原（温和）：绝大部分草地，少部分高处是石头
     public static final Biome PLAINS = register("plains", Biome.builder()
         .temperature(0.35f, 0.75f).humidity(0f, 0.6f)
         .water(Blocks.WATER).surface(Blocks.GRASS)
+        .bands(
+            BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SAND),      //150 沙滩（海岸过渡）
+            BiomeBand.of(Chunk.SEA_LEVEL + 7, Blocks.GRASS), //157 绝大部分草地
+            BiomeBand.of(228, Blocks.STONE))                 //228 高处少量石头
         .tint(new Color(0.4f, 0.7f, 0.3f, 1f))
         .build());
 

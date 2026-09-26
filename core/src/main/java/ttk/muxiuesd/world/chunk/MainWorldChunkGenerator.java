@@ -46,7 +46,9 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
         chunk.setBiome(chunkBiome);
         chunk.setCanSpawn(chunkBiome.getCanSpawn());   //出生能力来自群系注册阶段确定
 
-        //② 遍历区块内每个格子：按该格实际高度决定方块（海陆交界由 150 等高线逐格过渡）
+        //② 遍历区块内每个格子：按该格实际温度/湿度/高度逐格判定群系并决定方块。
+        //核心过渡思想（方式A）：温度和湿度是连续噪声场，每格用自己的温湿判群系，
+        //相邻格温湿连续 → 群系沿温度/湿度等值线自然渐变过渡，不再沿区块边界硬切。
         chunk.traversal((x, y) -> {
             float wx = chunk.getWorldX(x);
             float wy = chunk.getWorldY(y);
@@ -58,11 +60,11 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
             //而非区块级硬判定，保证湿地与相邻群系边界的水塘渐变过渡。
             else if (cs.wetlandStrength(wx, wy) > 0.5 && cs.isWetlandPondCell(wx, wy)) height = Chunk.SEA_LEVEL - 8;
 
-            //方块决定：统一用陆地群系查表（参数取区块平滑高度带）按该格高度 decideBlock，
-            //decideBlock 在群系自己的高度断点分带表（或默认模板）中定位方块：
-            //<海平面→水、海平面以上→沙/草/石/雪（按群系配置）。
-            //沙漠(all-sand)、雪原(all-snow)等由各自 bands 决定，边界靠连续强度场渐变。
-            Block block = cs.lookupLandBiome(temp, humid, smoothedHeight).decideBlock(height);
+            //逐格判定群系（连续温湿场 → 群系边界自然渐变）
+            double t  = cs.sampleTemp(wx, wy);
+            double hu = cs.sampleHumidity(wx, wy);
+            Biome biome = cs.lookupLandBiome(t, hu, height);
+            Block block = biome.decideBlock(height);
             chunk.setBlock(block, x, y);
             chunk.setHeight(x, y, height);
         });

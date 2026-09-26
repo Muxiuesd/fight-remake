@@ -100,21 +100,24 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         this.initPool();
 
-        //确定出生点：存档无出生点数据时，用种子计算并保存到世界信息，再把玩家放到出生点
-        ensurePlayerSpawnPoint(seed);
+        //确定出生点（存档无出生点数据时，用种子计算并保存到世界信息）
+        Vector2 spawnPoint = this.ensurePlayerSpawnPoint(seed);
+        //决定玩家进入位置：首次进入→出生点；重新进入已游玩存档→上次退出位置
+        //（确保出生点被计算后，再交给 PlayerSystem 判断用出生点还是读档位置）
+        ps.placePlayerAtInitialPosition(spawnPoint);
 
-        // 预加载一次（基于玩家所在位置 = 出生点）
+        // 预加载一次（基于玩家确定后的最终位置）
         this.update(-1.2f);
         Log.print(TAG, "ChunkSystem初始化完成！");
     }
 
     /**
-     * 确保玩家出生点存在（出生点是存档属性，随世界信息读写）
+     * 确保玩家出生点存在并返回出生点坐标（出生点是存档属性，随世界信息读写）
      * <p>
-     * 存档无出生点时，用种子计算一个合法的陆地出生点（非海洋/河流/湖泊、方块非水）并保存；
-     * 之后把玩家实体放到出生点坐标，使预加载与后续生成都基于出生区块。
+     * 存档无出生点 → 用种子计算一个合法的陆地出生点（非海洋/河流/湖泊、方块非水）并保存；
+     * 已有 → 读取。*不在此处移动玩家*——玩家首次进世界/复活是否用出生点由 PlayerSystem 决定。
      */
-    private void ensurePlayerSpawnPoint (long seed) {
+    private Vector2 ensurePlayerSpawnPoint (long seed) {
         float spawnX, spawnY;
         if (!WorldInfoTypes.FLOAT.containsKey(Fight.SPAWN_X.getKey())) {
             //存档无出生点 → 计算并保存
@@ -128,8 +131,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             spawnX = WorldInfoTypes.FLOAT.get(Fight.SPAWN_X.getKey());
             spawnY = WorldInfoTypes.FLOAT.get(Fight.SPAWN_Y.getKey());
         }
-        //把玩家放到出生点
-        this.player.setPosition(spawnX, spawnY);
+        return new Vector2(spawnX, spawnY);
     }
 
     @Override

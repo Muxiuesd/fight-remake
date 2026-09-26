@@ -56,6 +56,7 @@ public class PlayerSystem extends WorldSystem {
 
     private Player player;
     private Vector2 playerLastPosition;
+    private boolean playerLoaded;   //本世界是否读取了已游玩的玩家存档（true=进入时回到上次退出位置）
 
     private Timer<?> bubbleEmitTimer;  //气泡粒子发射计时器
 
@@ -73,12 +74,14 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        //有玩家数据就读取
+        //有玩家数据就读取（含上次退出的位置 → 重新进入回到那里）
         if (UnifiedFileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
             this.setPlayer(this.readPlayerData());
+            this.playerLoaded = true;   //已游玩过：进入时保持上次退出位置
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
             this.setPlayer(Entities.PLAYER.create(getWorld()));
+            this.playerLoaded = false;   //首次进入：进入时放到出生点
             Log.print(TAG(), "未探查到玩家数据文件，新建玩家实体");
         }
 
@@ -87,6 +90,24 @@ public class PlayerSystem extends WorldSystem {
         GUISystem.getInstance().setCurScreen(PLAYER_HUD_SCREEN);
 
         Log.print(TAG(), "PlayerSystem初始化完成！");
+    }
+
+    /**
+     * 决定玩家进入世界的位置（由 ChunkSystem 在确定出生点后调用）：
+     * <ul>
+     *   <li>首次进入（新建玩家）：设置位置到出生点；</li>
+     *   <li>重新进入已游玩存档（读档玩家）：保持读出的<b>上次退出位置</b>。</li>
+     * </ul>
+     * 此处<b>不加载区块</b>——玩家脚下的初始区块统一由 {@code ChunkSystem} 的预加载
+     * （{@code update(-1.2f)}）加载，避免与预加载对同一区块重复 {@code addChunk}。
+     */
+    public void placePlayerAtInitialPosition (Vector2 spawn) {
+        if (this.playerLoaded) {
+            //读档位置已由玩家数据读出，保持不动（初始区块由预加载加载）
+            return;
+        }
+        //首次进入 → 设置到出生点（初始区块由预加载加载）
+        this.player.setPosition(spawn.x, spawn.y);
     }
 
     @Override
@@ -279,7 +300,9 @@ public class PlayerSystem extends WorldSystem {
         this.setPlayer(newPlayer);
 
         //复活到出生点（出生点是存档属性，已在世界信息中记录）
-        this.teleportToSpawnPoint(newPlayer);
+        float sx = WorldInfoTypes.FLOAT.get(Fight.SPAWN_X);
+        float sy = WorldInfoTypes.FLOAT.get(Fight.SPAWN_Y);
+        this.teleportToSpawnPoint(newPlayer, new Vector2(sx, sy));
         this.playerLastPosition = newPlayer.getPosition();
         es.add(newPlayer);
 
@@ -292,15 +315,13 @@ public class PlayerSystem extends WorldSystem {
     }
 
     /**
-     * 把玩家传送到出生点（世界信息中记录的世界坐标）
+     * 把玩家传送到指定出生点坐标（出生点是首次进入/复活时用的位置）
      */
-    private void teleportToSpawnPoint (Player player) {
-        float sx = WorldInfoTypes.FLOAT.get(Fight.SPAWN_X);
-        float sy = WorldInfoTypes.FLOAT.get(Fight.SPAWN_Y);
-        player.setPosition(sx, sy);
+    private void teleportToSpawnPoint (Player player, Vector2 spawn) {
+        player.setPosition(spawn.x, spawn.y);
         //确保出生点所在区块已加载
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
-        cs.loadChunkBlocking(cs.getChunkPos(sx, sy));
+        cs.loadChunkBlocking(cs.getChunkPos(spawn.x, spawn.y));
         //防御：万一出生点不在可站立位置，向上找安全处兜底
         this.ensureSafeSpawnPosition();
     }

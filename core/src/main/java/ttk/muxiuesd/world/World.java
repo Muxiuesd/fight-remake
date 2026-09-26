@@ -82,6 +82,14 @@ public abstract class World implements Updateable, Disposable {
      * 读取世界信息
      * */
     public void readWorldInfo() {
+        //切档清理：清空全局静态的世界信息map，避免上一个存档的字段残留到本次存档
+        //（WorldInfoTypes 的 map 是全局共享单例，decode 只会 put、从不 clear，
+        //  若新档缺失某些键，旧档残留值会被新世界读到 → 串档/用错出生点、种子等）
+        WorldInfoTypes.INT.clear();
+        WorldInfoTypes.LONG.clear();
+        WorldInfoTypes.FLOAT.clear();
+        WorldInfoTypes.STRING.clear();
+
         //检查世界信息文件是否存在
         if(UnifiedFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
             //存在就读取
