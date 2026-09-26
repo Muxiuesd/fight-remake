@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.player.Player;
 
 public class CameraFollowSystem extends WorldSystem {
-    public static final float MAX_ZOOM = 10.0f;
+    public static final float MAX_ZOOM = 20.0f;
     public static final float MIN_ZOOM = 0.3f;
 
     private Entity<?> follower; //相机跟随的实体，默认是玩家实体

@@ -6,7 +6,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.biome.Biome;
-import ttk.muxiuesd.world.biome.HeightLayer;
+import ttk.muxiuesd.world.biome.BiomeBand;
 import ttk.muxiuesd.world.chunk.Chunk;
 
 /**
@@ -27,43 +27,52 @@ public final class Biomes {
         .tint(new Color(0.2f, 0.4f, 0.9f, 1f))
         .build());
 
-    /// 低海拔（区块平滑高度 < LOW_BAND_TOP）→ 湿地（走统一高程带，低处自然多为草地）
+    /// 湿地（低海拔+湿润）：低位草带，无石头/雪
     public static final Biome WETLAND = register("wetland", Biome.builder()
-        .water(Blocks.WATER).beach(Blocks.SAND).surface(Blocks.GRASS)
+        .water(Blocks.WATER).surface(Blocks.GRASS)
+        .bands(
+            BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SAND),
+            BiomeBand.of(Chunk.SEA_LEVEL + 7, Blocks.GRASS))
         .tint(new Color(0.4f, 0.5f, 0.4f, 1f))
         .build());
 
-    /// 高海拔（区块平滑高度 ≥ HIGH_BAND_BOTTOM）→ 山地（走统一高程带：石→雪）
+    /// 山地（高海拔）：低位石、峰顶雪
     public static final Biome MOUNTAIN = register("mountain", Biome.builder()
-        .water(Blocks.WATER).beach(Blocks.SAND).surface(Blocks.STONE)
+        .water(Blocks.WATER).surface(Blocks.STONE)
+        .bands(
+            BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SAND),
+            BiomeBand.of(Chunk.SEA_LEVEL + 7, Blocks.STONE),
+            BiomeBand.of(Chunk.SNOWLINE, Blocks.SNOW))
         .tint(new Color(0.6f, 0.6f, 0.65f, 1f))
         .build());
 
-    /// 中海拔低温 → 雪原（走统一高程带，高处自然出雪；沙漠同理由生成器铺沙）
+    /// 雪原（明显低温）：全雪
     public static final Biome SNOWY = register("snowy", Biome.builder()
-        .temperature(0f, 0.35f)
-        .water(Blocks.WATER).beach(Blocks.SAND).surface(Blocks.SNOW)
+        .temperature(0f, 0.30f)
+        .water(Blocks.WATER).surface(Blocks.SNOW)
+        .bands(BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SNOW))
         .tint(new Color(0.9f, 0.9f, 0.95f, 1f))
         .build());
 
-    /// 沙漠（方块由 desertStrength 连续渐变铺设，走统一带保高程分层与平滑过渡）
+    /// 沙漠（明显高温+干旱）：全沙
     public static final Biome DESERT = register("desert", Biome.builder()
-        .temperature(0.65f, 1f).humidity(0f, 0.4f)
-        .water(Blocks.WATER).beach(Blocks.SAND).surface(Blocks.SAND)
+        .temperature(0.70f, 1f).humidity(0f, 0.30f)
+        .water(Blocks.WATER).surface(Blocks.SAND)
+        .bands(BiomeBand.of(Chunk.SEA_LEVEL, Blocks.SAND))
         .tint(new Color(0.85f, 0.8f, 0.5f, 1f))
         .build());
 
-    /// 森林（走统一高程带：草→石→雪）
+    /// 森林（明显湿润）：走默认模板
     public static final Biome FOREST = register("forest", Biome.builder()
-        .temperature(0.35f, 0.75f).humidity(0.6f, 1f)
-        .water(Blocks.WATER).beach(Blocks.SAND).surface(Blocks.GRASS)
+        .temperature(0.35f, 0.75f).humidity(0.75f, 1f)
+        .water(Blocks.WATER).surface(Blocks.GRASS)
         .tint(new Color(0.2f, 0.5f, 0.2f, 1f))
         .build());
 
-    /// 平原（走统一高程带：草→石→雪）
+    /// 平原（温和，生态群系均不达标时兜底）：走默认模板
     public static final Biome PLAINS = register("plains", Biome.builder()
         .temperature(0.35f, 0.75f).humidity(0f, 0.6f)
-        .water(Blocks.WATER).beach(Blocks.SAND).surface(Blocks.GRASS)
+        .water(Blocks.WATER).surface(Blocks.GRASS)
         .tint(new Color(0.4f, 0.7f, 0.3f, 1f))
         .build());
 

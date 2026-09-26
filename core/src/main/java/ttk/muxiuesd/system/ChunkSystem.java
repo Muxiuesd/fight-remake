@@ -16,10 +16,10 @@ import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
-import ttk.muxiuesd.registry.Blocks;
-import ttk.muxiuesd.registry.Biomes;
-import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.Biomes;
+import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
@@ -55,10 +55,10 @@ import java.util.concurrent.*;
  * */
 public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     public final String TAG = this.getClass().getName();
+    public static final float Slope = 1000.0f;   // 地形坡度，生成地形时的参数（世界坐标→噪声坐标分频；越大地形越平缓、大陆越大）
 
     public boolean chunkEdgeRender = false;
     public boolean wallHitboxRender = false;
-    public static final float Slope = 100.0f;   // 地形坡度，生成地形时的参数
 
     private Player player;
     private Vector2 playerLastPosition;
@@ -1066,13 +1066,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public double sampleHumidity (float wx, float wy) {
         return this.biomeSampler.sampleHumidity(wx, wy);
-    }
-
-    /**
-     * 连续沙漠强度 [0,1]（温度高+湿度低→接近1），用于沙漠与草原等群系渐变过渡
-     */
-    public double desertStrength (float wx, float wy) {
-        return this.biomeSampler.desertStrength(wx, wy);
     }
 
     /**

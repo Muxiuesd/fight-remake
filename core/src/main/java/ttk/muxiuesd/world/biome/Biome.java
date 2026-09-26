@@ -50,12 +50,24 @@ public class Biome {
     private float[] temperatureRange;               //温度区间 [min,max]（中海拔查表）
     private float[] humidityRange;                  //湿度区间 [min,max]
     private final Block surfaceBlock;               //兜底地表方块
-    private final Block waterBlock;                 //水域方块（高度<0）
-    private final Block beachBlock;                 //过渡带方块（+1~+4）
-    private final List<HeightLayer> heightLayers;   //高程分层（高度带→方块）
+    private final Block waterBlock;                 //水域方块（高度<海平面）
+    private final List<BiomeBand> bands;            //高度>海平面的断点分带表（null=用默认模板）
     private final float spawnWeight;                //海陆权重（仅 OCEAN 有意义）
     private final Color tint;                       //环境色调（可选）
     private final boolean canSpawn;                 //该群系是否可作为玩家出生点（注册阶段确定）
+
+    /**
+     * 全局默认高程带模板（平原/森林/山地通用）：海平面之上 沙→草→石→雪。
+     * <p>
+     * 断点语义：高度 ≥ startHeight 用该方块，延续到下一断点。
+     * 群系若未显式指定 {@code bands}，则沿用此默认模板。
+     */
+    public static final List<BiomeBand> DEFAULT_BANDS = List.of(
+        BiomeBand.of(Chunk.SEA_LEVEL,         Blocks.SAND),    //150 沙（沙滩）
+        BiomeBand.of(Chunk.SEA_LEVEL + 7,     Blocks.GRASS),   //157 草
+        BiomeBand.of(Chunk.GRASS_TOP + 1,     Blocks.STONE),   //201 石
+        BiomeBand.of(Chunk.SNOWLINE,          Blocks.SNOW)     //236 雪
+    );
 
     public Biome (Builder builder) {
         this.id = builder.id;
@@ -64,8 +76,7 @@ public class Biome {
         this.humidityRange = builder.humidityRange;
         this.surfaceBlock = builder.surfaceBlock;
         this.waterBlock = builder.waterBlock;
-        this.beachBlock = builder.beachBlock;
-        this.heightLayers = builder.heightLayers;
+        this.bands = builder.bands;
         this.spawnWeight = builder.spawnWeight;
         this.tint = builder.tint;
         //未显式设置时：陆地群系默认可出生，海洋不可出生
@@ -73,31 +84,21 @@ public class Biome {
     }
 
     /**
-     * 按格子的实际高度决定该格生成哪种方块（过渡流畅的核心）
+     * 按格子的实际高度决定该格生成哪种方块。
      * <p>
-     * 高度 < 海平面(SEA_LEVEL) → 水；海平面~沙滩带上限(BEACH_MAX) → 沙。
-     * 陆地统一高程带（所有群系默认一致，保证跨群系过渡流畅）：
-     *   BEACH_MAX~GRASS_TOP → 草；GRASS_TOP~STONE_TOP → 石；≥SNOWLINE → 雪。
-     * 群系可通过 {@code heightLayers} 覆盖某些高度带（如沙漠全沙、雪原全雪），
-     * 未命中的高度带仍回落到统一高程带。
+     * 高度 < 海平面(SEA_LEVEL) → 水；否则在群系的高度断点分带表中定位方块，
+     * 未命中任何带（理论上不会）兜底返回地表方块。
      */
     public Block decideBlock (int height) {
         if (height < Chunk.SEA_LEVEL) return this.getWaterBlock();
-        if (height <= Chunk.BEACH_MAX) return this.getBeachBlock();
-        //群系覆盖层（可选）：命中某覆盖高度带则用覆盖块，否则继续走统一高程带
-        if (this.getHeightLayers() != null) {
-            for (HeightLayer layer : this.getHeightLayers()) {
-                if (height >= layer.getMinHeight() && height <= layer.getMaxHeight()) {
-                    return layer.getBlock();
-                }
+        List<BiomeBand> b = this.bands != null ? this.bands : DEFAULT_BANDS;
+        //b 按 startHeight 升序；从高到低找第一个 height≥start
+        for (int i = b.size() - 1; i >= 0; i--) {
+            if (height >= b.get(i).getStartHeight()) {
+                return b.get(i).getBlock();
             }
         }
-        //统一高程带：草 → 石 → 雪（雪线 ≥ SNOWLINE）
-        if (height < Chunk.SNOWLINE) {
-            if (height <= Chunk.GRASS_TOP) return Blocks.GRASS;
-            return Blocks.STONE;
-        }
-        return Blocks.SNOW;
+        return this.getSurfaceBlock();
     }
 
     public boolean isOcean () {
@@ -130,6 +131,28 @@ public class Biome {
         return this.humidityRange == null ? 1f : this.humidityRange[1];
     }
 
+    /**
+     * 群系对该点温度湿度的匹配度 [0,1]（配置驱动）。
+     * <p>
+     * 温度/湿度落在本群系声明范围内 → 匹配 1（饱和）；越偏离范围匹配越低。
+     * 未声明范围的维度视为全匹配（1）。两维度匹配度相乘作为综合匹配度。
+     */
+    public double matchDegree (double temp, double humid) {
+        return this.rangeMatch(temp, this.temperatureRange)
+             * this.rangeMatch(humid, this.humidityRange);
+    }
+
+    private static double rangeMatch (double value, float[] range) {
+        if (range == null) return 1;                     //未声明范围 → 全匹配
+        double min = range[0], max = range[1];
+        if (value >= min && value <= max) return 1;      //区间内 → 满配（饱和）
+        double half = (max - min) / 2.0;
+        if (half <= 0) return 0;
+        //区间外 → 按超出半宽的倍数线性衰减
+        double d = value < min ? (min - value) / half : (value - max) / half;
+        return d >= 2 ? 0 : 1 - d / 2.0;
+    }
+
     public Identifier getId () {
         return this.id;
     }
@@ -155,14 +178,6 @@ public class Biome {
 
     public Block getWaterBlock () {
         return waterBlock;
-    }
-
-    public Block getBeachBlock () {
-        return beachBlock;
-    }
-
-    public List<HeightLayer> getHeightLayers () {
-        return heightLayers;
     }
 
     public float getSpawnWeight () {
@@ -194,8 +209,7 @@ public class Biome {
         private float[] humidityRange;
         private Block surfaceBlock;
         private Block waterBlock;
-        private Block beachBlock;
-        private List<HeightLayer> heightLayers;
+        private List<BiomeBand> bands;           //null=用默认模板
         private float spawnWeight = 0f;
         private Color tint;
         private boolean canSpawn;
@@ -231,14 +245,12 @@ public class Biome {
             return this;
         }
 
-        public Builder beach (Block block) {
-            this.beachBlock = block;
-            return this;
-        }
-
-        public Builder heightLayers (HeightLayer... layers) {
-            this.heightLayers = new java.util.ArrayList<>();
-            java.util.Collections.addAll(this.heightLayers, layers);
+        /**
+         * 显式设置该群系的高度断点分带表（null/不调用 → 用 {@link Biome#DEFAULT_BANDS} 默认模板）。
+         * 断点须按 startHeight 升序。
+         */
+        public Builder bands (BiomeBand... bandsArr) {
+            this.bands = bandsArr != null && bandsArr.length > 0 ? new java.util.ArrayList<>(java.util.List.of(bandsArr)) : null;
             return this;
         }
 

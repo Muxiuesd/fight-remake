@@ -1,7 +1,6 @@
 package ttk.muxiuesd.world.chunk;
 
 import com.badlogic.gdx.math.Vector2;
-import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Walls;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
@@ -60,18 +59,10 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
             else if (cs.wetlandStrength(wx, wy) > 0.5 && cs.isWetlandPondCell(wx, wy)) height = Chunk.SEA_LEVEL - 8;
 
             //方块决定：统一用陆地群系查表（参数取区块平滑高度带）按该格高度 decideBlock，
-            //decideBlock 内部处理：<海平面→水、海平面~BEACH_MAX→沙、更高→分层地表。
-            //这样即便区块被标为海洋(Ocean)，靠岸的较高格也会因高度≥海平面 而上沙/陆，海陆在海平面(150)等高线处自然过渡。
+            //decideBlock 在群系自己的高度断点分带表（或默认模板）中定位方块：
+            //<海平面→水、海平面以上→沙/草/石/雪（按群系配置）。
+            //沙漠(all-sand)、雪原(all-snow)等由各自 bands 决定，边界靠连续强度场渐变。
             Block block = cs.lookupLandBiome(temp, humid, smoothedHeight).decideBlock(height);
-            //沙漠渐变：在草地带（沙滩之上、雪线之下）用连续沙漠强度 + 噪声抖动铺沙，
-            //沙漠中心(强度≈1)几乎全沙，沙漠边缘(强度渐降)沙草斑驳过渡，与其他群系柔和相连。
-            //低门槛(0.3)+抖动使过渡带更宽缓，避免生硬切变。
-            if (height > Chunk.BEACH_MAX && height < Chunk.SNOWLINE) {
-                double desert = cs.desertStrength(wx, wy);
-                if (desert > 0.3 && desert > this.dither01(wx, wy)) {
-                    block = Blocks.SAND;
-                }
-            }
             chunk.setBlock(block, x, y);
             chunk.setHeight(x, y, height);
         });
@@ -92,13 +83,5 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
     @Override
     public String chooseBlock (int height) {
         return null;
-    }
-
-    /**
-     * 确定性逐格抖动值 [0,1)：用世界噪声高频采样产生，用于沙漠沙/草过渡的噪声抖动，
-     * 使沙漠边缘沙草斑驳而非硬切（同一种子跨区块可复现）。
-     */
-    private double dither01 (float wx, float wy) {
-        return getChunkSystem().getWorldNoise().getNorNoise(wx * 0.4f, wy * 0.4f);
     }
 }

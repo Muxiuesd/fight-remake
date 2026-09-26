@@ -20,7 +20,8 @@ public class BiomeSampler {
 
 // 温度/湿度/河流/湖泊 的采样频率与偏移
 private static final float TEMP_LOW_FREQ = 0.0006f, TEMP_HIGH_FREQ = 0.002f, TEMP_OFFSET = 0f;
-    private static final float HUMID_LOW_FREQ = 0.0006f, HUMID_HIGH_FREQ = 0.002f, HUMID_OFFSET = 100f;
+    //湿度用与温度不同的相位大偏移，使其与温度场相对独立（否则温湿强正相关致无沙漠气候）；频率仍低频保持湿地带连续
+    private static final float HUMID_LOW_FREQ = 0.0006f, HUMID_HIGH_FREQ = 0.002f, HUMID_OFFSET = 3000f;
     private static final float RIVER_FREQ = 0.002f, RIVER_OFFSET = 200f, RIVER_BAND = 0.85f;
     private static final float LAKE_FREQ = 0.01f, LAKE_OFFSET = 300f, LAKE_THRESHOLD = 0.75f;
 
@@ -119,23 +120,6 @@ private static final float TEMP_LOW_FREQ = 0.0006f, TEMP_HIGH_FREQ = 0.002f, TEM
         return low * 0.6 + high * 0.4;
     }
 
-    /**
-     * 连续"沙漠强度" [0,1]：温度越高、湿度越低 → 越接近 1（纯沙漠）。
-     * <p>
-     * 用连续插值而非硬阈值，配合噪声抖动让沙漠与其他群系（尤其草原）的边界渐变过渡、斑驳自然，
-     * 避免"区块级全沙 vs 全草"的硬切。阈值与 {@link #lookupLandBiome} 的 DESERT 判定一致
-     * （temp≥0.65 且 humid≤0.4 附近为沙漠核心）。
-     */
-    public double desertStrength (float wx, float wy) {
-        double temp  = this.sampleTemp(wx, wy);
-        double humid = this.sampleHumidity(wx, wy);
-        //温度：0.55 → 0，0.72 → 1（核心 0.65 时 ≈0.59）
-        double t = clamp01((temp - 0.55) / (0.72 - 0.55));
-        //湿度：0.50 → 0，0.28 → 1（核心 0.40 时 ≈0.45）
-        double h = clamp01((0.50 - humid) / (0.50 - 0.28));
-        return Math.min(t, h);
-    }
-
     private static double clamp01 (double v) {
         return v < 0 ? 0 : (v > 1 ? 1 : v);
     }
@@ -143,27 +127,28 @@ private static final float TEMP_LOW_FREQ = 0.0006f, TEMP_HIGH_FREQ = 0.002f, TEM
     /**
      * 陆地群系查表：区块级平滑高度分段 + 连续生态强度场（温度 + 湿度）
      * <p>
-     * 低地、高地不再用硬高度门槛切分，而是并入统一的<b>连续生态强度场</b>：
-     * 湿地靠"低海拔 + 湿润"得分、山地靠"高海拔"得分、雪原/沙漠/森林/平原靠温度湿度得分，
-     * 取各群系强度最大者。如此相邻群系在交界处由强度相对大小自然渐变切换，避免硬切。
+     * 低地（湿地）、高地（山地）由高度得分，生态群系（雪原/沙漠/森林/平原）由
+     * 各自声明的温度/湿度 range 配置（matchDegree）匹配度竞争，取最大者。
+     * 相邻群系在交界处由强度相对大小自然渐变切换，避免硬切。
      */
     public Biome lookupLandBiome (double temp, double humid, int chunkHeight) {
-        //连续生态强度（0~1），边界由强度相对大小自然切换
-        double wetland = wetlandStrength(chunkHeight, humid);                    //低海拔且湿润 → 湿地
-        double mountain = clamp01((chunkHeight - Chunk.HIGH_BAND_BOTTOM) / 30.0); //高海拔 → 山地
-        double snowy  = clamp01((0.45 - temp) / 0.25);                          //温度越低越强（雪原）
-        double desert = clamp01((temp - 0.50) / 0.20)                           //高温主导
-                        * (0.6 + 0.4 * clamp01((0.58 - humid) / 0.35));         //低湿加强，高湿减弱
-        double forest = clamp01((humid - 0.55) / 0.20);                         //湿度越高越强（森林）
-        double plains = 0.34 * clamp01((0.45 - Math.abs(temp - 0.5)) / 0.45);   //温湿适中的平原兜底偏置
+        //高度驱动的群系（绝对门槛，优先于生态群系）
+        double wetland  = wetlandStrength(chunkHeight, humid);
+        double mountain = clamp01((chunkHeight - 200) / 40.0);  //200起，力度到240满分
+        //温度湿度配置驱动的特殊生态群系（按各群系 range 匹配度）
+        double snowy  = Biomes.SNOWY.matchDegree(temp, humid);
+        double desert = Biomes.DESERT.matchDegree(temp, humid);
+        double forest = Biomes.FOREST.matchDegree(temp, humid);
 
-        //取强度最大者（湿地、山地在交界处与生态群系自然竞争）
-        if (wetland >= mountain && wetland >= snowy && wetland >= desert && wetland >= forest && wetland >= plains) return Biomes.WETLAND;
-        if (mountain >= snowy && mountain >= desert && mountain >= forest && mountain >= plains) return Biomes.MOUNTAIN;
-        if (snowy >= desert && snowy >= forest && snowy >= plains) return Biomes.SNOWY;
-        if (desert >= forest && desert >= plains) return Biomes.DESERT;
-        if (forest >= plains) return Biomes.FOREST;
-        return Biomes.PLAINS;
+        //① 湿地/山地按其自身强度达标优先，不与生态群系争
+        if (wetland >= 0.5 && wetland >= mountain) return Biomes.WETLAND;
+        if (mountain >= 0.5) return Biomes.MOUNTAIN;
+        //② 特殊生态群系（雪原/沙漠/森林）取匹配最高者；都不明显（<0.6）→平原兜底
+        double best = Math.max(snowy, Math.max(desert, forest));
+        if (best < 0.6) return Biomes.PLAINS;
+        if (best == snowy) return Biomes.SNOWY;
+        if (best == desert) return Biomes.DESERT;
+        return Biomes.FOREST;
     }
 
     /**
