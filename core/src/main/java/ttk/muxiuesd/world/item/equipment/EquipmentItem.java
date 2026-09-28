@@ -14,7 +14,7 @@ import ttk.muxiuesd.world.item.abs.Item;
  * TODO 装备的装备属性效果
  * */
 public class EquipmentItem extends Item {
-    /// 装备类型
+    /// 装备类型（后续改为可以注册类型形式）
     public enum Type{
         HELMET,     //头盔
         CHESTPLATE, //胸甲
