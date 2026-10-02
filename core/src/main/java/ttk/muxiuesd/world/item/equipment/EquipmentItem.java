@@ -14,20 +14,21 @@ import ttk.muxiuesd.world.item.abs.Item;
  * TODO 装备的装备属性效果
  * */
 public class EquipmentItem extends Item {
-    /// 装备类型
-    public enum Type{
-        HELMET,     //头盔
-        CHESTPLATE, //胸甲
-        LEGGINGS,   //腿甲
-        BOOTS,      //靴子
-        OTHERS      //其他类型
-    }
-    //装备的类型
-    public final EquipmentItem.Type equipmentType;
+    /// 本装备物品持有的装备类型（注册实例），由 Builder 在构造时注入，之后不可改
+    private final EquipmentType equipmentType;
 
-    public EquipmentItem (EquipmentItem.Type equipmentType, Property property) {
+    public EquipmentItem (EquipmentType equipmentType, Property property) {
         super(property);
         this.equipmentType = equipmentType;
+    }
+
+    /**
+     * 获取本装备持有的装备类型
+     * <p>
+     * 装备槽位持有的也是"注册实例"，两者是同一实例时该装备才能放入该槽位。
+     * */
+    public EquipmentType getEquipmentType () {
+        return this.equipmentType;
     }
 
     @Override

@@ -43,6 +43,15 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public static final float KNOCKBACK_AIR_DRAG_PER_SECOND = 0.6f;  //空中击退每秒速度衰减到的比例
 
     /**
+     * 装备背包的容量（装备容器有几个格）
+     * <p>
+     * 与"注册了多少种装备类型"无关，两者没有强关联：
+     * 容量是装备容器自身的尺寸，装备类型是物品种类。
+     * 它也与装备槽位的数量无关——槽位由写 UI 的人在装备面板里决定。
+     * */
+    public static final int DEFAULT_EQUIPMENT_BACKPACK_SIZE = 4;
+
+    /**
      * 活物实体的现代化编解码器
      * <p>
      * 解码时通过实体注册表创建实例（会创建出正确的实体类），
@@ -110,7 +119,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             .setCurSpan(0)
             .setTask(() -> this.attacked = false);
         this.backpack = new Backpack(backpackSize);
-        this.equipmentBackpack = new Backpack(4);
+        //装备背包容量是独立的容器尺寸，不由注册的装备类型数量决定
+        this.equipmentBackpack = new Backpack(DEFAULT_EQUIPMENT_BACKPACK_SIZE);
         this.maxSwingHandDegree = 60f;
         this.knockbackTimer = Pools.TASK_TIMER.obtain().setMaxSpan(KNOCKBACK_DURATION).setCurSpan(0);
         this.knockbackActive = false;

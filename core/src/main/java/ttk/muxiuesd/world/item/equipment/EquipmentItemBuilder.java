@@ -9,22 +9,22 @@ import ttk.muxiuesd.world.item.builder.ItemBuilder;
 /**
  * 装备物品构建器
  * <p>
- * 装备的类型通过 {@link EquipmentItem.Type} 指定。
+ * 装备的类型通过注册的 {@link EquipmentType} 实例指定。
  */
 public class EquipmentItemBuilder implements ItemBuilder<EquipmentItem> {
-    private final EquipmentItem.Type type;
+    private final EquipmentType type;
     private AudioHolder equipSound = Sounds.EQUIP;
     private float damageReduction = 0.0f;
 
 
-    private EquipmentItemBuilder (EquipmentItem.Type type) {
+    private EquipmentItemBuilder (EquipmentType type) {
         this.type = type;
     }
 
     /**
      * 创建装备构建器，指定装备类型
      * */
-    public static EquipmentItemBuilder create (EquipmentItem.Type type) {
+    public static EquipmentItemBuilder create (EquipmentType type) {
         return new EquipmentItemBuilder(type);
     }
 

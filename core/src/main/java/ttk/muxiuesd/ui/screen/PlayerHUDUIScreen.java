@@ -6,7 +6,7 @@ import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.ui.abs.FightUIScreen;
 import ttk.muxiuesd.ui.components.HotbarPlayerSlotUI;
-import ttk.muxiuesd.ui.panel.InfoPanel;
+import ttk.muxiuesd.ui.components.InfoPanel;
 
 /**
  * 玩家的HUD屏幕

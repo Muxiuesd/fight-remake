@@ -21,6 +21,7 @@ import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.item.equipment.EquipmentType;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
@@ -47,6 +48,7 @@ public class Registries {
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
     public static final Registry<StatusEffect> STATUS_EFFECT = create(RegistryKeys.STATUS_EFFECT);
+    public static final Registry<EquipmentType> EQUIPMENT_TYPE = create(RegistryKeys.EQUIPMENT_TYPE);
 
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
     public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);

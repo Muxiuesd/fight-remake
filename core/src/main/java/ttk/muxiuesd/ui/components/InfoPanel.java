@@ -1,4 +1,4 @@
-package ttk.muxiuesd.ui.panel;
+package ttk.muxiuesd.ui.components;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -8,7 +8,6 @@ import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registry.Fonts;
-import ttk.muxiuesd.ui.components.InfoEntry;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryBiome;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryFPS;
 import ttk.muxiuesd.ui.components.infoentries.InfoEntryMemory;

@@ -37,6 +37,9 @@ public class MainGameScreen implements Screen {
         //注意：Items 的静态字段引用了 Blocks、Walls、Entities、StatusEffects、Sounds，
         //必须确保这些注册表在 Items 之前完成类加载（init 触发类加载 → 静态字段初始化）
         Pools.init();
+        //装备类型是纯数据注册（无贴图/音效等 GL 依赖），但必须在 Items 之前完成：
+        //Items 的静态字段初始化时就会构造 EquipmentItem（引用 EquipmentTypes.HELMET 等）
+        EquipmentTypes.init();
         EventTypes.init();
         Sounds.init();
         BlockEntities.init();

@@ -5,27 +5,24 @@ import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.equipment.EquipmentItem;
+import ttk.muxiuesd.world.item.equipment.EquipmentType;
 
 /**
  * 装备物品槽位的UI组件
+ * <p>
+ * 每个槽位持有一种已注册的 {@link EquipmentType} 实例：
+ * 只有当"物品持有的装备类型"与"槽位持有的装备类型"是同一实例时，物品才能放入。
+ * <p>
+ * {@code index} 是与装备背包格一一对应的下标，其值与槽位的显示坐标一样，
+ * 由写 UI 的 {@code PlayerInventoryUIPanel} 在构造槽位时决定。
  * */
 public class EquipmentPlayerSlotUI extends PlayerSlotUI {
-    /// 槽位索引到装备类型的显式映射（不依赖 values() 顺序，避免枚举扩容时越界/错位）
-    private static final EquipmentItem.Type[] SLOT_TYPE_MAP = {
-        EquipmentItem.Type.HELMET,
-        EquipmentItem.Type.CHESTPLATE,
-        EquipmentItem.Type.LEGGINGS,
-        EquipmentItem.Type.BOOTS
-    };
+    /// 本槽位接受的装备类型（注册实例）
+    public final EquipmentType type;
 
-    public final EquipmentItem.Type type;
-
-    public EquipmentPlayerSlotUI (PlayerSystem playerSystem, int index, float x, float y) {
+    public EquipmentPlayerSlotUI (PlayerSystem playerSystem, int index, EquipmentType type, float x, float y) {
         super(playerSystem, index, x, y);
-        //索引超出映射范围时用 OTHERS 兜底，避免 ArrayIndexOutOfBounds
-        this.type = index >= 0 && index < SLOT_TYPE_MAP.length
-            ? SLOT_TYPE_MAP[index]
-            : EquipmentItem.Type.OTHERS;
+        this.type = type;
     }
 
     /**
@@ -35,7 +32,8 @@ public class EquipmentPlayerSlotUI extends PlayerSlotUI {
     public boolean checkItemType (ItemStack itemStack) {
         Item item = itemStack.getItem();
         if (item instanceof EquipmentItem equipmentItem) {
-            return equipmentItem.equipmentType == type;
+            //注册实例的引用同一性：同一种装备类型在游戏中只有唯一实例
+            return equipmentItem.getEquipmentType() == type;
         }
 
         return false;
