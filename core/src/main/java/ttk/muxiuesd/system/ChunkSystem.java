@@ -251,10 +251,17 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             BlockPos pos = blockEntity.getBlockPos();
             //找对应的渲染器来执行渲染
             BlockEntityRenderer<BlockEntity> renderer = BlockEntityRendererRegistry.get(blockEntity);
+            //渲染器未注册（返回null，注册表内部已log）时不绘制该方块实体，避免崩溃
+            if (renderer == null) return;
             BlockEntityRenderer.Context context = renderer.getContext();
             context.x = pos.x;
             context.y = pos.y;
-            renderer.render(batch, blockEntity, context);
+            //上下文必须成对释放：render 抛异常也不能把已取出的实例漏在池外（P-B3）
+            try {
+                renderer.render(batch, blockEntity, context);
+            } finally {
+                renderer.freeContext(context);
+            }
         });
     }
 

@@ -56,7 +56,7 @@ public class EventTypes {
         new EventHandler<BlockReplaceEvent, EventPosterBlockReplace>() {
         @Override
         public void callEvents (EventPosterBlockReplace poster) {
-            getEvents().forEach(event -> event.handle(poster.world, poster.newBlock, poster.newBlock, poster.wx, poster.wy));
+            getEvents().forEach(event -> event.handle(poster.world, poster.newBlock, poster.oldBlock, poster.wx, poster.wy));
         }
     });
 
