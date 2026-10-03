@@ -395,9 +395,25 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 获取实体的中心点的坐标（与世界坐标是两个概念），会影响实体的某些渲染坐标
+     * 获取实体的中心点坐标（世界坐标）
      * <p>
-     * 默认是实体的世界坐标
+     * 实体坐标 (x, y) 就是碰撞箱的中心：身体碰撞箱的起终点相对中心偏移宽高的一半，
+     * 见 {@link #fastAddBodyHitBox()}；脚底 = {@code y - getHeight() / 2f}。
+     * <p>
+     * <b>约定：需要把实体换算成"所在的那一格方块/区块"时，一律用这个中心点取样。</b>
+     * 全项目的判定取样点如下——
+     * <ul>
+     *     <li>移动摩擦与击退摩擦：实体中心（{@code ttk.muxiuesd.system.EntitySystem} 速度摩擦处、
+     *         {@code ttk.muxiuesd.world.entity.abs.LivingEntity} 击退物理处）</li>
+     *     <li>脚步粒子判定：实体中心（{@code ttk.muxiuesd.system.PlayerSystem#emitFootstepParticle}）</li>
+     *     <li>游泳判定：实体中心（{@code ttk.muxiuesd.system.PlayerSystem} 玩家游泳处）</li>
+     *     <li>实体归属的区块（区块加载与卸载、实体存档分组）：实体中心
+     *         （{@code ttk.muxiuesd.system.ChunkSystem#getPlayerChunkPosition}、
+     *         {@code ttk.muxiuesd.system.EntitySystem} 实体卸载与保存处）</li>
+     *     <li><b>例外：粒子发射位置与"从脚下找可站立格"用脚底</b>——粒子从脚下扬起才是想要的表现，
+     *         重生落地要以脚为准，所以这两类不做中心取样</li>
+     * </ul>
+     * 注：每次调用返回的是<b>新的</b> Vector2 副本，改它不会影响实体坐标。
      * */
     public Vector2 getCenterPos () {
         return new Vector2(this.x, this.y);

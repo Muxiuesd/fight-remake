@@ -944,6 +944,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * 获取玩家所在的区块编号
      */
     private ChunkPosition getPlayerChunkPosition(Player player) {
+        //玩家所在区块按中心点取样（取样点约定见 Entity.getCenterPos()）
         Vector2 playerCenter = player.getCenterPos();
         return this.getChunkPos(playerCenter.x, playerCenter.y);
     }

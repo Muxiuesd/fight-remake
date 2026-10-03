@@ -190,16 +190,18 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             return;
         }
 
-        //击退中：计算衰减（地面按脚下方块摩擦，速度每秒衰减到 1-摩擦系数；空中按空气阻力）
+        //击退中：计算衰减（地面按所在方块摩擦，速度每秒衰减到 1-摩擦系数；空中按空气阻力）
+        //与移动摩擦一致，按中心点取样（取样点约定见 Entity.getCenterPos()）
         float decay;
         if (this.getEntitySystem() == null) {
             decay = (float) Math.pow(KNOCKBACK_AIR_DRAG_PER_SECOND, delta);
         } else {
             ChunkSystem cs = this.getEntitySystem().getWorld().getSystem(ChunkSystem.class);
-            Block block = cs.getBlock(this.getX(), this.getY() - this.getHeight() / 2f);
+            Vector2 entityCenter = this.getCenterPos();
+            Block block = cs.getBlock(entityCenter.x, entityCenter.y);
             float friction = (block == null) ? 0f : block.getProperty().getFriction();
             if (friction > 0f) {
-                //地面：受脚下方块摩擦力作用
+                //地面：受所在方块摩擦力作用
                 decay = (float) Math.pow(Math.max(0f, 1f - friction), delta);
             } else {
                 //空中：空气阻力

@@ -340,8 +340,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         //如果实体在地面上
         if (entity.isOnGround()) {
-            //计算脚下方块摩擦对速度的影响（取样点与游泳判定一致，都用实体底部）
-            Block block = cs.getBlock(entity.getX(), entity.getY() - entity.getHeight() / 2f);
+            //计算所在方块的摩擦对速度的影响：按中心点取样（取样点约定见 Entity.getCenterPos()）
+            Vector2 entityCenter = entity.getCenterPos();
+            Block block = cs.getBlock(entityCenter.x, entityCenter.y);
             if (block != null) {
                 float scale = Math.max(0f, 1f - block.getProperty().getFriction());
                 if (entity.hasIntent()) {
@@ -476,6 +477,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Array<Entity<?>> unload = new Array<>();    //需要被卸载的实体组
 
         for (Entity<?> entity: copy) {
+            //实体归属的区块按中心点取样（取样点约定见 Entity.getCenterPos()）
             ChunkPosition chunkPosition = cs.getChunkPos(entity.getCenterPos());
             EntityProvider<?> entityProvider = entity.getProvider();
             //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
@@ -517,6 +519,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             EntityProvider<?> entityProvider = entity.getProvider();
             if (!entityProvider.canBeSaved) continue;
 
+            //实体存档分组同样按中心点取样
             Vector2 position = entity.getCenterPos();
             ChunkPosition chunkPosition = chunkSystem.getChunkPos(position.x, position.y);
             String name = chunkPosition.toString();

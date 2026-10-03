@@ -126,8 +126,8 @@ public class PlayerSystem extends WorldSystem {
         //玩家速度计算
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Vector2 playerCenter = this.player.getCenterPos();
-        //用玩家底部判定是否在水中（半身没入水中也算游泳），而不是中心点
-        Block block = cs.getBlock(playerCenter.x, playerCenter.y - this.player.getHeight() / 2f);
+        //是否游泳：按中心点取样（取样点约定见 Entity.getCenterPos()）
+        Block block = cs.getBlock(playerCenter.x, playerCenter.y);
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
@@ -153,7 +153,7 @@ public class PlayerSystem extends WorldSystem {
     /**
      * 玩家行走脚下粒子
      * <p>
-     * 玩家移动（且脚部接触方块）时，周期性向行走方向的反方向发出脚下碎片粒子。
+     * 玩家移动（且脚下有方块）时，周期性向行走方向的反方向发出脚下碎片粒子。
      * 脚步间隔与每次粒子数量随移动速度变化：移速越快间隔越短、粒子越多
      * */
     private void emitFootstepParticle (Player player, ChunkSystem cs) {
@@ -161,10 +161,13 @@ public class PlayerSystem extends WorldSystem {
         float curSpeed = player.getCurSpeed();
         if (curSpeed <= 0f) return;
 
-        //脚部位置：实体坐标是碰撞箱中心，脚底 = 中心 - 半高
-        Block underFoot = cs.getBlock(player.getX(), player.getY() - player.getHeight() / 2f);
+        //是否踩在方块上：按中心点取样（取样点约定见 Entity.getCenterPos()）
+        Vector2 playerCenter = player.getCenterPos();
+        Block standingBlock = cs.getBlock(playerCenter.x, playerCenter.y);
         //空气方块与水方块不可产生脚步粒子
-        if (underFoot == null || underFoot == Blocks.ARI || underFoot instanceof BlockWater) return;
+        if (standingBlock == null || standingBlock == Blocks.ARI || standingBlock instanceof BlockWater) return;
+        //发射点在脚底：实体坐标是碰撞箱中心，脚底 = 中心 - 半高（碎片从脚下扬起，而不是从身体中心）
+        Vector2 footPos = new Vector2(player.getX(), player.getY() - player.getHeight() / 2f);
 
         //移速挂钩：0~1 归一化（Player.MOVE_SPEED 为最大移速）
         float speedRatio = MathUtils.clamp(curSpeed / Player.MOVE_SPEED, 0f, 1f);
@@ -179,11 +182,10 @@ public class PlayerSystem extends WorldSystem {
         count = Math.min(count, MAX_FOOTSTEP_PARTICLES - activeCount);
 
         //粒子向行走方向的反方向发出（玩家向前走，碎片向后扬起）
-        Vector2 footPos = new Vector2(player.getX(), player.getY() - player.getHeight() / 2f);
         Vector2 reverseVel = new Vector2(-player.getVelX(), -player.getVelY());
 
         ParticleSystem pts = getManager().getSystem(ParticleSystem.class);
-        pts.footstepParticle(underFoot, footPos, reverseVel, count, 0.5f);
+        pts.footstepParticle(standingBlock, footPos, reverseVel, count, 0.5f);
     }
 
     /**
@@ -333,6 +335,7 @@ public class PlayerSystem extends WorldSystem {
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         float px = this.player.getX();
         float py = this.player.getY();
+        //脚底 = 碰撞箱中心 - 半高（向上搜索可站立格时以脚为准，保证玩家的脚能落在那格上）
         float halfH = this.player.getHeight() / 2f;
         for (int i = 0; i < 64; i++) {
             float checkY = py + i;
