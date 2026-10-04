@@ -31,6 +31,7 @@ public class MaterialItemGroup {
             .add(Items.SPAWN_EGG_SLIME)
             .add(Items.SPAWN_EGG_ZOMBIE)
             .add(Items.SPAWN_EGG_PUFFER_FISH)
+            .add(Items.SPAWN_EGG_CHICKEN)
             ;
     });
 }

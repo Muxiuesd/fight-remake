@@ -18,6 +18,8 @@ public class FoodItemGroup {
             .add(Items.PUFFER_FISH)
             .add(Items.POTATO)
             .add(Items.POTATO_BAKED)
+            .add(Items.CHICKEN_RAW)
+            .add(Items.CHICKEN_COOKED)
             .add(Items.POTION_HEAL_LEVEL_1)
             .add(Items.POTION_HEAL_LEVEL_2)
             .add(Items.POTION_HEAL_LEVEL_3)

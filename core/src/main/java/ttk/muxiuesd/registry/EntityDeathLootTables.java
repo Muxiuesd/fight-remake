@@ -4,6 +4,7 @@ import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.loottable.common.LootEntry;
 import ttk.muxiuesd.world.loottable.common.LootGroup;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
@@ -44,6 +45,17 @@ public class EntityDeathLootTables {
             .setGroups(
                 LootGroup.of("food",
                     LootEntry.of(Items.PUFFER_FISH, 0, 1, 1f)
+                )
+            )
+            .build()
+    );
+    public static final EntityDeathLootTable CHICKEN = register(Entities.CHICKEN,
+        EntityDeathLootTable.Builder.create()
+            .setGroups(
+                LootGroup.of("food",
+                    //权重 9 : 1 = 90% 掉落生鸡肉；空条目（VOID）命中后会被 EntityDeathLootTable.generate 跳过，不会生成空气物品实体
+                    LootEntry.of(Items.CHICKEN_RAW, 1, 1, 9f),
+                    LootEntry.of(ItemStack.VOID, 1, 1, 1f)
                 )
             )
             .build()

@@ -179,6 +179,7 @@ public final class Items {
     public static final Item SPAWN_EGG_ZOMBIE = registerSpawnEgg("spawn_egg_zombie", Entities.ZOMBIE);
     //生物刷怪蛋
     public static final Item SPAWN_EGG_PUFFER_FISH = registerSpawnEgg("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
+    public static final Item SPAWN_EGG_CHICKEN = registerSpawnEgg("spawn_egg_chicken", Entities.CHICKEN);
 
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
@@ -234,6 +235,17 @@ public final class Items {
         EffectItemBuilder.create()
             .setSounds(EffectItem.EAT_SOUNDS)
             .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 10f, 2))
+    );
+    //生鸡肉：走食物注册，但不带任何状态效果（不加 setEffects，吃下去只播默认音效）
+    public static final Item CHICKEN_RAW = register("chicken_raw",
+        Fight.ItemTexturePath("foods/chicken_raw.png"),
+        EffectItemBuilder.create()
+    );
+    //熟鸡肉：治疗效果等级 1、持续 1 秒（每整秒回 2×等级 血，故总共回 2 点）
+    public static final Item CHICKEN_COOKED = register("chicken_cooked",
+        Fight.ItemTexturePath("foods/chicken_cooked.png"),
+        EffectItemBuilder.create()
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 1f, 1))
     );
 
 

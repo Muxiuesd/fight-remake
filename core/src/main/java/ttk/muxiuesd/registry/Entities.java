@@ -12,6 +12,7 @@ import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.entity.creature.Chicken;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
 import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
@@ -78,6 +79,14 @@ public final class Entities {
         EntityProvider.Builder.<PufferFish>create(PufferFish::new)
             .setDefaultType(EntityTypes.CREATURE)
             .setRenderer(() -> new LivingEntityRenderer<>(Fight.ID("puffer_fish"), "fish/puffer_fish.png"))
+            .setCodec(LivingEntity.CODEC)
+            .build()
+    );
+    public static final EntityProvider<Chicken> CHICKEN = register(
+        "chicken",
+        EntityProvider.Builder.<Chicken>create(Chicken::new)
+            .setDefaultType(EntityTypes.CREATURE)
+            .setRenderer(() -> new LivingEntityRenderer<>(Fight.ID("chicken"), "chicken/chicken.png"))
             .setCodec(LivingEntity.CODEC)
             .build()
     );
