@@ -35,6 +35,28 @@ public class Resource<T> {
     }
 
     /**
+     * 创建一个水平镜像的贴图资源
+     * <p>
+     * 贴图是朝着某个方向画的实体（例如鸡的贴图朝右），实体朝反方向时就需要镜像绘制
+     * <p>
+     * 与原资源共用同一个 {@link Identifier}：这个副本在语义上就是同一张贴图的渲染变体，不是独立资源；
+     * 且 {@link #ofTextureRegion} 对已注册的 id 不会重复注册路径映射，共用是安全的
+     * <p>
+     * 延迟加载：首次 {@link #get()} 时才从原资源取贴图并翻转，构造阶段不触发加载。
+     * 原资源加载失败（为 null）时本资源同样为 null，由调用方判空处理
+     * */
+    public static Resource<TextureRegion> ofFlippedTextureRegion (Resource<TextureRegion> originalResource) {
+        return new Resource<>(originalResource.getIdentifier(), null, null, () -> {
+            TextureRegion region = originalResource.get();
+            if (region == null) return null;
+            //拷贝一份再翻转左右：flip 是原地修改且返回 void，不能直接改原贴图
+            TextureRegion flippedRegion = new TextureRegion(region);
+            flippedRegion.flip(true, false);
+            return flippedRegion;
+        });
+    }
+
+    /**
      * 快捷加载并且设定资源的方法
      * @param id 资源id
      * @param originalPath 原始资源路径。没有文件开头标记的话，默认路径在游戏内部路径（assets/）目录下

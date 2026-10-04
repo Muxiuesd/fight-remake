@@ -1,11 +1,13 @@
 package ttk.muxiuesd.registry;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.entity.*;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
@@ -86,7 +88,16 @@ public final class Entities {
         "chicken",
         EntityProvider.Builder.<Chicken>create(Chicken::new)
             .setDefaultType(EntityTypes.CREATURE)
-            .setRenderer(() -> new LivingEntityRenderer<>(Fight.ID("chicken"), "chicken/chicken.png"))
+            //鸡的贴图是朝右画的：实体朝左时水平镜像绘制
+            .setRenderer(() -> {
+                Resource<TextureRegion> bodyResource = Resource.ofTextureRegion(
+                    Fight.ID("chicken"), Fight.EntityTexturePath("chicken/chicken.png"));
+                //这里显式写出活物渲染器的实体类型，避免链式调用时被推断成 LivingEntity<?>
+                LivingEntityRenderer<Chicken> renderer = new LivingEntityRenderer<>(
+                    Fight.ID("chicken"), "chicken/chicken.png",
+                    Resource.ofFlippedTextureRegion(bodyResource));
+                return renderer.setFlipWhenFacing(true);
+            })
             .setCodec(LivingEntity.CODEC)
             .build()
     );

@@ -26,6 +26,16 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
     );
 
     /**
+     * 是否按实体朝向水平翻转贴图
+     * <p>
+     * 贴图是朝着某个方向画的实体（例如鸡的贴图朝右），开启后实体朝反方向时贴图会镜像绘制。
+     * 默认关闭，既有实体不受影响
+     * <p>
+     * 这是渲染器自身的配置项，不是实体的方向状态——朝向每帧都从实体身上现取
+     * */
+    private boolean flipWhenFacing = false;
+
+    /**
      * @param textureId 身体贴图资源的id（一般与实体id相同）
      * @param texturePath 身体贴图文件在 texture/entity 目录下的路径
      * */
@@ -33,8 +43,24 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
         super(textureId, texturePath);
     }
 
+    /**
+     * @param textureId 身体贴图资源的id（一般与实体id相同）
+     * @param texturePath 身体贴图文件在 texture/entity 目录下的路径
+     * @param flippedTextureRegionResource 水平镜像的身体贴图资源，
+     *                                     由 {@link Resource#ofFlippedTextureRegion} 创建，
+     *                                     贴图朝右画的实体朝左时使用
+     * */
+    public LivingEntityRenderer (String textureId, String texturePath,
+                                 Resource<TextureRegion> flippedTextureRegionResource) {
+        super(Resource.ofTextureRegion(textureId, Fight.EntityTexturePath(texturePath)),
+              flippedTextureRegionResource);
+    }
+
     @Override
     public void draw (Batch batch, T entity, Context context) {
+        //需要翻转朝向时把信号写进渲染上下文（贴图朝右画的实体，朝左时就镜像绘制）
+        context.flipX = this.flipWhenFacing && isFacingLeft(entity);
+
         batch.setColor(1f, 1f, 1f, 0.666f);
         //渲染影子
         batch.draw(ENTITY_SHADOW_RESOURCE.get(),
@@ -61,6 +87,39 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
         if (entity.renderHandItem) {
             this.drawHandItem(batch, entity, context);
         }
+    }
+
+    /**
+     * 判断实体当前是否朝左
+     * <p>
+     * 依据是实体朝向向量的水平分量（也就是朝向与x轴夹角的余弦）的符号：朝右为正、朝左为负。
+     * 用实体的 getDirection() 而不是速度：大部分实体的朝向就是它的速度朝向，
+     * 但有些实体（例如玩家）的朝向由别的规则决定，朝向的语义归实体自己管
+     * <p>
+     * 静止时方向是零向量（{@code Direction.nor()} 对零向量不做归一化，直接把分量置0），
+     * 水平分量为0时这里判定为false，也就是转回贴图默认朝向的那一侧（朝右）
+     * <p>
+     * 只取水平分量而不是完整的cos值——斜向移动时仍然按主要朝向翻面
+     * */
+    private static boolean isFacingLeft (LivingEntity<?> entity) {
+        return entity.getDirection().getX() < 0f;
+    }
+
+    /**
+     * 是否按实体朝向翻转贴图
+     * */
+    public boolean isFlipWhenFacing () {
+        return this.flipWhenFacing;
+    }
+
+    /**
+     * 设置是否按实体朝向翻转贴图，返回自身便于链式配置
+     * <p>
+     * 需要同时给渲染器配置水平镜像的贴图资源，否则镜像时没有贴图可画
+     * */
+    public LivingEntityRenderer<T> setFlipWhenFacing (boolean flipWhenFacing) {
+        this.flipWhenFacing = flipWhenFacing;
+        return this;
     }
 
     /**

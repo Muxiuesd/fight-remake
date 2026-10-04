@@ -113,6 +113,16 @@ public interface EntityRenderer<T extends Entity<?>> {
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
 
+        /**
+         * 是否水平镜像绘制
+         * <p>
+         * 与几何参数无关：x/y/width/height/origin/scale/rotation 只决定四边形的位置与形状，
+         * 而绘制时写进顶点的 UV 是直接取自贴图对象的（{@code SpriteBatch.draw} 里
+         * {@code u = region.u; u2 = region.u2;}，没有任何跟缩放相关的分支），
+         * 所以镜像只能靠换一张 UV 相反的贴图，这个字段就是"要不要换"的信号
+         * */
+        public boolean flipX = false;
+
         public Context() {}
         public Context (float x, float y, float width, float height) {
             this.x = x;
@@ -132,6 +142,7 @@ public interface EntityRenderer<T extends Entity<?>> {
             this.scaleX = 1f;
             this.scaleY = 1f;
             this.rotation = 0f;
+            this.flipX = false;
         }
     }
 
@@ -142,13 +153,33 @@ public interface EntityRenderer<T extends Entity<?>> {
      * */
     class StandardRenderer<T extends Entity<?>> implements EntityRenderer<T> {
         private final Resource<TextureRegion> textureRegionResource;
+        /**
+         * 水平镜像的贴图资源
+         * <p>
+         * 为 null 表示这个渲染器没有镜像贴图，此时即使上下文要求镜像也只会画原贴图
+         * */
+        private final Resource<TextureRegion> flippedTextureRegionResource;
 
         /**
          * @param textureId 贴图资源的id（一般与实体id相同）
          * @param texturePath 贴图文件在 texture/entity 目录下的路径
          * */
         public StandardRenderer (String textureId, String texturePath) {
-            this.textureRegionResource = Resource.ofTextureRegion(textureId, Fight.EntityTexturePath(texturePath));
+            this(Resource.ofTextureRegion(textureId, Fight.EntityTexturePath(texturePath)), null);
+        }
+
+        /**
+         * 带镜像贴图的构造
+         *
+         * @param textureRegionResource 贴图资源
+         * @param flippedTextureRegionResource 水平镜像的贴图资源，
+         *                                     由 {@link Resource#ofFlippedTextureRegion} 创建，
+         *                                     没有则传 null
+         * */
+        public StandardRenderer (Resource<TextureRegion> textureRegionResource,
+                                 Resource<TextureRegion> flippedTextureRegionResource) {
+            this.textureRegionResource = textureRegionResource;
+            this.flippedTextureRegionResource = flippedTextureRegionResource;
         }
 
         @Override
@@ -156,10 +187,21 @@ public interface EntityRenderer<T extends Entity<?>> {
             return this.textureRegionResource.get();
         }
 
+        /**
+         * 获取水平镜像的贴图（首次调用时才真正创建）
+         * <p>
+         * 没有配置镜像贴图时返回 null，调用方需要判空
+         * */
+        public TextureRegion getFlippedTextureRegion () {
+            if (this.flippedTextureRegionResource == null) return null;
+            return this.flippedTextureRegionResource.get();
+        }
+
         @Override
         public void draw (Batch batch, T entity, Context context) {
             //最基础的绘制，绘制实体的身体贴图
-            TextureRegion bodyTextureRegion = getTextureRegion();
+            //需要镜像绘制的时候用镜像贴图，否则用原贴图
+            TextureRegion bodyTextureRegion = context.flipX ? this.getFlippedTextureRegion() : this.getTextureRegion();
             if (bodyTextureRegion != null) {
                 batch.draw(bodyTextureRegion,
                     context.x - context.width / 2, context.y - context.height / 2,

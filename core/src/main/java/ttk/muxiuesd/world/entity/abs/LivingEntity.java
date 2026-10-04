@@ -447,7 +447,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     /**
-     * 获取当前实体的朝向
+     * 获取当前实体的朝向，没有特殊修改那就是以实体的速度方向为朝向。
      * */
     public Direction getDirection () {
         return new Direction(getVelX(), getVelY());
