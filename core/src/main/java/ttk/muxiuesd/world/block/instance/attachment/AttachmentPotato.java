@@ -1,4 +1,4 @@
-package ttk.muxiuesd.world.block.instance.botany;
+package ttk.muxiuesd.world.block.instance.attachment;
 
 import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.system.TimeSystem;
@@ -10,9 +10,9 @@ import ttk.muxiuesd.world.block.abs.Botany;
  * <p>
  * 不同生长等级的贴图由植物渲染器持有（见 Blocks.registerBotany）
  * */
-public class BotanyPotato extends Botany {
+public class AttachmentPotato extends Botany {
 
-    public BotanyPotato () {
+    public AttachmentPotato () {
         super(new Property());
     }
 
@@ -26,11 +26,7 @@ public class BotanyPotato extends Botany {
     }
 
     @Override
-    public BotanyPotato createSelf () {
-        BotanyPotato instance = new BotanyPotato();
-        instance
-            .setDroppedItem(getDroppedItem())
-            .setIdentifier(getIdentifier());
-        return instance;
+    protected AttachmentPotato createSelf () {
+        return new AttachmentPotato();
     }
 }

@@ -5,8 +5,8 @@ import game.muxiuesd.bedrockcore.serialization.DataResult;
 import game.muxiuesd.bedrockcore.serialization.RawObject;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.biome.Biome;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.chunk.Chunk;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -23,7 +23,7 @@ public class CodecChunk {
      * 结构：<br>
      * blocks：每个坐标的方块（普通方块是id字符串，带方块实体的方块是完整数据map）<br>
      * walls：不为空的墙体<br>
-     * botany：不为空的植物<br>
+     * botany：不为空的附着物（键名历史遗留，实际存的是附着物）<br>
      * heights：每个坐标的高度
      * */
     public static final Codec<Chunk> CODEC = new Codec<>() {
@@ -31,7 +31,7 @@ public class CodecChunk {
         public RawObject encode (Chunk chunk) {
             Map<String, Object> blocks = new LinkedHashMap<>();
             Map<String, Object> walls = new LinkedHashMap<>();
-            Map<String, Object> botanys = new LinkedHashMap<>();
+            Map<String, Object> attachments = new LinkedHashMap<>();
             Map<String, Object> heights = new LinkedHashMap<>();
 
             chunk.traversal((x, y) -> {
@@ -49,9 +49,9 @@ public class CodecChunk {
                     walls.put(name, Wall.CODEC.encode(wall).unwrap());
                 }
 
-                Botany botany = chunk.getBotany(x, y);
-                if (botany != null) {
-                    botanys.put(name, Botany.CODEC.encode(botany).unwrap());
+                Attachment attachment = chunk.getAttachment(x, y);
+                if (attachment != null) {
+                    attachments.put(name, Attachment.CODEC.encode(attachment).unwrap());
                 }
 
                 heights.put(name, Codec.INT.encode(chunk.getHeight(x, y)).unwrap());
@@ -60,7 +60,7 @@ public class CodecChunk {
             Map<String, Object> root = new LinkedHashMap<>();
             root.put("blocks", blocks);
             root.put("walls", walls);
-            root.put("botany", botanys);
+            root.put("botany", attachments);
             root.put("heights", heights);
             root.put("canSpawn", Codec.BOOL.encode(chunk.getCanSpawn()).unwrap());
             //群系id（null 时存 null，解码端跳过）
@@ -81,8 +81,8 @@ public class CodecChunk {
             Map<String, Object> blocks = asMap(Codec.wrap(rawMap.get("blocks")));
             //墙体
             Map<String, Object> walls = asMap(Codec.wrap(rawMap.get("walls")));
-            //植物
-            Map<String, Object> botanys = asMap(Codec.wrap(rawMap.get("botany")));
+            //附着物
+            Map<String, Object> attachments = asMap(Codec.wrap(rawMap.get("botany")));
             //高度
             Map<String, Object> heights = asMap(Codec.wrap(rawMap.get("heights")));
 
@@ -117,17 +117,17 @@ public class CodecChunk {
                     }
                 }
 
-                //植物（解码异常时跳过该格，不中断整块区块）
-                if (botanys.containsKey(name)) {
+                //附着物（解码异常时跳过该格，不中断整块区块）
+                if (attachments.containsKey(name)) {
                     try {
-                        DataResult<Botany> botanyResult = Botany.CODEC.decode(Codec.wrap(botanys.get(name)));
-                        if (botanyResult.isSuccess()) {
-                            chunk.setBotany(botanyResult.result().get(), x, y);
+                        DataResult<Attachment> attachmentResult = Attachment.CODEC.decode(Codec.wrap(attachments.get(name)));
+                        if (attachmentResult.isSuccess()) {
+                            chunk.setAttachment(attachmentResult.result().get(), x, y);
                         } else {
-                            errors.append("[").append(name).append("]植物: ").append(botanyResult.error().orElse("")).append("; ");
+                            errors.append("[").append(name).append("]附着物: ").append(attachmentResult.error().orElse("")).append("; ");
                         }
                     } catch (Exception e) {
-                        errors.append("[").append(name).append("]植物解码异常: ").append(e.getMessage()).append("; ");
+                        errors.append("[").append(name).append("]附着物解码异常: ").append(e.getMessage()).append("; ");
                     }
                 }
 

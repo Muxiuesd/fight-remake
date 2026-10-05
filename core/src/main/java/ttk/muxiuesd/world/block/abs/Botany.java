@@ -1,64 +1,20 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.Tickable;
-import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.system.EntitySystem;
-import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatInt;
 import ttk.muxiuesd.world.cat.CatsHolder;
-import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
-import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
- * 植物基础抽象类
+ * 植物
  * <p>
- * 姑且算方块，使用方块的逻辑
+ * 附着物中的一种，有自己的状态数据（生长等级），所以是每格独享实例
  * <p>
- * 不同生长等级的贴图由植物渲染器持有
+ * 编解码器继承自{@link Attachment#CODEC}，本类不再单独持有一个
+ * <p>
+ * 不同生长等级的贴图由植物渲染器持有（见 Blocks.registerBotany）
  * */
-public abstract class Botany extends Block implements Tickable, ICatData {
-    /**
-     * 植物的现代化编解码器
-     * <p>
-     * 解码时通过方块注册表拿到原型，再调用{@link #createSelf}创建一个新的实例
-     */
-    public static final Codec<Botany> CODEC = CodecBuilder.<Botany>create()
-        .paramField("id", Botany::getID, Codec.STRING)
-        .field("property",
-            botany -> {
-                //把当前的cats数据写入属性，保证保存的数据是最新的
-                CatsHolder cats = botany.getProperty().get(PropertyTypes.CATS);
-                if (cats != null) {
-                    botany.writeCatData(cats);
-                }
-                return botany.getProperty();
-            },
-            (botany, property) -> {
-                //设置属性
-                botany.setProperty(property);
-                //把属性中保存的cats数据读取到植物上
-                CatsHolder cats = property.get(PropertyTypes.CATS);
-                if (cats != null) {
-                    botany.readCatData(cats);
-                }
-            },
-            Block.Property.CODEC)
-        .factory(id -> {
-            Block block = Registries.BLOCK.getOrNull(id);
-            if (block instanceof Botany botany) return botany.createSelf();
-            throw new IllegalArgumentException("方块注册表中不存在植物方块：" + id);
-        });
-
-    private Item droppedItem;   //植物生长过程中被破坏后的掉落物
+public abstract class Botany extends Attachment implements Tickable, ICatData {
     private int growLevel = 0;  //生长等级，每一个生长等级会有不同的贴图
 
 
@@ -67,9 +23,25 @@ public abstract class Botany extends Block implements Tickable, ICatData {
     }
 
     /**
-     * 生成自己的实例
+     * 植物是每格独享实例，覆写此方法产生自己的副本
      * */
-    public abstract Botany createSelf ();
+    @Override
+    public Botany createInstance () {
+        Botany instance = this.createSelf();
+        //把原型上的配置复制给新的实例
+        instance
+            .setDroppedItem(this.getDroppedItem())
+            .setIdentifier(this.getIdentifier());
+        return instance;
+    }
+
+    /**
+     * 生成自己的实例
+     * <p>
+     * 这里把返回类型收窄成{@link Botany}，子类返回自己的类型就行，调用方不需要强转
+     * */
+    @Override
+    protected abstract Botany createSelf ();
 
     @Override
     public void readCatData (CatsHolder holder) {
@@ -79,32 +51,6 @@ public abstract class Botany extends Block implements Tickable, ICatData {
     @Override
     public void writeCatData (CatsHolder holder) {
         holder.put("growLevel", new CatInt(this.getGrowLevel()));
-    }
-
-    @Override
-    public void beDestroyed (World world, Vector2 position) {
-        Item item = this.getDroppedItem();
-        if (item == null) return;
-
-        //掉落物品
-        EntitySystem es = world.getSystem(EntitySystem.class);
-        Vector2 pos = new Vector2(position);
-        pos.add(
-            MathUtils.random(-0.3f, 0.3f),
-            MathUtils.random(-0.3f, 0.3f)
-        );
-        ItemEntity itemEntity = ItemEntityGetter.get(es, pos, new ItemStack(item, 1));
-        itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-
-    }
-
-    public Item getDroppedItem () {
-        return this.droppedItem;
-    }
-
-    public Botany setDroppedItem (Item droppedItem) {
-        this.droppedItem = droppedItem;
-        return this;
     }
 
     /**

@@ -8,8 +8,9 @@ import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.render.world.block.BotanyRenderer;
+import ttk.muxiuesd.render.world.block.AttachmentRenderer;
 import ttk.muxiuesd.render.world.block.FurnaceRenderer;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
@@ -18,7 +19,7 @@ import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockCraftingTable;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.block.instance.botany.BotanyPotato;
+import ttk.muxiuesd.world.block.instance.attachment.AttachmentPotato;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -118,8 +119,9 @@ public final class Blocks {
         () -> new Block.Property().setFriction(WOOL_FRICTION)
     );
 
-    /// 植物
-    public static final Botany POTATO = registerBotany("potato", BotanyPotato::new,
+    /// 附着物
+    //植物
+    public static final Botany POTATO = registerBotany("potato", AttachmentPotato::new,
         "potatoes_stage_0.png",
         "potatoes_stage_1.png",
         "potatoes_stage_2.png",
@@ -133,15 +135,25 @@ public final class Blocks {
 
 
     /**
-     * 注册一个植物方块
-     * @param growLevelTextureNames 不同生长等级的贴图文件名（位于 botany/crops/ 目录下），按生长等级从小到大
+     * 注册一个附着物方块
+     * @param textureNames 贴图文件名（位于 attachment/crops/ 目录下），只有一张贴图的附着物传一个就行
      * */
-    public static <T extends Botany> T registerBotany (String name, Supplier<T> factory, String... growLevelTextureNames) {
+    public static <T extends Attachment> T registerAttachment (String name, Supplier<T> factory, String... textureNames) {
         return register(
             name,
             factory,
-            new BotanyRenderer<T>(growLevelTextureNames)
+            new AttachmentRenderer<T>(textureNames)
         );
+    }
+
+    /**
+     * 注册一个植物方块
+     * <p>
+     * 植物是每格独享实例，这里注册的实例与世界里的每格实例都出自同一个工厂
+     * @param growLevelTextureNames 不同生长等级的贴图文件名（位于 attachment/crops/ 目录下），按生长等级从小到大
+     * */
+    public static <T extends Botany> T registerBotany (String name, Supplier<T> factory, String... growLevelTextureNames) {
+        return registerAttachment(name, factory, growLevelTextureNames);
     }
 
     /**
@@ -265,4 +277,13 @@ public final class Blocks {
     void registerBlockEntityRenderer (T blockWithEntity, BlockEntityRenderer<E> renderer) {
         BlockEntityRendererRegistry.register(blockWithEntity, renderer);
     }
+
+
+    /**
+     * 本类是否已经类初始化完成（上面所有方块字段都已赋值）
+     * <p>
+     * 必须在所有方块字段<b>之后</b>声明，静态字段是按声明顺序赋值的，
+     * 所以本字段为true就代表所有的方块都能安全地被引用了。见{@link AttachmentPlacements#init()}
+     * */
+    static final boolean READY = true;
 }

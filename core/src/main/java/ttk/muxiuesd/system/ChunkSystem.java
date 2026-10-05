@@ -17,6 +17,7 @@ import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.AttachmentPlacements;
 import ttk.muxiuesd.registry.Biomes;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.WorldInfoTypes;
@@ -29,10 +30,10 @@ import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.biome.BiomeSampler;
 import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
-import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.chunk.Chunk;
@@ -355,9 +356,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             //TODO 事件：添加方块实体
 
         }
-        else if (block instanceof Botany botany) {
-            //如果是植物方块
-            this.addBlockInstance(botany);
+        else if (block instanceof Attachment attachment) {
+            //如果是附着物方块
+            this.addBlockInstance(attachment);
         }
         else {
             //普通方块
@@ -377,12 +378,15 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         if (chunk == null) return removed;
         GridPoint2 chunkBlockPos = Chunk.worldToChunk(round.x, round.y);
 
-        //只移除独立实例（带方块实体/植物），普通方块是全世界共享实例不能移除
+        //只移除独立实例（带方块实体/每格独享的附着物），全世界共享的实例（普通方块、共享型附着物）不能移除
         if (removed instanceof BlockWithEntity blockWithEntity) {
             this.removeBlockInstance(blockWithEntity);
-        }else if (removed instanceof Botany botany) {
-            this.removeBlockInstance(botany);
+        }else if (removed instanceof Attachment attachment && isInstanceAttachment(attachment)) {
+            this.removeBlockInstance(attachment);
         }
+        //方块被移除，附着在它上面的附着物就悬空了，先一并破坏掉
+        this.destroyAttachment(wx, wy + 1f);
+
         //用空气方块占位（不能直接 setBlock(null)，会触发 addBlock(null) NPE）
         chunk.setBlock(Blocks.ARI, chunkBlockPos.x, chunkBlockPos.y);
 
@@ -398,7 +402,7 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     /**
      * 向世界添加方块实例
      * <p>
-     * 普通方块全世界一个实例，方块实体每一个都是单独实例，植物方块也是单独实例
+     * 普通方块、共享型附着物全世界一个实例，方块实体、每格独享型附着物（植物等）每一个都是单独实例
      * */
     private void addBlockInstance (Block block) {
         String blockKey = this.getBlockKey(block);
@@ -520,6 +524,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
+        //方块被替换掉了，附着在它上面的附着物就悬空了，先一并破坏掉
+        this.destroyAttachment(wx, wy + 1f);
+
         //破坏方块粒子：被替换下来的非空气方块生成残渣粒子
         if (oldBlock != Blocks.ARI) {
             this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(oldBlock, round);
@@ -585,55 +592,62 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 放置植物
+     * 放置附着物
      * <p>
-     * 当对应坐标上没有其他植物时就放置此植物
+     * 当对应坐标上没有其他附着物、且正对着的方块允许它附着时才放置
+     * @return 放置成功返回true，否则为false
      * */
-    public void placeBotany (Botany botany, float wx, float wy) {
+    public boolean placeAttachment (Attachment attachment, float wx, float wy) {
         Chunk chunk = this.getChunk(wx, wy);
         //区块未加载时无法放置
-        if (chunk == null) return;
-        Vector2 roundPos = Util.fastRound(wx, wy);
-        GridPoint2 chunkPos = Chunk.worldToChunk(roundPos.x, roundPos.y);
-        //如果这个坐标上没有其他植物就可以放置
-        if (!chunk.hasBotany(chunkPos.x, chunkPos.y)) {
-            //创建新的植物实例并添加
-            Botany self = botany.createSelf();
-            this.addBlock(self, wx, wy);
-            chunk.setBotany(self, chunkPos.x, chunkPos.y);
-        }
+        if (chunk == null) return false;
+        //这里就这么写，没问题别动
+        Vector2 round = Util.fastRound(wx, wy);
+        GridPoint2 chunkPos = Chunk.worldToChunk(round.x, round.y);
+        //如果这个坐标上没有其他附着物就可以放置
+        if (chunk.hasAttachment(chunkPos.x, chunkPos.y)) return false;
+
+        //附着物必须能放在下方的方块上，能放哪些由放置规则注册表决定
+        Block below = this.getBlock(wx, wy);
+        if (!AttachmentPlacements.canPlaceOn(below, attachment)) return false;
+
+        //产生新的实例并添加
+        Attachment instance = attachment.createInstance();
+        this.addBlock(instance, wx, wy);
+        chunk.setAttachment(instance, chunkPos.x, chunkPos.y);
+        return true;
     }
 
     /**
-     * 破坏植物
+     * 破坏附着物
      * @param position 世界坐标
-     * @return 被移除的植物，如果这个坐标上没有植物就返回空
+     * @return 被移除的附着物，如果这个坐标上没有附着物就返回空
      * */
-    public Botany destroyBotany (Vector2 position) {
-        return this.destroyBotany(position.x, position.y);
+    public Attachment destroyAttachment (Vector2 position) {
+        return this.destroyAttachment(position.x, position.y);
     }
     /**
-     * 破坏植物
-     * @return 返回被破坏的植物的实例
+     * 破坏附着物
+     * @return 返回被破坏的附着物的实例
      * */
-    public Botany destroyBotany (float wx, float wy) {
+    public Attachment destroyAttachment (float wx, float wy) {
         Chunk chunk = this.getChunk(wx, wy);
         //区块未加载时无法破坏
         if (chunk == null) return null;
         Vector2 roundPos = Util.fastRound(wx, wy);
         GridPoint2 chunkPos = Chunk.worldToChunk(roundPos.x, roundPos.y);
 
-        if (chunk.hasBotany(chunkPos.x, chunkPos.y)) {
-            //有植物就破坏，并且返回被破坏的植物实例
-            Botany botanyInstance = chunk.getBotany(chunkPos.x, chunkPos.y);
-            //记得移除这个植物的实例
-            this.removeBlockInstance(botanyInstance);
-            chunk.setBotany(null, chunkPos.x, chunkPos.y);
+        if (chunk.hasAttachment(chunkPos.x, chunkPos.y)) {
+            //有附着物就破坏，并且返回被破坏的附着物实例
+            Attachment attachmentInstance = chunk.getAttachment(chunkPos.x, chunkPos.y);
+            //记得移除这个附着物的实例
+            this.removeBlockInstance(attachmentInstance);
+            chunk.setAttachment(null, chunkPos.x, chunkPos.y);
             //调用被破坏方法
-            botanyInstance.beDestroyed(getWorld(), roundPos);
-            //破坏植物粒子：生成残渣粒子
-            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(botanyInstance, roundPos);
-            return botanyInstance;
+            attachmentInstance.beDestroyed(getWorld(), roundPos);
+            //破坏附着物粒子：生成残渣粒子
+            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(attachmentInstance, roundPos);
+            return attachmentInstance;
         }
 
         return null;
@@ -892,24 +906,24 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
     }
 
     /**
-     * 获取植物
+     * 获取附着物
      * @param position 世界坐标
      * */
-    public Botany getBotany (Vector2 position) {
-        return this.getBotany(position.x, position.y);
+    public Attachment getAttachment (Vector2 position) {
+        return this.getAttachment(position.x, position.y);
     }
     /**
-     * 获取植物
+     * 获取附着物
      * @param wx 世界x坐标
      * @param wy 世界y坐标
-     * @return 植物
+     * @return 附着物
      * */
-    public Botany getBotany (float wx, float wy) {
+    public Attachment getAttachment (float wx, float wy) {
         Vector2 round = Util.fastRound(wx, wy);
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
         if (chunk == null) return null;
 
-        return chunk.seekBotany(round.x, round.y);
+        return chunk.seekAttachment(round.x, round.y);
     }
 
     /**
@@ -1159,15 +1173,27 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
      * <p>
      * 对于一个方块对应一个实例的方块来说，方快类型不同，键的类型就不同。普通方块全世界一个共享的实例，就直接用方快id当键
      * <p>
+     * 附着物分两种：每格独享的（植物等，与带方块实体的方块一样用 id@hashCode 当键）与全世界共享的（火把等，与普通方块一样用id当键）
+     * <p>
      * TODO 多种类型的方快的方快键的判断
      * */
     private String getBlockKey (Block block) {
         if (block instanceof BlockWithEntity blockWithEntity) {
             return blockWithEntity.getID() + "@" + blockWithEntity.hashCode();
         }
-        if (block instanceof Botany botany) {
-            return botany.getID() + "@" + botany.hashCode();
+        //每格独享的附着物必须先于共享型判断，否则它会与共享型的附着物混用同一个键
+        if (block instanceof Attachment attachment && this.isInstanceAttachment(attachment)) {
+            return attachment.getID() + "@" + attachment.hashCode();
         }
         return block.getID();
+    }
+
+    /**
+     * 这个附着物是不是每格独享实例
+     * <p>
+     * {@link Attachment#createInstance()} 产生新实例的（植物等）就是每格独享，返回自身的（火把等）就是全世界共享
+     * */
+    private boolean isInstanceAttachment (Attachment attachment) {
+        return attachment.createInstance() != attachment;
     }
 }

@@ -14,8 +14,8 @@ import ttk.muxiuesd.render.world.item.SwordRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
@@ -288,7 +288,8 @@ public final class Items {
 
     /**
      * 注册农作物物品
-     * */    public static CropItem register (String name, Botany crop) {
+     * */
+    public static CropItem register (String name, Attachment crop) {
         CropItem cropItem = register(name, () -> new CropItem(crop));
         crop.setDroppedItem(cropItem);
         return cropItem;
