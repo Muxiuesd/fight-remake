@@ -114,6 +114,12 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 - **UIButton 左键采用方案 B（按下→松开触发）**：按下帧只记 `pendingClick`+坐标，每帧检测"松开且仍在按钮上"才触发；按住移出/不可见/禁用则取消。其他组件（快捷栏 SlotUI 等）保持方案 A（按下即发）。组件移除时取消 `pendingClick` 防残留。
 - **玩家输入门控**：鼠标悬停 HUD UI 时不处理鼠标操作与世界交互（`!mouseOverUI()` 门控）；但键盘操作（移动/丢弃/数字键）只受 `curScreen==HUD` 门控。
 - **物品**：
+  - **鼠标与物品的分工（2026-09-27 定案，改物品交互前先看这条）**：
+    - **左键 = 使用物品本身**，不认目标：`PlayerSystem.handleInput` → `LivingEntity.useItem(World)` → `ItemStack.use(World, LivingEntity)` → `IItemStackBehaviour.use` → `Item.use(物品堆叠, 世界, 使用者)`。空手左键仍是破坏（`WorldInputHandleSystem` 里被 `handItemStack.isVoid()` 挡着，两者不冲突）。
+    - **右键 = 交互**，空手与手持都算：空手走 `BlockEntity.interact(...)` / 拆墙；**手持物品走 `LivingEntity.useOn(World, Vector2)` → `ItemStack.useOn` → `IItemStackBehaviour.useOn` → `Item.useOn(物品堆叠, 世界, 使用者, 目标坐标)`**，目标坐标就是鼠标指向的世界坐标。接线在 `system/WorldInputHandleSystem.java` 的右键分支（原来那个 `//TODO 玩家手持物品交互` 已被填上）。
+    - **`Item.useOn` 的默认实现是 `return false` 且不播任何音效**（接口里的 `IItemStackBehaviour.useOn` 也是 `default return false`，所以现有物品一个都没被影响）。**失败要静默**：用不上的时候既不能响也不能扣数量 —— 消耗品的"扣一个"完全由返回值驱动（`ConsumptionItemStackBehaviour` 里 `use` 与 `useOn` 共用同一个 `consume()`）。
+    - **不需要同时覆写两个**：一个物品要么"使用自己"（覆写 `use`，如食物/剑/鱼竿/刷怪蛋/方块物品），要么"对着东西用"（覆写 `useOn`，如骨粉、种子）。**只覆写 `useOn` 就自动获得了"左键不消耗也不响"**（继承 `Item.use` 的 false），不用再写空的 `use`。
+    - **右键点方块实体时方块实体优先**：`WorldInputHandleSystem` 里 `blockEntity.interactWithItem(...)` 返回 `SUCCESS` 就直接 `return`（那件物品已经被方块实体收下了，如放进熔炉），只有返回 `FAILURE` 才轮到物品自己的 `useOn()`。空手分支同理直接 `return`。
   - 行为由 `getBehaviour()` 覆写返回注册的静态行为决定（`Item.Type` 已删除）。
   - 浅拷贝策略：仅 `ShallowCopyable` 的类调 `copy()`（现仅 `CatsHolder`），其余共享引用（规定语义，非 bug）。
   - 堆叠条件：同类 + `Property.equals`（值语义）；`ItemStack.copy(0)` 会被 `Math.max(amount,1)` 抬升为 1，空掉落用 `ItemStack.VOID`。
@@ -157,7 +163,10 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 | 运行时替换贴图没效果 | `AssetsLoader.load` 按 id 缓存，改文件后必须重启游戏 |
 | 改 `LivingEntity.getDirection()` 语义 | 它的调用点散布在挥砍方向、**远程子弹发射方向**、手持物品旋转角等 16 处，且 `Player` 覆写为鼠标方向；动它之前先搜全部调用点 |
 | 新加的附着物"右键毫无反应" | 90% 是忘了在 `registry/AttachmentPlacements` 里登记放置规则——**没登记过的附着物一处都放不了**；剩下 10% 是登记的是白名单但没包含脚下的方块 |
-| 土豆点耕地"有时能种有时不能" / 点了没反应 | 已经修过了：附着物的支撑方块就是**它自己那一格坐标处的方块**，点耕地就种在耕地那一格。**再出现这种症状先查放置规则表和 `getBlock(wx, wy)`（同一格，不是 y 减 1）拿到的方块**，别去怀疑输入链路（`PlayerSystem` → `useItem` → `CropItem.use` 这条链是通的，失败是**静默**的：不扣数量、不播音效、也不报错） |
+| 土豆点耕地"有时能种有时不能" / 点了没反应 | 已经修过了：附着物的支撑方块就是**它自己那一格坐标处的方块**，点耕地就种在耕地那一格。**再出现这种症状先查放置规则表和 `getBlock(wx, wy)`（同一格，不是 y 减 1）拿到的方块**，别去怀疑输入链路（右键 → `useOn` → `CropItem.useOn` 这条链是通的，失败是**静默**的：不扣数量、不播音效、也不报错） |
+| **左键**拿种子/骨粉点没反应 | 设计如此：种植与催熟都是"物品对着方块交互"，走 `useOn()`（右键）。左键走的是 `use()`，`CropItem`/`BoneMealItem` 都没覆写它 → 继承 `Item.use` 的 `return false`，**既不消耗也不出声** |
+| 右键用骨粉没反应 | 目标格不是 `Botany` 实例，或那株已经 `isFullyGrown()`（到上限）——两种都是 `BoneMealItem.useOn` 返回 false，静默不消耗。**先确认鼠标指着的就是作物那一格**（与种植同一套 `fastRound` 取整），再看它是不是早满了 |
+| 骨粉左键白扣一个 | 说明有人给物品覆写了 `use()` 却没实现有效果的分支；`Item.use()` 默认**播音效且返回 true**，而消耗品减一完全由返回值驱动（见第八章"鼠标与物品的分工"） |
 | 附着物放置规则登记早了 | 规则要引用 `Blocks.XXX`，必须在 `Blocks.init()` 之后；`Blocks.READY` 与 `AttachmentPlacements.init()` 里的检查就是防这个——顺序错了 `Blocks.POTATO` 还是 null，`registerWhitelist` 只会报错然后把**唯一那条规则静默丢掉** |
 | 附着物判定用方块对象当键 | 植物每格一个实例，`==` 比较在放置时必然查不到；规则表和 `ChunkSystem.getBlockKey` 都用 `Identifier` |
 | 读档出来的植物"不再生长"或"挖掉它下面的方块就崩`实例从未添加过`" | 同一个根因：每格独享附着物的运行时登记（`blockInstances` + `TimeSystem` tick）**不随存档回来**，必须由 `ChunkSystem.addChunk` 遍历 `attachments` 列重新 `addBlockInstance()`。改动区块加载/卸载代码时先确认这一对还在 |
@@ -194,13 +203,13 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 
 附着物（`Attachment`）= "必须附着在下方方块之上、被破坏就破碎掉落物品"的方块；植物（`Botany`）是它的**有状态子类**。它们**单独占 `Chunk` 的一列**（`Chunk.attachments`），不进 `blocks` 数组 → **不参与碰撞与寻路，实体能穿过去**（想挡路得走 `Wall` 体系）。
 
-以新增植物为例（现成参照 `world/block/instance/attachment/AttachmentPotato.java`，32 行）：
+以新增植物为例（现成参照 `world/block/instance/attachment/BotanyPotato.java`）：
 
-1. **类**：植物 `extends Botany`，构造 `super(new Property())`；只需三块——`tick(World, float)`（生长逻辑）、`protected Xxx createSelf()`（`return new Xxx()`）、其它什么都不用写。共享型装饰物直接 `extends Attachment`（不实现 `Tickable`，就不进 tick 列表）。
+1. **类**：植物 `extends Botany`，构造 `super(new Property())`；必须写四块——`tick(World, float)`（生长逻辑）、`public int maxGrowLevel()`（**抽象方法，不写编译不过**；取值 = 阶段贴图张数 − 1）、`protected Xxx createSelf()`（`return new Xxx()`）、其它什么都不用写。`tick` 里的上限守卫用 `isFullyGrown()`，别自己写 `getGrowLevel() >= 数字`（上限散写两处早晚不一致）。共享型装饰物直接 `extends Attachment`（不实现 `Tickable`，就不进 tick 列表）。
    - **不要覆写 `createInstance()`**：`Botany` 已经写好"出副本 + 从原型复制 `droppedItem`/`identifier`"；只覆写 `createSelf()`。
    - `Botany.createSelf()` 的返回类型是**协变的**（`protected abstract Botany createSelf()`），子类返回自己的类型即可，调用方不用强转。
 2. **注册**：`registry/Blocks.java` 里
-   - 植物：`registerBotany("potato", AttachmentPotato::new, "potatoes_stage_0.png", ..., "potatoes_stage_3.png")` — 多个贴图按**生长等级从小到大**给，渲染器按 `getGrowLevel()` 选帧、超出就拿最后一帧。
+   - 植物：`registerBotany("potato", BotanyPotato::new, "potatoes_stage_0.png", ..., "potatoes_stage_3.png")` — 多个贴图按**生长等级从小到大**给，渲染器按 `getGrowLevel()` 选帧、超出就拿最后一帧（`AttachmentRenderer` 里 `Math.min(level, length - 1)`，所以上限写大了只会一直画最后一张、不会崩，但**上限的正确取值就是"贴图张数 − 1"**：土豆 4 张配 3、小麦 8 张配 7）。
    - 单贴图装饰物：`registerAttachment("torch", TorchAttachment::new, "torch.png")`。
    - 贴图根目录是 `assets/texture/blocks/attachment/crops/`（`Fight.AttachmentTexturePath("crops/xxx.png")` → `ATTACHMENT_TEXTURE_ROOT = BLOCK_TEXTURE_ROOT + "attachment/"`）；**方块**的贴图目录也是 `texture/blocks/`，贴图目录少写一层 `blocks/` 就会在启动时报资源加载失败。
 3. **登记放置规则**（**必做，漏了就是"右键毫无反应"**）：在 `registry/AttachmentPlacements.java` 里登记，二选一，**一个附着物只能选一种方案**：
@@ -211,7 +220,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
    - 规则**只在玩家放置时生效**，读档直接写进区块、不查表。
    - **"附着物的支撑方块"就是它自己那一格坐标处的方块**（**别理解成 y 减 1 那一格**）：`placeAttachment` 把鼠标坐标 `Util.fastRound` 成格坐标后，**附着物就放在这一格**，同时拿**这一格的方块**去查放置规则。所以白名单里写"耕地方块"就等于"鼠标点耕地就能种在耕地上"，附着物和耕地同处一格。放置成功后两者再无引用关系，格子里那个方块只是当初允许放置的依据；该格方块一变，这一格的附着物就该跟着没（`removeBlock`/`replaceBlock` 用**同一格坐标、不加 y 偏移**去 `destroyAttachment`）。
 4. **掉落物**：`registry/Items.java` 加 `register("potato", Blocks.POTATO)`（命中原生作物重载，内部会 `crop.setDroppedItem(cropItem)`）。**共享型装饰物没有这个重载**，要自己写物品类并在注册后调 `attachment.setDroppedItem(...)`；不设就是被破坏后什么都不掉。
-5. **玩家放置**：用 `CropItem`（`world/item/consumption/CropItem.java`）——它的 `use()` 只做"`placeAttachment` 成功吗"，**不再硬编码任何方块**（能不能种由步骤 3 的规则表决定），失败不消耗物品、不播音效。左键破坏**天然优先于同格的方块**（`WorldInputHandleSystem` 的空手左键分支先查附着物）；同格方块被挖/被替换时，`ChunkSystem.removeBlock`/`replaceBlock` 会调 `destroyAttachment(round.x, round.y)`（**同一格坐标、不加 y 偏移**）把失去支撑的附着物一并破坏。**不用改 `MainGameScreen`。**
+5. **玩家放置**：用 `CropItem`（`world/item/consumption/CropItem.java`）—— **种植是"物品对着方块交互"，所以它覆写的是 `useOn()`（右键）而不是 `use()`（左键）**：`useOn` 只做"`placeAttachment` 成功吗"，**不再硬编码任何方块**（能不能种由步骤 3 的规则表决定），失败不消耗物品、不播音效。**左键拿在手里点不会有任何反应、也不会消耗**（继承 `Item.use` 的 `false`）。左键破坏**天然优先于同格的方块**（`WorldInputHandleSystem` 的空手左键分支先查附着物）；同格方块被挖/被替换时，`ChunkSystem.removeBlock`/`replaceBlock` 会调 `destroyAttachment(round.x, round.y)`（**同一格坐标、不加 y 偏移**）把失去支撑的附着物一并破坏。**不用改 `MainGameScreen`。**
 6. **存档**：走 `Attachment.CODEC`（每格状态由 `Botany.readCatData/writeCatData` 存进 `Cats`，键 `"growLevel"`）；JSON 键名是历史遗留的 `"botany"`，**别改**，改了旧存档读不出来。加新的每格状态就在 `readCatData`/`writeCatData` 里加一对键。
 7. **区块挂载要重新登记（写新附着物时不用管，但改动 `ChunkSystem` 时务必记得）**：每格独享的附着物**只把数据存进区块**，它的"运行时登记"（`blockInstances` 那一条 + `TimeSystem` 的 tick）不会随存档回来。`ChunkSystem.addChunk` 遍历 `blocks` 列时**必须顺带遍历 `attachments` 列**并 `addBlockInstance()`，`removeChunk` 对称地只摘除、**不掉包**。漏掉加载侧的后果有两个而且都很隐蔽：读档出来的植物**不再生长**，以及**挖掉它下面的方块会崩**（`destroyAttachment → removeBlockInstance` 用 `id@instance.hashCode` 当键，查不到就报"实例从未添加过"，异常抛在世界更新链上会打断整帧）。
 

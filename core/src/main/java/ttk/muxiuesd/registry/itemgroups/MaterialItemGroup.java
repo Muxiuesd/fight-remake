@@ -17,6 +17,8 @@ public class MaterialItemGroup {
             //普通材料
             .add(Items.STICK)
             .add(Items.SLIME_BALL)
+            .add(Items.BONE)
+            .add(Items.BONE_MEAL)
 
             .add(Items.COAL)
             .add(Items.RAW_IRON)

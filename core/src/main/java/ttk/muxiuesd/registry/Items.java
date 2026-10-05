@@ -42,6 +42,9 @@ public final class Items {
     //材料类
     public static final Item STICK = register("stick");
     public static final Item SLIME_BALL = register("slime_ball");
+    public static final Item BONE = register("bone");
+    public static final Item BONE_MEAL = register("bone_meal", BoneMealItem::new);
+    //矿物材料
     public static final Item RAW_IRON = register("raw_iron");
     public static final Item RAW_GOLD = register("raw_gold");
     public static final Item IRON_INGOT = register("iron_ingot");
