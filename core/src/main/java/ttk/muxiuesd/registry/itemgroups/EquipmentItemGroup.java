@@ -14,6 +14,7 @@ public class EquipmentItemGroup {
         .build()
         .selfAction(group -> {
         group
+            .add(Items.TORCH)
             .add(Items.IRON_HELMET)
             .add(Items.IRON_CHESTPLATE)
             .add(Items.IRON_LEGGINGS)
