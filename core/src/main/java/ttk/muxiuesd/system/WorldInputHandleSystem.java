@@ -144,7 +144,8 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                     Log.print(TAG, "鼠标破坏的方块为：" + mouseBlock.getClass().getName());
                 }
             }
-            //TODO 手持物品左键
+            //手持物品的左键不在这里处理：那是"使用物品本身"，由 PlayerSystem 走 LivingEntity.useItem() -> Item.use()
+            //右键才是交互，手持物品时由下面的分支调用 LivingEntity.useOn() -> Item.useOn()
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
 
@@ -162,17 +163,21 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
 
                 //玩家空手与方块实体交互
                 if (handItemStack.isVoid()) {
-                    InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);
+                    blockEntity.interact(getWorld(), player, interactGrid);
                     //TODO 空手交互事件
-                } else {
-                    //玩家手持物品与方块实体交互
-                    InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid);
-                    if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
+                    return;
+                }
+                //玩家手持物品与方块实体交互，方块实体的交互优先
+                if (blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid) == InteractResult.SUCCESS) {
+                    if (handItemStack.getAmount() == 0) {
                         //使用成功就检测手持物品是否用完，用完就清除
                         player.getBackpack().clear(player.getHandIndex());
                     }
                     //TODO 手持物品交互事件
+                    return;
                 }
+                //方块实体用不上这件物品，才轮到物品自己去和世界交互
+                player.useOn(getWorld(), mouseWorldPosition);
             } else {
                 /// 玩家与非方块实体的东西交互
                 //玩家空手交互
@@ -188,8 +193,10 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                         Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
                         this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, replacedBlock, 1);
                     }*/
+                } else {
+                    //玩家手持物品交互
+                    player.useOn(getWorld(), mouseWorldPosition);
                 }
-                //TODO 玩家手持物品交互
             }
         }
     }

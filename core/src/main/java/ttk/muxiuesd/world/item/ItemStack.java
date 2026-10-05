@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.item;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
@@ -70,6 +71,14 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
      * */
     public boolean use (World world, LivingEntity<?> user) {
         return this.behaviour.use(world, user, this);
+    }
+
+    /**
+     * 对着世界里的某个目标使用（右键交互）
+     * @param targetPos 目标位置（通常是鼠标指向的世界坐标）
+     * */
+    public boolean useOn (World world, LivingEntity<?> user, Vector2 targetPos) {
+        return this.behaviour.useOn(world, user, this, targetPos);
     }
 
     /**

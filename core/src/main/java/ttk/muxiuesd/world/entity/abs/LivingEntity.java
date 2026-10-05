@@ -282,6 +282,19 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     /**
+     * 实体拿着手上的物品对着世界里的某个目标使用（右键交互）
+     * @param targetPos 目标位置（通常是鼠标指向的世界坐标）
+     * @return 使用成功返回true，使用失败或者手上没有物品可供使用则返回false
+     * */
+    public boolean useOn (World world, Vector2 targetPos) {
+        ItemStack itemStack = this.getHandItemStack();
+        if (!itemStack.isVoid()) {
+            return itemStack.useOn(world, this, targetPos);
+        }
+        return false;
+    }
+
+    /**
      * 丢弃物品
      * @return 丢弃成功返回丢出来的物品实体，丢弃失败返回null
      * */

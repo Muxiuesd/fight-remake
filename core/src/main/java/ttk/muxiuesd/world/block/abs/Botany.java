@@ -61,6 +61,37 @@ public abstract class Botany extends Attachment implements Tickable, ICatData {
         return this;
     }
 
+    /**
+     * 生长等级增加某一值，但是不会超过生长等级上限
+     * <p>
+     * 骨粉之类的催熟手段用这个方法，免得把生长等级顶到上限之外
+     * @return 等级有变化返回true，已经到上限返回false
+     * */
+    public boolean growLevelIncreaseUpToMax (int value) {
+        if (this.isFullyGrown()) return false;
+        //加完之后再夹到上限，避免一次加多级时冲过头
+        int level = Math.min(this.getGrowLevel() + value, this.maxGrowLevel());
+        this.setGrowLevel(level);
+        return true;
+    }
+
+    /**
+     * 是否已经长到最高等级
+     * */
+    public boolean isFullyGrown () {
+        return this.getGrowLevel() >= this.maxGrowLevel();
+    }
+
+    /**
+     * 此植物的生长等级上限
+     * <p>
+     * 每个植物必须自己声明：上限应当等于"生长阶段贴图张数 - 1"（见{@code Blocks.registerBotany}）。
+     * <p>
+     * 上限与贴图张数不匹配也不会出问题：渲染那边按{@code Math.min(等级, 贴图数 - 1)}取图，
+     * 等级超出就一直是最后一张
+     * */
+    public abstract int maxGrowLevel ();
+
     public int getGrowLevel () {
         return this.growLevel;
     }

@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.item.abs;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
@@ -70,6 +71,20 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
         ses.playSpatialSound(useSound, user);
 
         return true;
+    }
+
+    /**
+     * 手持此物品对着世界里的某个目标使用（右键交互）
+     * <p>
+     * 与{@link #use}的分工：{@code use}是"使用物品本身"，不认目标（左键）；
+     * 本方法是对着鼠标指到的东西用。
+     * <p>
+     * 默认返回false，也就是"这个物品不能对着东西用"，并且不播放任何音效 ——
+     * 用不上的时候要静默失败，不然玩家会以为用出去了（消耗品据此决定扣不扣数量）
+     * @param targetPos 目标位置（通常是鼠标指向的世界坐标）
+     * */
+    public boolean useOn (ItemStack itemStack, World world, LivingEntity<?> user, Vector2 targetPos) {
+        return false;
     }
 
     /**
