@@ -12,6 +12,6 @@ public class BlockAir extends Block {
     public static final BlockRenderer<BlockAir> RENDERER = (batch, block, context) -> {};
 
     public BlockAir () {
-        super(new Property().setFriction(0f));
+        super(Block.createProperty().setFriction(0f));
     }
 }

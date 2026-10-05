@@ -47,11 +47,15 @@ public class Block implements ID<Block>, Disposable {
     public static final float HITBOX_END_X_OFFSET = WIDTH / 2, HITBOX_END_Y_OFFSET = HEIGHT / 2;
 
     /**
-     * 生成默认的属性
+     * 生成正常方块默认的属性
      * 有些需要实例化的东西就放里面防止浅拷贝
      * */
-    public static Property createProperty() {
-        return Property.create();
+    public static Property createProperty () {
+        return Property.create()
+            .set(PropertyTypes.BLOCK_FRICTON, 0f)   //默认无摩擦（摩擦越大移动越慢）
+            .set(PropertyTypes.BLOCK_WALKABLE, true)    //默认可以行走（寻路用）
+            .set(PropertyTypes.BLOCK_SWIMMABLE, false)  //默认不可游泳（水生方块如水位 true）
+            ;
     }
 
     private Identifier identifier;
@@ -111,19 +115,19 @@ public class Block implements ID<Block>, Disposable {
                 CodecJsonPropertiesMap.CODEC)
             .noArgFactory(Property::new);
 
+        /**
+         * 创建一个属性的实例
+         * */
         public static Property create () {
             return new Property();
         }
 
         private JsonPropertiesMap propertiesDataMap;
 
-        public Property () {
-            /// 这里有可能浅拷贝
+        private Property () {
+            /// 有的深拷贝、有的浅拷贝，不能一概而论
             this.propertiesDataMap = new JsonPropertiesMap()
-                .add(PropertyTypes.BLOCK_FRICTON, 0f)   //默认无摩擦（摩擦越大移动越慢）
                 .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
-                .add(PropertyTypes.BLOCK_WALKABLE, true)    //默认可以行走（寻路用）
-                .add(PropertyTypes.BLOCK_SWIMMABLE, false)  //默认不可游泳（水生方块如水位 true）
                 .add(PropertyTypes.CATS, new CatsHolder());
         }
 

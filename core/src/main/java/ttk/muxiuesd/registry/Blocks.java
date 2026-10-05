@@ -10,16 +10,13 @@ import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.block.AttachmentRenderer;
 import ttk.muxiuesd.render.world.block.FurnaceRenderer;
-import ttk.muxiuesd.world.block.abs.Attachment;
-import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.BlockEntity;
-import ttk.muxiuesd.world.block.abs.BlockWithEntity;
-import ttk.muxiuesd.world.block.abs.Botany;
+import ttk.muxiuesd.world.block.abs.*;
 import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockCraftingTable;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.block.instance.attachment.AttachmentPotato;
+import ttk.muxiuesd.world.block.instance.attachment.BotanyPotato;
+import ttk.muxiuesd.world.block.instance.attachment.BotanyWheat;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -36,97 +33,108 @@ public final class Blocks {
     //自然方块
     public static final Block ARI = register("air", BlockAir::new, BlockAir.RENDERER);
     public static final Block TEST_BLOCK = registerCommon("block_test",
-        () -> new Block.Property().setFriction(0.9f)
+        () -> Block.createProperty().setFriction(0.9f)
     );
     public static final Block GRASS = registerCommon("grass",
-        () -> new Block.Property().setFriction(0.05f).setSounds(Sounds.GRASS)
+        () -> Block.createProperty().setFriction(0.05f).setSounds(Sounds.GRASS)
     );
     public static final Block STONE = registerCommon("stone",
-        () -> new Block.Property().setFriction(0.06f).setSounds(Sounds.STONE)
+        () -> Block.createProperty().setFriction(0.06f).setSounds(Sounds.STONE)
     );
     public static final Block SNOW = registerCommon("snow",
-        () -> new Block.Property().setFriction(0.15f).setSounds(Sounds.STONE) //后面改
+        () -> Block.createProperty().setFriction(0.15f).setSounds(Sounds.STONE) //后面改
     );
     public static final Block SAND = registerCommon("sand",
-        () -> new Block.Property().setFriction(0.1f).setSounds(Sounds.SAND)
+        () -> Block.createProperty().setFriction(0.1f).setSounds(Sounds.SAND)
     );
     public static final Block FARMLAND_DRY = registerCommon("farmland_dry",
-        () -> new Block.Property().setFriction(0.1f).setSounds(Sounds.GRASS)
+        () -> Block.createProperty().setFriction(0.1f).setSounds(Sounds.GRASS)
     );
     public static final Block WATER = register("water", BlockWater::new,
-        () -> new Block.Property().setFriction(0.77f).setWalkable(false).setSwimmable(true),
+        () -> Block.createProperty().setFriction(0.77f).setWalkable(false).setSwimmable(true),
         BlockWater.RENDERER
     );
 
     //建筑方块
     public static final Block GLASS = registerCommon("glass",
-        () -> new Block.Property().setFriction(0.05f)
+        () -> Block.createProperty().setFriction(0.05f)
     );
 
     //矿物方块
     public static final Block COAL_ORE = registerCommon("coal_ore",
-        () -> new Block.Property().setFriction(0.06f)
+        () -> Block.createProperty().setFriction(0.06f)
     );
 
     //颜色方块
     public static final float WOOL_FRICTION = 0.05f;
     public static final Block WOOL_BLACK = register("wool_colored_black", "wool/wool_colored_black",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_BLUE = register("wool_colored_blue", "wool/wool_colored_blue",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_BROWN = register("wool_colored_brown", "wool/wool_colored_brown",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_CYAN = register("wool_colored_cyan", "wool/wool_colored_cyan",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_GRAY = register("wool_colored_gray", "wool/wool_colored_gray",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_GREEN = register("wool_colored_green", "wool/wool_colored_green",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_LIGHT_BLUE = register("wool_colored_light_blue", "wool/wool_colored_light_blue",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_LIME = register("wool_colored_lime", "wool/wool_colored_lime",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_MAGENTA = register("wool_colored_magenta", "wool/wool_colored_magenta",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_ORANGE = register("wool_colored_orange", "wool/wool_colored_orange",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_PINK = register("wool_colored_pink", "wool/wool_colored_pink",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_PURPLE = register("wool_colored_purple", "wool/wool_colored_purple",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_RED = register("wool_colored_red", "wool/wool_colored_red",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_SILVER = register("wool_colored_silver", "wool/wool_colored_silver",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_WHITE = register("wool_colored_white", "wool/wool_colored_white",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
     public static final Block WOOL_YELLOW = register("wool_colored_yellow", "wool/wool_colored_yellow",
-        () -> new Block.Property().setFriction(WOOL_FRICTION)
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
     );
 
     /// 附着物
-    //植物
-    public static final Botany POTATO = registerBotany("potato", AttachmentPotato::new,
+    //农作物
+    public static final Botany POTATO = registerBotany("potato", BotanyPotato::new,
         "potatoes_stage_0.png",
         "potatoes_stage_1.png",
         "potatoes_stage_2.png",
         "potatoes_stage_3.png"
     );
+    public static final Botany WHEAT = registerBotany("wheat", BotanyWheat::new,
+        "wheat_stage_0.png",
+        "wheat_stage_1.png",
+        "wheat_stage_2.png",
+        "wheat_stage_3.png",
+        "wheat_stage_4.png",
+        "wheat_stage_5.png",
+        "wheat_stage_6.png",
+        "wheat_stage_7.png"
+    );
+
 
     /// 带有方块实体的方块
     public static final BlockCraftingTable CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);

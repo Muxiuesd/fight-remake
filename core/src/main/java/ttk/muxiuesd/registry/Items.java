@@ -27,6 +27,7 @@ import ttk.muxiuesd.world.item.weapon.RangedWeaponBuilder;
 import ttk.muxiuesd.world.item.weapon.sword.SwordBuilder;
 import ttk.muxiuesd.world.wall.Wall;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -215,6 +216,8 @@ public final class Items {
 
     /// 农作物物品
     public static final Item POTATO = register("potato", Blocks.POTATO);
+    public static final Item SEEDS_WHEAT = register("seeds_wheat", Blocks.WHEAT);
+    public static final Item WHEAT = register("wheat");
     //食物类
     public static final Item FISH = register("fish", Fight.ItemTexturePath("foods/fish.png"),
         EffectItemBuilder.create()
@@ -290,7 +293,20 @@ public final class Items {
      * 注册农作物物品
      * */
     public static CropItem register (String name, Attachment crop) {
-        CropItem cropItem = register(name, () -> new CropItem(crop));
+        /*CropItem cropItem = register(name, () -> new CropItem(crop));
+        crop.setDroppedItem(cropItem);
+        return cropItem;*/
+        return register(name, CropItem::new, crop);
+    }
+
+    /**
+     * 注册农作物物品
+     * @param supplier 作为种子的物品
+     * @param crop 农作物
+     * */
+    public static <T extends Attachment, R extends CropItem> CropItem register (String name, Function<T, R> supplier, T crop) {
+        R cropItem = register(name, () -> supplier.apply(crop));
+        //设置被波坏后掉落物品，这里肯定掉落作为种子的物品
         crop.setDroppedItem(cropItem);
         return cropItem;
     }

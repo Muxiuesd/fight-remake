@@ -6,8 +6,8 @@ import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
-import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -61,6 +61,15 @@ public abstract class Attachment extends Block {
             },
             Block.Property.CODEC)
         .factory(Attachment::fromId);
+
+    /**
+     * 创建一个附着物的属性
+     * */
+    public static Property createProperty() {
+        return Block.Property.create();
+    }
+
+
 
     private Item droppedItem;   //附着物被破坏后的掉落物，为null时什么都不掉
 

@@ -70,6 +70,7 @@ public final class AttachmentPlacements {
     static {
         //土豆：只能种在耕地上
         registerWhitelist(Blocks.POTATO, Blocks.FARMLAND_DRY);
+        registerWhitelist(Blocks.WHEAT, Blocks.FARMLAND_DRY);
     }
 
 

@@ -5,6 +5,7 @@ import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.serialization.codecs.builders.BlockWithEntityCodecBuilder;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityCraftingTable;
 
@@ -19,7 +20,7 @@ public class BlockCraftingTable extends BlockWithEntity implements Codecable<Blo
     );
 
     public BlockCraftingTable () {
-        super(new Property().setFriction(0.7f));
+        super(Block.createProperty().setFriction(0.7f));
     }
 
 

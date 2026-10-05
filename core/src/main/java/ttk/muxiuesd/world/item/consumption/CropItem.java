@@ -9,7 +9,7 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
- * 农作物类型的物品
+ * 农作物类型的物品（种子类）
  * <p>
  * 对着允许种植的地面方块使用可以种植，或者可以直接食用
  * */
