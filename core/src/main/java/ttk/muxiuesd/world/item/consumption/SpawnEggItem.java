@@ -26,15 +26,18 @@ public class SpawnEggItem<T extends Entity<T>> extends ConsumptionItem{
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        if (user instanceof Player) {
-            EntitySystem es = world.getSystem(EntitySystem.class);
-            T entity = this.entityProvider.create(world);
-            entity.setPosition(Util.getMouseWorldPosition());
-            entity.setEntitySystem(es);
-            es.add(entity);
-        }
+        //只有玩家才能用刷怪蛋召唤实体，其他人用不算成功（不消耗、不播音效）
+        if (!(user instanceof Player)) return false;
 
-        return super.use(itemStack, world, user);
+        EntitySystem es = world.getSystem(EntitySystem.class);
+        T entity = this.entityProvider.create(world);
+        entity.setPosition(Util.getMouseWorldPosition());
+        entity.setEntitySystem(es);
+        es.add(entity);
+
+        //召唤成功，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
+        this.playUseSound(world, user);
+        return true;
     }
 
     public EntityProvider<T> getEntityProvider () {

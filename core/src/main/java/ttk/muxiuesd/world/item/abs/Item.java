@@ -62,15 +62,27 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
     /**
      * 使用此物品
+     * <p>
+     * 默认返回false，也就是"这件物品不能使用"，并且不播放任何音效 ——
+     * 用不上的时候要静默失败，不然玩家会以为用出去了（消耗品据此决定扣不扣数量）。
+     * <p>
+     * 只有真正做成了事的子类才覆写本方法，在成功路径上自己调用
+     * {@link #playUseSound(World, LivingEntity)} 播放音效并返回true
      * @return 是否使用成功
      * */
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        //播放物品使用音效
-        AudioHolder useSound = this.getProperty().getUseSound();
-        SoundSystem ses = world.getSystem(SoundSystem.class);
-        ses.playSpatialSound(useSound, user);
+        return false;
+    }
 
-        return true;
+    /**
+     * 播放此物品的使用音效
+     * <p>
+     * 只在子类确定使用成功时调用：默认的{@link #use}不播音效，
+     * 失败路径也不该播（静默失败）
+     * */
+    protected void playUseSound (World world, LivingEntity<?> user) {
+        AudioHolder useSound = this.getProperty().getUseSound();
+        world.getSystem(SoundSystem.class).playSpatialSound(useSound, user);
     }
 
     /**

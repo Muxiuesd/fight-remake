@@ -55,6 +55,8 @@ public class BlockItem extends ConsumptionItem {
                 }
             }
         }
+        //播放放置音效（物品默认的 use 不播音效也不报成功，这里得自己来）
+        this.playUseSound(world, user);
         return true;
     }
 }

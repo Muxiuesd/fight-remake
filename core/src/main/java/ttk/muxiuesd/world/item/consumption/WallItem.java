@@ -55,7 +55,11 @@ public class WallItem extends ConsumptionItem {
         //标记为假时说明与实体碰撞箱不冲突，就执行放置
         if (!flag) {
             ChunkSystem cs = world.getSystem(ChunkSystem.class);
-            if (cs.placeWall(this.getWall(), worldPosition.x, worldPosition.y)) return super.use(itemStack, world, user);
+            if (cs.placeWall(this.getWall(), worldPosition.x, worldPosition.y)) {
+                //放置成功，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
+                this.playUseSound(world, user);
+                return true;
+            }
         }
         return false;
     }

@@ -6,6 +6,8 @@ import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -29,6 +31,14 @@ public class EquipmentItem extends Item {
      * */
     public EquipmentType getEquipmentType () {
         return this.equipmentType;
+    }
+
+    @Override
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
+        //能走到这里说明装备类型的装备槽位已经找到、装备已经换好了（见 EquipmentItemStackBehaviour#use）
+        //物品默认的 use 不播音效也不报成功，所以这里自己补上
+        this.playUseSound(world, user);
+        return true;
     }
 
     @Override

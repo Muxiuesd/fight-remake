@@ -45,6 +45,7 @@ public class EffectItem extends ConsumptionItem {
                 user.setEffect(effect.getEffect(), effect.getDuration(), effect.getLevel());
             }
         }
+        //吃/喝下去本身就是使用成功（物品默认的 use 不播音效也不报成功）
         return true;
     }
 

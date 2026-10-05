@@ -117,7 +117,8 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
   - **鼠标与物品的分工（2026-09-27 定案，改物品交互前先看这条）**：
     - **左键 = 使用物品本身**，不认目标：`PlayerSystem.handleInput` → `LivingEntity.useItem(World)` → `ItemStack.use(World, LivingEntity)` → `IItemStackBehaviour.use` → `Item.use(物品堆叠, 世界, 使用者)`。空手左键仍是破坏（`WorldInputHandleSystem` 里被 `handItemStack.isVoid()` 挡着，两者不冲突）。
     - **右键 = 交互**，空手与手持都算：空手走 `BlockEntity.interact(...)` / 拆墙；**手持物品走 `LivingEntity.useOn(World, Vector2)` → `ItemStack.useOn` → `IItemStackBehaviour.useOn` → `Item.useOn(物品堆叠, 世界, 使用者, 目标坐标)`**，目标坐标就是鼠标指向的世界坐标。接线在 `system/WorldInputHandleSystem.java` 的右键分支（原来那个 `//TODO 玩家手持物品交互` 已被填上）。
-    - **`Item.useOn` 的默认实现是 `return false` 且不播任何音效**（接口里的 `IItemStackBehaviour.useOn` 也是 `default return false`，所以现有物品一个都没被影响）。**失败要静默**：用不上的时候既不能响也不能扣数量 —— 消耗品的"扣一个"完全由返回值驱动（`ConsumptionItemStackBehaviour` 里 `use` 与 `useOn` 共用同一个 `consume()`）。
+    - **`Item.use` 与 `Item.useOn` 的默认实现都是 `return false`，并且都不播任何音效**（接口里的 `IItemStackBehaviour.useOn` 也是 `default return false`，所以现有物品一个都没被影响）。**失败要静默**：用不上的时候既不能响也不能扣数量 —— 消耗品的"扣一个"完全由返回值驱动（`ConsumptionItemStackBehaviour` 里 `use` 与 `useOn` 共用同一个 `consume()`）。
+    - **真做成了事的子类才覆写，并在成功路径上自己播音效**：`Item#playUseSound(World, LivingEntity)`（protected）就是给子类在成功时调的（`BlockItem`/`WallItem`/`SpawnEggItem`/`RangedWeapon`/`ItemFishPole`/`EquipmentItem` 都这么写；`Sword` 早就自己播、`return hitAnything`；`EffectItem` 自己按 `consumeSounds` 播）。**默认若返回 true，等于没覆写的物品（所有普通材料：`BONE`/`STICK`/`WHEAT`…都是 `ConsumptionItem`）左键点一下就被"成功"消耗掉**，这是曾经的坑。
     - **不需要同时覆写两个**：一个物品要么"使用自己"（覆写 `use`，如食物/剑/鱼竿/刷怪蛋/方块物品），要么"对着东西用"（覆写 `useOn`，如骨粉、种子）。**只覆写 `useOn` 就自动获得了"左键不消耗也不响"**（继承 `Item.use` 的 false），不用再写空的 `use`。
     - **右键点方块实体时方块实体优先**：`WorldInputHandleSystem` 里 `blockEntity.interactWithItem(...)` 返回 `SUCCESS` 就直接 `return`（那件物品已经被方块实体收下了，如放进熔炉），只有返回 `FAILURE` 才轮到物品自己的 `useOn()`。空手分支同理直接 `return`。
   - 行为由 `getBehaviour()` 覆写返回注册的静态行为决定（`Item.Type` 已删除）。
@@ -166,7 +167,8 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 | 土豆点耕地"有时能种有时不能" / 点了没反应 | 已经修过了：附着物的支撑方块就是**它自己那一格坐标处的方块**，点耕地就种在耕地那一格。**再出现这种症状先查放置规则表和 `getBlock(wx, wy)`（同一格，不是 y 减 1）拿到的方块**，别去怀疑输入链路（右键 → `useOn` → `CropItem.useOn` 这条链是通的，失败是**静默**的：不扣数量、不播音效、也不报错） |
 | **左键**拿种子/骨粉点没反应 | 设计如此：种植与催熟都是"物品对着方块交互"，走 `useOn()`（右键）。左键走的是 `use()`，`CropItem`/`BoneMealItem` 都没覆写它 → 继承 `Item.use` 的 `return false`，**既不消耗也不出声** |
 | 右键用骨粉没反应 | 目标格不是 `Botany` 实例，或那株已经 `isFullyGrown()`（到上限）——两种都是 `BoneMealItem.useOn` 返回 false，静默不消耗。**先确认鼠标指着的就是作物那一格**（与种植同一套 `fastRound` 取整），再看它是不是早满了 |
-| 骨粉左键白扣一个 | 说明有人给物品覆写了 `use()` 却没实现有效果的分支；`Item.use()` 默认**播音效且返回 true**，而消耗品减一完全由返回值驱动（见第八章"鼠标与物品的分工"） |
+| 骨粉左键白扣一个 | 不可能再发生了（`Item.use` 已改为静默 `return false`）；**若又出现，说明有人给某个物品覆写 `use()` 却写了"只播音效 / 无条件 `return true`"**——消耗品减一完全由返回值驱动（见第八章"鼠标与物品的分工"） |
+| 左键拿材料（骨头/木棍/小麦…）点一下就少一个 | 老问题：`Item.use()` 曾经**默认播音效并 `return true`**，而这些材料都是 `ConsumptionItem` 且没覆写 `use()` → 点一下算"使用成功"。现已改为默认静默 `false`；新写物品时**别在 `use()` 里无条件 `return true`** |
 | 附着物放置规则登记早了 | 规则要引用 `Blocks.XXX`，必须在 `Blocks.init()` 之后；`Blocks.READY` 与 `AttachmentPlacements.init()` 里的检查就是防这个——顺序错了 `Blocks.POTATO` 还是 null，`registerWhitelist` 只会报错然后把**唯一那条规则静默丢掉** |
 | 附着物判定用方块对象当键 | 植物每格一个实例，`==` 比较在放置时必然查不到；规则表和 `ChunkSystem.getBlockKey` 都用 `Identifier` |
 | 读档出来的植物"不再生长"或"挖掉它下面的方块就崩`实例从未添加过`" | 同一个根因：每格独享附着物的运行时登记（`blockInstances` + `TimeSystem` tick）**不随存档回来**，必须由 `ChunkSystem.addChunk` 遍历 `attachments` 列重新 `addBlockInstance()`。改动区块加载/卸载代码时先确认这一对还在 |

@@ -56,7 +56,9 @@ public class ItemFishPole extends Item {
             es.add(fishingHook);
             fishingHook.setEntitySystem(es);
             this.throwHook(itemStack, world, fishingHook);
-            return super.use(itemStack, world, user);
+            //抛出鱼钩，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
+            this.playUseSound(world, user);
+            return true;
         }else if (!hook.onCasting() && !hook.isReturning){ //鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
             Vector2 hookPos = hook.getCenterPos();
             ChunkSystem cs = world.getSystem(ChunkSystem.class);
@@ -82,7 +84,9 @@ public class ItemFishPole extends Item {
             }
 
             this.pullHook(itemStack);
-            return super.use(itemStack, world, user);
+            //收杆，播放音效并报告成功
+            this.playUseSound(world, user);
+            return true;
         }
         //到这里就说明在抛竿或者收杆的动作之中，所以是使用失败的
         return false;
