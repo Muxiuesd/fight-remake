@@ -22,8 +22,8 @@ import ttk.muxiuesd.serialization.codecs.CodecChunk;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.biome.Biome;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.wall.Wall;
 
 
@@ -94,7 +94,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
     private final Wall<?>[][]  walls;
-    private final Botany[][]  botanys;
+    private final Attachment[][]  attachments;
     private final int[][] heights;
 
     private Biome biome;   //该区块所属的群系（生成时确定，供渲染/判定复用）
@@ -108,7 +108,7 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public Chunk () {
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
-        this.botanys = new Botany[ChunkHeight][ChunkWidth];
+        this.attachments = new Attachment[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
     }
 
@@ -143,16 +143,16 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
                 }
             }
         });
-        //绘制植物
+        //绘制附着物
         this.traversal((x, y) -> {
-            Botany botany = this.botanys[y][x];
-            if (botany != null) {
-                BlockRenderer<Block> renderer = BlockRendererRegistry.get(botany);
+            Attachment attachment = this.attachments[y][x];
+            if (attachment != null) {
+                BlockRenderer<Block> renderer = BlockRendererRegistry.get(attachment);
                 if (renderer != null) {
                     BlockRenderer.Context context = renderer.getContext();
                     context.x = x + cp.x * ChunkWidth;
                     context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, botany, context);
+                    renderer.render(batch, attachment, context);
                     renderer.freeContext(context);
                 }
             }
@@ -217,24 +217,24 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     }
 
     /**
-     * 设置这个区块上的某一个植物
+     * 设置这个区块上的某一个附着物
      * */
-    public void setBotany (Botany botany, int cx, int cy) {
-        this.botanys[cy][cx] = botany;
+    public void setAttachment (Attachment attachment, int cx, int cy) {
+        this.attachments[cy][cx] = attachment;
     }
 
     /**
-     * 获取这个区块上的某一个植物
+     * 获取这个区块上的某一个附着物
      * */
-    public Botany getBotany (int cx, int cy) {
-        return this.botanys[cy][cx];
+    public Attachment getAttachment (int cx, int cy) {
+        return this.attachments[cy][cx];
     }
 
     /**
-     * 检测这个区块上是否有植物
+     * 检测这个区块上是否有附着物
      * */
-    public boolean hasBotany (int cx, int cy) {
-        return this.botanys[cy][cx] != null;
+    public boolean hasAttachment (int cx, int cy) {
+        return this.attachments[cy][cx] != null;
     }
 
 
@@ -290,14 +290,14 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     }
 
     /**
-     * 查找植物
+     * 查找附着物
      * @param wx 世界坐标x
      * @param wy 世界坐标y
-     * @return 找到植物就返回对应的实例，否则为null
+     * @return 找到附着物就返回对应的实例，否则为null
      */
-    public Botany seekBotany (float wx, float wy) {
+    public Attachment seekAttachment (float wx, float wy) {
         GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
-        return this.getBotany(chunkPos.x, chunkPos.y);
+        return this.getAttachment(chunkPos.x, chunkPos.y);
     }
 
     /**

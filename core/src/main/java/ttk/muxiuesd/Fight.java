@@ -10,7 +10,7 @@ public class Fight {
     public static final String SOUND_ROOT = AUDIO_ROOT + "sound/";
     public static final String TEXTURE_ROOT = "texture/";
     public static final String BLOCK_TEXTURE_ROOT   = TEXTURE_ROOT + "blocks/";
-    public static final String BOTANY_TEXTURE_ROOT   = TEXTURE_ROOT + "botany/";
+    public static final String ATTACHMENT_TEXTURE_ROOT   = BLOCK_TEXTURE_ROOT + "attachment/";
     public static final String ENTITY_TEXTURE_ROOT  = TEXTURE_ROOT + "entity/";
     public static final String ITEM_TEXTURE_ROOT    = TEXTURE_ROOT + "item/";
     public static final String UI_TEXTURE_ROOT      = TEXTURE_ROOT + "ui/";
@@ -100,10 +100,10 @@ public class Fight {
     }
 
     /**
-     * 从植物的材质根路径中获取植物的材质
+     * 从附着物的材质根路径中获取附着物的材质
      * */
-    public static String BotanyTexturePath (String path) {
-        return BOTANY_TEXTURE_ROOT + path;
+    public static String AttachmentTexturePath (String path) {
+        return ATTACHMENT_TEXTURE_ROOT + path;
     }
 
     public static String EntityTexturePath (String path) {

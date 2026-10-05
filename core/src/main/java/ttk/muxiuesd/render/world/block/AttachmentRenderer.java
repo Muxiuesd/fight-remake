@@ -5,32 +5,34 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Botany;
 
 /**
- * 植物渲染器
+ * 附着物渲染器
  * <p>
- * 持有植物不同生长等级的贴图，根据生长等级选择对应的贴图渲染
+ * 持有多个贴图，根据生长等级选择对应的贴图渲染（不是植物就把生长等级当成0，只用第一张贴图）
  * */
-public class BotanyRenderer<T extends Botany> implements BlockRenderer<T> {
+public class AttachmentRenderer<T extends Attachment> implements BlockRenderer<T> {
     private final TextureRegion[] textureRegions;   //不同生长等级的贴图
 
     /**
-     * @param textureNames 不同生长等级的贴图文件名（位于 botany/crops/ 目录下）
+     * @param textureNames 不同生长等级的贴图文件名（位于 blocks/attachment/crops/ 目录下）
      * */
-    public BotanyRenderer (String... textureNames) {
+    public AttachmentRenderer (String... textureNames) {
         this.textureRegions = new TextureRegion[textureNames.length];
         for (int i = 0; i < textureNames.length; i++) {
             this.textureRegions[i] = Util.loadTextureRegion(
                 Fight.ID(textureNames[i]),
-                Fight.BotanyTexturePath("crops/" + textureNames[i])
+                Fight.AttachmentTexturePath("crops/" + textureNames[i])
             );
         }
     }
 
     @Override
-    public void render (Batch batch, T botany, Context context) {
-        int level = botany.getGrowLevel();
+    public void render (Batch batch, T attachment, Context context) {
+        //只有植物才有生长等级，其他的附着物都按0级渲染
+        int level = attachment instanceof Botany botany ? botany.getGrowLevel() : 0;
         //如果生长等级超过对应的贴图，就使用最大的贴图
         TextureRegion textureRegion = this.textureRegions[Math.min(level, this.textureRegions.length - 1)];
         if (textureRegion == null) return;

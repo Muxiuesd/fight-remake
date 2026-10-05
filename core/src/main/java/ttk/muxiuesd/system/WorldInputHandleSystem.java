@@ -30,7 +30,7 @@ import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
-import ttk.muxiuesd.world.block.abs.Botany;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.entity.player.Player;
@@ -131,11 +131,11 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
             //空手左键，且玩家并不是刚用完物品，就是破坏
             if (handItemStack.isVoid() && !player.isUsingItem()) {
-                Botany botany = cs.getBotany(mouseWorldPosition);
-                if (botany != null) {
-                    //有植物就优先破坏植物
-                    cs.destroyBotany(mouseWorldPosition);
-                    Log.print(TAG, "鼠标破坏的植物为：" + botany.getClass().getName());
+                Attachment attachment = cs.getAttachment(mouseWorldPosition);
+                if (attachment != null) {
+                    //有附着物就优先破坏附着物，不会破坏到它下面的方块
+                    cs.destroyAttachment(mouseWorldPosition);
+                    Log.print(TAG, "鼠标破坏的附着物为：" + attachment.getClass().getName());
                 }else if (mouseBlock != Blocks.ARI) {
                     //如果不是空气方块就破坏它
                     //破坏方块（也就是把对应坐标的方块替换成空气方块）
