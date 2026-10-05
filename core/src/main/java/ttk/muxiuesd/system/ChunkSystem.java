@@ -315,6 +315,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             //把区块里的方块实例加进系统里
             Block block = chunk.getBlock(x, y);
             this.addBlock(block, chunk.getWorldX(x), chunk.getWorldY(y));
+
+            //每格独享的附着物读档出来之后也要重新挂回系统，否则它只活在区块数组里：
+            //被破坏时removeBlockInstance会找不到它的实例而报错，也不会再进tick更新（不再生长）
+            Attachment attachment = chunk.getAttachment(x, y);
+            if (attachment != null && this.isInstanceAttachment(attachment)) {
+                this.addBlockInstance(attachment);
+            }
         });
         this._loadChunks.add(chunk);
     }
@@ -332,6 +339,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
                 //方块实体的完整内容物已由 ChunkUnloadTask 随区块存档写盘保留，
                 //若这里再走 beDestroyed 掉包会使内容物复制（同批物品既在存档又掉一份进世界）。
                 this.removeBlockEntity(blockWithEntity, false);
+            }
+
+            //每格独享的附着物同样只从系统移除，内容还在区块数组里、随区块存档写盘，
+            //区块再加载时由addChunk重新挂回，所以这里也不能走beDestroyed掉包
+            Attachment attachment = chunk.getAttachment(x, y);
+            if (attachment != null && this.isInstanceAttachment(attachment)) {
+                this.removeBlockInstance(attachment);
             }
         });
     }
@@ -384,8 +398,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }else if (removed instanceof Attachment attachment && isInstanceAttachment(attachment)) {
             this.removeBlockInstance(attachment);
         }
-        //方块被移除，附着在它上面的附着物就悬空了，先一并破坏掉
-        this.destroyAttachment(wx, wy + 1f);
+        //附着物就跟它的支撑方块在同一格里：这一格的方块没了，这一格的附着物就悬空了，一并破坏掉
+        //（用取整后的格子坐标算，不加偏移——附着物不在上面一格，它就在这一格）
+        this.destroyAttachment(round.x, round.y);
 
         //用空气方块占位（不能直接 setBlock(null)，会触发 addBlock(null) NPE）
         chunk.setBlock(Blocks.ARI, chunkBlockPos.x, chunkBlockPos.y);
@@ -433,8 +448,14 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             return this.blockInstances.remove(this.getBlockKey(blockWithEntity));
         }
 
-        //普通方块
+        //普通方块、每格独享的附着物（附着物用的是实例的hashCode当键）
+        //附着物可能没登记过（旧存档、或者被别的途径写进区块的），这时报错但不抛异常：
+        //抛异常会把整个世界更新中断掉，代价比"实例表里少一条"大得多
         if (!this.blockInstances.containsKey(blockKey)) {
+            if (block instanceof Attachment) {
+                Log.error(TAG, "附着物：" + blockKey + " 的实例从未添加过！！！", new IllegalStateException());
+                return null;
+            }
             throw new IllegalArgumentException("方块：" + blockKey + " 的实例从未添加过！！！");
         }
 
@@ -514,6 +535,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             this.removeBlockInstance(oldBlock);
         }
 
+        //这一格原来有方块，现在被换掉了，跟它同格的附着物就失去了支撑，一并破坏掉
+        //（附着物和它的支撑方块在同一格里，所以这里不加偏移，就用这一格的坐标；
+        //  这一格原本是空气的话不碰——没有方块可以失去，附着物继续附着在下方方块上）
+        if (oldBlock != Blocks.ARI) {
+            this.destroyAttachment(round.x, round.y);
+        }
+
         //如果新方块是带有方块实体的方块，需要新建一个实例再添加
         //setBlock 内部会统一调用 addBlock（只执行一次，避免 bePlaced 重复触发）
         if (newBlock instanceof BlockWithEntity blockWithEntity) {
@@ -523,9 +551,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         }
 
         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
-
-        //方块被替换掉了，附着在它上面的附着物就悬空了，先一并破坏掉
-        this.destroyAttachment(wx, wy + 1f);
 
         //破坏方块粒子：被替换下来的非空气方块生成残渣粒子
         if (oldBlock != Blocks.ARI) {
@@ -641,7 +666,11 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             //有附着物就破坏，并且返回被破坏的附着物实例
             Attachment attachmentInstance = chunk.getAttachment(chunkPos.x, chunkPos.y);
             //记得移除这个附着物的实例
-            this.removeBlockInstance(attachmentInstance);
+            //（每格独享的附着物可能存在没登记进系统的：比如旧存档里的、或者是还没走addChunk重建的，
+            //  这时只报错、不抛异常，破坏流程照常走完，否则一次破坏会把整个世界更新中断掉）
+            if (this.isInstanceAttachment(attachmentInstance)) {
+                this.removeBlockInstance(attachmentInstance);
+            }
             chunk.setAttachment(null, chunkPos.x, chunkPos.y);
             //调用被破坏方法
             attachmentInstance.beDestroyed(getWorld(), roundPos);

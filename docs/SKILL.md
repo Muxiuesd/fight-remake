@@ -157,9 +157,10 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 | 运行时替换贴图没效果 | `AssetsLoader.load` 按 id 缓存，改文件后必须重启游戏 |
 | 改 `LivingEntity.getDirection()` 语义 | 它的调用点散布在挥砍方向、**远程子弹发射方向**、手持物品旋转角等 16 处，且 `Player` 覆写为鼠标方向；动它之前先搜全部调用点 |
 | 新加的附着物"右键毫无反应" | 90% 是忘了在 `registry/AttachmentPlacements` 里登记放置规则——**没登记过的附着物一处都放不了**；剩下 10% 是登记的是白名单但没包含脚下的方块 |
-| 土豆点耕地"有时能种有时不能" / 点了没反应 | 已经修过了：`placeAttachment` 会把"点到方块"改放到它上方一格。**再出现这种症状先查放置规则表和 `getBlock` 拿到的支撑方块**，别去怀疑输入链路（`PlayerSystem` → `useItem` → `CropItem.use` 这条链是通的，失败是**静默**的：不扣数量、不播音效、也不报错） |
+| 土豆点耕地"有时能种有时不能" / 点了没反应 | 已经修过了：附着物的支撑方块就是**它自己那一格坐标处的方块**，点耕地就种在耕地那一格。**再出现这种症状先查放置规则表和 `getBlock(wx, wy)`（同一格，不是 y 减 1）拿到的方块**，别去怀疑输入链路（`PlayerSystem` → `useItem` → `CropItem.use` 这条链是通的，失败是**静默**的：不扣数量、不播音效、也不报错） |
 | 附着物放置规则登记早了 | 规则要引用 `Blocks.XXX`，必须在 `Blocks.init()` 之后；`Blocks.READY` 与 `AttachmentPlacements.init()` 里的检查就是防这个——顺序错了 `Blocks.POTATO` 还是 null，`registerWhitelist` 只会报错然后把**唯一那条规则静默丢掉** |
 | 附着物判定用方块对象当键 | 植物每格一个实例，`==` 比较在放置时必然查不到；规则表和 `ChunkSystem.getBlockKey` 都用 `Identifier` |
+| 读档出来的植物"不再生长"或"挖掉它下面的方块就崩`实例从未添加过`" | 同一个根因：每格独享附着物的运行时登记（`blockInstances` + `TimeSystem` tick）**不随存档回来**，必须由 `ChunkSystem.addChunk` 遍历 `attachments` 列重新 `addBlockInstance()`。改动区块加载/卸载代码时先确认这一对还在 |
 | `Botany` 的 `createSelf()` 忘了复制配置 | 现在由 `Botany.createInstance()` 统一复制 `droppedItem`/`identifier`，子类只写 `createSelf()`；**别去覆写 `createInstance()`** |
 
 ## 十一、新增一个生物 / 实体
@@ -208,8 +209,9 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
    - 登记位置就在该类的 **`static { ... }` 静态块**里（与现有那行土豆规则放一起）；`init()` 只负责打日志，由 `MainGameScreen.show()` 在 `Blocks.init()` **之后**调用以触发类加载。**规则数据必须等方块注册完才能登记**（要引用 `Blocks.XXX`），所以别把它挪到 `Blocks` 之前——真挪错了会在启动时报"方块还没注册完就登记了附着物的放置规则"。
    - 判定：**空气方块一律不能附着**（无条件保底，空黑名单 = 除了空气哪都能放）；**没登记过的附着物一处都放不了**；方案记在内部的 `ATTACHMENT_RULE` 里，所以两张表**不存在"同时命中谁优先"**，换方案重复注册会报错并忽略；同方案可多次注册**累加**（重复方块自动去重）。
    - 规则**只在玩家放置时生效**，读档直接写进区块、不查表。
-   - **"点方块的哪一半都能种"是放置器保证的**：`placeAttachment` 收到的是鼠标点到的方块，**点到方块会自动改放到它的上方一格**（`if (getBlock(wx, wy) != Blocks.ARI) wy += Block.HEIGHT;`），所以白名单里写"耕地方块"就等于"能种在耕地上"。
+   - **"附着物的支撑方块"就是它自己那一格坐标处的方块**（**别理解成 y 减 1 那一格**）：`placeAttachment` 把鼠标坐标 `Util.fastRound` 成格坐标后，**附着物就放在这一格**，同时拿**这一格的方块**去查放置规则。所以白名单里写"耕地方块"就等于"鼠标点耕地就能种在耕地上"，附着物和耕地同处一格。放置成功后两者再无引用关系，格子里那个方块只是当初允许放置的依据；该格方块一变，这一格的附着物就该跟着没（`removeBlock`/`replaceBlock` 用**同一格坐标、不加 y 偏移**去 `destroyAttachment`）。
 4. **掉落物**：`registry/Items.java` 加 `register("potato", Blocks.POTATO)`（命中原生作物重载，内部会 `crop.setDroppedItem(cropItem)`）。**共享型装饰物没有这个重载**，要自己写物品类并在注册后调 `attachment.setDroppedItem(...)`；不设就是被破坏后什么都不掉。
-5. **玩家放置**：用 `CropItem`（`world/item/consumption/CropItem.java`）——它的 `use()` 只做"`placeAttachment` 成功吗"，**不再硬编码任何方块**（能不能种由步骤 3 的规则表决定），失败不消耗物品、不播音效。左键破坏**天然优先于下方的方块**（`WorldInputHandleSystem` 的空手左键分支先查附着物）；下方方块被挖/被替换时，`ChunkSystem.removeBlock`/`replaceBlock` 会调 `destroyAttachment(wx, wy + 1f)` 把悬空的附着物一并破坏。**不用改 `MainGameScreen`。**
+5. **玩家放置**：用 `CropItem`（`world/item/consumption/CropItem.java`）——它的 `use()` 只做"`placeAttachment` 成功吗"，**不再硬编码任何方块**（能不能种由步骤 3 的规则表决定），失败不消耗物品、不播音效。左键破坏**天然优先于同格的方块**（`WorldInputHandleSystem` 的空手左键分支先查附着物）；同格方块被挖/被替换时，`ChunkSystem.removeBlock`/`replaceBlock` 会调 `destroyAttachment(round.x, round.y)`（**同一格坐标、不加 y 偏移**）把失去支撑的附着物一并破坏。**不用改 `MainGameScreen`。**
 6. **存档**：走 `Attachment.CODEC`（每格状态由 `Botany.readCatData/writeCatData` 存进 `Cats`，键 `"growLevel"`）；JSON 键名是历史遗留的 `"botany"`，**别改**，改了旧存档读不出来。加新的每格状态就在 `readCatData`/`writeCatData` 里加一对键。
+7. **区块挂载要重新登记（写新附着物时不用管，但改动 `ChunkSystem` 时务必记得）**：每格独享的附着物**只把数据存进区块**，它的"运行时登记"（`blockInstances` 那一条 + `TimeSystem` 的 tick）不会随存档回来。`ChunkSystem.addChunk` 遍历 `blocks` 列时**必须顺带遍历 `attachments` 列**并 `addBlockInstance()`，`removeChunk` 对称地只摘除、**不掉包**。漏掉加载侧的后果有两个而且都很隐蔽：读档出来的植物**不再生长**，以及**挖掉它下面的方块会崩**（`destroyAttachment → removeBlockInstance` 用 `id@instance.hashCode` 当键，查不到就报"实例从未添加过"，异常抛在世界更新链上会打断整帧）。
 
