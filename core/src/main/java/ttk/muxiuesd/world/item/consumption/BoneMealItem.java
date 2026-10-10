@@ -39,10 +39,6 @@ public class BoneMealItem extends ConsumptionItem {
             return false;
         }
         //已经长到上限就不再浪费骨粉
-        if (!botany.growLevelIncreaseUpToMax(1)) {
-            return false;
-        }
-        //借父类的实现播放物品使用音效并且返回true，消耗品据此把数量减一
-        return super.useOn(itemStack, world, user, targetPos);
+        return botany.growLevelIncreaseUpToMax(1);
     }
 }

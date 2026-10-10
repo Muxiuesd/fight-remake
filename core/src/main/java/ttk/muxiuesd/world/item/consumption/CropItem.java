@@ -36,10 +36,7 @@ public class CropItem extends ConsumptionItem {
         ChunkSystem chunkSystem = world.getSystem(ChunkSystem.class);
         //能不能种在这里由放置规则决定（见 AttachmentPlacements），物品这边不再硬编码耕地
         //放置失败就不算使用成功，不消耗物品
-        if (!chunkSystem.placeAttachment(this.getAttachment(), targetPos.x, targetPos.y)) {
-            return false;
-        }
-        return super.useOn(itemStack, world, user, targetPos);
+        return chunkSystem.placeAttachment(this.getAttachment(), targetPos.x, targetPos.y);
     }
 
     public Attachment getAttachment () {
