@@ -448,14 +448,9 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             return this.blockInstances.remove(this.getBlockKey(blockWithEntity));
         }
 
-        //普通方块、每格独享的附着物（附着物用的是实例的hashCode当键）
-        //附着物可能没登记过（旧存档、或者被别的途径写进区块的），这时报错但不抛异常：
-        //抛异常会把整个世界更新中断掉，代价比"实例表里少一条"大得多
+        //普通方块与每格独享的附着物（附着物的键是实例的hashCode）
+        //查不到键说明这个实例压根没登记过，是真缺陷，直接报错
         if (!this.blockInstances.containsKey(blockKey)) {
-            if (block instanceof Attachment) {
-                Log.error(TAG, "附着物：" + blockKey + " 的实例从未添加过！！！", new IllegalStateException());
-                return null;
-            }
             throw new IllegalArgumentException("方块：" + blockKey + " 的实例从未添加过！！！");
         }
 
@@ -665,12 +660,8 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
         if (chunk.hasAttachment(chunkPos.x, chunkPos.y)) {
             //有附着物就破坏，并且返回被破坏的附着物实例
             Attachment attachmentInstance = chunk.getAttachment(chunkPos.x, chunkPos.y);
-            //记得移除这个附着物的实例
-            //（每格独享的附着物可能存在没登记进系统的：比如旧存档里的、或者是还没走addChunk重建的，
-            //  这时只报错、不抛异常，破坏流程照常走完，否则一次破坏会把整个世界更新中断掉）
-            if (this.isInstanceAttachment(attachmentInstance)) {
-                this.removeBlockInstance(attachmentInstance);
-            }
+            //移除这个附着物的实例（每格独享的附着物都是登记过的：放置与读档都走addBlock/addChunk）
+            this.removeBlockInstance(attachmentInstance);
             chunk.setAttachment(null, chunkPos.x, chunkPos.y);
             //调用被破坏方法
             attachmentInstance.beDestroyed(getWorld(), roundPos);
