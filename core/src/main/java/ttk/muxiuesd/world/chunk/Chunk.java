@@ -1,22 +1,13 @@
 package ttk.muxiuesd.world.chunk;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
-import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
-import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
-import ttk.muxiuesd.registrant.BlockRendererRegistry;
-import ttk.muxiuesd.registrant.WallRendererRegistry;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.serialization.codecs.CodecChunk;
 import ttk.muxiuesd.system.ChunkSystem;
@@ -30,9 +21,11 @@ import ttk.muxiuesd.world.wall.Wall;
 /**
  * 一个区块
  * <p>
- * 一行一行更新绘制
+ * 只持有数据：方块、墙体、附着物、地形高度，以及区块内的坐标换算
+ * <p>
+ * 区块内容的绘制不在这里，统一由 {@link ttk.muxiuesd.system.ChunkRenderSystem} 负责
  * */
-public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
+public class Chunk implements Disposable, Updateable {
     /**
      * 区块的现代化编解码器
      * */
@@ -110,53 +103,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
         this.attachments = new Attachment[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
-    }
-
-    @Override
-    public void draw(Batch batch) {
-        ChunkPosition cp = this.chunkPosition;
-        //绘制方快
-        this.traversal((x, y) -> {
-            Block block = this.blocks[y][x];
-            if (block != null) {
-                BlockRenderer<Block> renderer = BlockRendererRegistry.get(block);
-                if (renderer != null) {
-                    BlockRenderer.Context context = renderer.getContext();
-                    context.x = x + cp.x * ChunkWidth;
-                    context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, block, context);
-                    renderer.freeContext(context);
-                }
-            }
-        });
-        //绘制墙体
-        this.traversal((x, y) -> {
-            Wall<?> wall = this.walls[y][x];
-            if (wall != null) {
-                WallRenderer<Wall<?>> renderer = WallRendererRegistry.getRenderer(wall);
-                if (renderer != null) {
-                    WallRenderer.Context context = renderer.getContext();
-                    context.x = x + cp.x * ChunkWidth;
-                    context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, wall, context);
-                    renderer.freeContext(context);
-                }
-            }
-        });
-        //绘制附着物
-        this.traversal((x, y) -> {
-            Attachment attachment = this.attachments[y][x];
-            if (attachment != null) {
-                BlockRenderer<Block> renderer = BlockRendererRegistry.get(attachment);
-                if (renderer != null) {
-                    BlockRenderer.Context context = renderer.getContext();
-                    context.x = x + cp.x * ChunkWidth;
-                    context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, attachment, context);
-                    renderer.freeContext(context);
-                }
-            }
-        });
     }
 
     @Override
@@ -321,43 +267,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             cy = (int) (wy % ChunkHeight);
         }
         return new GridPoint2(cx, cy);
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        //绘制区块边界
-        if (this.chunkSystem.chunkEdgeRender) {
-            batch.setColor(Color.PURPLE);
-            //内部区域边界
-            for (int i = 0; i < chunkZone.length; i++) {
-                Rectangle zone = chunkZone[i];
-                batch.rect(zone.x, zone.y, zone.width, zone.height);
-            }
-            //区块整个边界
-            batch.setColor(new Color(255, 0, 0, 255));
-            batch.rect(
-                this.chunkPosition.x * ChunkWidth + ZONE_RECTANGLE_OFFSET.x,
-                this.chunkPosition.y * ChunkHeight+ ZONE_RECTANGLE_OFFSET.y,
-                ChunkWidth, ChunkHeight
-            );
-            //还原颜色
-            batch.setColor(Color.WHITE);
-        }
-        //绘制墙体的碰撞箱范围
-        if (this.chunkSystem.wallHitboxRender) {
-            batch.setColor(Color.BLUE);
-            this.traversal(((x, y) -> {
-                Wall wall = walls[y][x];
-                if (wall != null && wall.getHitboxRectangle() != null) {
-                    /*Rectangle hitbox = wall.getHitbox();
-                    batch.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());*/
-                    wall.renderShape(batch);
-                }
-            }));
-            //还原颜色
-            batch.setColor(Color.WHITE);
-        }
-
     }
 
     /**

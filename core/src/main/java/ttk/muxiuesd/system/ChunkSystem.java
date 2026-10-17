@@ -1,8 +1,5 @@
 package ttk.muxiuesd.system;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -13,15 +10,11 @@ import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterBlockReplace;
 import ttk.muxiuesd.interfaces.Tickable;
-import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
-import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
-import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.AttachmentPlacements;
 import ttk.muxiuesd.registry.Biomes;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.WorldInfoTypes;
-import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.util.Util;
@@ -54,12 +47,9 @@ import java.util.concurrent.*;
  * <p>
  * 世界地图运行的核心系统，每一个区块持有方块、墙体以及植物的数据，这个系统负责统筹世界上所有的区块
  * */
-public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
+public class ChunkSystem extends WorldSystem {
     public final String TAG = this.getClass().getName();
     public static final float Slope = 1000.0f;   // 地形坡度，生成地形时的参数（世界坐标→噪声坐标分频；越大地形越平缓、大陆越大）
-
-    public boolean chunkEdgeRender = false;
-    public boolean wallHitboxRender = false;
 
     private Player player;
     private Vector2 playerLastPosition;
@@ -225,68 +215,6 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
             this.calculateNeedUnloadedChunk();
             this.playerLastPosition.set(this.player.getX(), this.player.getY());
         }
-    }
-
-    @Override
-    public void draw(Batch batch) {
-        //区块绘制，看不见的区块将会被剔除
-        OrthographicCamera camera = PlayerCamera.INSTANCE.getCamera();
-        //区块的世界尺寸 = 格子数 × 单格子世界尺寸（Block.WIDTH/HEIGHT = 1，故 = ChunkWidth）
-        float halfW = Chunk.ChunkWidth * Block.WIDTH / 2f;
-        float halfH = Chunk.ChunkHeight * Block.HEIGHT / 2f;
-        for (Chunk chunk : this.activeChunks) {
-            //区块左下角世界坐标（getWorldX(0) 是最左格中心，需回退半格到边界）
-            float leftBottomX = chunk.getWorldX(0) - Block.WIDTH / 2f;
-            float leftBottomY = chunk.getWorldY(0) - Block.HEIGHT / 2f;
-            //boundsInFrustum 期望"中心点 + 半宽半高"，z 维度在 2D 正交相机中恒可见，传 0
-            if (camera.frustum.boundsInFrustum(
-                leftBottomX + halfW, leftBottomY + halfH, 0,
-                halfW, halfH, 0
-            )) {
-                chunk.draw(batch);
-            }
-        }
-
-        //绘制方块实体
-        this.getBlockEntities().forEach((block, blockEntity) -> {
-            BlockPos pos = blockEntity.getBlockPos();
-            //找对应的渲染器来执行渲染
-            BlockEntityRenderer<BlockEntity> renderer = BlockEntityRendererRegistry.get(blockEntity);
-            //渲染器未注册（返回null，注册表内部已log）时不绘制该方块实体，避免崩溃
-            if (renderer == null) return;
-            BlockEntityRenderer.Context context = renderer.getContext();
-            context.x = pos.x;
-            context.y = pos.y;
-            //上下文必须成对释放：render 抛异常也不能把已取出的实例漏在池外（P-B3）
-            try {
-                renderer.render(batch, blockEntity, context);
-            } finally {
-                renderer.freeContext(context);
-            }
-        });
-    }
-
-    @Override
-    public void batchRender (Batch batch) {
-        this.draw(batch);
-    }
-
-    @Override
-    public void shapeRender (ShapeRenderer shapeRenderer) {
-        this.renderShape(shapeRenderer);
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        for (Chunk chunk : this.activeChunks) {
-            chunk.renderShape(batch);
-        }
-    }
-
-
-    @Override
-    public int getRenderPriority () {
-        return 100;
     }
 
     @Override
@@ -1182,6 +1110,13 @@ public class ChunkSystem extends WorldSystem implements IWorldChunkRender {
 
     public ConcurrentHashMap<String, Block> getBlockInstancesMap () {
         return this.blockInstances;
+    }
+
+    /**
+     * 获取当前活跃的区块（区块渲染系统用）
+     * */
+    public ArrayList<Chunk> getActiveChunks () {
+        return this.activeChunks;
     }
 
     public ConcurrentHashMap<BlockWithEntity, BlockEntity> getBlockEntities () {

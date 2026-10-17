@@ -84,10 +84,12 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         }
         // C键控制区块边界是否绘制
         if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
-            cs.chunkEdgeRender = !cs.chunkEdgeRender;
+            ChunkRenderSystem crs = getManager().getSystem(ChunkRenderSystem.class);
+            crs.chunkEdgeRender = !crs.chunkEdgeRender;
         }
         if (KeyBindings.HitboxDisplay.wasJustPressed()) {
-            cs.wallHitboxRender = !cs.wallHitboxRender;
+            ChunkRenderSystem crs = getManager().getSystem(ChunkRenderSystem.class);
+            crs.wallHitboxRender = !crs.wallHitboxRender;
         }
         // F键控制流场调试是否绘制
         if (KeyBindings.FlowFieldDisplay.wasJustPressed()) {

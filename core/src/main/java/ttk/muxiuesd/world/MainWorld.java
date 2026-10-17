@@ -22,6 +22,8 @@ public class MainWorld extends World {
         addSystem("EventSystem", new EventSystem(this));
         addSystem("PlayerSystem", new PlayerSystem(this));
         addSystem("ChunkSystem", new ChunkSystem(this));
+        //区块渲染系统：区块内容的绘制全部在这里（方块层 → 墙体层 → 附着物层）
+        addSystem("ChunkRenderSystem", new ChunkRenderSystem(this));
         //寻路系统需要在实体移动前更新流场（EntitySystem 在实体状态机中查询流场方向）
         addSystem("PathfindingSystem", new PathfindingSystem(this));
         addSystem("EntitySystem", new EntitySystem(this));
