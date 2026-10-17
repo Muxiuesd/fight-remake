@@ -34,7 +34,13 @@ import ttk.muxiuesd.world.chunk.ChunkLoadTask;
 import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.chunk.MainWorldChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
+import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.entity.player.Player;
+import ttk.muxiuesd.world.hitbox.RectHitbox;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.spawn.SpawnPointFinder;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -427,28 +433,21 @@ public class ChunkSystem extends WorldSystem {
     }
 
     /**
-     * 替换某个位置的方块
-     * @param position 世界坐标
+     * 放置方块
+     * <p>
+     * 这一格原本就有方块的话会被替换掉，被替换下来的旧方块走完整的破坏收尾（破坏音 + 残渣粒子 + 掉落）
+     * @return 放置成功返回true；区块未加载等放不上来的情况返回false
      * */
-    public Block replaceBlock (Block newBlock, Vector2 position) {
-        return this.replaceBlock(newBlock, position.x, position.y);
-    }
-    /**
-     * 替换某个位置的方块
-     * @return 被替换下来的方块
-     * */
-    public Block replaceBlock (Block newBlock, float wx, float wy) {
+    public boolean placeBlock (Block newBlock, float wx, float wy) {
         if (newBlock == null) {
             throw new NullPointerException("newBlock 不能为null！！！");
         }
-        Block oldBlock = this.getBlock(wx, wy);
         Vector2 round = Util.fastRound(wx, wy);
-
-        ChunkPosition chunkPosition = this.getChunkPosition(round);
-        Chunk chunk = this.getChunk(chunkPosition);
-        //区块未加载时无法替换
-        if (chunk == null) return oldBlock;
+        Chunk chunk = this.getChunk(this.getChunkPosition(round));
+        //区块未加载时无法放置
+        if (chunk == null) return false;
         GridPoint2 chunkBlockPos = Chunk.worldToChunk(round.x, round.y);
+        Block oldBlock = chunk.getBlock(chunkBlockPos.x, chunkBlockPos.y);
 
         //如果旧的方块是带有方块实体的方块
         if (oldBlock instanceof BlockWithEntity blockWithEntity) {
@@ -461,8 +460,13 @@ public class ChunkSystem extends WorldSystem {
         //这一格原来有方块，现在被换掉了，跟它同格的附着物就失去了支撑，一并破坏掉
         //（附着物和它的支撑方块在同一格里，所以这里不加偏移，就用这一格的坐标；
         //  这一格原本是空气的话不碰——没有方块可以失去，附着物继续附着在下方方块上）
-        if (oldBlock != Blocks.ARI) {
+        //旧方块自己也要走完破坏收尾：破坏音 + 残渣粒子 + 掉落
+        //（损坏存档里未知id的格子解码失败会保持null，这种格子什么都不做）
+        if (oldBlock != null && oldBlock != Blocks.ARI) {
             this.destroyAttachment(round.x, round.y);
+            this.getWorld().getSystem(SoundSystem.class).playDestroySound(oldBlock, round.x, round.y);
+            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(oldBlock, round);
+            this.dropDestroyed(oldBlock, round.x, round.y);
         }
 
         //如果新方块是带有方块实体的方块，需要新建一个实例再添加
@@ -475,37 +479,57 @@ public class ChunkSystem extends WorldSystem {
 
         EventBus.post(EventTypes.BLOCK_REPLACE, new EventPosterBlockReplace(getWorld(), newBlock, oldBlock, wx, wy));
 
-        //破坏方块粒子：被替换下来的非空气方块生成残渣粒子
-        if (oldBlock != Blocks.ARI) {
-            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(oldBlock, round);
-        }
+        return true;
+    }
 
-        return oldBlock;
+    /**
+     * 破坏方块
+     * <p>
+     * 等价于把这一格替换成空气方块，破坏音、残渣粒子、掉落都由 {@link #placeBlock} 统一处理
+     * */
+    public void destroyBlock (Vector2 position) {
+        this.destroyBlock(position.x, position.y);
+    }
+    public void destroyBlock (float wx, float wy) {
+        this.placeBlock(Blocks.ARI, wx, wy);
     }
 
     /**
      * 放置墙体
+     * <p>
+     * 与方块物品放置方块一致：这一格原本有墙体的话会被替换掉，旧墙体走完整的破坏收尾
+     * <p>
+     * 与方块不同的是墙体是填满一格的障碍，放置前要检测目标格上有没有实体，有实体就放不了
      * @return 放置成功返回true，否则为false
      * */
     public boolean placeWall (Wall<?> wall, float wx, float wy) {
-        //本来就有墙体就不能放置
-        if (this.getWall(wx, wy) != null) return false;
-
-        Block block = this.getBlock(wx, wy);
-        //在空气方块或者水方块上不得放置墙体
-        if (block instanceof BlockAir || block instanceof BlockWater) return false;
-
         Vector2 round = Util.fastRound(wx, wy);
-        //每一个墙体都是一个单独的实例
-        Wall<?> instance = wall.createSelf(round);
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
         //区块未加载时无法放置
         if (chunk == null) return false;
         GridPoint2 chunkWallPos = Chunk.worldToChunk(round.x, round.y);
-        chunk.setWall(instance, chunkWallPos.x, chunkWallPos.y);
+        Block block = chunk.getBlock(chunkWallPos.x, chunkWallPos.y);
+        //在空气方块或者水方块上不得放置墙体
+        if (block instanceof BlockAir || block instanceof BlockWater) return false;
 
-        System.out.println("在区块：" + chunk.getChunkPosition().toString()
-            + " 的" + chunkWallPos.toString() + "上放置墙体");
+        //每一个墙体都是一个单独的实例，先建出来——碰撞检测要用它的碰撞箱
+        //（原型墙的碰撞箱中心在世界原点，拿它判重叠永远判不中）
+        Wall<?> instance = wall.createSelf(round);
+        //目标格上站着实体就不能放，否则实体被卡在墙体里面
+        for (Entity<?> entity : this.getWorld().getSystem(EntitySystem.class).getEntities()) {
+            if (entity.getBodyHitbox() instanceof RectHitbox rectHitbox
+                && instance.getHitboxRectangle().overlaps(rectHitbox.getRectangle())) return false;
+        }
+
+        //这一格原本有墙体，被替换下来的旧墙体走完整的破坏收尾
+        Wall<?> oldWall = chunk.getWall(chunkWallPos.x, chunkWallPos.y);
+        if (oldWall != null) {
+            this.getWorld().getSystem(SoundSystem.class).playDestroySound(oldWall, round.x, round.y);
+            this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(oldWall, round);
+            this.dropDestroyed(oldWall, round.x, round.y);
+        }
+
+        chunk.setWall(instance, chunkWallPos.x, chunkWallPos.y);
 
         //通知寻路系统该格不可走了
         PathfindingSystem pathfindingSystem = this.getWorld().getSystem(PathfindingSystem.class);
@@ -516,27 +540,53 @@ public class ChunkSystem extends WorldSystem {
 
     /**
      * 破坏墙体
-     * @return 被破坏的墙体实例
+     * <p>
+     * 清空这一格的墙体，然后破坏音、残渣粒子、掉落，与方块的破坏收尾完全一致
      * */
-    public Wall<?> destroyWall (Vector2 position) {
-        return this.destroyWall(position.x, position.y);
+    public void destroyWall (Vector2 position) {
+        this.destroyWall(position.x, position.y);
     }
-    public Wall<?> destroyWall (float wx, float wy) {
-        //没有墙体
-        if (this.getWall(wx, wy) == null) return null;
+    public void destroyWall (float wx, float wy) {
         Vector2 round = Util.fastRound(wx, wy);
         Chunk chunk = this.getChunk(this.getChunkPosition(round));
         //区块未加载时无法破坏
-        if (chunk == null) return null;
+        if (chunk == null) return;
         GridPoint2 cp = Chunk.worldToChunk(round.x, round.y);
         Wall<?> wall = chunk.getWall(cp.x, cp.y);
+        //没有墙体就什么都不做
+        if (wall == null) return;
         chunk.setWall(null, cp.x, cp.y);
 
         //通知寻路系统该格可行走了
         PathfindingSystem pathfindingSystem = this.getWorld().getSystem(PathfindingSystem.class);
         if (pathfindingSystem != null) pathfindingSystem.onWallChanged(round.x, round.y);
 
-        return wall;
+        this.getWorld().getSystem(SoundSystem.class).playDestroySound(wall, round.x, round.y);
+        this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(wall, round);
+        this.dropDestroyed(wall, round.x, round.y);
+    }
+
+    /**
+     * 一个方块类（方块、墙体、附着物）被打掉之后的掉落
+     * <p>
+     * 战利品表优先（现有表全是掉落自身，等价于掉1个自己），没有表就掉自身的物品1个
+     * */
+    private void dropDestroyed (Block destroyed, float wx, float wy) {
+        Vector2 position = new Vector2(wx, wy);
+        //获取方块类对象的掉落物表
+        BlockDropLootTable dropLootTable = Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(destroyed.getIdentifier());
+        if (dropLootTable != null) {
+            dropLootTable.generate(getWorld(), new BlockDropLootTable.Conditions().setPos(position));
+            return;
+        }
+        //找不到注册的战利品表就尝试找对应的方块物品
+        Item item = Registries.ITEM.getOrNull(destroyed.getIdentifier());
+        //既没有战利品表也没有对应物品的方块，打掉之后不掉东西
+        if (item == null) return;
+        //把方块变成方块物品并且变成物品实体形式掉落在世界上
+        ItemEntityGetter.get(getWorld().getSystem(EntitySystem.class), new ItemStack(item, 1))
+            .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
+            .setPosition(position);
     }
 
     /**
@@ -594,6 +644,8 @@ public class ChunkSystem extends WorldSystem {
             chunk.setAttachment(null, chunkPos.x, chunkPos.y);
             //调用被破坏方法
             attachmentInstance.beDestroyed(getWorld(), roundPos);
+            //播放附着物的破坏音效（附着物与方块、墙体共用同一个音效入口）
+            this.getWorld().getSystem(SoundSystem.class).playDestroySound(attachmentInstance, roundPos.x, roundPos.y);
             //破坏附着物粒子：生成残渣粒子
             this.getWorld().getSystem(ParticleSystem.class).blockBreakParticle(attachmentInstance, roundPos);
             return attachmentInstance;

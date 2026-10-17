@@ -44,8 +44,7 @@ public class EventSystem extends WorldSystem {
             .subscribe(EventTypes.ENTITY_DEATH, new EventSlimeDead())
             .subscribe(EventTypes.ENTITY_DEATH, new EventLivingEntityDeath())
             .subscribe(EventTypes.BULLET_SHOOT, new EventPlayerShootBullet())
-            .subscribe(EventTypes.BULLET_SHOOT, new EventEnemyShootBullet())
-            .subscribe(EventTypes.BLOCK_REPLACE, new EventBlockReplace());
+            .subscribe(EventTypes.BULLET_SHOOT, new EventEnemyShootBullet());
     }
 
     /**

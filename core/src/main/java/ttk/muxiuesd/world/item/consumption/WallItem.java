@@ -1,16 +1,11 @@
 package ttk.muxiuesd.world.item.consumption;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.ChunkSystem;
-import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
-import ttk.muxiuesd.world.hitbox.Hitbox;
-import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -23,7 +18,7 @@ public class WallItem extends ConsumptionItem {
     private final Wall<?> wall;
 
     public WallItem(final Wall<?> wall) {
-        this(wall, new Property().setUseSound(Sounds.STONE.put()));
+        this(wall, new Property());
     }
 
     public WallItem (final Wall<?> wall, Property property) {
@@ -33,35 +28,20 @@ public class WallItem extends ConsumptionItem {
 
     /**
      * 使用放置墙体
+     * <p>
+     * 与方块物品放置方块一致：目标格上有没有实体、这一格原本有没有墙体，都由 ChunkSystem 统一处理
      * */
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         Vector2 worldPosition = Util.getMouseWorldPosition();
-        //TODO 修复放置不准确的bug
-        //检查与实体的碰撞箱是否有冲突
-        boolean flag = false;
-        EntitySystem es = world.getSystem(EntitySystem.class);
-        Array<Entity<?>> entities = es.getEntities();
-        for (Entity<?> entity : entities) {
-            //Rectangle hitbox = entity.getHitbox();
-            Hitbox entityBodyHitbox = entity.getBodyHitbox();
-            if (entityBodyHitbox instanceof RectHitbox entityRectHitbox) {
-                if (wall.getHitboxRectangle().overlaps(entityRectHitbox.getRectangle())) {
-                    flag = true;
-                    break;
-                }
-            }
-        }
-        //标记为假时说明与实体碰撞箱不冲突，就执行放置
-        if (!flag) {
-            ChunkSystem cs = world.getSystem(ChunkSystem.class);
-            if (cs.placeWall(this.getWall(), worldPosition.x, worldPosition.y)) {
-                //放置成功，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
-                this.playUseSound(world, user);
-                return true;
-            }
-        }
-        return false;
+        ChunkSystem cs = world.getSystem(ChunkSystem.class);
+
+        //放不上来（区块没加载、空气/水方块上、目标格有实体）就返回false，物品不会被消耗
+        if (!cs.placeWall(this.getWall(), worldPosition.x, worldPosition.y)) return false;
+
+        //放置成功，播放墙体自己的放置音并报告成功（物品默认的 use 不播音效也不报成功）
+        world.getSystem(SoundSystem.class).playPutSound(this.getWall(), worldPosition.x, worldPosition.y);
+        return true;
     }
 
     public Wall<?> getWall () {

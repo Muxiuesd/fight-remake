@@ -23,6 +23,14 @@ public final class PropertyTypes {
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<Integer> ITEM_DURATION = register("item_duration", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
+    /**
+     * 功能型物品：手持时左键一律不破坏世界（附着物 / 墙体 / 方块都不破坏），
+     * 无论这次左键的物品使用成功还是失败。
+     * <p>
+     * 用于"左键是主动能"的物品（武器、鱼竿等），避免它们的左键既发动功能又拆地形。
+     * 注意：它是"物品类型级"的标记，判定时读物品原型的属性，不要读堆叠里的属性副本。
+     * */
+    public static final PropertyType<Boolean> ITEM_FUNCTIONAL = register("item_functional", new DefaultBoolPropertyType());
     public static final PropertyType<Boolean> FISHING_POLE_USING = register("fishing_pole_using", new PropertyFishingPoleUsing());
     //public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
     public static final PropertyType<AudioHolder> ITEM_USE_SOUND = register("item_use_sound", new PropertyItemUseSound());

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.system;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudioSource;
@@ -86,10 +87,11 @@ public class SoundSystem extends WorldSystem {
             Player player = this.ps.getPlayer();
             Vector2 playerCenter = player.getCenterPos();
             Block underfootBlock = cs.getBlock(playerCenter.x, playerCenter.y);
+            //脚下方块的材质变了才换音效，同一种地面连续走不重播
             AudioHolder walkAudio = underfootBlock.getProperty().getSounds().walk();
             if (! Objects.equals(this.curWalkAudio, walkAudio)) {
                 this.muteWalkSound();
-                this.playWalkSound(walkAudio, player);
+                this.playWalkSound(underfootBlock, player);
             }
             // 更新声源位置（玩家在移动）
             if (this.curWalkAudioInstance != null) {
@@ -102,20 +104,56 @@ public class SoundSystem extends WorldSystem {
     }
 
     /**
-     * 播放/恢复玩家走路音效（优先复用缓存）
+     * 播放/恢复方块类（方块 / 墙体 / 附着物）的走路音效
+     * <p>
+     * 三者都继承 Block，音效都挂在 Block.Property 的 BlockSounds 上，所以统一从这三个方法播放
+     * @param block 脚下的方块类
+     * @param walker 走路的实体
      * */
-    public void playWalkSound (AudioHolder walkAudio, Player player) {
+    public SpatialAudio playWalkSound (Block block, Entity<?> walker) {
+        return this.playWalkSound(block.getProperty().getSounds().walk(), walker);
+    }
+
+    /**
+     * 播放/恢复走路音效（优先复用缓存）
+     * */
+    private SpatialAudio playWalkSound (AudioHolder walkAudio, Entity<?> walker) {
         SpatialAudio audio = this.walkAudioCache.get(walkAudio);
         if (audio == null || !audio.isPlaying()) {
-            audio = this.playSpatialSound(walkAudio, player);
+            audio = this.playSpatialSound(walkAudio, walker);
             audio.setLooping(true);
             this.walkAudioCache.put(walkAudio, audio);
         } else {
-            audio.setBoundSource(player.getSounder());
+            audio.setBoundSource(walker.getSounder());
             audio.setVolume(1f);
         }
         this.curWalkAudio = walkAudio;
         this.curWalkAudioInstance = audio;
+        return audio;
+    }
+
+    /**
+     * 播放方块类（方块 / 墙体 / 附着物）的放置音效
+     * @param block 被放置的方块类
+     * */
+    public SpatialAudio playPutSound (Block block, float wx, float wy) {
+        return this.playSpatialSound(block.getProperty().getSounds().put(), this.atPosition(wx, wy));
+    }
+
+    /**
+     * 播放方块类（方块 / 墙体 / 附着物）的破坏音效
+     * @param block 被破坏的方块类
+     * */
+    public SpatialAudio playDestroySound (Block block, float wx, float wy) {
+        return this.playSpatialSound(block.getProperty().getSounds().destroy(), this.atPosition(wx, wy));
+    }
+
+    /**
+     * 一次性世界坐标音源（每次的破坏/放置位置都不同，不复用）
+     * */
+    private SpatialAudioSource atPosition (float wx, float wy) {
+        Vector3 pos = new Vector3(wx, wy, 0);
+        return () -> pos;
     }
 
     /**

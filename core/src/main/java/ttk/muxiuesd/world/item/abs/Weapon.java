@@ -24,6 +24,8 @@ public abstract class Weapon extends Item {
 
     public Weapon (Property property) {
         super(property);
+        //武器是功能型物品：手持时左键不破坏世界（武器的左键是"攻击"，不是"挖"）
+        this.getProperty().add(PropertyTypes.ITEM_FUNCTIONAL, true);
     }
 
     @Override

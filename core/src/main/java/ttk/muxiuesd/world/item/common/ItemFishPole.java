@@ -35,7 +35,9 @@ public class ItemFishPole extends Item {
     public ItemFishPole () {
         super(new Property().setMaxCount(1)
                 .add(PropertyTypes.ITEM_WITH_ENTITY, null)
-                .add(PropertyTypes.FISHING_POLE_USING, false));
+                .add(PropertyTypes.FISHING_POLE_USING, false)
+                //鱼竿是功能型物品：手持时左键不破坏世界（左键是"抛竿/收杆"）
+                .add(PropertyTypes.ITEM_FUNCTIONAL, true));
     }
 
     @Override

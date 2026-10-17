@@ -8,6 +8,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -66,7 +67,8 @@ public abstract class Attachment extends Block {
      * 创建一个附着物的属性
      * */
     public static Property createProperty() {
-        return Block.Property.create();
+        //附着物都是长在地面上的植物/装饰，音效统一用草方块的那一套
+        return Block.Property.create().setSounds(Sounds.GRASS);
     }
 
 
