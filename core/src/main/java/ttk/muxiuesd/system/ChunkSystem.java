@@ -589,7 +589,8 @@ public class ChunkSystem extends WorldSystem {
             //有附着物就破坏，并且返回被破坏的附着物实例
             Attachment attachmentInstance = chunk.getAttachment(chunkPos.x, chunkPos.y);
             //移除这个附着物的实例（每格独享的附着物都是登记过的：放置与读档都走addBlock/addChunk）
-            this.removeBlockInstance(attachmentInstance);
+            //共享型附着物全世界只有一个原型、从不登记进blockInstances，不能走实例移除
+            if (this.isInstanceAttachment(attachmentInstance)) this.removeBlockInstance(attachmentInstance);
             chunk.setAttachment(null, chunkPos.x, chunkPos.y);
             //调用被破坏方法
             attachmentInstance.beDestroyed(getWorld(), roundPos);

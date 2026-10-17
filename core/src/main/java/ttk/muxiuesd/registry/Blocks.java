@@ -15,6 +15,7 @@ import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockCraftingTable;
 import ttk.muxiuesd.world.block.instance.BlockFurnace;
 import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.block.instance.attachment.AttachmentStick;
 import ttk.muxiuesd.world.block.instance.attachment.BotanyPotato;
 import ttk.muxiuesd.world.block.instance.attachment.BotanyWheat;
 
@@ -133,6 +134,22 @@ public final class Blocks {
         "wheat_stage_5.png",
         "wheat_stage_6.png",
         "wheat_stage_7.png"
+    );
+
+    //装饰
+    /**
+     * 木棍：贴在草方块上的一格装饰
+     * <p>
+     * 贴图直接用木棍物品的贴图，不复制资源文件——{@code AssetsLoader}的缓存按路径命中，
+     * 相同的贴图路径只会加载一次，两张图共用同一个{@link com.badlogic.gdx.graphics.Texture}
+     * <p>
+     * 用{@link BlockRenderer.StandardRenderer}而不是{@link AttachmentRenderer}：后者绘制原点在格子中心、
+     * 贴图向上占半格（那是给竖直生长的植物用的），木棍需要与方块同框、落在格子正中
+     * */
+    public static final AttachmentStick STICK_ATTACHMENT = register(
+        "stick_attachment",
+        AttachmentStick::new,
+        new BlockRenderer.StandardRenderer<AttachmentStick>(Fight.ID("stick_attachment"), Fight.ItemTexturePath("stick.png"))
     );
 
 

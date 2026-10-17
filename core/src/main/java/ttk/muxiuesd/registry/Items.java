@@ -35,6 +35,10 @@ import java.util.function.Supplier;
  * */
 public final class Items {
     public static void init () {
+        //木棍附着物被破坏后必定掉落1~2个木棍
+        //从物品侧设置：Blocks先于Items初始化，反过来写（Blocks引用Items）就是静态初始化环，见H14
+        Blocks.STICK_ATTACHMENT.setDroppedItem(STICK, 1, 2);
+
         Log.print(Items.class.getName(), "所有物品注册完成");
     }
 

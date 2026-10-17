@@ -1,12 +1,14 @@
 package ttk.muxiuesd.world.chunk;
 
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.Walls;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
 import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.block.instance.attachment.AttachmentStick;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -77,6 +79,17 @@ public class MainWorldChunkGenerator extends ChunkGenerator {
                 Wall<?> wall = Walls.SMOOTH_STONE.createSelf(new Vector2(chunk.getWorldX(x), chunk.getWorldY(y)));
                 chunk.setWall(wall, x, y);
             }
+        });
+
+        //④ 附着物：草方块上按概率生成木棍，不限定群系（草方块覆盖到的群系都会有）
+        //必须排在墙体遍历之后：上面的规则要跳过有墙体的格子
+        chunk.traversal((x, y) -> {
+            //草方块判定先做，能筛掉大部分格子
+            if (chunk.getBlock(x, y) != Blocks.GRASS) return;
+            if (chunk.getWall(x, y) != null) return;
+            if (ThreadLocalRandom.current().nextFloat() >= AttachmentStick.SPAWN_CHANCE) return;
+            //共享型附着物直接放注册表里的原型，不登记实例（生成期与读档写的是同一份区块数据）
+            chunk.setAttachment(Blocks.STICK_ATTACHMENT, x, y);
         });
 
         return chunk;

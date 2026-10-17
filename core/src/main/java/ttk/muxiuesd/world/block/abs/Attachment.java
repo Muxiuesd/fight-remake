@@ -72,6 +72,8 @@ public abstract class Attachment extends Block {
 
 
     private Item droppedItem;   //附着物被破坏后的掉落物，为null时什么都不掉
+    private int dropMin = 1;    //掉落数量下限
+    private int dropMax = 1;    //掉落数量上限
 
     public Attachment (Property property) {
         super(property);
@@ -116,7 +118,8 @@ public abstract class Attachment extends Block {
             MathUtils.random(-0.3f, 0.3f),
             MathUtils.random(-0.3f, 0.3f)
         );
-        ItemEntity itemEntity = ItemEntityGetter.get(es, pos, new ItemStack(item, 1));
+        ItemEntity itemEntity = ItemEntityGetter.get(es, pos,
+            new ItemStack(item, MathUtils.random(this.dropMin, this.dropMax)));
         itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
     }
 
@@ -126,6 +129,16 @@ public abstract class Attachment extends Block {
 
     public Attachment setDroppedItem (Item droppedItem) {
         this.droppedItem = droppedItem;
+        return this;
+    }
+
+    /**
+     * 设置掉落物与掉落数量区间，破坏时在[min, max]之间随机掉落
+     * */
+    public Attachment setDroppedItem (Item droppedItem, int dropMin, int dropMax) {
+        this.droppedItem = droppedItem;
+        this.dropMin = dropMin;
+        this.dropMax = dropMax;
         return this;
     }
 }
