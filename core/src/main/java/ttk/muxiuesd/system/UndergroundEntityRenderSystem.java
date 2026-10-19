@@ -30,13 +30,8 @@ public class UndergroundEntityRenderSystem extends EntityRenderSystem implements
     }
 
     @Override
-    public void draw(Batch batch) {
-        drawEntities(batch, this.getUndergroundEntities());
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        renderShapeEntities(batch, this.getUndergroundEntities());
+    protected Array<Entity<?>> getRenderEntities () {
+        return this.getUndergroundEntities();
     }
 
     @Override

@@ -196,7 +196,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 - `EntityProvider.Builder.setRenderer(Supplier)` 是**注册期立即 `get()`**（`interfaces/world/entity/EntityProvider.java`），`renderer` 为 final 字段 → **每种实体只有一个渲染器实例**，允许在渲染器里缓存东西；但**不要让它每帧 new 对象**。
 - 三层结构，按需覆写：
   - `interfaces/render/world/entity/EntityRenderer.java` 的 `StandardRenderer<T>`：一个 `bodyTextureRegion` + `draw(batch, entity, context)`（9 参 `batch.draw`）+ 空的 `drawShape`（实体是**贴图**还是**纯色形状**由子类决定）。
-  - `render/world/entity/LivingEntityRenderer.java`：`super.draw` 之外画影子、受击变红、手持物品；`flipWhenFacing`（贴图水平镜像开关，默认 false）在这里。
+  - `render/world/entity/LivingEntityRenderer.java`：身体绘制之外做受击变红、手持物品；`flipWhenFacing`（贴图水平镜像开关，默认 false）在这里。**影子不在这里画**——`drawShadow` 只转发 `EntityRenderer.Shadow.draw`，由 `EntityRenderSystem` 的"影子趟"统一调用（同一渲染层内先画完所有影子、再画所有身体）。
   - 子类只做装配：`EnemyRenderer`（16 行）、`PlayerRenderer`（45 行，`super.draw` 后再画护盾）。
 - **`Context` 是池化对象**，实体/物品/方块/WallRenderer/BlockEntityRenderer **各有独立的 `Context implements Pool.Poolable`（5 个，无公共基类）**。每帧流程是 `renderer.getContext(entity)` → `renderer.draw(batch, entity, context)` → `renderer.freeContext(context)`（`system/abs/EntityRenderSystem.java:31-46`，形状走 `:48-63`）。
   - **给 `Context` 加字段，必须同时加到 `reset()` 里复位**，否则上一帧/上一个实体（或另一张地图）的取值会泄漏到下一个实体，表现为随机闪一下。

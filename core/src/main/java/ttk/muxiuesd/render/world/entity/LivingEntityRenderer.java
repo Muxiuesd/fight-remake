@@ -20,10 +20,6 @@ import ttk.muxiuesd.world.item.abs.Item;
  * */
 public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRenderer.StandardRenderer<T> {
     public static final Color ATTACTED_COLOR = new Color(1f, 0f, 0f, 1f);
-    public static final Resource<TextureRegion> ENTITY_SHADOW_RESOURCE = Resource.ofTextureRegion(
-        Fight.ID("entity_shadow"),
-        Fight.EntityTexturePath("shadow.png")
-    );
 
     /**
      * 是否按实体朝向水平翻转贴图
@@ -57,20 +53,20 @@ public class LivingEntityRenderer<T extends LivingEntity<?>> extends EntityRende
     }
 
     @Override
+    public boolean hasShadow () {
+        return true;
+    }
+
+    @Override
+    public void drawShadow (Batch batch, T entity, Context context) {
+        //影子不参与镜像，贴图是对称的
+        EntityRenderer.Shadow.draw(batch, context);
+    }
+
+    @Override
     public void draw (Batch batch, T entity, Context context) {
         //需要翻转朝向时把信号写进渲染上下文（贴图朝右画的实体，朝左时就镜像绘制）
         context.flipX = this.flipWhenFacing && isFacingLeft(entity);
-
-        batch.setColor(1f, 1f, 1f, 0.666f);
-        //渲染影子
-        batch.draw(ENTITY_SHADOW_RESOURCE.get(),
-            context.x - context.width / 2f, context.y - (context.height / 5f) - (context.height / 2f),
-            context.originX, context.originY,
-            context.width, context.height,
-            context.scaleX, context.scaleY / 2f,
-            context.rotation
-        );
-        batch.setColor(1f, 1f, 1f, 1f);
 
         //身体渲染
         if (!entity.isAttacked()) {

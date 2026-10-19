@@ -1,5 +1,6 @@
 package ttk.muxiuesd.interfaces.render.world.entity;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -23,6 +24,25 @@ public interface EntityRenderer<T extends Entity<?>> {
      * */
     default TextureRegion getTextureRegion () {
         return null;
+    }
+
+    /**
+     * 是否有影子
+     * <p>
+     * 默认没有。有影子的渲染器覆写为 true 并实现 {@link #drawShadow}，
+     * 影子由 {@code EntityRenderSystem} 在"影子趟"里统一绘制
+     * */
+    default boolean hasShadow () {
+        return false;
+    }
+
+    /**
+     * 单独绘制影子
+     * <p>
+     * 由 {@code EntityRenderSystem} 在影子趟统一调用：这一趟只画影子不画身体，
+     * 一趟画完才开始画所有实体的身体，所以影子永远不会压住别的实体的身体
+     * */
+    default void drawShadow (Batch batch, T entity, Context context) {
     }
 
     /**
@@ -215,6 +235,43 @@ public interface EntityRenderer<T extends Entity<?>> {
 
         @Override
         public void drawShape (ShapeRenderer batch, T entity, Context context) {
+        }
+    }
+
+    /**
+     * 实体影子
+     * <p>
+     * 影子与身体分开画：同一个渲染层内先画完所有影子、再画所有身体。
+     * 所有实体共用同一张影子贴图，几何只在这里写一份
+     * */
+    class Shadow {
+        /** 影子颜色：白色 + 2/3 透明度（影子贴图本身是全白的） */
+        public static final Color COLOR = new Color(1f, 1f, 1f, 0.333f);
+        /** 影子贴图资源，所有实体共用 */
+        public static final Resource<TextureRegion> RESOURCE = Resource.ofTextureRegion(
+            Fight.ID("entity_shadow"),
+            Fight.EntityTexturePath("shadow.png")
+        );
+
+        private Shadow () {
+        }
+
+        /**
+         * 在渲染上下文所在的位置画一个影子
+         * <p>
+         * 纵向压成实体的一半高，并整体下移实体的 1/5 高度，让影子贴在地面上
+         * */
+        public static void draw (Batch batch, Context context) {
+            batch.setColor(COLOR);
+            batch.draw(RESOURCE.get(),
+                context.x - context.width / 2f,
+                context.y - (context.height / 5f) - (context.height / 2f),
+                context.originX, context.originY,
+                context.width, context.height,
+                context.scaleX, context.scaleY / 2f,
+                context.rotation
+            );
+            batch.setColor(1f, 1f, 1f, 1f);
         }
     }
 }
