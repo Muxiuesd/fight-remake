@@ -7,6 +7,7 @@ import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
@@ -60,6 +61,14 @@ public class Block implements ID<Block>, Disposable {
 
     private Identifier identifier;
     private Property property;
+    /**
+     * 这个方块怎么画
+     * <p>
+     * 注册时一次性绑定，渲染热路径直接读字段，不再每格去查注册表
+     * <p>
+     * 每格独享实例（如植物）在{@code createInstance()}里要把它复制过去
+     * */
+    private BlockRenderer<Block> renderer;
 
 
     public Block (Property property) {
@@ -97,6 +106,16 @@ public class Block implements ID<Block>, Disposable {
         }
         this.identifier = identifier;
         return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Block setRenderer (BlockRenderer<? extends Block> renderer) {
+        this.renderer = (BlockRenderer<Block>) renderer;
+        return this;
+    }
+
+    public BlockRenderer<Block> getRenderer () {
+        return this.renderer;
     }
 
     @Override

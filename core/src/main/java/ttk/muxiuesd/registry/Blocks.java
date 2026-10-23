@@ -283,6 +283,7 @@ public final class Blocks {
                                                 BlockRenderer<T> renderer) {
         T block = factory.get();
         block.setIdentifier(identifier);
+        block.setRenderer(renderer);    //渲染热路径直接读字段，不再查注册表
         Registries.BLOCK.register(identifier, block);
 
         registerBlockRenderer(block, renderer);

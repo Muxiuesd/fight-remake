@@ -472,7 +472,9 @@ public class ChunkSystem extends WorldSystem {
         //如果新方块是带有方块实体的方块，需要新建一个实例再添加
         //setBlock 内部会统一调用 addBlock（只执行一次，避免 bePlaced 重复触发）
         if (newBlock instanceof BlockWithEntity blockWithEntity) {
-            chunk.setBlock(blockWithEntity.createSelf(), chunkBlockPos.x, chunkBlockPos.y);
+            BlockWithEntity instance = blockWithEntity.createSelf();
+            instance.setRenderer(blockWithEntity.getRenderer());    //实例自己也要能画
+            chunk.setBlock(instance, chunkBlockPos.x, chunkBlockPos.y);
         }else {
             chunk.setBlock(newBlock, chunkBlockPos.x, chunkBlockPos.y);
         }

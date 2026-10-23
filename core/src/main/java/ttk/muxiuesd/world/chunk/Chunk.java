@@ -90,6 +90,17 @@ public class Chunk implements Disposable, Updateable {
     private final Attachment[][]  attachments;
     private final int[][] heights;
 
+    /**
+     * 每一行的占用位图：第 x 位为 1 表示这一格有内容
+     * <p>
+     * 渲染只遍历置位的格子，空层（整行位图为 0）直接跳过，不再逐格判断
+     * <p>
+     * 只在下面三个 setter 里维护，任何地方都不要绕过 setter 直接写上面三个数组
+     * */
+    private final long[] blockBits = new long[ChunkHeight];
+    private final long[] wallBits = new long[ChunkHeight];
+    private final long[] attachmentBits = new long[ChunkHeight];
+
     private Biome biome;   //该区块所属的群系（生成时确定，供渲染/判定复用）
     private boolean canSpawn;   //该区块是否可作为玩家出生点（由群系注册阶段确定，随存档保存）
 
@@ -122,6 +133,8 @@ public class Chunk implements Disposable, Updateable {
     public void setBlock (Block block, int cx, int cy) {
         if (block == null) block = Blocks.ARI;
         this.blocks[cy][cx] = block;
+        if (block == Blocks.ARI) this.blockBits[cy] &= ~(1L << cx);
+        else this.blockBits[cy] |= 1L << cx;
         //确保区块系统里存在这个方块
         if (this.chunkSystem != null) {
             this.chunkSystem.addBlock(block, this.getWorldX(cx), this.getWorldY(cy));
@@ -144,6 +157,8 @@ public class Chunk implements Disposable, Updateable {
 
     public void setWall (Wall<?> wall, int cx, int cy) {
         this.walls[cy][cx] = wall;
+        if (wall == null) this.wallBits[cy] &= ~(1L << cx);
+        else this.wallBits[cy] |= 1L << cx;
     }
 
     /**
@@ -167,6 +182,8 @@ public class Chunk implements Disposable, Updateable {
      * */
     public void setAttachment (Attachment attachment, int cx, int cy) {
         this.attachments[cy][cx] = attachment;
+        if (attachment == null) this.attachmentBits[cy] &= ~(1L << cx);
+        else this.attachmentBits[cy] |= 1L << cx;
     }
 
     /**
@@ -181,6 +198,25 @@ public class Chunk implements Disposable, Updateable {
      * */
     public boolean hasAttachment (int cx, int cy) {
         return this.attachments[cy][cx] != null;
+    }
+
+    /**
+     * 这一行的方块占用位图，第 x 位为 1 表示这一格有方块
+     * <p>
+     * 渲染用：只遍历置位的格子
+     * */
+    public long getBlockBits (int cy) {
+        return this.blockBits[cy];
+    }
+
+    /** 这一行的墙体占用位图，用法同上 */
+    public long getWallBits (int cy) {
+        return this.wallBits[cy];
+    }
+
+    /** 这一行的附着物占用位图，用法同上 */
+    public long getAttachmentBits (int cy) {
+        return this.attachmentBits[cy];
     }
 
 

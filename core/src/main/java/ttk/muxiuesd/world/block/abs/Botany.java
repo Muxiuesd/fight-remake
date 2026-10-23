@@ -31,7 +31,8 @@ public abstract class Botany extends Attachment implements Tickable, ICatData {
         //把原型上的配置复制给新的实例
         instance
             .setDroppedItem(this.getDroppedItem())
-            .setIdentifier(this.getIdentifier());
+            .setIdentifier(this.getIdentifier())
+            .setRenderer(this.getRenderer());
         return instance;
     }
 

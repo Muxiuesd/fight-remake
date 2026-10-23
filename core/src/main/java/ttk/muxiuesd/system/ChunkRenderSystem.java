@@ -10,7 +10,6 @@ import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
-import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.WallRendererRegistry;
 import ttk.muxiuesd.render.camera.PlayerCamera;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -116,73 +115,86 @@ public class ChunkRenderSystem extends WorldSystem implements IWorldChunkRender 
      * 绘制一个区块的方块层
      * */
     private void drawBlocks (Chunk chunk, Batch batch) {
-        chunk.traversal((x, y) -> {
-            Block block = chunk.getBlock(x, y);
-            if (block == null) return;
+        final float baseX = chunk.getWorldX(0);
+        final float baseY = chunk.getWorldY(0);
+        for (int y = 0; y < Chunk.ChunkHeight; y++) {
+            long bits = chunk.getBlockBits(y);
+            while (bits != 0) {
+                int x = Long.numberOfTrailingZeros(bits);
+                bits &= bits - 1;   //抹掉这一位，继续找下一个
 
-            BlockRenderer<Block> renderer = BlockRendererRegistry.get(block);
-            if (renderer != null) {
+                Block block = chunk.getBlock(x, y);
+                //渲染器在注册时就绑在方块原型上，这里直接读字段，不再每格查注册表
+                BlockRenderer<Block> renderer = block.getRenderer();
                 BlockRenderer.Context context = renderer.getContext();
-                context.x = chunk.getWorldX(x);
-                context.y = chunk.getWorldY(y);
+                context.x = baseX + x;
+                context.y = baseY + y;
                 //上下文必须成对释放：render 抛异常也不能把已取出的实例漏在池外（P-B3）
                 try {
                     renderer.render(batch, block, context);
                 } finally {
                     renderer.freeContext(context);
                 }
-            }
 
-            //带方块实体的方块：紧接着渲染它的方块实体
-            if (block instanceof BlockWithEntity blockWithEntity) {
-                this.drawBlockEntity(blockWithEntity, batch);
+                //带方块实体的方块：紧接着渲染它的方块实体
+                if (block instanceof BlockWithEntity blockWithEntity) {
+                    this.drawBlockEntity(blockWithEntity, batch);
+                }
             }
-        });
+        }
     }
 
     /**
      * 绘制一个区块的墙体层
      * */
     private void drawWalls (Chunk chunk, Batch batch) {
-        chunk.traversal((x, y) -> {
-            Wall<?> wall = chunk.getWall(x, y);
-            if (wall == null) return;
+        final float baseX = chunk.getWorldX(0);
+        final float baseY = chunk.getWorldY(0);
+        for (int y = 0; y < Chunk.ChunkHeight; y++) {
+            long bits = chunk.getWallBits(y);
+            while (bits != 0) {
+                int x = Long.numberOfTrailingZeros(bits);
+                bits &= bits - 1;
 
-            WallRenderer<Wall<?>> renderer = WallRendererRegistry.getRenderer(wall);
-            if (renderer != null) {
+                Wall<?> wall = chunk.getWall(x, y);
+                WallRenderer<Wall<?>> renderer = WallRendererRegistry.getRenderer(wall);
                 WallRenderer.Context context = renderer.getContext();
-                context.x = chunk.getWorldX(x);
-                context.y = chunk.getWorldY(y);
+                context.x = baseX + x;
+                context.y = baseY + y;
                 try {
                     renderer.render(batch, wall, context);
                 } finally {
                     renderer.freeContext(context);
                 }
             }
-        });
+        }
     }
 
     /**
      * 绘制一个区块的附着物层
      * */
     private void drawAttachments (Chunk chunk, Batch batch) {
-        chunk.traversal((x, y) -> {
-            Attachment attachment = chunk.getAttachment(x, y);
-            if (attachment == null) return;
+        final float baseX = chunk.getWorldX(0);
+        final float baseY = chunk.getWorldY(0);
+        for (int y = 0; y < Chunk.ChunkHeight; y++) {
+            long bits = chunk.getAttachmentBits(y);
+            while (bits != 0) {
+                int x = Long.numberOfTrailingZeros(bits);
+                bits &= bits - 1;
 
-            //附着物是方块的一种，同样走方块渲染器（贴图按生长阶段取）
-            BlockRenderer<Block> renderer = BlockRendererRegistry.get(attachment);
-            if (renderer != null) {
+                Attachment attachment = chunk.getAttachment(x, y);
+                //附着物是方块的一种，同样走方块渲染器（贴图按生长阶段取）
+                BlockRenderer<Block> renderer = attachment.getRenderer();
                 BlockRenderer.Context context = renderer.getContext();
-                context.x = chunk.getWorldX(x);
-                context.y = chunk.getWorldY(y);
+                context.x = baseX + x;
+                context.y = baseY + y;
                 try {
                     renderer.render(batch, attachment, context);
                 } finally {
                     renderer.freeContext(context);
                 }
             }
-        });
+        }
     }
 
     /**
@@ -209,6 +221,9 @@ public class ChunkRenderSystem extends WorldSystem implements IWorldChunkRender 
 
     @Override
     public void renderShape (ShapeRenderer batch) {
+        //两个调试开关都关着时，连可见区块都不用收集
+        if (!this.chunkEdgeRender && !this.wallHitboxRender) return;
+
         this.collectVisibleChunks();
 
         for (Chunk chunk : this.visibleChunks) {

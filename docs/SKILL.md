@@ -174,6 +174,8 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 | 附着物判定用方块对象当键 | 植物每格一个实例，`==` 比较在放置时必然查不到；规则表和 `ChunkSystem.getBlockKey` 都用 `Identifier` |
 | 读档出来的植物"不再生长"或"挖掉它下面的方块就崩`实例从未添加过`" | 同一个根因：每格独享附着物的运行时登记（`blockInstances` + `TimeSystem` tick）**不随存档回来**，必须由 `ChunkSystem.addChunk` 遍历 `attachments` 列重新 `addBlockInstance()`。改动区块加载/卸载代码时先确认这一对还在 |
 | `Botany` 的 `createSelf()` 忘了复制配置 | 现在由 `Botany.createInstance()` 统一复制 `droppedItem`/`identifier`，子类只写 `createSelf()`；**别去覆写 `createInstance()`** |
+| 新方块 / 新附着物不显示（或进世界就空指针） | 渲染器现在由 `Blocks.register` 在注册时**绑到方块原型上**（`block.setRenderer(renderer)`），渲染热路径直接读 `block.getRenderer()`、不再查 `BlockRendererRegistry`。所以方块**必须经 `Blocks.register` 注册**；每格独享的实例（`Botany`、`BlockWithEntity` 的 `createSelf()`）还要复制 `renderer`，否则渲染时空指针（故意 fail fast，不是静默不画） |
+| 区块渲染少画了格子 / 新放的方块不出现 | `Chunk` 的 `blocks`/`walls`/`attachments` 三个数组只能经 `setBlock`/`setWall`/`setAttachment` 写——三层占用位图（`blockBits`/`wallBits`/`attachmentBits`）就在这三个方法里维护，绕过它们直接写数组 → 位图不置位 → 渲染直接跳过该格 |
 
 ## 十一、新增一个生物 / 实体
 
