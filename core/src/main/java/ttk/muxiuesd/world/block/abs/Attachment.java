@@ -7,6 +7,7 @@ import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.BlockDropLootTables;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.EntitySystem;
@@ -110,6 +111,10 @@ public abstract class Attachment extends Block {
 
     @Override
     public void beDestroyed (World world, Vector2 position) {
+        //掉落表优先：登记过掉落表的附着物由表决定掉什么（作物按成熟度区分）
+        boolean mature = this instanceof Botany botany && botany.isFullyGrown();
+        if (BlockDropLootTables.generate(world, this, position, mature)) return;
+
         Item item = this.getDroppedItem();
         if (item == null) return;
 

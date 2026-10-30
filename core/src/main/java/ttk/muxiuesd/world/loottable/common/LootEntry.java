@@ -66,8 +66,10 @@ public class LootEntry implements Supplier<ItemStack> {
      * */
     @Override
     public ItemStack get () {
+        //数量没写死区间时按区间随机；写死了就用写死的那个数，别去读模板数量
+        //（模板数量恒为 1，写成 LootEntry.of(item, 3, 3, 1f) 会错误地只掉 1 个）
         int amount = this.minAmount == this.maxAmount
-            ? this.itemStack.getAmount()
+            ? this.minAmount
             : MathUtils.random(this.minAmount, this.maxAmount);
         //数量为 0：不掉落该物品
         if (amount <= 0) return ItemStack.VOID;

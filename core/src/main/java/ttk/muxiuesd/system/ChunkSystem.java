@@ -13,6 +13,7 @@ import ttk.muxiuesd.interfaces.Tickable;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.AttachmentPlacements;
 import ttk.muxiuesd.registry.Biomes;
+import ttk.muxiuesd.registry.BlockDropLootTables;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -40,7 +41,6 @@ import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.spawn.SpawnPointFinder;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -575,12 +575,8 @@ public class ChunkSystem extends WorldSystem {
      * */
     private void dropDestroyed (Block destroyed, float wx, float wy) {
         Vector2 position = new Vector2(wx, wy);
-        //获取方块类对象的掉落物表
-        BlockDropLootTable dropLootTable = Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(destroyed.getIdentifier());
-        if (dropLootTable != null) {
-            dropLootTable.generate(getWorld(), new BlockDropLootTable.Conditions().setPos(position));
-            return;
-        }
+        //掉落表优先：方块与墙体没有成熟度，一律按未成熟处理
+        if (BlockDropLootTables.generate(getWorld(), destroyed, position, false)) return;
         //找不到注册的战利品表就尝试找对应的方块物品
         Item item = Registries.ITEM.getOrNull(destroyed.getIdentifier());
         //既没有战利品表也没有对应物品的方块，打掉之后不掉东西
