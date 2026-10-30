@@ -38,9 +38,15 @@ public final class Sounds {
 
     ///物品
     public static final AudioHolder ITEM_CLICK = registerSound("item_click", "item/click.ogg");
-    public static final AudioHolder ITEM_PUT = registerSound("item_put", "item/put.ogg");
-    public static final AudioHolder ITEM_POP = registerSound("item_pop", "item/pop.ogg");
+    public static final AudioHolder ITEM_PUT   = registerSound("item_put", "item/put.ogg");
+    public static final AudioHolder ITEM_POP   = registerSound("item_pop", "item/pop.ogg");
     public static final AudioHolder ITEM_BREAK = registerSound("item_break", "item/break.ogg");
+    public static final AudioHolder CROP_PLANT_1 = registerSound("crop_plant_1",  "item/crop/crop_plant_1.ogg");
+    public static final AudioHolder CROP_PLANT_2 = registerSound("crop_plant_2",  "item/crop/crop_plant_2.ogg");
+    public static final AudioHolder CROP_PLANT_3 = registerSound("crop_plant_3",  "item/crop/crop_plant_3.ogg");
+    public static final AudioHolder CROP_PLANT_4 = registerSound("crop_plant_4",  "item/crop/crop_plant_4.ogg");
+    public static final AudioHolder CROP_PLANT_5 = registerSound("crop_plant_5",  "item/crop/crop_plant_5.ogg");
+    public static final AudioHolder CROP_PLANT_6 = registerSound("crop_plant_6",  "item/crop/crop_plant_6.ogg");
 
     ///装备物品
     public static final AudioHolder EQUIP = registerSound("equip", "item/equipment/equip.ogg");
@@ -51,6 +57,13 @@ public final class Sounds {
     public static final AudioHolder GRASS_2 = registerSound("grass_2",  "block/grass_2.ogg");
     public static final AudioHolder GRASS_3 = registerSound("grass_3",  "block/grass_3.ogg");
     public static final AudioHolder GRASS_4 = registerSound("grass_4",  "block/grass_4.ogg");
+    //农作物
+    public static final AudioHolder CROP_BREAK_1 = registerSound("crop_break_1",  "block/crop/crop_break_1.ogg");
+    public static final AudioHolder CROP_BREAK_2 = registerSound("crop_break_2",  "block/crop/crop_break_2.ogg");
+    public static final AudioHolder CROP_BREAK_3 = registerSound("crop_break_3",  "block/crop/crop_break_3.ogg");
+    public static final AudioHolder CROP_BREAK_4 = registerSound("crop_break_4",  "block/crop/crop_break_4.ogg");
+    public static final AudioHolder CROP_BREAK_5 = registerSound("crop_break_5",  "block/crop/crop_break_5.ogg");
+    public static final AudioHolder CROP_BREAK_6 = registerSound("crop_break_6",  "block/crop/crop_break_6.ogg");
     //方块
     public static final BlockSounds STONE =  registerBlockSounds("stone", "stone.ogg");
     public static final BlockSounds SAND =   registerBlockSounds("sand", "sand.ogg");

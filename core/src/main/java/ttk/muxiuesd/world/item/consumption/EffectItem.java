@@ -1,9 +1,7 @@
 package ttk.muxiuesd.world.item.consumption;
 
-import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
@@ -22,7 +20,6 @@ public class EffectItem extends ConsumptionItem {
     };
 
     private Effect[] effects;            //使用后获得的状态效果
-    private AudioHolder[] consumeSounds; //可选的使用音效（null 时使用属性默认音效）
 
     public EffectItem (Property property) {
         super(property);
@@ -31,13 +28,14 @@ public class EffectItem extends ConsumptionItem {
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
         //播放音效：指定了音效数组就随机播放，否则用属性默认音效
-        AudioHolder sound;
-        if (this.consumeSounds != null && this.consumeSounds.length > 0) {
-            sound = this.consumeSounds[MathUtils.random(0, this.consumeSounds.length - 1)];
+        /*AudioHolder sound;
+        AudioHolder[] consumeSounds = getConsumeSounds();
+        if (consumeSounds != null && consumeSounds.length > 0) {
+            sound = consumeSounds[MathUtils.random(0, consumeSounds.length - 1)];
         } else {
             sound = this.getProperty().getUseSound();
         }
-        world.getSystem(SoundSystem.class).playSpatialSound(sound, user);
+        world.getSystem(SoundSystem.class).playSpatialSound(sound, user);*/
 
         //把效果施加到 user
         if (this.effects != null) {
@@ -45,6 +43,8 @@ public class EffectItem extends ConsumptionItem {
                 user.setEffect(effect.getEffect(), effect.getDuration(), effect.getLevel());
             }
         }
+
+        playUseSound(world, user);
         //吃/喝下去本身就是使用成功（物品默认的 use 不播音效也不报成功）
         return true;
     }
@@ -58,14 +58,6 @@ public class EffectItem extends ConsumptionItem {
         return this;
     }
 
-    public AudioHolder[] getConsumeSounds () {
-        return this.consumeSounds;
-    }
-
-    public EffectItem setConsumeSounds (AudioHolder[] consumeSounds) {
-        this.consumeSounds = consumeSounds;
-        return this;
-    }
 
     /**
      * 使用后会获得的状态效果

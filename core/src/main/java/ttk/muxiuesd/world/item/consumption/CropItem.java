@@ -1,6 +1,8 @@
 package ttk.muxiuesd.world.item.consumption;
 
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.audio.AudioHolder;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Attachment;
@@ -16,16 +18,20 @@ import ttk.muxiuesd.world.item.ItemStack;
  * 也不会消耗（默认实现返回false，用不上的时候要静默失败）
  * */
 public class CropItem extends ConsumptionItem {
+    /// 默认的种植音效
+    public static final AudioHolder[] PLANT_SOUNDS = new AudioHolder[] {
+        Sounds.CROP_PLANT_1, Sounds.CROP_PLANT_2, Sounds.CROP_PLANT_3,
+        Sounds.CROP_PLANT_4, Sounds.CROP_PLANT_5, Sounds.CROP_PLANT_6,
+    };
+
     private Attachment attachment;
 
-    public CropItem (Attachment attachment) {
+    public CropItem (Attachment attachment, AudioHolder[] plantSounds) {
         super();
         this.attachment = attachment;
+        setConsumeSounds(plantSounds);
     }
 
-    public CropItem (Property property) {
-        super(property);
-    }
 
     /**
      * 对着目标位置种植
@@ -35,8 +41,12 @@ public class CropItem extends ConsumptionItem {
     public boolean useOn (ItemStack itemStack, World world, LivingEntity<?> user, Vector2 targetPos) {
         ChunkSystem chunkSystem = world.getSystem(ChunkSystem.class);
         //能不能种在这里由放置规则决定（见 AttachmentPlacements），物品这边不再硬编码耕地
-        //放置失败就不算使用成功，不消耗物品
-        return chunkSystem.placeAttachment(this.getAttachment(), targetPos.x, targetPos.y);
+        //放置失败就不算使用成功，不消耗物品的数量
+        boolean result = chunkSystem.placeAttachment(this.getAttachment(), targetPos.x, targetPos.y);
+
+        if (result) playUseSound(world, user);
+
+        return result;
     }
 
     public Attachment getAttachment () {

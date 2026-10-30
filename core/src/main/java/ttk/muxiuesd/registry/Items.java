@@ -296,7 +296,7 @@ public final class Items {
      * 注册农作物物品
      * */
     public static CropItem register (String name, Attachment crop) {
-        return register(name, CropItem::new, crop);
+        return register(name, (attachment) -> new CropItem(attachment, CropItem.PLANT_SOUNDS), crop);
     }
 
     /**
@@ -304,7 +304,7 @@ public final class Items {
      * @param supplier 作为种子的物品
      * @param crop 农作物
      * */
-    public static <T extends Attachment, R extends CropItem> CropItem register (String name, Function<T, R> supplier, T crop) {
+    public static <A extends Attachment, R extends CropItem> CropItem register (String name, Function<A, R> supplier, A crop) {
         return register(name, () -> supplier.apply(crop));
     }
 

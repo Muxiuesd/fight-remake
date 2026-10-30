@@ -80,7 +80,7 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 只在子类确定使用成功时调用：默认的{@link #use}不播音效，
      * 失败路径也不该播（静默失败）
      * */
-    protected void playUseSound (World world, LivingEntity<?> user) {
+    public void playUseSound (World world, LivingEntity<?> user) {
         AudioHolder useSound = this.getProperty().getUseSound();
         world.getSystem(SoundSystem.class).playSpatialSound(useSound, user);
     }

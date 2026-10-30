@@ -23,9 +23,10 @@ public class EffectItemBuilder implements ItemBuilder<EffectItem> {
 
     @Override
     public EffectItem build () {
-        return new EffectItem(this.property.copy())
+        return (EffectItem) new EffectItem(this.property.copy())
+            .setEffects(this.effects)
             .setConsumeSounds(this.consumeSounds)
-            .setEffects(this.effects);
+            ;
     }
 
     public EffectItemBuilder setSounds (AudioHolder... consumeSounds) {
