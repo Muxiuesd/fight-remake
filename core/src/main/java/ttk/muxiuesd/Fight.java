@@ -1,5 +1,6 @@
 package ttk.muxiuesd;
 
+import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.util.Info;
 
 public class Fight {
@@ -38,8 +39,22 @@ public class Fight {
     public static final Info<Float> ENTITY_RENDER_RANGE = Info.create("entity_render_range", 20f);
     //实体更新距离，与玩家距离超过这个值的实体不更新
     public static final Info<Float> ENTITY_UPDATE_RANGE = Info.create("entity_update_range", 32f);
-    //空气摩擦力
+    //空气摩擦力(不是空气方块的摩擦力，注意区分)
     public static final Info<Float> AIR_FRICTION= Info.create("air_friction", 0.03f);
+    //方块被破坏后掉落物的最小速度
+    public static final Info<Float> BLOCK_DROP_ITEM_ENTITY_MIN_SPEED = Info.create("block_drop_item_entity_min_speed", 0.25f);
+    //方块被破坏后掉落物的最大速度
+    public static final Info<Float> BLOCK_DROP_ITEM_ENTITY_MAX_SPEED = Info.create("block_drop_item_entity_max_speed", 0.55f);
+    /**
+     * 获取方块破坏后掉落物的随机速度
+     * */
+    public static float getBlockDropItemEntityRandomSpeed () {
+        return MathUtils.random(
+            BLOCK_DROP_ITEM_ENTITY_MIN_SPEED.getValue(),
+            BLOCK_DROP_ITEM_ENTITY_MAX_SPEED.getValue()
+        );
+    }
+
 
     /**
      * 存档路径常量

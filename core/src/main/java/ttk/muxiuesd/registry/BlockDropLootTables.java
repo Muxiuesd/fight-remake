@@ -6,41 +6,26 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.common.LootCondition;
 import ttk.muxiuesd.world.loottable.common.LootEntry;
 import ttk.muxiuesd.world.loottable.common.LootGroup;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * 方块的掉落物战利品表注册
+ * <p>
+ * 掉落表是掉落的唯一来源：没登记表的方块、墙体、附着物被打掉之后什么都不掉，注册期也不做校验
  * */
 public class BlockDropLootTables {
     public static void init () {
-        //附着物被破坏时掉什么完全由掉落表决定，没登记表的附着物砸了什么都不掉——这里启动即报错
-        List<String> missing = new ArrayList<>();
-        for (Block block : Registries.BLOCK.getMap().values()) {
-            if (!(block instanceof Attachment)) continue;
-            if (Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(block.getIdentifier()) == null) {
-                missing.add(block.getID());
-            }
-        }
-        if (!missing.isEmpty()) {
-            throw new IllegalStateException("附着物没有登记掉落表：" + String.join("、", missing));
-        }
         Log.print(BlockDropLootTables.class.getName(), "方块掉落战利品表注册完成");
     }
 
-    public static final HashMap<Block, BlockDropLootTable> DROP_SELF_GROUP = new HashMap<>();
     static {
         dropSelf(
             //自然方块
-            Blocks.GRASS, Blocks.STONE, Blocks.SAND, Blocks.FARMLAND_DRY, Blocks.WATER,
+            Blocks.GRASS, Blocks.STONE, Blocks.SAND, Blocks.SNOW, Blocks.FARMLAND_DRY, Blocks.WATER,
 
             //建筑方块
             Blocks.GLASS,
@@ -63,9 +48,11 @@ public class BlockDropLootTables {
     public static final BlockDropLootTable POTATO = register(Blocks.POTATO.getIdentifier(), BlockDropLootTable.Builder.create()
         .setGroups(
             LootGroup.of(LootCondition.IMMATURE, "potato_immature",
-            LootEntry.of(Items.POTATO, 1, 1, 1f)),
+                LootEntry.of(Items.POTATO, 1, 1, 1f)
+            ),
             LootGroup.of(LootCondition.MATURE, "potato_mature",
-            LootEntry.of(Items.POTATO, 2, 4, 1f))
+                LootEntry.of(Items.POTATO, 2, 4, 1f)
+            )
         )
         .build()
     );
@@ -73,11 +60,14 @@ public class BlockDropLootTables {
     public static final BlockDropLootTable WHEAT = register(Blocks.WHEAT.getIdentifier(), BlockDropLootTable.Builder.create()
         .setGroups(
             LootGroup.of(LootCondition.IMMATURE, "wheat_immature",
-            LootEntry.of(Items.SEEDS_WHEAT, 1, 1, 1f)),
+                LootEntry.of(Items.SEEDS_WHEAT, 1, 1, 1f)
+            ),
             LootGroup.of(LootCondition.MATURE, "wheat_mature",
-            LootEntry.of(Items.WHEAT, 1, 3, 1f)),
+                LootEntry.of(Items.WHEAT, 1, 3, 1f)
+            ),
             LootGroup.of(LootCondition.MATURE, "wheat_mature_seeds",
-            LootEntry.of(Items.SEEDS_WHEAT, 1, 3, 1f))
+                LootEntry.of(Items.SEEDS_WHEAT, 1, 3, 1f)
+            )
         )
         .build()
     );
@@ -86,34 +76,37 @@ public class BlockDropLootTables {
     public static final BlockDropLootTable STICK_ATTACHMENT = register(Blocks.STICK_ATTACHMENT.getIdentifier(), BlockDropLootTable.Builder.create()
         .setGroups(
             LootGroup.of("stick",
-            LootEntry.of(Items.STICK, 1, 2, 1f))
+                LootEntry.of(Items.STICK, 1, 2, 1f)
+            )
         )
         .build()
     );
 
 
 
-
     /**
      * 按注册的掉落表生成掉落
      * <p>
-     * 方块、墙体、附着物共用这一个入口；没有注册掉落表时返回false，由调用方决定兜底怎么掉
+     * 方块、墙体、附着物共用这一个入口；没有注册掉落表就什么都不掉
      * @param mature 目标是否成熟，只有附着物（植物）用得到，其它方块类一律传false
-     * @return 找到了掉落表并已经生成掉落物返回true
      * */
-    public static boolean generate (World world, Block block, Vector2 position, boolean mature) {
+    public static void generate (World world, Block block, Vector2 position, boolean mature) {
         BlockDropLootTable lootTable = Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(block.getIdentifier());
-        if (lootTable == null) return false;
-        lootTable.generate(world, new BlockDropLootTable.Conditions()
-            .setPos(position)
-            .setMature(mature));
-        return true;
+        if (lootTable == null) return;
+        lootTable.generate(
+            world,
+            new BlockDropLootTable.Conditions()
+                .setPos(position)
+                .setMature(mature)
+        );
     }
 
-
+    /**
+     * 自我掉落的方块的快捷掉落物注册
+     * */
     private static void dropSelf (Block... blocks) {
         for (Block block : blocks) {
-            DROP_SELF_GROUP.put(block, registerDropSelf(block));
+            registerDropSelf(block);
         }
     }
 

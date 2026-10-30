@@ -1,12 +1,15 @@
 package ttk.muxiuesd.world.loottable.block;
 
 import game.muxiuesd.bedrockcore.math.Vec2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.block.BlockLootTable;
 import ttk.muxiuesd.interfaces.world.loottable.LootTable;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.system.EntitySystem;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
@@ -60,8 +63,16 @@ public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Con
         for (ItemStack drop : drops) {
             //数量被随机成 0 的条目会返回空堆叠，表示这一条目这次不掉
             if (drop.isVoid()) continue;
+
             //掉落物必须能被立即捡起来，否则会在地上躺很久
-            ItemEntityGetter.getPickUpable(es, pos, drop);
+            ItemEntity itemEntity = ItemEntityGetter.getPickUpable(es, pos, drop);
+            double radian = Util.randomRadian();
+            float speed = Fight.getBlockDropItemEntityRandomSpeed();
+            itemEntity.setVelocity(
+                (float) Math.cos(radian),
+                (float) Math.sin(radian)
+            );
+            itemEntity.setCurSpeed(speed);
         }
     }
 
@@ -103,7 +114,6 @@ public class BlockDropLootTable implements BlockLootTable<BlockDropLootTable.Con
             return this.mature;
         }
 
-        @SuppressWarnings("unchecked")
         public Conditions setMature (boolean mature) {
             this.mature = mature;
             return (Conditions) this;

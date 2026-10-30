@@ -102,7 +102,7 @@ public abstract class Attachment extends Block {
 
     @Override
     public void beDestroyed (World world, Vector2 position) {
-        //掉什么完全由掉落表决定：附着物必须登记自己的表，没登记启动时就报错了
+        //掉什么完全由掉落表决定，没登记表就什么都不掉
         boolean mature = this instanceof Botany botany && botany.isFullyGrown();
         BlockDropLootTables.generate(world, this, position, mature);
     }

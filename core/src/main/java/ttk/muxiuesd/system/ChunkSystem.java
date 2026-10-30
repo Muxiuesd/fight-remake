@@ -36,11 +36,8 @@ import ttk.muxiuesd.world.chunk.ChunkUnloadTask;
 import ttk.muxiuesd.world.chunk.MainWorldChunkGenerator;
 import ttk.muxiuesd.world.chunk.abs.ChunkGenerator;
 import ttk.muxiuesd.world.entity.abs.Entity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
-import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.spawn.SpawnPointFinder;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -571,20 +568,11 @@ public class ChunkSystem extends WorldSystem {
     /**
      * 一个方块类（方块、墙体、附着物）被打掉之后的掉落
      * <p>
-     * 战利品表优先（现有表全是掉落自身，等价于掉1个自己），没有表就掉自身的物品1个
+     * 掉什么完全由掉落表决定：没登记表的方块/墙体/附着物打掉之后什么都不掉
      * */
     private void dropDestroyed (Block destroyed, float wx, float wy) {
-        Vector2 position = new Vector2(wx, wy);
-        //掉落表优先：方块与墙体没有成熟度，一律按未成熟处理
-        if (BlockDropLootTables.generate(getWorld(), destroyed, position, false)) return;
-        //找不到注册的战利品表就尝试找对应的方块物品
-        Item item = Registries.ITEM.getOrNull(destroyed.getIdentifier());
-        //既没有战利品表也没有对应物品的方块，打掉之后不掉东西
-        if (item == null) return;
-        //把方块变成方块物品并且变成物品实体形式掉落在世界上
-        ItemEntityGetter.get(getWorld().getSystem(EntitySystem.class), new ItemStack(item, 1))
-            .setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue())
-            .setPosition(position);
+        //方块与墙体没有成熟度，一律按未成熟处理
+        BlockDropLootTables.generate(getWorld(), destroyed, new Vector2(wx, wy), false);
     }
 
     /**
