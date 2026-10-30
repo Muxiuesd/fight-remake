@@ -23,6 +23,16 @@ public interface BlockRenderer<T extends Block> {
     }
 
     /**
+     * 获取这一格方块的贴图
+     * <p>
+     * 贴图随实例状态变化的渲染器（如按生长阶段换帧的作物）覆写这个重载；
+     * 与实例无关的渲染器不用管，默认退回无参版本
+     * */
+    default TextureRegion getTextureRegion (Block block) {
+        return this.getTextureRegion();
+    }
+
+    /**
      * 待实现的渲染方法
      * */
     void render(Batch batch, T block, Context context);

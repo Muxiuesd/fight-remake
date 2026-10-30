@@ -34,6 +34,8 @@ public final class Walls {
         if (renderer == null) {
             renderer = new WallRenderer.StandardRenderer<>(identifier.getID(), texturePath);
         }
+        //与 Blocks.register 对齐：渲染器同时挂在墙体原型上，取贴图（破坏残渣、脚步粒子）走它
+        t.setRenderer(renderer);
         WallRendererRegistry.register(t, renderer);
         return t;
     }

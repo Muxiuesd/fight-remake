@@ -8,8 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.render.IWorldParticleRender;
-import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
-import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registry.ParticleEmitters;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
@@ -149,9 +147,7 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
      * @param position 破坏位置（方块中心）
      */
     public void blockBreakParticle (Block block, Vector2 position) {
-        BlockRenderer<? extends Block> renderer = BlockRendererRegistry.getOrNull(block);
-        if (renderer == null) return;
-        TextureRegion region = renderer.getTextureRegion();
+        TextureRegion region = block.getTextureRegion();
         if (region == null) return;
 
         ParticleEmitter<BlockBreakParticle> emitter = ParticleEmitters.BLOCK_BREAK;
@@ -181,9 +177,7 @@ public class ParticleSystem extends WorldSystem implements IWorldParticleRender 
      */
     public void footstepParticle (Block block, Vector2 footPosition, Vector2 reverseVelocity,
                                   int count, float duration) {
-        BlockRenderer<? extends Block> renderer = BlockRendererRegistry.getOrNull(block);
-        if (renderer == null) return;
-        TextureRegion region = renderer.getTextureRegion();
+        TextureRegion region = block.getTextureRegion();
         if (region == null) return;
 
         ParticleEmitter<ParticleFootstep> emitter = ParticleEmitters.FOOTSTEP;

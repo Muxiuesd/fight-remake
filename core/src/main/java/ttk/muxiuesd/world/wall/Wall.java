@@ -55,9 +55,20 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
     }
 
     /**
-     * 创建一个墙体实例
+     * 由原型创建这一格的墙体实例
+     * <p>
+     * 渲染器一并复制过去：墙体每格一个实例，取贴图（破坏残渣、脚步粒子）要靠它
      * */
-    public abstract T createSelf (Vector2 position);
+    public final T createSelf (Vector2 position) {
+        T self = this.createSelfInstance(position);
+        self.setRenderer(this.getRenderer());
+        return self;
+    }
+
+    /**
+     * 子类实现的实例创建，只负责填好自身数据（坐标、id 等），渲染器由{@link #createSelf}统一复制
+     * */
+    protected abstract T createSelfInstance (Vector2 position);
 
     @Override
     public void renderShape(ShapeRenderer batch) {

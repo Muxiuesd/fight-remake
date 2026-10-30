@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.block.abs;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
@@ -116,6 +117,19 @@ public class Block implements ID<Block>, Disposable {
 
     public BlockRenderer<Block> getRenderer () {
         return this.renderer;
+    }
+
+    /**
+     * 取这一格的贴图
+     * <p>
+     * 直接问自己持有的渲染器，与渲染热路径同源；没有渲染器就没有贴图
+     * <p>
+     * 破坏残渣、脚步粒子都用它取贴图，所以贴图随实例状态变化的渲染器要覆写
+     * {@link BlockRenderer#getTextureRegion(Block)}
+     * */
+    public TextureRegion getTextureRegion () {
+        BlockRenderer<Block> renderer = this.getRenderer();
+        return renderer == null ? null : renderer.getTextureRegion(this);
     }
 
     @Override

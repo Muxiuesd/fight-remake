@@ -6,6 +6,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.block.abs.Attachment;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.Botany;
 
 /**
@@ -30,11 +31,21 @@ public class AttachmentRenderer<T extends Attachment> implements BlockRenderer<T
     }
 
     @Override
+    public TextureRegion getTextureRegion () {
+        //没有生长等级语义的调用方（如取固定贴图）就用第一帧
+        return this.textureRegions[0];
+    }
+
+    @Override
+    public TextureRegion getTextureRegion (Block block) {
+        //只有植物才有生长等级，其他的附着物都按0级取图
+        int level = block instanceof Botany botany ? botany.getGrowLevel() : 0;
+        return this.textureRegions[Math.min(level, this.textureRegions.length - 1)];
+    }
+
+    @Override
     public void render (Batch batch, T attachment, Context context) {
-        //只有植物才有生长等级，其他的附着物都按0级渲染
-        int level = attachment instanceof Botany botany ? botany.getGrowLevel() : 0;
-        //如果生长等级超过对应的贴图，就使用最大的贴图
-        TextureRegion textureRegion = this.textureRegions[Math.min(level, this.textureRegions.length - 1)];
+        TextureRegion textureRegion = this.getTextureRegion(attachment);
         if (textureRegion == null) return;
 
         batch.draw(

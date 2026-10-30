@@ -158,7 +158,7 @@ public class ChunkRenderSystem extends WorldSystem implements IWorldChunkRender 
 
                 Wall<?> wall = chunk.getWall(x, y);
                 WallRenderer<Wall<?>> renderer = WallRendererRegistry.getRenderer(wall);
-                WallRenderer.Context context = renderer.getContext();
+                BlockRenderer.Context context = renderer.getContext();
                 context.x = baseX + x;
                 context.y = baseY + y;
                 try {

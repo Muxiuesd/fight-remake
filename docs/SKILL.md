@@ -175,6 +175,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 | 读档出来的植物"不再生长"或"挖掉它下面的方块就崩`实例从未添加过`" | 同一个根因：每格独享附着物的运行时登记（`blockInstances` + `TimeSystem` tick）**不随存档回来**，必须由 `ChunkSystem.addChunk` 遍历 `attachments` 列重新 `addBlockInstance()`。改动区块加载/卸载代码时先确认这一对还在 |
 | `Botany` 的 `createSelf()` 忘了复制配置 | 现在由 `Botany.createInstance()` 统一复制 `identifier`/`renderer`，子类只写 `createSelf()`；**别去覆写 `createInstance()`** |
 | 新方块 / 新附着物不显示（或进世界就空指针） | 渲染器现在由 `Blocks.register` 在注册时**绑到方块原型上**（`block.setRenderer(renderer)`），渲染热路径直接读 `block.getRenderer()`、不再查 `BlockRendererRegistry`。所以方块**必须经 `Blocks.register` 注册**；每格独享的实例（`Botany`、`BlockWithEntity` 的 `createSelf()`）还要复制 `renderer`，否则渲染时空指针（故意 fail fast，不是静默不画） |
+| 破坏方块/植物/墙体时有的出残渣粒子、有的不出现，或粒子颜色不对 | 粒子贴图统一从 `Block.getTextureRegion()` 取（问自己的渲染器），**不要再查 `BlockRendererRegistry`**。所以：① 自定义渲染器持有贴图却没覆写 `getTextureRegion()` → 该物体永远没粒子；② 贴图随状态变化（作物按生长阶段）却只覆写了无参版 → 永远只能取到第 0 帧；③ 墙体也一样——`Walls.register` 会把渲染器绑到原型、`Wall.createSelf` 自动复制到每格实例 |
 | 区块渲染少画了格子 / 新放的方块不出现 | `Chunk` 的 `blocks`/`walls`/`attachments` 三个数组只能经 `setBlock`/`setWall`/`setAttachment` 写——三层占用位图（`blockBits`/`wallBits`/`attachmentBits`）就在这三个方法里维护，绕过它们直接写数组 → 位图不置位 → 渲染直接跳过该格 |
 
 ## 十一、新增一个生物 / 实体
@@ -200,7 +201,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
   - `interfaces/render/world/entity/EntityRenderer.java` 的 `StandardRenderer<T>`：一个 `bodyTextureRegion` + `draw(batch, entity, context)`（9 参 `batch.draw`）+ 空的 `drawShape`（实体是**贴图**还是**纯色形状**由子类决定）。
   - `render/world/entity/LivingEntityRenderer.java`：身体绘制之外做受击变红、手持物品；`flipWhenFacing`（贴图水平镜像开关，默认 false）在这里。**影子不在这里画**——`drawShadow` 只转发 `EntityRenderer.Shadow.draw`，由 `EntityRenderSystem` 的"影子趟"统一调用（同一渲染层内先画完所有影子、再画所有身体）。
   - 子类只做装配：`EnemyRenderer`（16 行）、`PlayerRenderer`（45 行，`super.draw` 后再画护盾）。
-- **`Context` 是池化对象**，实体/物品/方块/WallRenderer/BlockEntityRenderer **各有独立的 `Context implements Pool.Poolable`（5 个，无公共基类）**。每帧流程是 `renderer.getContext(entity)` → `renderer.draw(batch, entity, context)` → `renderer.freeContext(context)`（`system/abs/EntityRenderSystem.java:31-46`，形状走 `:48-63`）。
+- **`Context` 是池化对象**，实体/物品/方块/BlockEntityRenderer **各有独立的 `Context implements Pool.Poolable`（4 个，无公共基类）**；**墙体渲染器不再自带 Context，复用 `BlockRenderer.Context`**（`WallRenderer extends BlockRenderer`）。每帧流程是 `renderer.getContext(entity)` → `renderer.draw(batch, entity, context)` → `renderer.freeContext(context)`（`system/abs/EntityRenderSystem.java:31-46`，形状走 `:48-63`）。
   - **给 `Context` 加字段，必须同时加到 `reset()` 里复位**，否则上一帧/上一个实体（或另一张地图）的取值会泄漏到下一个实体，表现为随机闪一下。
 - 渲染器与实体互不认识具体生物类：要区分外观就加**渲染器自己的开关/子类**，不要 `instanceof`；而"这个实体是否需要某能力"的开关放在渲染器实例上、由注册处配置。
 

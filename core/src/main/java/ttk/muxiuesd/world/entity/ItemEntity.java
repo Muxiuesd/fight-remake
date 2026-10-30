@@ -120,6 +120,7 @@ public class ItemEntity extends Entity<ItemEntity> implements Pool.Poolable, Poo
         setSpeed(0f);
         setPosition(0f, 0f);
         setVelocity(0f, 0f);
+        setOnGround(true);
         setItemStack(ItemStack.VOID);
         setLivingTime(0f);
         this.cycle = 0f;    //重置悬浮动画相位
