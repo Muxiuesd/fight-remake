@@ -6,19 +6,33 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.common.LootCondition;
 import ttk.muxiuesd.world.loottable.common.LootEntry;
 import ttk.muxiuesd.world.loottable.common.LootGroup;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 方块的掉落物战利品表注册
  * */
 public class BlockDropLootTables {
     public static void init () {
+        //附着物被破坏时掉什么完全由掉落表决定，没登记表的附着物砸了什么都不掉——这里启动即报错
+        List<String> missing = new ArrayList<>();
+        for (Block block : Registries.BLOCK.getMap().values()) {
+            if (!(block instanceof Attachment)) continue;
+            if (Registries.BLOCK_DROP_LOOT_TABLE.getOrNull(block.getIdentifier()) == null) {
+                missing.add(block.getID());
+            }
+        }
+        if (!missing.isEmpty()) {
+            throw new IllegalStateException("附着物没有登记掉落表：" + String.join("、", missing));
+        }
         Log.print(BlockDropLootTables.class.getName(), "方块掉落战利品表注册完成");
     }
 
@@ -43,29 +57,42 @@ public class BlockDropLootTables {
             //墙体方块
             Walls.SMOOTH_STONE
         );
-
-        //作物：按成熟度掉不同的东西（成熟度由 Attachment#beDestroyed 传进来）
-        register(Blocks.POTATO.getIdentifier(), BlockDropLootTable.Builder.create()
-            .setGroups(
-                LootGroup.of(LootCondition.IMMATURE, "potato_immature",
-                    LootEntry.of(Items.POTATO, 1, 1, 1f)),
-                LootGroup.of(LootCondition.MATURE, "potato_mature",
-                    LootEntry.of(Items.POTATO, 2, 4, 1f))
-            )
-            .build()
-        );
-        register(Blocks.WHEAT.getIdentifier(), BlockDropLootTable.Builder.create()
-            .setGroups(
-                LootGroup.of(LootCondition.IMMATURE, "wheat_immature",
-                    LootEntry.of(Items.SEEDS_WHEAT, 1, 1, 1f)),
-                LootGroup.of(LootCondition.MATURE, "wheat_mature",
-                    LootEntry.of(Items.WHEAT, 1, 3, 1f)),
-                LootGroup.of(LootCondition.MATURE, "wheat_mature_seeds",
-                    LootEntry.of(Items.SEEDS_WHEAT, 1, 3, 1f))
-            )
-            .build()
-        );
     }
+
+    //作物：按成熟度掉不同的东西（成熟度由 Attachment#beDestroyed 传进来）
+    public static final BlockDropLootTable POTATO = register(Blocks.POTATO.getIdentifier(), BlockDropLootTable.Builder.create()
+        .setGroups(
+            LootGroup.of(LootCondition.IMMATURE, "potato_immature",
+            LootEntry.of(Items.POTATO, 1, 1, 1f)),
+            LootGroup.of(LootCondition.MATURE, "potato_mature",
+            LootEntry.of(Items.POTATO, 2, 4, 1f))
+        )
+        .build()
+    );
+
+    public static final BlockDropLootTable WHEAT = register(Blocks.WHEAT.getIdentifier(), BlockDropLootTable.Builder.create()
+        .setGroups(
+            LootGroup.of(LootCondition.IMMATURE, "wheat_immature",
+            LootEntry.of(Items.SEEDS_WHEAT, 1, 1, 1f)),
+            LootGroup.of(LootCondition.MATURE, "wheat_mature",
+            LootEntry.of(Items.WHEAT, 1, 3, 1f)),
+            LootGroup.of(LootCondition.MATURE, "wheat_mature_seeds",
+            LootEntry.of(Items.SEEDS_WHEAT, 1, 3, 1f))
+        )
+        .build()
+    );
+
+    //木棍：共享型装饰物，被破坏后掉1~2个木棍
+    public static final BlockDropLootTable STICK_ATTACHMENT = register(Blocks.STICK_ATTACHMENT.getIdentifier(), BlockDropLootTable.Builder.create()
+        .setGroups(
+            LootGroup.of("stick",
+            LootEntry.of(Items.STICK, 1, 2, 1f))
+        )
+        .build()
+    );
+
+
+
 
     /**
      * 按注册的掉落表生成掉落

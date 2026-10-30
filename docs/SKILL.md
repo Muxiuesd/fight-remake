@@ -173,7 +173,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 | 附着物放置规则登记早了 | 规则要引用 `Blocks.XXX`，必须在 `Blocks.init()` 之后；`Blocks.READY` 与 `AttachmentPlacements.init()` 里的检查就是防这个——顺序错了 `Blocks.POTATO` 还是 null，`registerWhitelist` 只会报错然后把**唯一那条规则静默丢掉** |
 | 附着物判定用方块对象当键 | 植物每格一个实例，`==` 比较在放置时必然查不到；规则表和 `ChunkSystem.getBlockKey` 都用 `Identifier` |
 | 读档出来的植物"不再生长"或"挖掉它下面的方块就崩`实例从未添加过`" | 同一个根因：每格独享附着物的运行时登记（`blockInstances` + `TimeSystem` tick）**不随存档回来**，必须由 `ChunkSystem.addChunk` 遍历 `attachments` 列重新 `addBlockInstance()`。改动区块加载/卸载代码时先确认这一对还在 |
-| `Botany` 的 `createSelf()` 忘了复制配置 | 现在由 `Botany.createInstance()` 统一复制 `droppedItem`/`identifier`，子类只写 `createSelf()`；**别去覆写 `createInstance()`** |
+| `Botany` 的 `createSelf()` 忘了复制配置 | 现在由 `Botany.createInstance()` 统一复制 `identifier`/`renderer`，子类只写 `createSelf()`；**别去覆写 `createInstance()`** |
 | 新方块 / 新附着物不显示（或进世界就空指针） | 渲染器现在由 `Blocks.register` 在注册时**绑到方块原型上**（`block.setRenderer(renderer)`），渲染热路径直接读 `block.getRenderer()`、不再查 `BlockRendererRegistry`。所以方块**必须经 `Blocks.register` 注册**；每格独享的实例（`Botany`、`BlockWithEntity` 的 `createSelf()`）还要复制 `renderer`，否则渲染时空指针（故意 fail fast，不是静默不画） |
 | 区块渲染少画了格子 / 新放的方块不出现 | `Chunk` 的 `blocks`/`walls`/`attachments` 三个数组只能经 `setBlock`/`setWall`/`setAttachment` 写——三层占用位图（`blockBits`/`wallBits`/`attachmentBits`）就在这三个方法里维护，绕过它们直接写数组 → 位图不置位 → 渲染直接跳过该格 |
 
@@ -211,7 +211,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 以新增植物为例（现成参照 `world/block/instance/attachment/BotanyPotato.java`）：
 
 1. **类**：植物 `extends Botany`，构造 `super(new Property())`；必须写四块——`tick(World, float)`（生长逻辑）、`public int maxGrowLevel()`（**抽象方法，不写编译不过**；取值 = 阶段贴图张数 − 1）、`protected Xxx createSelf()`（`return new Xxx()`）、其它什么都不用写。`tick` 里的上限守卫用 `isFullyGrown()`，别自己写 `getGrowLevel() >= 数字`（上限散写两处早晚不一致）。共享型装饰物直接 `extends Attachment`（不实现 `Tickable`，就不进 tick 列表）。
-   - **不要覆写 `createInstance()`**：`Botany` 已经写好"出副本 + 从原型复制 `droppedItem`/`identifier`"；只覆写 `createSelf()`。
+   - **不要覆写 `createInstance()`**：`Botany` 已经写好"出副本 + 从原型复制 `identifier`/`renderer`"；只覆写 `createSelf()`。
    - `Botany.createSelf()` 的返回类型是**协变的**（`protected abstract Botany createSelf()`），子类返回自己的类型即可，调用方不用强转。
 2. **注册**：`registry/Blocks.java` 里
    - 植物：`registerBotany("potato", BotanyPotato::new, "potatoes_stage_0.png", ..., "potatoes_stage_3.png")` — 多个贴图按**生长等级从小到大**给，渲染器按 `getGrowLevel()` 选帧、超出就拿最后一帧（`AttachmentRenderer` 里 `Math.min(level, length - 1)`，所以上限写大了只会一直画最后一张、不会崩，但**上限的正确取值就是"贴图张数 − 1"**：土豆 4 张配 3、小麦 8 张配 7）。
@@ -224,7 +224,7 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
    - 判定：**空气方块一律不能附着**（无条件保底，空黑名单 = 除了空气哪都能放）；**没登记过的附着物一处都放不了**；方案记在内部的 `ATTACHMENT_RULE` 里，所以两张表**不存在"同时命中谁优先"**，换方案重复注册会报错并忽略；同方案可多次注册**累加**（重复方块自动去重）。
    - 规则**只在玩家放置时生效**，读档直接写进区块、不查表。
    - **"附着物的支撑方块"就是它自己那一格坐标处的方块**（**别理解成 y 减 1 那一格**）：`placeAttachment` 把鼠标坐标 `Util.fastRound` 成格坐标后，**附着物就放在这一格**，同时拿**这一格的方块**去查放置规则。所以白名单里写"耕地方块"就等于"鼠标点耕地就能种在耕地上"，附着物和耕地同处一格。放置成功后两者再无引用关系，格子里那个方块只是当初允许放置的依据；该格方块一变，这一格的附着物就该跟着没（`removeBlock`/`replaceBlock` 用**同一格坐标、不加 y 偏移**去 `destroyAttachment`）。
-4. **掉落物**：`registry/Items.java` 加 `register("potato", Blocks.POTATO)`（命中原生作物重载，内部会 `crop.setDroppedItem(cropItem)`）。**共享型装饰物没有这个重载**，要自己写物品类并在注册后调 `attachment.setDroppedItem(...)`；不设就是被破坏后什么都不掉。
+4. **掉落物**：掉落**只有掉落表一条路**——在 `registry/BlockDropLootTables.java` 的 `static {}` 里 `register(<方块>.getIdentifier(), Builder.create().setGroups(...).build())`；作物按 `LootCondition.IMMATURE`/`MATURE` 分组（成熟度由 `Attachment#beDestroyed` 传进 `generate`），未成熟组掉种子、成熟组掉收获物。`Attachment` 上**没有** `droppedItem` 字段，别再写 `setDroppedItem`。**每个附着物都必须登记表**：`BlockDropLootTables.init()` 启动时遍历方块注册表，缺表直接抛 `IllegalStateException`（"附着物没有登记掉落表：…"）。
 5. **玩家放置**：用 `CropItem`（`world/item/consumption/CropItem.java`）—— **种植是"物品对着方块交互"，所以它覆写的是 `useOn()`（右键）而不是 `use()`（左键）**：`useOn` 只做"`placeAttachment` 成功吗"，**不再硬编码任何方块**（能不能种由步骤 3 的规则表决定），失败不消耗物品、不播音效。**左键拿在手里点不会有任何反应、也不会消耗**（继承 `Item.use` 的 `false`）。左键破坏**天然优先于同格的方块**（`WorldInputHandleSystem` 的空手左键分支先查附着物）；同格方块被挖/被替换时，`ChunkSystem.removeBlock`/`replaceBlock` 会调 `destroyAttachment(round.x, round.y)`（**同一格坐标、不加 y 偏移**）把失去支撑的附着物一并破坏。**不用改 `MainGameScreen`。**
 6. **存档**：走 `Attachment.CODEC`（每格状态由 `Botany.readCatData/writeCatData` 存进 `Cats`，键 `"growLevel"`）；JSON 键名是历史遗留的 `"botany"`，**别改**，改了旧存档读不出来。加新的每格状态就在 `readCatData`/`writeCatData` 里加一对键。
 7. **区块挂载要重新登记（写新附着物时不用管，但改动 `ChunkSystem` 时务必记得）**：每格独享的附着物**只把数据存进区块**，它的"运行时登记"（`blockInstances` 那一条 + `TimeSystem` 的 tick）不会随存档回来。`ChunkSystem.addChunk` 遍历 `blocks` 列时**必须顺带遍历 `attachments` 列**并 `addBlockInstance()`，`removeChunk` 对称地只摘除、**不掉包**。漏掉加载侧的后果有两个而且都很隐蔽：读档出来的植物**不再生长**，以及**挖掉它下面的方块会崩**（`destroyAttachment → removeBlockInstance` 用 `id@instance.hashCode` 当键，查不到就报"实例从未添加过"，异常抛在世界更新链上会打断整帧）。

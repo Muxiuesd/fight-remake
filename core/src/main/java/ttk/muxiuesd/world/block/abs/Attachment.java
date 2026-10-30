@@ -1,22 +1,15 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.BlockDropLootTables;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatsHolder;
-import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
-import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 附着物
@@ -65,24 +58,6 @@ public abstract class Attachment extends Block {
         .factory(Attachment::fromId);
 
     /**
-     * 创建一个附着物的属性
-     * */
-    public static Property createProperty() {
-        //附着物都是长在地面上的植物/装饰，音效统一用草方块的那一套
-        return Block.Property.create().setSounds(Sounds.GRASS);
-    }
-
-
-
-    private Item droppedItem;   //附着物被破坏后的掉落物，为null时什么都不掉
-    private int dropMin = 1;    //掉落数量下限
-    private int dropMax = 1;    //掉落数量上限
-
-    public Attachment (Property property) {
-        super(property);
-    }
-
-    /**
      * 由方块id创建附着物实例
      * <p>
      * 共享型附着物全世界一个实例，直接返回注册表里的原型；<br>
@@ -93,6 +68,22 @@ public abstract class Attachment extends Block {
         if (block instanceof Attachment attachment) return attachment.createInstance();
         throw new IllegalArgumentException("方块注册表中不存在附着物：" + id);
     }
+
+
+    /**
+     * 创建一个附着物的属性
+     * */
+    public static Property createProperty() {
+        //附着物都是长在地面上的植物/装饰，音效统一用草方块的那一套
+        return Block.Property.create().setSounds(Sounds.GRASS);
+    }
+
+
+
+    public Attachment (Property property) {
+        super(property);
+    }
+
 
     /**
      * 产生要放入世界的实例
@@ -111,41 +102,8 @@ public abstract class Attachment extends Block {
 
     @Override
     public void beDestroyed (World world, Vector2 position) {
-        //掉落表优先：登记过掉落表的附着物由表决定掉什么（作物按成熟度区分）
+        //掉什么完全由掉落表决定：附着物必须登记自己的表，没登记启动时就报错了
         boolean mature = this instanceof Botany botany && botany.isFullyGrown();
-        if (BlockDropLootTables.generate(world, this, position, mature)) return;
-
-        Item item = this.getDroppedItem();
-        if (item == null) return;
-
-        //破碎掉落物品
-        EntitySystem es = world.getSystem(EntitySystem.class);
-        Vector2 pos = new Vector2(position);
-        pos.add(
-            MathUtils.random(-0.3f, 0.3f),
-            MathUtils.random(-0.3f, 0.3f)
-        );
-        ItemEntity itemEntity = ItemEntityGetter.get(es, pos,
-            new ItemStack(item, MathUtils.random(this.dropMin, this.dropMax)));
-        itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-    }
-
-    public Item getDroppedItem () {
-        return this.droppedItem;
-    }
-
-    public Attachment setDroppedItem (Item droppedItem) {
-        this.droppedItem = droppedItem;
-        return this;
-    }
-
-    /**
-     * 设置掉落物与掉落数量区间，破坏时在[min, max]之间随机掉落
-     * */
-    public Attachment setDroppedItem (Item droppedItem, int dropMin, int dropMax) {
-        this.droppedItem = droppedItem;
-        this.dropMin = dropMin;
-        this.dropMax = dropMax;
-        return this;
+        BlockDropLootTables.generate(world, this, position, mature);
     }
 }
