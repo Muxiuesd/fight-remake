@@ -1,6 +1,7 @@
 package ttk.muxiuesd.world.block.instance.attachment;
 
 import com.badlogic.gdx.math.MathUtils;
+import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Botany;
@@ -15,7 +16,7 @@ public class BotanyWheat extends Botany {
     public static final int MAX_GROW_LEVEL = 7;
 
     public BotanyWheat () {
-        super(createProperty());
+        super(createProperty().setSounds(Sounds.CROP));
     }
 
     @Override
