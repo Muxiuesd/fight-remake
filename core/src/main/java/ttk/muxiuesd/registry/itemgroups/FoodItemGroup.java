@@ -19,6 +19,7 @@ public class FoodItemGroup {
             .add(Items.POTATO_BAKED)
             .add(Items.SEEDS_WHEAT)
             .add(Items.WHEAT)
+            .add(Items.BREAD)
 
             //肉类
             .add(Items.FISH)

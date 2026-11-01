@@ -253,6 +253,12 @@ public final class Items {
         EffectItemBuilder.create()
             .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 1f, 1))
     );
+    //面包
+    public static final Item BREAD = register("bread",
+        Fight.ItemTexturePath("foods/bread.png"),
+        EffectItemBuilder.create()
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 2f, 1))
+    );
 
 
     /// 墙体物品

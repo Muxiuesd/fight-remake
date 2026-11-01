@@ -3,6 +3,7 @@ package ttk.muxiuesd.registry;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.util.Pair;
 import ttk.muxiuesd.recipe.CraftingTableRecipe;
 import ttk.muxiuesd.recipe.RecipeParser;
 import ttk.muxiuesd.recipe.ShapedCraftingTableRecipe;
@@ -138,6 +139,16 @@ public class CraftingRecipes {
     );
 
 
+    /// 食物类合成配方
+    public static final CraftingTableRecipe BREAD = registerShaped("bread", Items.BREAD,
+        "WWW",
+        "   ",
+        "   ",
+        Pattern.of('W', Items.WHEAT)
+    );
+
+
+
 
     /**
      * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
@@ -183,7 +194,8 @@ public class CraftingRecipes {
     public static CraftingTableRecipe registerShaped (String name,
                                                 String[] pattern, HashMap<Character, Item> keys,
                                                 ItemStack output) {
-        Identifier identifier = Identifier.of(Fight.NAMESPACE, name);
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        //解析配方
         ShapedCraftingTableRecipe shapedRecipe = RecipeParser.parseShaped(pattern, keys, output);
         return register(identifier, shapedRecipe);
     }
@@ -202,7 +214,7 @@ public class CraftingRecipes {
     /**
      * 工具类：字符与物品映射类
      * */
-    public static class Pattern implements ttk.muxiuesd.interfaces.util.Pair<Character, Item> {
+    public static class Pattern implements Pair<Character, Item> {
         private Character character;
         private Item item;
 
