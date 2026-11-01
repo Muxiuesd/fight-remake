@@ -31,6 +31,12 @@ public class FoodItemGroup {
             .add(Items.POTION_HEAL_LEVEL_1)
             .add(Items.POTION_HEAL_LEVEL_2)
             .add(Items.POTION_HEAL_LEVEL_3)
+            .add(Items.POTION_POISON_LEVEL_1)
+            .add(Items.POTION_POISON_LEVEL_2)
+            .add(Items.POTION_POISON_LEVEL_3)
+            .add(Items.POTION_MOVE_SPEED_LEVEL_1)
+            .add(Items.POTION_MOVE_SPEED_LEVEL_2)
+            .add(Items.POTION_MOVE_SPEED_LEVEL_3)
         ;
     });
 }

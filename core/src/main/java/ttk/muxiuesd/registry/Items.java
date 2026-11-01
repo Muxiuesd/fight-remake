@@ -265,6 +265,7 @@ public final class Items {
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
     /// 药水物品
+    //治疗药水
     public static final Item POTION_HEAL_LEVEL_1 = register("potion_heal_level_1",
         Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
         EffectItemBuilder.create()
@@ -283,6 +284,46 @@ public final class Items {
             .setSounds(Sounds.ENTITY_DRINK)
             .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 60f, 3))
     );
+    //毒药水
+    public static final Item POTION_POISON_LEVEL_1 = register("potion_poison_level_1",
+        Fight.ItemTexturePath("potion/potion_bottle_poison.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 10f, 1))
+    );
+    public static final Item POTION_POISON_LEVEL_2 = register("potion_poison_level_2",
+        Fight.ItemTexturePath("potion/potion_bottle_poison.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 30f, 2))
+    );
+    public static final Item POTION_POISON_LEVEL_3 = register("potion_poison_level_3",
+        Fight.ItemTexturePath("potion/potion_bottle_poison.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 60f, 3))
+    );
+    //速度药水
+    public static final Item POTION_MOVE_SPEED_LEVEL_1 = register("potion_move_speed_level_1",
+        Fight.ItemTexturePath("potion/potion_bottle_move_speed.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.MOVE_SPEED, 10f, 1))
+    );
+    public static final Item POTION_MOVE_SPEED_LEVEL_2 = register("potion_move_speed_level_2",
+        Fight.ItemTexturePath("potion/potion_bottle_move_speed.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.MOVE_SPEED, 30f, 2))
+    );
+    public static final Item POTION_MOVE_SPEED_LEVEL_3 = register("potion_move_speed_level_3",
+        Fight.ItemTexturePath("potion/potion_bottle_move_speed.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.MOVE_SPEED, 60f, 3))
+    );
+
+
 
     /**
      * 最简单、最普通物品的注册

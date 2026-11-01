@@ -2,39 +2,57 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.id.Identifier;
-import ttk.muxiuesd.util.Util;
+import ttk.muxiuesd.resource.Resource;
 
 /**
  * 状态效果抽象类
  * */
 public abstract class StatusEffect {
     private final Identifier identifier;
-    private TextureRegion icon;
+    private Resource<TextureRegion> iconResource;
 
     public StatusEffect (Identifier identifier, String iconPath) {
-        this(identifier);
-        loadIcon(identifier.getID(), iconPath);
-    }
-    public StatusEffect (Identifier identifier) {
         this.identifier = identifier;
+        this.setIconResource(Resource.ofTextureRegion(identifier.getID(), iconPath));
     }
 
     /**
      * 每tick对实体触发的效果
-     *
      * @param entity 作用效果的实体
      * @param level 当前效果的等级
      * */
-    public abstract void applyEffectTick(LivingEntity<?> entity, int level);
+    public void applyEffectTick (LivingEntity<?> entity, int level) {}
 
     /**
      * 每秒对实体触发的效果
-     *
      * @param entity 作用效果的实体
      * @param level 当前效果的等级
      * */
-    public abstract void applyEffectPreSecond(LivingEntity<?> entity, int level);
+    public void applyEffectPreSecond (LivingEntity<?> entity, int level) {}
 
+    /**
+     * 在状态效果起始开始应用
+     * */
+    public void beginApplyEffect (LivingEntity<?> entity, int level) {}
+
+    /**
+     * 在状态效果结束时应用
+     * */
+    public void endApplyEffect (LivingEntity<?> entity, int level) {}
+
+
+    public TextureRegion getIcon () {
+        return this.getIconResource().get();
+    }
+
+    public Resource<TextureRegion> getIconResource () {
+        return this.iconResource;
+    }
+
+    public StatusEffect setIconResource (Resource<TextureRegion> iconResource) {
+        this.iconResource = iconResource;
+        return this;
+    }
 
     public String getId () {
         return this.identifier.getID();
@@ -44,14 +62,7 @@ public abstract class StatusEffect {
         return this.identifier;
     }
 
-    public StatusEffect loadIcon (String textureId, String path) {
-        this.icon = Util.loadTextureRegion(textureId, path);
-        return this;
-    }
 
-    public TextureRegion getIcon () {
-        return this.icon;
-    }
 
     /**
      * 状态效果的数据类

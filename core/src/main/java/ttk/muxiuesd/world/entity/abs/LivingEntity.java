@@ -31,9 +31,7 @@ import java.util.LinkedHashMap;
 /**
  * 活物实体
  * <p>
- * 有生命值、能持有、使用物品，有各种行为
- * <p>
- * TODO 活物实体能有buff影响其行为状态
+ * 有生命值、能持有、使用物品、有状态效果，有各种行为
  * */
 public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> {
     public static final Vector2 DEFAULT_SIZE = new Vector2(1f, 1f);
@@ -164,7 +162,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         this.updateKnockback(delta);
 
         //处理当前状态（击退中暂停状态机，避免 AI 意图覆盖击退速度）
-        if (!this.isKnockback() && this.getCurState() != null) this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
+        if (!this.isKnockback() && this.getCurState() != null) {
+            this.getCurState().handle(getEntitySystem().getWorld(), (T) this, delta);
+        }
 
         if (this.swingHandTimer != null) {
             this.swingHandTimer.update(delta);
@@ -254,9 +254,10 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     private void updateStatusEffect (float delta) {
         //需要被移除的状态效果
         Array<StatusEffect> remove = new Array<>();
+        LinkedHashMap<StatusEffect, StatusEffect.Data> effectMap = this.getEffects();
 
-        for (StatusEffect effect : this.effects.keySet()) {
-            StatusEffect.Data data = this.effects.get(effect);
+        for (StatusEffect effect : effectMap.keySet()) {
+            StatusEffect.Data data = effectMap.get(effect);
             data.decreaseDuration(delta);
             //检查时间是否归零
             if (data.getDuration() <= 0f) remove.add(effect);
@@ -265,7 +266,9 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         if (remove.isEmpty()) return;
         //移除
         for (StatusEffect effect : remove) {
-            this.effects.remove(effect);
+            //移除并且执行状态效果的结束应用
+            StatusEffect.Data data = effectMap.remove(effect);
+            effect.endApplyEffect(this, data.getLevel());
         }
     }
 
@@ -620,13 +623,15 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         LinkedHashMap<StatusEffect, StatusEffect.Data> effectsMap = this.getEffects();
         //已经存在效果
         if (effectsMap.containsKey(effect)) {
-            //覆盖
+            //覆盖（刻意设计：不比较等级和时长，后来的直接覆盖前面的）
             effectsMap.get(effect)
                 .setDuration(duration)
                 .setLevel(level);
+            //开始应用效果
+            effect.beginApplyEffect(this, level);
         }else {
             //没这个效果就直接添加
-            effectsMap.put(effect, new StatusEffect.Data(duration, level));
+            this.addEffect(effect, duration, level);
         }
 
         return (T) this;
@@ -644,6 +649,15 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         return (T) this;
     }
 
+    /**
+     * 添加这个状态效果
+     * */
+    private void addEffect (StatusEffect effect, float duration, int level) {
+        this.getEffects().put(effect, new StatusEffect.Data(duration, level));
+        //开始应用效果
+        effect.beginApplyEffect(this, level);
+    }
+
     @Override
     public void dispose () {
         super.dispose();
@@ -652,6 +666,12 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         Pools.TASK_TIMER.free(this.effectPreTickTimer);
         Pools.TASK_TIMER.free(this.effectPreSecondTimer);
         Pools.TASK_TIMER.free(this.knockbackTimer);
+
+        this.attackedTimer = null;
+        this.effectPreTickTimer = null;
+        this.effectPreSecondTimer = null;
+        this.knockbackTimer = null;
+
         if (this.swingHandTimer != null) {
             Pools.TASK_TIMER.free(this.swingHandTimer);
             this.swingHandTimer = null;

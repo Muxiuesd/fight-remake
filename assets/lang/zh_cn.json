@@ -60,6 +60,17 @@
   "item.fight:gold_ingot":  "&&c金锭",
   "item.fight:diamond":     "&&m钻石",
 
-  "effect.fight:healing":   "治疗 等级：{0}",
-  "effect.fight:poison":    "中毒 等级：{0}"
+  "item.fight:potion_heal_level_1":       "治疗药水 Ⅰ",
+  "item.fight:potion_heal_level_2":       "治疗药水 Ⅱ",
+  "item.fight:potion_heal_level_3":       "治疗药水 Ⅲ",
+  "item.fight:potion_poison_level_1":     "中毒药水 Ⅰ",
+  "item.fight:potion_poison_level_2":     "中毒药水 Ⅱ",
+  "item.fight:potion_poison_level_3":     "中毒药水 Ⅲ",
+  "item.fight:potion_move_speed_level_1": "速度提升药水 Ⅰ",
+  "item.fight:potion_move_speed_level_2": "速度提升药水 Ⅱ",
+  "item.fight:potion_move_speed_level_3": "速度提升药水 Ⅲ",
+
+  "effect.fight:healing":       "治疗 等级：{0}",
+  "effect.fight:poison":        "中毒 等级：{0}",
+  "effect.fight:move_speed":    "移速增加 等级：{0}"
 }
