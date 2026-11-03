@@ -28,6 +28,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.equipment.EquipmentType;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
+import ttk.muxiuesd.world.loottable.fishing.FishingLootTable;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -65,6 +66,7 @@ public class RegistryKeys {
 
     public static final RegistryKey<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE = new RegistryKey<>();
     public static final RegistryKey<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE = new RegistryKey<>();
+    public static final RegistryKey<FishingLootTable> FISHING_LOOT_TABLE = new RegistryKey<>();
 
     public static final RegistryKey<Biome> BIOME = new RegistryKey<>();
 

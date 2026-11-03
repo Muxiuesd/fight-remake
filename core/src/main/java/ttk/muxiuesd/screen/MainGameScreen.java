@@ -54,6 +54,7 @@ public class MainGameScreen implements Screen {
         CraftingRecipes.init();
         BlockDropLootTables.init();
         EntityDeathLootTables.init();
+        FishingLootTables.init();
         AttachmentPlacements.init();
 
         MainWorld mainWorld = new MainWorld(this);

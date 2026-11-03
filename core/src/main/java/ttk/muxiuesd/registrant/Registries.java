@@ -24,6 +24,7 @@ import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.equipment.EquipmentType;
 import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
 import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
+import ttk.muxiuesd.world.loottable.fishing.FishingLootTable;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.wall.Wall;
 
@@ -61,6 +62,7 @@ public class Registries {
 
     public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE      = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE);
     public static final Registry<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE  = create(RegistryKeys.ENTITY_DEATH_LOOT_TABLE);
+    public static final Registry<FishingLootTable> FISHING_LOOT_TABLE          = create(RegistryKeys.FISHING_LOOT_TABLE);
 
     public static final Registry<Biome> BIOME = create(RegistryKeys.BIOME);
 

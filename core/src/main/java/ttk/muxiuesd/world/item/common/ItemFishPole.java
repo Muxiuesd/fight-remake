@@ -3,25 +3,21 @@ package ttk.muxiuesd.world.item.common;
 import com.badlogic.gdx.math.Vector2;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.FishingLootTables;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
-import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.ParticleSystem;
-import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
 import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.loottable.fishing.FishingLootTable;
 
 /**
  * 钓鱼竿
@@ -67,22 +63,11 @@ public class ItemFishPole extends Item {
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
                 //需要鱼钩在水中才能钓到鱼
-                //生成钓鱼战利品
-                FishingLootTable.fastGenerate(100, genItemStack -> {
-                    ItemEntity itemEntity = ItemEntityGetter.getPickUpable(user.getEntitySystem(), hookPos, genItemStack)
-                        .setVelocity(new Direction(hook.getCenterPos(), hook.getOwner().getCenterPos()).toVector2())
-                        .setCurSpeed(this.pullSpeed)
-                        .setOnGround(false);
-                    itemEntity.setOnAirTimer(
-                        Pools.TASK_TIMER.obtain()
-                            .setMaxSpan(1.8f)
-                            .setCurSpan(0)
-                            .setTask(() -> {
-                                Pools.TASK_TIMER.free(itemEntity.getOnAirTimer());
-                                itemEntity.setOnAirTimer(null);
-                            })
-                    );
-                });
+                //生成钓鱼战利品：查注册的钓鱼表，掉落物从鱼钩位置朝使用者飞
+                FishingLootTables.generate(
+                    world, user, itemStack,
+                    hookPos, hook.getOwner().getCenterPos(), this.pullSpeed, 100
+                );
             }
 
             this.pullHook(itemStack);

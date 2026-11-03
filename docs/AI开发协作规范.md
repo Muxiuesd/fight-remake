@@ -100,6 +100,8 @@
 - 抽取：每组独立抽取 `rollCount` 次，组内按权重累加随机命中；`allowDuplicates=false` 时用 `Iterator.remove()` 去重（**不能用 for-each 内 remove，会 CME**）。
 - **数量下限可为 0**：`LootEntry.get()` 随机到 0 时返回 `ItemStack.VOID`（表示不掉落），生成处跳过空堆叠——不要直接 `copy(0)`（`ItemStack.copy` 内部 `Math.max(amount,1)` 会把 0 抬升为 1）。
 - 触发：实体死亡事件查 `Registries.ENTITY_DEATH_LOOT_TABLE` → `lootTable.generate`。
+- **三类表都走注册表，不要新建独立单例**：方块/墙体/附着物的表登记在 `Registries.BLOCK_DROP_LOOT_TABLE`（`BlockDropLootTables` 里注册），实体死亡表登记在 `Registries.ENTITY_DEATH_LOOT_TABLE`（`EntityDeathLootTables`），钓鱼表登记在 `Registries.FISHING_LOOT_TABLE`（`FishingLootTables`，`FishingLootTable` 自带 `Conditions.hookPos/pullTarget/pullSpeed/luck`）。没登记表 = 不掉任何东西，注册期不做校验。
+- 新增一种"带自己触发上下文"的表时：类实现 `LootTable<自己的 Conditions>`，`Conditions` 继承 `LootTable.Conditions<Conditions>` 并加场景字段；注册类只做 `register` + `getOrNull(id)` 两步，**不要**在表里做 `Holder.INSTANCE` 单例。
 
 ### 1. 浅拷贝策略（方案 A，重要）
 `JsonPropertiesMap.copy()` 的属性值副本策略（已写入 `JsonPropertiesMap.java` doc）：
