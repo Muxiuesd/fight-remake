@@ -23,50 +23,6 @@ public final class ItemGroups {
     public static final ItemGroup TOOL_BLOCK_ITEM = register(BlockItemGroups.TOOL_GROUP);
 
 
-    /*public static final ItemGroup COMMON_ITEM = register("common_item").selfAction((self) -> {
-        self
-            .add(Items.SLIME_BALL)
-            .add(Items.COAL)
-            .add(Items.STICK)
-            .add(Items.PUFFER_FISH)
-
-            .add(Items.DIAMOND_HELMET)
-            .add(Items.DIAMOND_CHESTPLATE)
-            .add(Items.DIAMOND_LEGGINGS)
-            .add(Items.DIAMOND_BOOTS)
-
-            .add(Items.SPAWN_EGG_SLIME)
-            .add(Items.SPAWN_EGG_PUFFER_FISH)
-
-            .add(Items.FURNACE)
-            .add(Items.CRAFTING_TABLE)
-
-            .add(Items.WOOL_BLACK)
-            .add(Items.WOOL_BLUE)
-            .add(Items.WOOL_BROWN)
-            .add(Items.WOOL_CYAN)
-            .add(Items.WOOL_GRAY)
-            .add(Items.WOOL_GREEN)
-            .add(Items.WOOL_LIGHT_BLUE)
-            .add(Items.WOOL_LIME)
-            .add(Items.WOOL_MAGENTA)
-            .add(Items.WOOL_ORANGE)
-            .add(Items.WOOL_PINK)
-            .add(Items.WOOL_PURPLE)
-            .add(Items.WOOL_RED)
-            .add(Items.WOOL_SILVER)
-            .add(Items.WOOL_WHITE)
-            .add(Items.WOOL_YELLOW)
-
-            .add(Items.GRASS)
-            .add(Items.FARMLAND_DRY)
-            .add(Items.STONE)
-
-            .add(Items.POTATO)
-        ;
-        });*/
-
-
     public static ItemGroup register (String name) {
         return register(new ItemGroup(Identifier.of(Fight.ID(name))));
     }
