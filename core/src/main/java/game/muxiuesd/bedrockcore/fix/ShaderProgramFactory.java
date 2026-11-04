@@ -3,6 +3,7 @@ package game.muxiuesd.bedrockcore.fix;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 
 /**
  * 针对Macos的着色器编译解决方案
@@ -92,8 +93,8 @@ public class ShaderProgramFactory {
      */
     public static ShaderProgram fromFile(FileHandle vertexShader,
                                          FileHandle fragmentShader) {
-        return fromString(vertexShader.readString(),
-            fragmentShader.readString());
+        return fromString(FileUtil.readText(vertexShader),
+            FileUtil.readText(fragmentShader));
     }
 
     /**

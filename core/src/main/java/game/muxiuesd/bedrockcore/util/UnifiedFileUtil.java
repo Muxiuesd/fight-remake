@@ -5,6 +5,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * 统一文件工具
  * <p>
@@ -112,6 +114,22 @@ public class UnifiedFileUtil {
     }
 
     /**
+     * 获取游戏内部（assets）的文件，路径不带标记
+     * <p>
+     * 给“只有一种根、路径本来就不带标记”的调用方用，避免误走 {@link #getFileUtil(String)} 的默认 LOCAL
+     * */
+    public static FileHandle internalFile (String path) {
+        return INTERNAL_FILE_UTIL.getFileHandle(path);
+    }
+
+    /**
+     * 获取绝对路径的文件，路径不带标记
+     * */
+    public static FileHandle absoluteFile (String path) {
+        return ABSOLUTE_FILE_UTIL.getFileHandle(path);
+    }
+
+    /**
      * 原子写入文件（先写临时文件再重命名）
      * <p>
      * 防止写入过程中被中断/并发写导致半截文件损坏存档
@@ -121,7 +139,7 @@ public class UnifiedFileUtil {
         String cleanPath = removePathStarts(path);
 
         FileHandle tmpFile = fileUtil.getFileHandle(cleanPath, fileName + ".tmp");
-        tmpFile.writeString(content, false);
+        tmpFile.writeString(content, false, StandardCharsets.UTF_8.name());
 
         java.io.File tmp = tmpFile.file();
         java.io.File target = fileUtil.getFileHandle(cleanPath, fileName).file();
@@ -129,7 +147,7 @@ public class UnifiedFileUtil {
         if (target.exists()) target.delete();
         if (tmp.renameTo(target)) return;
         //rename 失败（如文件被占用），回退为直接写目标
-        fileUtil.getFileHandle(cleanPath, fileName).writeString(content, false);
+        fileUtil.getFileHandle(cleanPath, fileName).writeString(content, false, StandardCharsets.UTF_8.name());
         tmp.delete();
     }
 
@@ -147,7 +165,7 @@ public class UnifiedFileUtil {
      * */
     public static FileHandle createDir (String dirPath) {
         FileUtil fileUtil = getFileUtil(dirPath);
-        return fileUtil.createDir(dirPath);
+        return fileUtil.createDir(removePathStarts(dirPath));
     }
 
     /**
@@ -170,7 +188,7 @@ public class UnifiedFileUtil {
      * 将文件以字符串形式读取出来
      * */
     public static String readFileAsString (String path, String fileName) {
-        return getFile(path, fileName).readString();
+        return FileUtil.readText(getFile(path, fileName));
     }
 
     /**
@@ -214,10 +232,10 @@ public class UnifiedFileUtil {
      * */
     public static JsonValue readJsonFile (FileHandle fileHandle, String fileName) {
         if (fileName.endsWith(".json")) {
-            String string = fileHandle.child(fileName).readString();
+            String string = FileUtil.readText(fileHandle.child(fileName));
             return new JsonReader().parse(string);
         }
-        String string = fileHandle.child(fileName + ".json").readString();
+        String string = FileUtil.readText(fileHandle.child(fileName + ".json"));
         return new JsonReader().parse(string);
     }
 

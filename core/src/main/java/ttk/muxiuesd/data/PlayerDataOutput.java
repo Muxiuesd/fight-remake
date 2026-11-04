@@ -15,8 +15,6 @@ public class PlayerDataOutput extends JsonDataOutput {
     public void output (JsonDataWriter writer) {
         Json json = writer.getWriter();
         String string = json.getWriter().getWriter().toString();
-        /*AbsFileUtil.createFile(Fight.getPathSavePlayer(), PlayerSystem.PLAYER_DATA_FILE_NAME)
-            .writeString(json.prettyPrint(string), false);*/
 
         UnifiedFileUtil
             .createFile(Fight.getPathSavePlayer(), PlayerSystem.PLAYER_DATA_FILE_NAME)

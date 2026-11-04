@@ -132,7 +132,6 @@ public final class Sounds {
      * @param filePath 基于audio/music/文件夹下的文件路径
      * */
     public static AudioHolder registerMusic (String name, String filePath) {
-        //return register(Fight.ID(name), AbsFileUtil.getFileHandle(Fight.MusicPath(filePath)));
         return register(Fight.ID(name), InternalFileUtil.getInstance().getFileHandle(Fight.MusicPath(filePath)));
     }
 

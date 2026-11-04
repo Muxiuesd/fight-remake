@@ -1,8 +1,6 @@
 package ttk.muxiuesd.mod.api;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 import ttk.muxiuesd.mod.Mod;
@@ -110,10 +108,6 @@ public class ModFileLoader {
                 callback.run();
             }
         }
-    }
-
-    private FileHandle getFileHandle (String path) {
-        return Gdx.files.absolute(this.getAbsolutePath(path));
     }
 
     private String getAbsolutePath (String path) {

@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.resource.AssetsLoader;
 
@@ -54,7 +55,7 @@ public class ModLoader {
      * */
     private void loadMod(FileHandle modDir) {
         FileHandle infoFileHandle = modDir.child("info.json");
-        String infoString = infoFileHandle.readString();
+        String infoString = FileUtil.readText(infoFileHandle);
         if (infoString == null) {
             //TODO
             return;

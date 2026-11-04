@@ -1,8 +1,9 @@
 package ttk.muxiuesd.render.shader;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 
 /**
  * 草地的着色器
@@ -14,8 +15,8 @@ public class GrassShader {
     private static GrassShader grassShader;
 
     public GrassShader() {
-        String vert = Gdx.files.internal("shaders/grass/grass.vert").readString();
-        String frag = Gdx.files.internal("shaders/grass/grass.frag").readString();
+        String vert = FileUtil.readText(UnifiedFileUtil.internalFile("shaders/grass/grass.vert"));
+        String frag = FileUtil.readText(UnifiedFileUtil.internalFile("shaders/grass/grass.frag"));
         this.shader = new ShaderProgram(vert, frag);
 
         if (!this.shader.isCompiled()) {

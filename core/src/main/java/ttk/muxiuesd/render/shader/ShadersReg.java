@@ -1,9 +1,10 @@
 package ttk.muxiuesd.render.shader;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import ttk.muxiuesd.Fight;
 import game.muxiuesd.bedrockcore.fix.GL32CMacIssueHandler;
+import game.muxiuesd.bedrockcore.util.FileUtil;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 
 /**
  * 游戏内用到的着色器的注册
@@ -37,8 +38,8 @@ public class ShadersReg {
      * @return 注册的id
      * */
     public static String register (String id, String vertPath, String fragPath) {
-        String vert = Gdx.files.internal(vertPath).readString();
-        String frag = Gdx.files.internal(fragPath).readString();
+        String vert = FileUtil.readText(UnifiedFileUtil.internalFile(vertPath));
+        String frag = FileUtil.readText(UnifiedFileUtil.internalFile(fragPath));
 
         ShaderProgram shader = new ShaderProgram(vert, frag);
         ShaderScheduler.getInstance().registry(id, shader);

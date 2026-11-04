@@ -99,6 +99,10 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 - 区块存档 `CodecChunk` 存 blocks/walls/botany/heights/canSpawn/biome；高度范围校验用 `Chunk.LowestHeight/HighestHeight`。
 - Codec 惯用法：`RawObject.ofString/ofMap/ofList`；解码子值时 `Codec.STRING.decode(Codec.wrap(value))`；`DataResult` 的 `result()`/`error()`；部分失败时保留已解码数据。
 
+- **文本读取一律走 `FileUtil.readText (FileHandle file)`**（`core/src/main/java/game/muxiuesd/bedrockcore/util/FileUtil.java`）：内部是 `new String(file.readBytes(), StandardCharsets.UTF_8)`，并把首字符的 BOM 剥掉——这是全项目唯一的文本读取入口。**不要再直接写 `file.readString()`**：它默认也是 UTF-8，但会留下 `\uFEFF`，带 BOM 的 json 会让 `JsonReader` 直接解析失败。写端同理显式传编码：`file.writeString(content, false, StandardCharsets.UTF_8.name())`。
+
+- **取 `FileHandle` 一律走 `UnifiedFileUtil`**（`core/src/main/java/game/muxiuesd/bedrockcore/util/UnifiedFileUtil.java`）：路径不带标记、且明确知道根时用 `internalFile(path)`（assets 内部）或 `absoluteFile(path)`；路径自带 `I:@`/`A:@`/`E:@`/`L:@` 标记时才用 `getFileHandle(path)`。**别把裸路径交给 `getFileHandle`**：`getFileUtil` 对无标记路径默认返回 LOCAL（`Gdx.files.local`），而 `FightFileHandleResolver` 对同一路径默认 INTERNAL（`Gdx.files.internal`）——写错会静默读不到 assets 里的文件。资源加载走 `AssetsLoader`（内部就是 `FightFileHandleResolver`），存档与语言包/字体/音频的句柄走 `UnifiedFileUtil`，不要在业务代码里直接 `Gdx.files.internal/absolute`。
+
 ## 七、坐标系与 libgdx 绘制（易踩坑）
 
 - `GUICamera`：`setToOrtho(false)` → **y 轴向上**，原点屏幕中心，视口基准 512×512。鼠标 GUI 坐标用 `Util.getMouseUIPosition()`。

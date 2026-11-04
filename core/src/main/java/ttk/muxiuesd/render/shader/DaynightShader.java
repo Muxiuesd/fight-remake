@@ -1,10 +1,11 @@
 package ttk.muxiuesd.render.shader;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 
 /**
  * 着色器实现的日夜循环效果
@@ -13,8 +14,8 @@ public class DaynightShader {
     private final ShaderProgram shader;
 
     public DaynightShader() {
-        String vert = Gdx.files.internal("shaders/daynight/daynight.vert").readString();
-        String frag = Gdx.files.internal("shaders/daynight/daynight.frag").readString();
+        String vert = FileUtil.readText(UnifiedFileUtil.internalFile("shaders/daynight/daynight.vert"));
+        String frag = FileUtil.readText(UnifiedFileUtil.internalFile("shaders/daynight/daynight.frag"));
         this.shader = new ShaderProgram(vert, frag);
 
         if (!this.shader.isCompiled()) {

@@ -1,6 +1,7 @@
 package ttk.muxiuesd.lang;
 
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.data.JsonDataReader;
 import ttk.muxiuesd.id.Identifier;
@@ -29,7 +30,7 @@ public class LangPack {
     public void loadTexts (FileHandle fileHandle) {
         if (!fileHandle.exists()) return;
 
-        JsonDataReader jsonDataReader = new JsonDataReader(fileHandle.readString());
+        JsonDataReader jsonDataReader = new JsonDataReader(FileUtil.readText(fileHandle));
         jsonDataReader.getParse().forEach(textValue -> {
             String key = textValue.name();
             this.setText(key, jsonDataReader.readString(key));

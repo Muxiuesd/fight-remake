@@ -2,6 +2,7 @@ package ttk.muxiuesd.mod.api;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.mod.ModLibManager;
 
@@ -37,7 +38,7 @@ public class ModLibLoader {
             Log.error(TAG, "传入的加载空间：" + space + "不正确，只能为：Internal（游戏内部库）或 External（游戏外部库）");
             return;
         }
-        String code = libFile.readString();
+        String code = FileUtil.readText(libFile);
         if (!libFile.exists()) {
             Log.error(TAG, "无法加载：" + path + " ！！！");
             return;

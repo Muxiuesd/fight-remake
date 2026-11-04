@@ -3,6 +3,7 @@ package ttk.muxiuesd.mod;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonValue;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
 
 import javax.script.ScriptContext;
@@ -36,7 +37,7 @@ public class Mod implements Runnable{
 
         FileHandle mainFile = Gdx.files.absolute(this.modPath + info.getString("main"));
 
-        String code = mainFile.readString();
+        String code = FileUtil.readText(mainFile);
 
         this.engine = EngineFactory.createEngine();
         try {

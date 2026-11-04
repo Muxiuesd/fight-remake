@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * 抽象的文件工具类
  * <p>
@@ -143,18 +145,31 @@ public abstract class FileUtil {
     }
 
     /**
+     * 以 UTF-8 读取整个文本文件
+     * <p>
+     * 不管文件本身是什么编码，一律按 UTF-8 解码（无法解码的字节会被替换成 U+FFFD）。
+     * 开头的 UTF-8 BOM 会被跳过，避免解析 json 时多出一个不可见字符。
+     * <p>
+     * 全项目读取文本都走这个方法，不要直接调用 {@link FileHandle#readString()}
+     * */
+    public static String readText (FileHandle file) {
+        String text = new String(file.readBytes(), StandardCharsets.UTF_8);
+        return !text.isEmpty() && text.charAt(0) == 0xFEFF ? text.substring(1) : text;
+    }
+
+    /**
      * 将文件以字符串形式读取出来
      * */
     public String readFileAsString (String path, String fileName) {
-        return getFile(path, fileName).readString();
+        return readText(getFile(path, fileName));
     }
 
     public JsonValue readJsonFile (FileHandle fileHandle, String fileName) {
         if (fileName.endsWith(".json")) {
-            String string = getFile(fileHandle, fileName).readString();
+            String string = readText(getFile(fileHandle, fileName));
             return new JsonReader().parse(string);
         }
-        String string = getFile(fileHandle, fileName + ".json").readString();
+        String string = readText(getFile(fileHandle, fileName + ".json"));
         return new JsonReader().parse(string);
     }
     /**
@@ -163,10 +178,10 @@ public abstract class FileUtil {
      * */
     public JsonValue readJsonFile (String path, String fileName) {
         if (fileName.endsWith(".json")) {
-            String string = getFile(path, fileName).readString();
+            String string = readText(getFile(path, fileName));
             return new JsonReader().parse(string);
         }
-        String string = getFile(path, fileName + ".json").readString();
+        String string = readText(getFile(path, fileName + ".json"));
         return new JsonReader().parse(string);
     }
 
