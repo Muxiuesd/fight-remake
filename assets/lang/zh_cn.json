@@ -45,11 +45,21 @@
 
 
   "item.fight:torch":     "火把",
-  "item.fight:stick":     "木棍",
   "item.fight:fish_pole": "钓鱼竿",
+  "item.fight:stick":     "木棍",
+  "item.fight:bone":      "骨头",
+  "item.fight:bone_meal": "骨粉",
 
-  "item.fight:fish":        "鱼",
-  "item.fight:puffer_fish": "河豚",
+  "item.fight:potato":          "土豆",
+  "item.fight:seeds_wheat":     "小麦种子",
+  "item.fight:wheat":           "小麦",
+
+  "item.fight:fish":            "鱼",
+  "item.fight:puffer_fish":     "河豚",
+  "item.fight:potato_baked":    "熟土豆",
+  "item.fight:chicken_raw":     "生鸡肉",
+  "item.fight:chicken_cooked":  "熟鸡肉",
+  "item.fight:bread":           "面包",
 
   "item.fight:rubbish":     "垃圾",
 
