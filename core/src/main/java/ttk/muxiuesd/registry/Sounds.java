@@ -2,12 +2,12 @@ package ttk.muxiuesd.registry;
 
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.audio.SoundGroup;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.util.InternalFileUtil;
 import ttk.muxiuesd.world.block.BlockSounds;
 
 /**
@@ -132,7 +132,7 @@ public final class Sounds {
      * @param filePath 基于audio/music/文件夹下的文件路径
      * */
     public static AudioHolder registerMusic (String name, String filePath) {
-        return register(Fight.ID(name), InternalFileUtil.getInstance().getFileHandle(Fight.MusicPath(filePath)));
+        return register(Fight.ID(name), UnifiedFileUtil.internalFile(Fight.MusicPath(filePath)));
     }
 
     /**
@@ -140,7 +140,7 @@ public final class Sounds {
      * @param filePath 基于audio/sound/文件夹下的文件路径
      * */
     public static AudioHolder registerSound (String name, String filePath) {
-        return register(Fight.ID(name), InternalFileUtil.getInstance().getFileHandle(Fight.SoundPath(filePath)));
+        return register(Fight.ID(name), UnifiedFileUtil.internalFile(Fight.SoundPath(filePath)));
     }
 
     /**
