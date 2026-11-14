@@ -47,7 +47,6 @@ public class Player extends LivingEntity<Player> {
         super(world, entityType, maxHealth, curHealth, BACKPACK_SIZE);
         renderHandItem = true;
         setSpeed(MOVE_SPEED);
-        //setCurSpeed(getSpeed());
 
         this.defendCDTimer = Pools.TASK_TIMER.obtain()
             .setMaxSpan(2f)

@@ -8,6 +8,7 @@ import game.muxiuesd.bedrockcore.util.TaskTimer;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.entity.state.LivingEntityState;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.serialization.codecs.builders.LivingEntityCodecBuilder;
@@ -64,8 +65,6 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     private TaskTimer effectPreTickTimer;
     private TaskTimer effectPreSecondTimer;
 
-    private float maxHealth;                // 生命值上限
-    private float curHealth;                // 当前生命值
     private boolean attacked;               //是否收到攻击的状态
     private TaskTimer attackedTimer;        //被攻击状态持续的计时器
     public Backpack backpack;               //储存物品的背包容器
@@ -108,9 +107,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
                 }
             );
 
-
-        this.maxHealth = maxHealth;
-        this.curHealth = curHealth;
+        this.setMaxHealth(maxHealth);
+        this.setCurHealth(curHealth);
         this.attacked = false;
         this.attackedTimer = Pools.TASK_TIMER.obtain()
             .setMaxSpan(ATTACK_SPAN)
@@ -128,8 +126,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     public void readCatData (CatsHolder holder) {
         super.readCatData(holder);
         this.handIndex = holder.getInt("handIndex", 0);
-        this.maxHealth = holder.getFloat("maxHealth", 10f);
-        this.curHealth = holder.getFloat("curHealth", 10f);
+        this.setMaxHealth(holder.getFloat("maxHealth", 10f));
+        this.setCurHealth(holder.getFloat("curHealth", 10f));
     }
 
     @Override
@@ -137,8 +135,8 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         super.writeCatData(holder);
         holder
             .put("handIndex", new CatInt(this.handIndex))
-            .put("maxHealth", new CatFloat(this.maxHealth))
-            .put("curHealth", new CatFloat(this.curHealth));
+            .put("maxHealth", new CatFloat(this.getMaxHealth()))
+            .put("curHealth", new CatFloat(this.getCurHealth()));
     }
 
     /**
@@ -263,12 +261,13 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
             if (data.getDuration() <= 0f) remove.add(effect);
         }
 
-        if (remove.isEmpty()) return;
-        //移除
-        for (StatusEffect effect : remove) {
-            //移除并且执行状态效果的结束应用
-            StatusEffect.Data data = effectMap.remove(effect);
-            effect.endApplyEffect(this, data.getLevel());
+        if (!remove.isEmpty()) {
+            //移除
+            for (StatusEffect effect : remove) {
+                //移除并且执行状态效果的结束应用
+                StatusEffect.Data data = effectMap.remove(effect);
+                effect.endApplyEffect(this, data.getLevel());
+            }
         }
     }
 
@@ -359,7 +358,7 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     }
 
     public boolean isDeath () {
-        return this.curHealth <= 0;
+        return this.getCurHealth() <= 0;
     }
 
     /**
@@ -486,21 +485,33 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
         return (T) this;
     }
 
+    /**
+     * 获取最大血量（属性表里的原始值）
+     * */
     public float getMaxHealth () {
-        return this.maxHealth;
+        return this.getAttributesModifier().getBase(PropertyTypes.ENTITY_HEALTH, 10f);
     }
 
     public T setMaxHealth (float maxHealth) {
-        this.maxHealth = maxHealth;
+        //原始值就是最大血量；写原始值会把当前值一并重置成它，所以先把当前血量记下来
+        float curHealth = this.getCurHealth();
+        this.getAttributesModifier().setBase(PropertyTypes.ENTITY_HEALTH, maxHealth);
+        //上限被调低时当前血量压到新上限，调高时保持原血量
+        this.setCurHealth(Math.min(curHealth, maxHealth));
         return (T) this;
     }
 
+    /**
+     * 获取当前血量（属性表里的当前值，受伤/治疗改的就是它）
+     * */
     public float getCurHealth () {
-        return this.curHealth;
+        //当前值没登记过就按满血算
+        return this.getAttributesModifier().getOrDefault(PropertyTypes.ENTITY_HEALTH, this.getMaxHealth());
     }
 
     public T setCurHealth (float curHealth) {
-        this.curHealth = curHealth;
+        //只改当前值，绝不动原始值，否则受伤会把最大血量一起改掉
+        this.getAttributesModifier().set(PropertyTypes.ENTITY_HEALTH, MathUtils.clamp(curHealth, 0f, this.getMaxHealth()));
         return (T) this;
     }
 
@@ -646,6 +657,10 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
 
     public T setEffects (LinkedHashMap<StatusEffect, StatusEffect.Data> effectsMap) {
         this.effects = effectsMap;
+        //读档恢复：存档里只有效果的时长与等级，属性上被改写过的值要按它们重新应用一次
+        effectsMap.forEach((effect, data) -> effect.beginApplyEffect(this, data.getLevel()));
+        //效果可能抬高了生命上限，当前血量不该超过上限
+        if (this.getCurHealth() > this.getMaxHealth()) this.setCurHealth(this.getMaxHealth());
         return (T) this;
     }
 

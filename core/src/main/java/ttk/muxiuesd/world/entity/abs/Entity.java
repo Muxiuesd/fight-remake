@@ -23,7 +23,6 @@ import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntitySounder;
@@ -52,9 +51,8 @@ public abstract class Entity<T extends Entity<T>>
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
-    private float speed;                    //实体的基准速度（比如移动速度）
     private float x, y;                     //实体的世界坐标
-    private float velX, velY;               //实体的速度矢量
+    private float velX, velY;               //实体的运动速度矢量
     private float width, height;            //实体的宽高（世界渲染）
     private float originX = 0f, originY = 0f;
     private float scaleX = 1f, scaleY = 1f;
@@ -221,16 +219,27 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 获取实体的基准速度（比如移动速度）
+     * 获取实体的移动速度（当前值，可能被状态效果改写）
      * */
     public float getSpeed () {
-        return this.speed;
+        return this.getAttributesModifier().getOrDefault(PropertyTypes.ENTITY_MOVE_SPEED, 0f);
     }
 
+    /**
+     * 获取实体的原始移动速度（固定值，不受状态效果影响）
+     * */
+    public float getBaseSpeed () {
+        return this.getAttributesModifier().getBase(PropertyTypes.ENTITY_MOVE_SPEED, 0f);
+    }
+
+    /**
+     * 设置速度（基础速度）
+     * */
     public T setSpeed (float speed) {
         //守卫检查新值（原来检查旧值，负速度可被写入且无法改回）
         if (speed >= 0) {
-            this.speed = speed;
+            //写的是原始速度，状态效果改的是当前值
+            this.getAttributesModifier().setBase(PropertyTypes.ENTITY_MOVE_SPEED, speed);
         }
         return (T) this;
     }
@@ -483,6 +492,13 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
+    /**
+     * 获取实体的属性修饰表（原始值 / 当前值）
+     * */
+    public AttributesModifier getAttributesModifier () {
+        return this.getProperty().getAttributesModifier();
+    }
+
 
     /**
      * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦
@@ -626,6 +642,8 @@ public abstract class Entity<T extends Entity<T>>
     public static class Property {
         //属性映射
         private PropertiesDataMap<?, ?, ?> propertiesMap;
+        //实体的属性修饰表：原始值 + 当前值
+        private AttributesModifier attributesModifier = new AttributesModifier();
 
         public Property () {
             setPropertiesMap(
@@ -658,6 +676,15 @@ public abstract class Entity<T extends Entity<T>>
 
         public Entity.Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
             this.propertiesMap = propertiesMap;
+            return this;
+        }
+
+        public AttributesModifier getAttributesModifier () {
+            return this.attributesModifier;
+        }
+
+        public Entity.Property setAttributesModifier (AttributesModifier attributesModifier) {
+            this.attributesModifier = attributesModifier;
             return this;
         }
     }

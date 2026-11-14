@@ -49,7 +49,9 @@ public class CodecJsonPropertiesMap {
 
             for (Map.Entry<String, Object> rawEntry : rawMap.entrySet()) {
                 String id = rawEntry.getKey();
-                PropertyType<?> propType = Registries.PROPERTY_TYPE.get(id);
+                //用 getOrNull：存档里可能残留已删除/未注册的属性键（旧存档、卸载的 mod），
+                //那种情况应该跳过这一条并记错误，而不是抛异常把整个实体/区块的解码带崩
+                PropertyType<?> propType = Registries.PROPERTY_TYPE.getOrNull(id);
                 if (propType == null) {
                     errors.append("Unknown property: ").append(id).append("; ");
                     hasError = true;

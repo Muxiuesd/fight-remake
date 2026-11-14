@@ -9,6 +9,7 @@ import ttk.muxiuesd.event.poster.EventPosterEntityHurt;
 import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.DamageTypes;
 import ttk.muxiuesd.registry.Pools;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -37,7 +38,6 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
     private TaskTimer attackTimer;  //攻击计时器
     private float visionRange;      //视野范围
     private float attackRange;      //攻击范围，再此范围内的会被锁定并攻击
-    private float meleeDamage = 3f; //近战攻击的伤害值（远程攻击不适用）
     private float meleeKnockback = 0f;  //近战攻击的击退力度（0 = 不击退）
 
     public Enemy (World world, EntityType<?> entityType) {
@@ -229,17 +229,17 @@ public abstract class Enemy<E extends Enemy<E>> extends PathFindingEntity<E> {
     }
 
     /**
-     * 获取近战攻击的伤害值
+     * 获取近战攻击的伤害值（当前值，可能被状态效果改写）
      * */
     public float getMeleeDamage () {
-        return meleeDamage;
+        return this.getAttributesModifier().getOrDefault(PropertyTypes.ENTITY_ATTACK_DAMAGE, 3f);
     }
 
     /**
-     * 设置近战攻击的伤害值
+     * 设置近战攻击的伤害值（写的是原始值）
      * */
     public Enemy<?> setMeleeDamage (float meleeDamage) {
-        this.meleeDamage = meleeDamage;
+        this.getAttributesModifier().setBase(PropertyTypes.ENTITY_ATTACK_DAMAGE, meleeDamage);
         return this;
     }
 

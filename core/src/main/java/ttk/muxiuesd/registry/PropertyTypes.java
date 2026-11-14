@@ -51,6 +51,14 @@ public final class PropertyTypes {
     public static final PropertyType<Boolean> BLOCK_WALKABLE = register("block_walkable", new DefaultBoolPropertyType());
     public static final PropertyType<Boolean> BLOCK_SWIMMABLE = register("block_swimmable", new DefaultBoolPropertyType());
 
+    /// 实体属性（存的都是原始值，当前值由状态效果派生，见 AttributesModifier）
+    /// 生命值：原始值是最大血量（固定值），当前值是当前血量（受伤/治疗改的就是它）
+    public static final PropertyType<Float> ENTITY_HEALTH = register("entity_health", new DefaultFloatPropertyType());
+    /// 移动速度
+    public static final PropertyType<Float> ENTITY_MOVE_SPEED = register("entity_move_speed", new DefaultFloatPropertyType());
+    /// 近战攻击力
+    public static final PropertyType<Float> ENTITY_ATTACK_DAMAGE = register("entity_attack_damage", new DefaultFloatPropertyType());
+
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {
         String id = Fight.ID(name);

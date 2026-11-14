@@ -10,6 +10,7 @@ import ttk.muxiuesd.serialization.codecs.CodecCatsHolder;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.abs.AttributesModifier;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -32,7 +33,8 @@ public class EntityCodecBuilder {
             .field("y", Entity::getY, Entity::setY, Codec.FLOAT)
             .field("velX", Entity::getVelX, Entity::setVelX, Codec.FLOAT)
             .field("velY", Entity::getVelY, Entity::setVelY, Codec.FLOAT)
-            .field("speed", Entity::getSpeed, Entity::setSpeed, Codec.FLOAT)
+            //写原始速度，不能写 getSpeed：后者是当前值，带速度提升效果时存档会把加速值当成固定值，效果就永久了
+            .field("speed", Entity::getBaseSpeed, Entity::setSpeed, Codec.FLOAT)
             .field("width", Entity::getWidth, Entity::setWidth, Codec.FLOAT)
             .field("height", Entity::getHeight, Entity::setHeight, Codec.FLOAT)
             .field("originX", Entity::getOriginX, Entity::setOriginX, Codec.FLOAT)
@@ -41,6 +43,12 @@ public class EntityCodecBuilder {
             .field("scaleY", Entity::getScaleY, Entity::setScaleY, Codec.FLOAT)
             .field("rotation", Entity::getRotation, Entity::setRotation, Codec.FLOAT)
             .field("onGround", Entity::isOnGround, Entity::setOnGround, Codec.BOOL)
+            //实体属性表，只存原始值；当前值是状态效果派生出来的，由 setEffects 重新应用时再算
+            //必须排在 cats 之前解码：cats 里的 maxHealth 要覆盖属性表里的同名值
+            .field("attributes",
+                entity -> entity.getProperty().getAttributesModifier(),
+                (entity, attributes) -> entity.getProperty().setAttributesModifier(attributes),
+                AttributesModifier.CODEC)
             //cats 自定义数据：编码时先把实体字段写入 cats，解码时恢复（缺失字段时跳过，兼容旧存档）
             .field("cats",
                 entity -> {
