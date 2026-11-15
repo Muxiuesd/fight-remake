@@ -93,7 +93,8 @@ public class CodecChunk {
                 if (blocks.containsKey(name)) {
                     try {
                         DataResult<Block> blockResult = decodeBlock(Codec.wrap(blocks.get(name)));
-                        if (blockResult.isSuccess()) {
+                        //用 result() 而不是 isSuccess()：某个字段解码失败时实体照样构造出来了，不能因为一个字段把整格方块丢掉
+                        if (blockResult.result().isPresent()) {
                             chunk.setBlock(blockResult.result().get(), x, y);
                         } else {
                             errors.append("[").append(name).append("]方块: ").append(blockResult.error().orElse("")).append("; ");
@@ -107,7 +108,8 @@ public class CodecChunk {
                 if (walls.containsKey(name)) {
                     try {
                         DataResult<Wall<?>> wallResult = Wall.CODEC.decode(Codec.wrap(walls.get(name)));
-                        if (wallResult.isSuccess()) {
+                        //同上：字段坏了只丢字段，不丢整面墙
+                        if (wallResult.result().isPresent()) {
                             chunk.setWall(wallResult.result().get(), x, y);
                         } else {
                             errors.append("[").append(name).append("]墙体: ").append(wallResult.error().orElse("")).append("; ");
@@ -121,7 +123,8 @@ public class CodecChunk {
                 if (attachments.containsKey(name)) {
                     try {
                         DataResult<Attachment> attachmentResult = Attachment.CODEC.decode(Codec.wrap(attachments.get(name)));
-                        if (attachmentResult.isSuccess()) {
+                        //同上：字段坏了只丢字段，不丢整株附着物
+                        if (attachmentResult.result().isPresent()) {
                             chunk.setAttachment(attachmentResult.result().get(), x, y);
                         } else {
                             errors.append("[").append(name).append("]附着物: ").append(attachmentResult.error().orElse("")).append("; ");

@@ -25,7 +25,7 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     public static final Codec<ItemStack> CODEC = CodecBuilder.<ItemStack>create()
         .field("item", ItemStack::getItem, ItemStack::setItem, Item.CODEC)
         .field("amount", ItemStack::getAmount, ItemStack::setAmount, Codec.INT)
-        .field("property", ItemStack::getProperty, ItemStack::setProperty, Item.Property.CODEC)
+        .optionalField("property", ItemStack::getProperty, ItemStack::setProperty, Item.Property.CODEC)
         .noArgFactory(ItemStack::new);
 
 

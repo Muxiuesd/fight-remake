@@ -142,7 +142,7 @@ public class Block implements ID<Block>, Disposable {
      * */
     public static class Property {
         public static final Codec<Block.Property> CODEC = CodecBuilder.<Property>create()
-            .field("data_map",
+            .optionalField("data_map",
                 Block.Property::getPropertiesMap,
                 Block.Property::setPropertiesMap,
                 CodecJsonPropertiesMap.CODEC)

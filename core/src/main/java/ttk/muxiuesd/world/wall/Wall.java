@@ -29,7 +29,7 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
         .paramField("id", Wall::getID, Codec.STRING)
         .paramField("x", wall -> wall.x, Codec.FLOAT)
         .paramField("y", wall -> wall.y, Codec.FLOAT)
-        .field("property", Wall::getProperty, Wall::setProperty, Block.Property.CODEC)
+        .optionalField("property", Wall::getProperty, Wall::setProperty, Block.Property.CODEC)
         .factory((id, x, y) -> {
             Wall<?> prototype = Registries.WALL.getOrNull(id);
             if (prototype == null) {

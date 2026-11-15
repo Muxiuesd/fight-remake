@@ -66,6 +66,9 @@ public class LootEntry implements Supplier<ItemStack> {
      * */
     @Override
     public ItemStack get () {
+        //空条目：模板本身就是 VOID，这是战利品表表达"这一抽什么都不掉"的方式（如鸡的 9:1 空掉落）。
+        //VOID 没有属性，copy() 会空指针，所以这里直接返回空堆叠，由调用方跳过
+        if (this.itemStack.isVoid()) return ItemStack.VOID;
         //数量没写死区间时按区间随机；写死了就用写死的那个数，别去读模板数量
         //（模板数量恒为 1，写成 LootEntry.of(item, 3, 3, 1f) 会错误地只掉 1 个）
         int amount = this.minAmount == this.maxAmount

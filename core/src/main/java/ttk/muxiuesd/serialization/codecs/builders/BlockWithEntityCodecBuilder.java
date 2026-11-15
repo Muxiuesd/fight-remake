@@ -42,7 +42,7 @@ public class BlockWithEntityCodecBuilder {
                 BlockWithEntity::setBlockEntity,
                 blockEntityCodec
             )
-            .field("property",
+            .optionalField("property",
                 block -> {
                     //调用cats写入
                     CatsHolder cats = block.getProperty().get(PropertyTypes.CATS);

@@ -76,7 +76,7 @@ public class CodecJsonPropertiesMap {
     };
 
     public static final Codec<JsonPropertiesMap> CODEC = CodecBuilder.<JsonPropertiesMap>create()
-        .field("properties_map",
+        .optionalField("properties_map",
             JsonPropertiesMap::getPropertiesMap,
             JsonPropertiesMap::setPropertiesMap,
             MAP_CODEC)

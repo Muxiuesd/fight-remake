@@ -35,7 +35,7 @@ public abstract class Attachment extends Block {
      */
     public static final Codec<Attachment> CODEC = CodecBuilder.<Attachment>create()
         .paramField("id", Attachment::getID, Codec.STRING)
-        .field("property",
+        .optionalField("property",
             attachment -> {
                 //把当前的cats数据写入属性，保证保存的数据是最新的
                 CatsHolder cats = attachment.getProperty().get(PropertyTypes.CATS);

@@ -162,7 +162,7 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * */
     public static class Property implements Codecable<Property>{
         public static final Codec<Property> CODEC = CodecBuilder.<Property>create()
-            .field("data_map",
+            .optionalField("data_map",
                 Property::getPropertiesMap,
                 Property::setPropertiesMap,
                 CodecJsonPropertiesMap.CODEC)

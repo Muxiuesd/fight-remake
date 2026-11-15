@@ -98,6 +98,10 @@ description: fight_remake（Java17+libGDX 1.14.2 的 2D 游戏）项目的开发
 - `Biome` 是注册表单例，序列化只存 id，反序列化用 `Biome.byId(id)` 反查。
 - 区块存档 `CodecChunk` 存 blocks/walls/botany/heights/canSpawn/biome；高度范围校验用 `Chunk.LowestHeight/HighestHeight`。
 - Codec 惯用法：`RawObject.ofString/ofMap/ofList`；解码子值时 `Codec.STRING.decode(Codec.wrap(value))`；`DataResult` 的 `result()`/`error()`；部分失败时保留已解码数据。
+- **给已有存档加字段一律用 `optionalField`，不要用 `field`**：旧档没有这个键是常态，`field` 会记一条 `xxx: Missing;` 并把整次解码打成 error。`optionalField(name, getter, setter, codec)` 缺了就不动（保留工厂/构造器给的值），`optionalField(..., Supplier)` 缺了就写入默认值。默认值必须"等价于缺省状态"（集合给空集合、背包给默认大小），且要传 `Supplier` 而不是实例——默认值可能是可变对象。
+- **战利品表的"空条目"用 `LootEntry.of(ItemStack.VOID, ...)` 表达**（例如鸡 9:1 空掉落）：`LootEntry.get()` 会先判 `itemStack.isVoid()` 并直接返回 `ItemStack.VOID`，由 `EntityDeathLootTable.generate` 的 `isVoid()` 跳过。**不要对 VOID 调 `copy()`**——`ItemStack.VOID` 是私有空构造器造出来的，`property` 为 null，`copy()` 第一行就空指针。
+- **身份类字段仍用 `field`**（`id`/`type`/`block_pos`/`item`/`amount`/`damage`、`Entity` 的 `x/y/vel*/speed/width/height/origin*/scale*/rotation`）：缺了就是坏档，不要拿默认值糊过去；`paramField` 缺失时 `ObjectCodec` 直接返回 error 且不构造对象（不会再出现"null 塞进工厂再抛 NPE"）。
+- **判断"单格/单个对象解码成功"要用 `result().isPresent()`，不要用 `isSuccess()`**：`DataResult.ErrorWithPartial` 的 `isSuccess()` 是 false，但实例已经构造出来了。`CodecChunk` 的方块/墙体/附着物三处就是因为用 `isSuccess()`，导致任一字段坏掉就整格消失。唯一例外是背包槽位（`Inventory`）：那里宁可丢一件物品，也不要塞回数量为 0 的坏栈。
 
 - **文本读取一律走 `FileUtil.readText (FileHandle file)`**（`core/src/main/java/game/muxiuesd/bedrockcore/util/FileUtil.java`）：内部是 `new String(file.readBytes(), StandardCharsets.UTF_8)`，并把首字符的 BOM 剥掉——这是全项目唯一的文本读取入口。**不要再直接写 `file.readString()`**：它默认也是 UTF-8，但会留下 `\uFEFF`，带 BOM 的 json 会让 `JsonReader` 直接解析失败。写端同理显式传编码：`file.writeString(content, false, StandardCharsets.UTF_8.name())`。
 
