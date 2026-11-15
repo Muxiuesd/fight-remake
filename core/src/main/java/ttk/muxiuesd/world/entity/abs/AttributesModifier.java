@@ -9,6 +9,8 @@ import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 实体属性的修饰表：原始值 + 当前值
@@ -22,29 +24,65 @@ import java.util.LinkedHashMap;
  */
 public final class AttributesModifier implements Codecable<AttributesModifier> {
     /**
-     * 属性表的编解码器：复用属性表的通用编码，键是属性类型id，值是属性类型自己的值编码
+     * 属性表的编解码器
      * <p>
-     * 只编码原始值。当前值是状态效果派生出来的中间态，写进存档会和效果的剩余时长对不上。
+     * 结构是 {@code {"base": {属性id: 值…}, "current": {属性id: 值…}}}：
+     * base 是原始值；current 只存被改过的当前值。
+     * <p>
+     * 当前值也要落盘：像当前血量这种数据不是从原始值派生出来的（原始值是血量上限），
+     * 只存原始值的话读档就只剩满血。状态效果改出来的当前值存下来也没关系，
+     * 读档后 {@code LivingEntity.setEffects} 会按剩余时长重新应用一次，把它算回正确的值。
+     * <p>
+     * 旧存档的属性表只有一层（键直接是属性id），解码时按"只有原始值"处理
      * */
     public static final Codec<AttributesModifier> CODEC = new Codec<>() {
+        private static final String BASE = "base";
+        private static final String CURRENT = "current";
+
         @Override
         public RawObject encode (AttributesModifier modifier) {
-            return CodecJsonPropertiesMap.MAP_CODEC.encode(modifier.getBaseValues());
+            Map<String, Object> encoded = new LinkedHashMap<>();
+            encoded.put(BASE, CodecJsonPropertiesMap.MAP_CODEC.encode(modifier.getBaseValues()).unwrap());
+            encoded.put(CURRENT, CodecJsonPropertiesMap.MAP_CODEC.encode(modifier.getModifiedValues()).unwrap());
+            return RawObject.ofMap(encoded);
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public DataResult<AttributesModifier> decode (RawObject input) {
             AttributesModifier modifier = new AttributesModifier();
-            DataResult<LinkedHashMap<PropertyType, Object>> decoded =
-                CodecJsonPropertiesMap.MAP_CODEC.decode(input);
+            if (!input.isMap()) return DataResult.error("实体属性表应该是一个对象", modifier);
+            Map<String, Object> rawMap = input.asMap().get();
 
-            //解出来的每一条都是原始值，直接写进原始值表（当前值会同步成原始值）
-            decoded.result().ifPresent(map -> map.forEach((type, value) ->
+            //旧存档：整个对象就是原始值表，没有 base/current 两层
+            boolean nested = rawMap.containsKey(BASE) || rawMap.containsKey(CURRENT);
+            DataResult<LinkedHashMap<PropertyType, Object>> baseResult = nested
+                ? decodeMap(rawMap.get(BASE))
+                : CodecJsonPropertiesMap.MAP_CODEC.decode(input);
+            DataResult<LinkedHashMap<PropertyType, Object>> currentResult = nested
+                ? decodeMap(rawMap.get(CURRENT))
+                : DataResult.success(new LinkedHashMap<>());
+
+            //先原始值再当前值：先把基准铺好，再盖被改过的当前值
+            baseResult.result().ifPresent(map -> map.forEach((type, value) ->
                 modifier.setBase((PropertyType<Object>) type, value)));
+            currentResult.result().ifPresent(map -> map.forEach((type, value) ->
+                modifier.set((PropertyType<Object>) type, value)));
 
-            if (decoded.isSuccess()) return DataResult.success(modifier);
-            return DataResult.error(decoded.error().orElse("实体属性解码失败"), modifier);
+            if (baseResult.isSuccess() && currentResult.isSuccess()) return DataResult.success(modifier);
+
+            StringBuilder errors = new StringBuilder();
+            baseResult.error().ifPresent(errors::append);
+            currentResult.error().ifPresent(errors::append);
+            return DataResult.error(errors.length() == 0 ? "实体属性解码失败" : errors.toString(), modifier);
+        }
+
+        /**
+         * 解一层属性表；这一层没有时返回空表（旧存档没有 current 层是正常的）
+         * */
+        private DataResult<LinkedHashMap<PropertyType, Object>> decodeMap (Object rawValue) {
+            if (rawValue == null) return DataResult.success(new LinkedHashMap<>());
+            return CodecJsonPropertiesMap.MAP_CODEC.decode(Codec.wrap(rawValue));
         }
     };
 
@@ -62,9 +100,10 @@ public final class AttributesModifier implements Codecable<AttributesModifier> {
     }
 
     /**
-     * 获取当前值，没有登记过返回默认值
+     * 获取当前值
      * <p>
-     * 数值属性一律用这个带默认值的读法，避免 {@code Float} 拆箱空指针
+     * 当前值缺省就等于原始值：只有被状态效果改过才会有自己的条目。
+     * 原始值也没登记过时（比如属性键写错了）才用默认值兜底，避免 {@code Float} 拆箱空指针
      * */
     public <T> T getOrDefault (PropertyType<T> type, T defaultValue) {
         Object value = this.currentValues.get(type);
@@ -75,11 +114,13 @@ public final class AttributesModifier implements Codecable<AttributesModifier> {
     }
 
     /**
-     * 设置原始值，同时把当前值重置成它（写固定值就等于撤销这个属性上的临时修改）
+     * 设置原始值
+     * <p>
+     * 只写原始值，不碰当前值：当前值缺省就取原始值（见 {@link #getOrDefault(PropertyType, Object)}），
+     * 所以当前值表里只留"被改过"的项，写原始值不会顺手把正在生效的临时修改清掉
      * */
     public <T> AttributesModifier setBase (PropertyType<T> type, T base) {
         this.baseValues.put(type, base);
-        this.currentValues.put(type, base);
         return this;
     }
 
@@ -94,14 +135,10 @@ public final class AttributesModifier implements Codecable<AttributesModifier> {
     /**
      * 当前值还原成原始值（状态效果结束时用）
      * <p>
-     * 没有原始值的属性直接移除当前值，避免留下一个没有基准的孤儿条目
+     * 直接移除当前值即可：当前值缺省就是原始值，不用往表里拷一份
      * */
     public <T> AttributesModifier restore (PropertyType<T> type) {
-        if (this.baseValues.containsKey(type)) {
-            this.currentValues.put(type, this.baseValues.get(type));
-        } else {
-            this.currentValues.remove(type);
-        }
+        this.currentValues.remove(type);
         return this;
     }
 
@@ -111,6 +148,20 @@ public final class AttributesModifier implements Codecable<AttributesModifier> {
     public LinkedHashMap<PropertyType, Object> getBaseValues () {
         LinkedHashMap<PropertyType, Object> map = new LinkedHashMap<>(this.baseValues.size);
         this.baseValues.forEach(entry -> map.put(entry.key, entry.value));
+        return map;
+    }
+
+    /**
+     * 导出被改过的当前值（与原始值不同的那些），供编解码器使用
+     * <p>
+     * 当前值表里本来就只有被改过的项，这里再和原始值比一次，避免"改回原值但没移除"的项也写进存档
+     * */
+    public LinkedHashMap<PropertyType, Object> getModifiedValues () {
+        LinkedHashMap<PropertyType, Object> map = new LinkedHashMap<>();
+        this.currentValues.forEach(entry -> {
+            Object base = this.baseValues.get(entry.key);
+            if (!Objects.equals(base, entry.value)) map.put(entry.key, entry.value);
+        });
         return map;
     }
 

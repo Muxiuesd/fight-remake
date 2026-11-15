@@ -43,9 +43,9 @@ public class EntityCodecBuilder {
             .field("scaleY", Entity::getScaleY, Entity::setScaleY, Codec.FLOAT)
             .field("rotation", Entity::getRotation, Entity::setRotation, Codec.FLOAT)
             .field("onGround", Entity::isOnGround, Entity::setOnGround, Codec.BOOL)
-            //实体属性表，只存原始值；当前值是状态效果派生出来的，由 setEffects 重新应用时再算
+            //实体属性表：原始值 + 被改过的当前值（当前血量就是靠它落盘的）
             //可选字段：旧存档没有这张表，缺了就保持构造器给的空表，不算解码错误
-            //必须排在 cats 之前解码：cats 里的 maxHealth 要覆盖属性表里的同名值
+            //必须排在 cats 之前解码：cats 解码会调 readCatData，里面的血量钳制要用到属性表里的上限
             .optionalField("attributes",
                 entity -> entity.getProperty().getAttributesModifier(),
                 (entity, attributes) -> entity.getProperty().setAttributesModifier(attributes),

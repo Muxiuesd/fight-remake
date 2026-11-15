@@ -80,6 +80,10 @@ public abstract class PathFindingEntity<T extends PathFindingEntity<T>> extends 
     public void update (float delta) {
         super.update(delta);
 
+        //击退中不接管速度：逃跑（fleeFrom）与脱困（updateStuck）都会直接 setVelocity，
+        //会盖掉刚写进去的击退速度，并且白白冻结状态机
+        if (this.isKnockback()) return;
+
         //受击逃跑本能：逃跑期间持续远离攻击者
         if (this.fleeTarget != null) {
             this.fleeTimer.update(delta);

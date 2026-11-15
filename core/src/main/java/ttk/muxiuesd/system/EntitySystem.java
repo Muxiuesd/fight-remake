@@ -231,10 +231,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
             entity.update(delta);
 
-            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦（击退中的实体衰减由击退物理负责）
-            if (!entity.isKnockback()) {
-                this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
-            }
+            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦
+            //（击退中的实体也走这一套：按无意图规则吃摩擦，击退距离因此随地面材质变化）
+            this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
         }
     }
 
@@ -315,7 +314,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
      * <p>
      * 意图实体（{@link Entity#hasIntent()}）：每帧重置意图 → 帧级缩放（稳定速度 = 意图 × (1-摩擦)，帧率无关）；
      * 无意图实体（物品等）：秒级衰减 ×(1-摩擦)^(delta×参考帧率)（等效参考帧率下的帧级表现，帧率无关、快速停止）。
-     * 空气阻力（秒级）对所有实体生效；击退中实体由击退物理负责，跳过本方法
+     * 空气阻力（秒级）对所有实体生效；击退中实体按无意图规则衰减（距离由地面材质决定）
      */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
@@ -323,7 +322,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
 
         //水生生物（如河豚）在水中完全不受摩擦影响：不应用方块摩擦力，也不受空气阻力
         //（水中应无阻力地游动，避免被水的高摩擦属性（如 0.77）错误地当地面摩擦减速）
-        if (entity instanceof PathFindingEntity pathEntity && pathEntity.canSwim()) {
+        //击退中除外：被击退的水生生物也需要减速，否则会一直滑到击退结束
+        if (!entity.isKnockback() && entity instanceof PathFindingEntity pathEntity && pathEntity.canSwim()) {
             return;
         }
 
@@ -345,11 +345,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             Block block = cs.getBlock(entityCenter.x, entityCenter.y);
             if (block != null) {
                 float scale = Math.max(0f, 1f - block.getProperty().getFriction());
-                if (entity.hasIntent()) {
+                if (entity.hasIntent() && !entity.isKnockback()) {
                     //意图实体：帧级缩放（意图每帧重置 → 稳定速度 = 意图 × scale，帧率无关）
                     curSpeed *= scale;
                 } else {
-                    //无意图实体：秒级衰减（等效参考帧率下的帧级表现，帧率无关）
+                    //无意图实体、击退中的实体：秒级衰减（等效参考帧率下的帧级表现，帧率无关）
                     curSpeed *= (float) Math.pow(scale, delta * REFERENCE_FPS);
                 }
             }
