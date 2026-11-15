@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.data.JsonDataWriter;
 
 /**
- * 用于存储cat值的包装类
+ * 用于存储自定义属性（custom attribute tag （CAT））值的包装类
  * */
 public abstract class CatValue<T> implements Cloneable{
     private T value;

@@ -119,7 +119,7 @@ public final class AttributesModifier implements Codecable<AttributesModifier> {
         return CODEC;
     }
 
-    @SuppressWarnings("unchecked")
+
     private static <T> T cast (Object value) {
         return (T) value;
     }

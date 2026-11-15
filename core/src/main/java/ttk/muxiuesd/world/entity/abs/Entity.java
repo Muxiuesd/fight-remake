@@ -127,6 +127,9 @@ public abstract class Entity<T extends Entity<T>>
     public void tick (World world, float delta) {
     }
 
+    /**
+     * 实体被销毁的时候调用
+     * */
     @Override
     public void dispose() {
     }
@@ -167,11 +170,11 @@ public abstract class Entity<T extends Entity<T>>
     }
 
 
-    public T setPosition(Vector2 vector2) {
+    public T setPosition (Vector2 vector2) {
         this.setPosition(vector2.x, vector2.y);
         return (T) this;
     }
-    public T setPosition(float x, float y) {
+    public T setPosition (float x, float y) {
         this.x = x;
         this.y = y;
         this.updateHitboxCenterPos(x, y);
@@ -182,13 +185,13 @@ public abstract class Entity<T extends Entity<T>>
         this.setSize(size.x, size.y);
         return (T) this;
     }
-    public T setSize(float width, float height) {
+    public T setSize (float width, float height) {
         this.width = width;
         this.height = height;
         return (T) this;
     }
 
-    public T setBounds(float x, float y, float width, float height) {
+    public T setBounds (float x, float y, float width, float height) {
         this.setPosition(x, y);
         this.setSize(width, height);
         return (T) this;
@@ -197,7 +200,7 @@ public abstract class Entity<T extends Entity<T>>
     /**
      * 获取实体坐标
      * */
-    public Vector2 getPosition() {
+    public Vector2 getPosition () {
         return new Vector2(this.x, this.y);
     }
 
@@ -245,7 +248,7 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 获取当前速率
+     * 获取当前速率（由实体目前的具体速度矢量计算得到）
      */
     public float getCurSpeed () {
         return Vec2.len(this.getVelX(), this.getVelY());

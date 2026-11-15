@@ -17,7 +17,6 @@ import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatInt;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.Backpack;
@@ -125,18 +124,13 @@ public abstract class LivingEntity<T extends LivingEntity<T>> extends Entity<T> 
     @Override
     public void readCatData (CatsHolder holder) {
         super.readCatData(holder);
-        this.handIndex = holder.getInt("handIndex", 0);
-        this.setMaxHealth(holder.getFloat("maxHealth", 10f));
-        this.setCurHealth(holder.getFloat("curHealth", 10f));
+        this.setHandIndex(holder.getInt("handIndex", 0));
     }
 
     @Override
     public void writeCatData (CatsHolder holder) {
         super.writeCatData(holder);
-        holder
-            .put("handIndex", new CatInt(this.handIndex))
-            .put("maxHealth", new CatFloat(this.getMaxHealth()))
-            .put("curHealth", new CatFloat(this.getCurHealth()));
+        holder.put("handIndex", new CatInt(this.handIndex));
     }
 
     /**

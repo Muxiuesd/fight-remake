@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 /**
  * 自定义属性（custom attribute tag （CAT））标签持有者（算一个属性Property）
  * <p>
- * 持有管理一些自定义的属性
+ * 持有管理一些自定义的属性，这些数据通常随实例的保存而保存，随着实例的读取而读取。用来持久化一些独有的数据。
  * */
 public class CatsHolder implements ShallowCopyable<CatsHolder> {
     private final HashMap<String, CatValue<?>> entries = new LinkedHashMap<>();
