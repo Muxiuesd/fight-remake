@@ -67,6 +67,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     //可渲染的实体组map，key为渲染层级，value为该层级下所有要渲染的实体
     private final ConcurrentHashMap<RenderLayer, Array<Entity<?>>> renderableEntities = new ConcurrentHashMap<>();
 
+    //方块摩擦取样要按实体中心点查方块，tick 里每实体都要查，缓存一份省掉每帧的系统表查找
+    private ChunkSystem chunkSystem;
+
     // 线程池
     private ExecutorService executor;
     private ConcurrentHashMap<ChunkPosition, Future<Array<Entity<?>>>> entityLoadingTasks;
@@ -102,6 +105,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         //添加tick任务
         TimeSystem timeSystem = getManager().getSystem(TimeSystem.class);
         timeSystem.add(this);
+
+        //方块摩擦取样要用，ChunkSystem 的初始化在 EntitySystem 之前（见 MainWorld#addAllSystems 的顺序）
+        this.chunkSystem = getManager().getSystem(ChunkSystem.class);
 
         Log.print(TAG(), "EntitySystem初始化完成！");
     }
@@ -200,17 +206,23 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         }
 
         this.updateEntities(delta);
-    }
 
-    @Override
-    public void tick (World world, float delta) {
-        //每一个可更新实体的tick更新
-        this.updatableEntity.forEach(entity -> entity.tick(world, delta));
-
+        //实体集合的维护每帧做一次：放在 tick 里的话一帧补跑多步就会重复跑，徒增开销
         this.calculateNeedActiveEntity();
         this.calculateInactionEntity();
 
         this.checkTasks();
+    }
+
+    @Override
+    public void tick (World world, float delta) {
+        //每一个可更新实体的tick更新（AI 决策）
+        this.updatableEntity.forEach(entity -> entity.tick(world, delta));
+
+        //运动速度的计算改到固定节拍里：delta 恒为固定步长，帧率再高也不会多乘一次摩擦
+        for (Entity<?> entity : this.updatableEntity) {
+            this.calculateEntityCurSpeed(entity, this.chunkSystem, delta);
+        }
     }
 
     /**
@@ -230,10 +242,6 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             }
 
             entity.update(delta);
-
-            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦
-            //（击退中的实体也走这一套：按无意图规则吃摩擦，击退距离因此随地面材质变化）
-            this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
         }
     }
 
@@ -312,9 +320,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
     /**
      * 对实体进行当前速度大小的计算（不改变方向）
      * <p>
-     * 意图实体（{@link Entity#hasIntent()}）：每帧重置意图 → 帧级缩放（稳定速度 = 意图 × (1-摩擦)，帧率无关）；
-     * 无意图实体（物品等）：秒级衰减 ×(1-摩擦)^(delta×参考帧率)（等效参考帧率下的帧级表现，帧率无关、快速停止）。
-     * 空气阻力（秒级）对所有实体生效；击退中实体按无意图规则衰减（距离由地面材质决定）
+     * 在固定节拍里调用，delta 恒为 {@link TimeSystem#TickMaxSpan}。
+     * 方块摩擦按 ×(1-摩擦)^(delta×参考帧率) 衰减：tick 是 20Hz、参考帧率取 60，
+     * 一个 tick 内乘三次，等价于原来 60fps 下每帧乘一次的表现，帧率再变也不影响手感。
+     * 空气阻力（秒级）对所有实体生效；击退中实体同样吃方块摩擦（击退距离因此随地面材质变化）
      */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
         //对于速度为0的实体不进行速度更新
@@ -345,13 +354,8 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             Block block = cs.getBlock(entityCenter.x, entityCenter.y);
             if (block != null) {
                 float scale = Math.max(0f, 1f - block.getProperty().getFriction());
-                if (entity.hasIntent() && !entity.isKnockback()) {
-                    //意图实体：帧级缩放（意图每帧重置 → 稳定速度 = 意图 × scale，帧率无关）
-                    curSpeed *= scale;
-                } else {
-                    //无意图实体、击退中的实体：秒级衰减（等效参考帧率下的帧级表现，帧率无关）
-                    curSpeed *= (float) Math.pow(scale, delta * REFERENCE_FPS);
-                }
+                //按固定节拍换算：tick 20Hz × 参考帧率 60 = 一个 tick 乘三次，对齐原来 60fps 的手感
+                curSpeed *= (float) Math.pow(scale, delta * REFERENCE_FPS);
             }
         }
 

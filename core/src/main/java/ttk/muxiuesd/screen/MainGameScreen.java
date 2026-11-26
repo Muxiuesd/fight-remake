@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventTypes;
+import ttk.muxiuesd.interfaces.FixedTickable;
 import ttk.muxiuesd.mod.api.world.ModWorldProvider;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.render.RenderProcessorManager;
@@ -22,7 +23,7 @@ import ttk.muxiuesd.world.World;
 /**
  * 主游戏屏幕
  */
-public class MainGameScreen implements Screen {
+public class MainGameScreen implements Screen, FixedTickable {
     public static String TAG = MainGameScreen.class.getName();
 
     //游戏目前加载的世界，后续可能有多个世界
@@ -123,6 +124,16 @@ public class MainGameScreen implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
         this.world.update(delta);
+    }
+
+    /**
+     * 逻辑帧（tick）更新
+     * <p>
+     * 由 FightCore 以固定频率调用，delta 恒为固定步长；与 render 里的每帧更新如何分工见 World#tick
+     * */
+    @Override
+    public void tick (float tickSpan) {
+        if (this.world != null) this.world.tick(tickSpan);
     }
 
     @Override

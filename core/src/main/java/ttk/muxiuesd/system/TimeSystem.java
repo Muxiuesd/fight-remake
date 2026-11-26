@@ -13,16 +13,19 @@ import ttk.muxiuesd.world.World;
 /**
  * 时间系统
  * <p>
- * tick更新为不精确更新，无法保证每秒一定更新多少次，但会传入每两次tick更新的间隔以供使用
+ * tick 现在由 FightCore 以固定节拍驱动（FightCore#tickScreen -> World#tick -> 本类 tick），
+ * delta 恒为 {@link #TickMaxSpan}。本类只负责推进游戏内时间、维护 tick 名单并派发，
+ * 不再自己判断"攒够没有"——那样会丢帧，且传下去的 delta 不固定
  * */
 public class TimeSystem extends WorldSystem implements Tickable {
     public static final Info<Float> GAME_TIME = Info.create("game_time", 0f);
 
     public static final float REAL_SECOND_TO_GAME_MINUTE = 10f; // 游戏时间参数（1秒现实=10分钟游戏时间）
+    /// 逻辑帧频率：1 秒多少次 tick。改它会连带改掉所有按 tick 计算的玩法数值（作物生长、熔炉、状态效果）
     public static final int TicksPerSecond = 20;
+    /// 每个逻辑帧固定前进的时间（秒），tick 回传的 delta 永远是这个值
     public static final float TickMaxSpan = 1f / TicksPerSecond;
 
-    private float tickSpan = 0f;
     private float gameTime = 0f;    //游戏内的时间
 
     private final Array<Tickable> tickUpdates;
@@ -56,15 +59,14 @@ public class TimeSystem extends WorldSystem implements Tickable {
         if(this.gameTime >= 24f) {
             this.gameTime -= 24f;
         }
-
-        if (this.tickSpan >= TickMaxSpan) {
-            this.tick(getWorld(), this.tickSpan);
-            this.tickSpan = 0f;
-        }else {
-            this.tickSpan += delta;
-        }
     }
 
+    /**
+     * 派发一次逻辑帧
+     * <p>
+     * 由 FightCore 的固定节拍驱动，delta 恒为 {@link #TickMaxSpan}；
+     * 名单里的 Tickable（实体 AI、方块实体、作物）都在这个固定步长下演化
+     * */
     @Override
     public void tick (World world, float delta) {
         //更新所有的tick

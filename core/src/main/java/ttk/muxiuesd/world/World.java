@@ -9,16 +9,18 @@ import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
+import ttk.muxiuesd.interfaces.FixedTickable;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
+import ttk.muxiuesd.system.TimeSystem;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.manager.WorldSystemsManager;
 
 /**
  * 世界的基类
  * */
-public abstract class World implements Updateable, Disposable {
+public abstract class World implements Updateable, FixedTickable, Disposable {
     private final MainGameScreen screen;
     private WorldSystemsManager worldSystemsManager;
 
@@ -48,6 +50,23 @@ public abstract class World implements Updateable, Disposable {
         if (this.worldSystemsManager != null) {
             this.getSystemManager().update(delta);
         }
+    }
+
+    /**
+     * 逻辑帧（tick）更新
+     * <p>
+     * 由屏幕以固定频率调用，delta 恒为固定步长（不会因为掉帧变大）。
+     * 与 update 的分工：
+     * update 用真实帧间隔，负责"接触外部"——输入采样、位移执行与碰撞修正、各种计时器、区块 IO、相机/粒子/UI；
+     * tick 用固定步长，负责"内部演化"——实体 AI 决策、速度积分、方块实体与作物、WORLD_TICK 事件。
+     * <p>
+     * 位移与碰撞留在 update 里、速度由 tick 算，所以位置永远是"拿最近一次 tick 算出的速度"逐帧积分出来的：
+     * 帧率再高也不会多算一次摩擦，帧率再低也不会少走一段路
+     * */
+    @Override
+    public void tick (float tickSpan) {
+        if (this.worldSystemsManager == null) return;
+        this.getSystemManager().getSystem(TimeSystem.class).tick(this, tickSpan);
     }
 
     @Override
