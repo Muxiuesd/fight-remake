@@ -4,6 +4,7 @@ import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import game.muxiuesd.bedrockcore.serialization.builders.CodecBuilder0;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
@@ -34,6 +35,9 @@ public class BlockWithEntityCodecBuilder {
                     //工厂创建出来的方块实例没有标识符，在这里恢复，否则getID()会空指针
                     if (id != null && Identifier.check(id)) {
                         block.setIdentifier(Identifier.of(id));
+                        //渲染器是在注册时绑到方块原型上的，渲染热路径直接读实例的这个字段，
+                        //所以这里要按id把原型上的渲染器补到新实例上，否则读档出来的方块渲染时空指针
+                        block.setRenderer(Registries.BLOCK.get(block.getIdentifier()).getRenderer());
                     }
                 },
                 Codec.STRING)

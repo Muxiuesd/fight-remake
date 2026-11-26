@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
@@ -126,6 +127,12 @@ public class ChunkRenderSystem extends WorldSystem implements IWorldChunkRender 
                 Block block = chunk.getBlock(x, y);
                 //渲染器在注册时就绑在方块原型上，这里直接读字段，不再每格查注册表
                 BlockRenderer<Block> renderer = block.getRenderer();
+                if (renderer == null) {
+                    Log.error(TAG(), "方块：" + block + " 的渲染器实例字段不存在！（或许在注册表里面）", new RuntimeException());
+                    //直接跳过，连这次的方块实体都不渲染
+                    continue;
+                }
+
                 BlockRenderer.Context context = renderer.getContext();
                 context.x = baseX + x;
                 context.y = baseY + y;
