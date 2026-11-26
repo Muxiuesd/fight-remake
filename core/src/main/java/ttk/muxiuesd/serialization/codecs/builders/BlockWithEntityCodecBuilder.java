@@ -41,6 +41,8 @@ public class BlockWithEntityCodecBuilder {
                     }
                 },
                 Codec.STRING)
+            //注意：必须排在下面的 property 之前解码——property 里的 cats 会调 readCatData，
+            //而 BlockWithEntity.readCatData 是转发给自己的方块实体的，方块实体还没还原就会空指针
             .field("block_entity",
                 BlockWithEntity::getBlockEntity,
                 BlockWithEntity::setBlockEntity,

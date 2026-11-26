@@ -47,6 +47,8 @@ public class BlockFurnace extends BlockWithEntity implements Codecable<BlockFurn
     public BlockFurnace createSelf () {
         BlockFurnace blockFurnace = new BlockFurnace();
         blockFurnace.setIdentifier(getIdentifier());
+        //渲染器是注册时绑在原型上的，每格独享的实例要自己带一份，否则渲染热路径读到null
+        blockFurnace.setRenderer(this.getRenderer());
         return blockFurnace;
     }
 

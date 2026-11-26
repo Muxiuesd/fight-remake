@@ -28,6 +28,8 @@ public class BlockCraftingTable extends BlockWithEntity implements Codecable<Blo
     public BlockCraftingTable createSelf () {
         BlockCraftingTable block = new BlockCraftingTable();
         block.setIdentifier(getIdentifier());
+        //渲染器是注册时绑在原型上的，每格独享的实例要自己带一份，否则渲染热路径读到null
+        block.setRenderer(this.getRenderer());
         return block;
     }
 
