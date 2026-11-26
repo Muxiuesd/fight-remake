@@ -66,19 +66,22 @@ public class WorldInfo {
             return raw;
         }
     };
-    public static WorldInfo INSTANCE;
+
     public static String FILE_NAME = "worldInfo.json";
 
+    private static WorldInfo INSTANCE;
+
+    public static WorldInfo getInstance () { return INSTANCE; }
+    public static void setInstance (WorldInfo newInstance) {
+        if (newInstance == null) return;
+        INSTANCE = newInstance;
+    }
 
     private final HashMap<String, WorldInfoHashMap<?, ?>> information;
 
     public WorldInfo () {
         this.information = new HashMap<>();
-
-        //将注册表里的信息类型map全部加进来
-        Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
-            this.information.put(key.getID(), value);
-        });
+        this.addRegistryMap();
     }
 
     /**
@@ -118,8 +121,36 @@ public class WorldInfo {
         return (T) this.information.get(infoTypeId).get(key);
     }
 
-    public  WorldInfoHashMap<?, ?> getInfoTypeMap (String infoTypeId) {
+    public WorldInfoHashMap<?, ?> getInfoTypeMap (String infoTypeId) {
         if (!this.information.containsKey(infoTypeId)) return null;
         return this.information.get(infoTypeId);
+    }
+
+    /**
+     * 重置世界信息
+     * */
+    public void reset () {
+        Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
+            value.clear();
+        });
+
+        this.clearAllInfoMap();
+        this.addRegistryMap();
+    }
+
+    /**
+     * 把当前注册表里面注册的信息类型map给添加进来
+     * */
+    public void addRegistryMap () {
+        Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
+            this.information.put(key.getID(), value);
+        });
+    }
+
+    /**
+     * 清理所有的世界信息表
+     * */
+    public void clearAllInfoMap () {
+        this.information.clear();
     }
 }
