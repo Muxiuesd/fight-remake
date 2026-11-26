@@ -7,17 +7,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.util.Log;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
 import ttk.muxiuesd.event.EventBus;
 import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterWorldButtonInput;
 import ttk.muxiuesd.event.poster.EventPosterWorldKeyInput;
-import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.render.IWorldChunkRender;
 import ttk.muxiuesd.key.KeyBindings;
-import ttk.muxiuesd.registrant.Gets;
 import ttk.muxiuesd.registry.Blocks;
+import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.system.game.GUISystem;
 import ttk.muxiuesd.system.game.InputHandleSystem;
@@ -30,12 +28,9 @@ import ttk.muxiuesd.world.block.InteractResult;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
-import ttk.muxiuesd.world.block.abs.Botany;
-import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
-import ttk.muxiuesd.world.entity.genfactory.ItemEntityGetter;
+import ttk.muxiuesd.world.block.abs.Attachment;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.wall.Wall;
 
 /**
  * 世界输入处理系统
@@ -84,10 +79,17 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         }
         // C键控制区块边界是否绘制
         if (KeyBindings.ChunkBoundaryDisplay.wasJustPressed()) {
-            cs.chunkEdgeRender = !cs.chunkEdgeRender;
+            ChunkRenderSystem crs = getManager().getSystem(ChunkRenderSystem.class);
+            crs.chunkEdgeRender = !crs.chunkEdgeRender;
         }
         if (KeyBindings.HitboxDisplay.wasJustPressed()) {
-            cs.wallHitboxRender = !cs.wallHitboxRender;
+            ChunkRenderSystem crs = getManager().getSystem(ChunkRenderSystem.class);
+            crs.wallHitboxRender = !crs.wallHitboxRender;
+        }
+        // F键控制流场调试是否绘制
+        if (KeyBindings.FlowFieldDisplay.wasJustPressed()) {
+            PathfindingSystem ps = getManager().getSystem(PathfindingSystem.class);
+            if (ps != null) ps.flowFieldRender = !ps.flowFieldRender;
         }
 
         if (KeyBindings.PlayerPositionPrint.wasJustPressed()) {
@@ -107,8 +109,10 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
             }
         }
 
-        //需要玩家的鼠标不指向UI组件才能与世界交互
-        if (!GUISystem.getInstance().mouseOverUI()) {
+        //需要玩家当前的GUIScreen是HUD界面，并且鼠标不在UI组件上，防止同时操作两者
+        //（背包/创造界面打开时禁止与世界交互，无论鼠标是否在组件上）
+        if (GUISystem.getInstance().getCurScreen() == PlayerSystem.PLAYER_HUD_SCREEN
+            && !GUISystem.getInstance().mouseOverUI()) {
             this.playerInteractWithWorld(player, cs);
         }
     }
@@ -122,22 +126,32 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
         ItemStack handItemStack = player.getHandItemStack();
 
         if (KeyBindings.PlayerShoot.wasJustPressed()) {
-            //空手左键，且玩家并不是刚用完物品，就是破坏
-            if (handItemStack == null && !player.isUsingItem()) {
-                Botany botany = cs.getBotany(mouseWorldPosition);
-                if (botany != null) {
-                    //有植物就优先破坏植物
-                    cs.destroyBotany(mouseWorldPosition);
-                    Log.print(TAG, "鼠标破坏的植物为：" + botany.getClass().getName());
+            //功能型物品（武器、鱼竿）：手持时无论这次左键的使用成功还是失败，都不破坏世界
+            boolean handFunctional = !handItemStack.isVoid()
+                && handItemStack.getItem().getProperty().contain(PropertyTypes.ITEM_FUNCTIONAL);
+
+            //isUsingItem 由 PlayerSystem.update() 每帧先复位，再写入"这次左键的物品使用是否成功"，
+            //所以它为 true 表示这一下左键已经被物品用掉了（例如放置方块），不再是空挥。
+            //这里依赖 WorldInputHandleSystem 在 PlayerSystem 之后执行（见 MainWorld.addAllSystems 的顺序）
+            if (!handFunctional && !player.isUsingItem()) {
+                //一次左键只破坏一个层级：附着物 → 墙体 → 方块（与区块渲染层级自上而下一致）
+                //掉落、破坏音、残渣粒子都在 ChunkSystem 里，这里只负责按层级挑一个
+                Attachment attachment = cs.getAttachment(mouseWorldPosition);
+                if (attachment != null) {
+                    //有附着物就优先破坏附着物，不会破坏到它下面的墙体与方块
+                    cs.destroyAttachment(mouseWorldPosition);
+                    Log.print(TAG, "鼠标破坏的附着物为：" + attachment.getClass().getName());
+                }else if (cs.getWall(mouseWorldPosition) != null) {
+                    //没有附着物才破坏墙体，同格的方块不动
+                    cs.destroyWall(mouseWorldPosition);
                 }else if (mouseBlock != Blocks.ARI) {
-                    //如果不是空气方块就破坏它
-                    //破坏方块（也就是把对应坐标的方块替换成空气方块）
-                    Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
-                    this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, replacedBlock, 1);
+                    //都没有才破坏方块（也就是把对应坐标的方块替换成空气方块）
+                    cs.destroyBlock(mouseWorldPosition);
                     Log.print(TAG, "鼠标破坏的方块为：" + mouseBlock.getClass().getName());
                 }
             }
-            //TODO 手持物品左键
+            //手持物品的左键不在这里处理：那是"使用物品本身"，由 PlayerSystem 走 LivingEntity.useItem() -> Item.use()
+            //右键才是交互，手持物品时由下面的分支调用 LivingEntity.useOn() -> Item.useOn()
         }
         if (KeyBindings.PlayerInteract.wasJustPressed()) {
 
@@ -154,45 +168,31 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
                 //System.out.println(interactGrid);
 
                 //玩家空手与方块实体交互
-                if (handItemStack == null) {
-                    InteractResult result = blockEntity.interact(getWorld(), player, interactGrid);
+                if (handItemStack.isVoid()) {
+                    blockEntity.interact(getWorld(), player, interactGrid);
                     //TODO 空手交互事件
-                } else {
-                    //玩家手持物品与方块实体交互
-                    InteractResult result = blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid);
-                    if (result == InteractResult.SUCCESS && handItemStack.getAmount() == 0) {
+                    return;
+                }
+                //玩家手持物品与方块实体交互，方块实体的交互优先
+                if (blockEntity.interactWithItem(getWorld(), player, handItemStack, interactGrid) == InteractResult.SUCCESS) {
+                    if (handItemStack.getAmount() == 0) {
                         //使用成功就检测手持物品是否用完，用完就清除
-                        player.backpack.clear(player.getHandIndex());
+                        player.getBackpack().clear(player.getHandIndex());
                     }
                     //TODO 手持物品交互事件
+                    return;
                 }
+                //方块实体用不上这件物品，才轮到物品自己去和世界交互
+                player.useOn(getWorld(), mouseWorldPosition);
             } else {
                 /// 玩家与非方块实体的东西交互
-                //玩家空手交互
-                if (handItemStack == null) {
-                    //先检查这个坐标上面有无墙体
-                    if (cs.getWall(mouseWorldPosition) != null) {
-                        //有墙体就破坏墙体
-                        Wall<?> wall = cs.destroyWall(mouseWorldPosition);
-                        this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, wall, 1);
-                    }
-                    /* else if (mouseBlock != Blocks.ARI) {
-                        //破坏方块（也就是把对应坐标的方块替换成空气方块）
-                        Block replacedBlock = cs.replaceBlock(Blocks.ARI, mouseWorldPosition.x, mouseWorldPosition.y);
-                        this.dropItemEntity(player.getEntitySystem(), mouseWorldPosition, replacedBlock, 1);
-                    }*/
+                //破坏统一由左键处理（附着物 → 墙体 → 方块），空手右键不再破坏任何东西
+                if (!handItemStack.isVoid()) {
+                    //玩家手持物品交互
+                    player.useOn(getWorld(), mouseWorldPosition);
                 }
-                //TODO 玩家手持物品交互
             }
         }
-    }
-
-    private ItemEntity dropItemEntity (EntitySystem entitySystem, Vector2 pos, ID<?> idHolder, int amount) {
-        ItemEntity itemEntity = ItemEntityGetter.get(entitySystem, pos,
-            new ItemStack(Gets.ITEM(idHolder.getID()), amount)
-        );
-        itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-        return itemEntity;
     }
 
     @Override
@@ -255,6 +255,9 @@ public class WorldInputHandleSystem extends WorldSystem implements InputProcesso
 
     @Override
     public boolean scrolled (float amountX, float amountY) {
+        //背包/创造界面打开时滚轮不切换快捷栏，防止误操作
+        if (GUISystem.getInstance().getCurScreen() != PlayerSystem.PLAYER_HUD_SCREEN) return false;
+
         //玩家快捷栏指针循环
         Player player = playerSystem.getPlayer();
         int newIndex = player.getHandIndex() + (int) amountY;

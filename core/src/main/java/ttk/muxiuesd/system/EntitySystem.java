@@ -29,11 +29,16 @@ import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.chunk.Chunk;
-import ttk.muxiuesd.world.entity.*;
+import ttk.muxiuesd.world.entity.EntityLoadTask;
+import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.EntityUnloadTask;
+import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
+import ttk.muxiuesd.world.entity.abs.PathFindingEntity;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.hitbox.Hitbox;
 import ttk.muxiuesd.world.hitbox.RectHitbox;
 import ttk.muxiuesd.world.item.ItemPickUpState;
@@ -194,29 +199,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             _delayAdd.clear();
         }
 
-        //先把所有实体更新一次
-        for (Entity entity : this.updatableEntity) {
-
-            if (!(entity instanceof ItemEntity)) {
-                //对于非物品实体进行当前速度更新
-                this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
-            }
-            //细化实体更新
-            //对于活物实体
-            if (entity instanceof LivingEntity livingEntity) {
-                this.updateLivingEntity(livingEntity, delta);
-            }
-            //对于物品实体
-            else if (entity instanceof ItemEntity itemEntity) {
-                this.updateItemEntity(itemEntity, delta);
-            }
-
-            entity.update(delta);
-        }
-
-
-        /*this.updatableEntity.clear();
-        this.incationEntity.clear();*/
+        this.updateEntities(delta);
     }
 
     @Override
@@ -228,6 +211,30 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         this.calculateInactionEntity();
 
         this.checkTasks();
+    }
+
+    /**
+     * 更新所有可更新实体的总入口方法
+     * */
+    private void updateEntities (float delta) {
+        //先把所有实体更新一次
+        for (Entity entity : this.updatableEntity) {
+            //细化实体更新
+            //对于活物实体
+            if (entity instanceof LivingEntity livingEntity) {
+                this.updateLivingEntity(livingEntity, delta);
+            }
+            //对于物品实体
+            else if (entity instanceof ItemEntity itemEntity) {
+                this.updateItemEntity(itemEntity, delta);
+            }
+
+            entity.update(delta);
+
+            //状态机/玩家输入等"意图"写入之后再统一应用方块摩擦
+            //（击退中的实体也走这一套：按无意图规则吃摩擦，击退距离因此随地面材质变化）
+            this.calculateEntityCurSpeed(entity, getManager().getSystem(ChunkSystem.class), delta);
+        }
     }
 
     private void updateLivingEntity(LivingEntity livingEntity, float delta) {
@@ -249,7 +256,7 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
             return;
         }
         Player player = this.getPlayer();
-        //需要被丢弃物品实体存在时间超过三秒，防止一丢弃就被自动捡回来
+        //需要被丢弃物品实体存在时间超过两秒（ITEM_ENTITY_PICKUP_SPAN），防止一丢弃就被自动捡回来
         if (itemEntity.getLivingTime() > Fight.ITEM_ENTITY_PICKUP_SPAN.getValue()) {
             //当物品实体与玩家的碰撞箱相碰就是捡起
             if (itemEntity.getBodyHitbox().checkCollision(player.getBodyHitbox())) {
@@ -265,9 +272,11 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                     itemEntity.setLivingTime(0);
                 }
                 //捡起失败则什么也没发生（速度与基准速度都清零，防止残留速度）
-                itemEntity.setBeingAttracted(false);
-                itemEntity.setVelocity(0, 0);
-                itemEntity.setSpeed(0);
+                itemEntity
+                    .setBeingAttracted(false)
+                    .setOnGround(true)
+                    .setVelocity(0, 0)
+                    .setCurSpeed(0);
             }
 
             float distance = Util.getDistance(itemEntity, player);
@@ -276,75 +285,89 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
                 && !player.getBackpack().isFull(itemEntity.getItemStack());
             if (inRange) {
                 //在捡起范围内，并且对于这个物品来说背包还没满，让物品实体朝向玩家运动
-                itemEntity.setBeingAttracted(true);
                 Direction direction = new Direction(itemEntity.getCenterPos(), player.getCenterPos());
-                itemEntity.setVelocity(direction.getX(), direction.getY());
                 //吸引速度随距离衰减：远处快、近处慢（避免物品在玩家周围环绕抖动）
                 float speed = Math.min(12f, distance * 4f);
-                itemEntity.setSpeed(speed);
+                itemEntity
+                    .setBeingAttracted(true)
+                    .setOnGround(false)
+                    .setVelocity(direction.getX(), direction.getY())
+                    .setCurSpeed(speed);
             } else if (itemEntity.isBeingAttracted()) {
                 //离开了吸引范围：停止朝向玩家移动（不再保留残留速度）
-                itemEntity.setBeingAttracted(false);
-                itemEntity.setVelocity(0, 0);
-                itemEntity.setSpeed(0);
+                itemEntity
+                    .setBeingAttracted(false)
+                    .setOnGround(true)
+                    .setVelocity(0, 0)
+                    .setCurSpeed(0);
             }
         }
 
-        this.calculateItemEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
+        //this.calculateEntityCurSpeed(itemEntity, getManager().getSystem(ChunkSystem.class), delta);
     }
 
+    /// 无意图实体摩擦衰减的参考帧率：等效"该帧率下运行帧级衰减"的表现（数值与运行帧率无关，delta 自动补偿）
+    private static final float REFERENCE_FPS = 60f;
+
     /**
-     * 对实体进行当前速度计算
-     * */
+     * 对实体进行当前速度大小的计算（不改变方向）
+     * <p>
+     * 意图实体（{@link Entity#hasIntent()}）：每帧重置意图 → 帧级缩放（稳定速度 = 意图 × (1-摩擦)，帧率无关）；
+     * 无意图实体（物品等）：秒级衰减 ×(1-摩擦)^(delta×参考帧率)（等效参考帧率下的帧级表现，帧率无关、快速停止）。
+     * 空气阻力（秒级）对所有实体生效；击退中实体按无意图规则衰减（距离由地面材质决定）
+     */
     private void calculateEntityCurSpeed (Entity entity, ChunkSystem cs, float delta) {
-        //子弹实体不受方块摩擦力影响，只受空气阻力（在 Bullet 内部处理）
-        if (entity instanceof Bullet) return;
-
         //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0 || entity.getCurSpeed() <= 0) return;
+        if (entity.getSpeed() <= 0 && entity.getCurSpeed() <= 0) return;
 
-        //计算脚下方块摩擦对速度的影响
-        Vector2 center = entity.getCenterPos();
-        Block block = cs.getBlock(center.x, center.y);
-        if (block == null) return;
-
-        //目标速度 = 基准速度 × 摩擦系数，直接设置立即生效
-        //（不能用 lerp 平滑逼近：玩家的速度矢量每帧被输入系统重置，lerp 起点每帧都是全速，
-        //  导致永远无法收敛到目标速度，摩擦几乎失效）
-        float friction = block.getProperty().getFriction();
-        float curSpeed = entity.getSpeed() * friction;
-        //速度过小直接为0
-        if (curSpeed < MIN_SPEED) {
-            entity.setCurSpeed(0);
+        //水生生物（如河豚）在水中完全不受摩擦影响：不应用方块摩擦力，也不受空气阻力
+        //（水中应无阻力地游动，避免被水的高摩擦属性（如 0.77）错误地当地面摩擦减速）
+        //击退中除外：被击退的水生生物也需要减速，否则会一直滑到击退结束
+        if (!entity.isKnockback() && entity instanceof PathFindingEntity pathEntity && pathEntity.canSwim()) {
             return;
         }
-        entity.setCurSpeed(curSpeed);
-    }
 
-    /**
-     * 对物品实体进行当前速度计算
-     * */
-    private void calculateItemEntityCurSpeed (ItemEntity entity, ChunkSystem cs, float delta) {
-        //对于速度为0的实体不进行速度更新
-        if (entity.getSpeed() <= 0) return;
+        float airDrag = (float) Math.pow(1f - Fight.AIR_FRICTION.getValue(), delta);    //空气阻力的影响（秒级）
 
-        float curSpeed = entity.getSpeed();
-        //被玩家吸引时不受方块摩擦力影响（吸引速度由吸引逻辑每帧重设）
-        if (!entity.isBeingAttracted() && entity.isOnGround()) {
-            //计算脚下方块摩擦对速度的影响
-            Vector2 center = entity.getCenterPos();
-            Block block = cs.getBlock(center.x, center.y);
-            if (block == null) return;
-            curSpeed *= block.getProperty().getFriction();
-        }
-        //速度过小直接为0
-        if (curSpeed < MIN_SPEED) {
-            entity.setCurSpeed(0);
+        //子弹实体不受方块摩擦力影响，只受空气阻力
+        if (entity instanceof Bullet bullet) {
+            bullet.setVelX(bullet.getVelX() * airDrag);
+            bullet.setVelY(bullet.getVelY() * airDrag);
             return;
         }
+
+        float curSpeed = entity.getCurSpeed();
+
+        //如果实体在地面上
+        if (entity.isOnGround()) {
+            //计算所在方块的摩擦对速度的影响：按中心点取样（取样点约定见 Entity.getCenterPos()）
+            Vector2 entityCenter = entity.getCenterPos();
+            Block block = cs.getBlock(entityCenter.x, entityCenter.y);
+            if (block != null) {
+                float scale = Math.max(0f, 1f - block.getProperty().getFriction());
+                if (entity.hasIntent() && !entity.isKnockback()) {
+                    //意图实体：帧级缩放（意图每帧重置 → 稳定速度 = 意图 × scale，帧率无关）
+                    curSpeed *= scale;
+                } else {
+                    //无意图实体、击退中的实体：秒级衰减（等效参考帧率下的帧级表现，帧率无关）
+                    curSpeed *= (float) Math.pow(scale, delta * REFERENCE_FPS);
+                }
+            }
+        }
+
+        //速度过小直接为0
+        if (curSpeed < MIN_SPEED) {
+            entity.setCurSpeed(0f);
+            return;
+        }
+
         entity.setCurSpeed(curSpeed);
-        //物品实体的基准速度逐渐下降
-        entity.setSpeed((float) (entity.getSpeed() * Math.pow(0.98, delta * 60)));
+        //应用空气阻力
+        entity.setVelocity(entity.getVelX() * airDrag, entity.getVelY() * airDrag);
+
+        if (entity == getPlayer()) {
+            Log.print(TAG(), "玩家当前速度：" + entity.getCurSpeed());
+        }
     }
 
     /**
@@ -454,8 +477,9 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         Array<Entity<?>> unload = new Array<>();    //需要被卸载的实体组
 
         for (Entity<?> entity: copy) {
+            //实体归属的区块按中心点取样（取样点约定见 Entity.getCenterPos()）
             ChunkPosition chunkPosition = cs.getChunkPos(entity.getCenterPos());
-            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            EntityProvider<?> entityProvider = entity.getProvider();
             //检查实体所在区块是否为传入的需要被卸载的区块，同时需要实体能够被保存
             if (chunkPosition.equals(chunk.getChunkPosition())
                 && entityProvider.canBeSaved) {
@@ -492,9 +516,10 @@ public class EntitySystem extends WorldSystem implements IWorldGroundEntityRende
         ChunkSystem chunkSystem = getWorld().getSystem(ChunkSystem.class);
 
         for (Entity<?> entity: allEntities) {
-            EntityProvider<?> entityProvider = Registries.ENTITY.get(entity.getID());
+            EntityProvider<?> entityProvider = entity.getProvider();
             if (!entityProvider.canBeSaved) continue;
 
+            //实体存档分组同样按中心点取样
             Vector2 position = entity.getCenterPos();
             ChunkPosition chunkPosition = chunkSystem.getChunkPos(position.x, position.y);
             String name = chunkPosition.toString();

@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.pool.particle.ParticlePool;
 import ttk.muxiuesd.pool.particle.ParticleSpellPool;
-import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleSpell;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
@@ -23,7 +23,7 @@ public class EmitterEnemyShootParticle extends ParticleEmitter<ParticleSpell> {
         setParticlePool(POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
-        setTextureRegion(ParticleAssets.SPELL);
+        setTextureRegion(Fight.ID("spell"), Fight.ParticleTexturePath("spell.png"));
     }
 
     @Override

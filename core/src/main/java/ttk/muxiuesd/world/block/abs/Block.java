@@ -8,11 +8,11 @@ import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.data.JsonPropertiesMap;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
+import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSounds;
@@ -49,28 +49,31 @@ public class Block implements ID<Block>, Disposable {
     public static final float HITBOX_END_X_OFFSET = WIDTH / 2, HITBOX_END_Y_OFFSET = HEIGHT / 2;
 
     /**
-     * 生成默认的属性
+     * 生成正常方块默认的属性
      * 有些需要实例化的东西就放里面防止浅拷贝
      * */
-    public static Property createProperty() {
-        return Property.create();
+    public static Property createProperty () {
+        return Property.create()
+            .set(PropertyTypes.BLOCK_FRICTON, 0f)   //默认无摩擦（摩擦越大移动越慢）
+            .set(PropertyTypes.BLOCK_WALKABLE, true)    //默认可以行走（寻路用）
+            .set(PropertyTypes.BLOCK_SWIMMABLE, false)  //默认不可游泳（水生方块如水位 true）
+            ;
     }
 
     private Identifier identifier;
-    private Resource<TextureRegion> textureResource;
     private Property property;
+    /**
+     * 这个方块怎么画
+     * <p>
+     * 注册时一次性绑定，渲染热路径直接读字段，不再每格去查注册表
+     * <p>
+     * 每格独享实例（如植物）在{@code createInstance()}里要把它复制过去
+     * */
+    private BlockRenderer<Block> renderer;
 
 
     public Block (Property property) {
         this.setProperty(property);
-    }
-    public Block (Property property, String textureId) {
-        this(property, textureId, null);
-    }
-    public Block (Property property, String textureId, String texturePath) {
-        this.setProperty(property);
-        //this.textureRegion = Util.loadTextureRegion(textureId, texturePath);
-        this.textureResource = Resource.ofTextureRegion(textureId, texturePath);
     }
 
     /**
@@ -87,35 +90,46 @@ public class Block implements ID<Block>, Disposable {
         this.property = property;
     }
 
-    /**
-     * 检测方快的材质贴图是否存在
-     * */
-    public boolean textureIsValid() {
-        return this.textureResource != null && this.textureResource.get() != null;
-    }
-
-    public TextureRegion getTextureRegion () {
-        return this.textureResource != null ? this.textureResource.get() : null;
-    }
-
     @Override
     public String getID () {
         return this.getIdentifier().getID();
-    }
-    @Override
-    public Block setID (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
-        return this;
     }
 
     public Identifier getIdentifier () {
         return this.identifier;
     }
 
+    @Override
     public Block setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！方块：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
         return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Block setRenderer (BlockRenderer<? extends Block> renderer) {
+        this.renderer = (BlockRenderer<Block>) renderer;
+        return this;
+    }
+
+    public BlockRenderer<Block> getRenderer () {
+        return this.renderer;
+    }
+
+    /**
+     * 取这一格的贴图
+     * <p>
+     * 直接问自己持有的渲染器，与渲染热路径同源；没有渲染器就没有贴图
+     * <p>
+     * 破坏残渣、脚步粒子都用它取贴图，所以贴图随实例状态变化的渲染器要覆写
+     * {@link BlockRenderer#getTextureRegion(Block)}
+     * */
+    public TextureRegion getTextureRegion () {
+        BlockRenderer<Block> renderer = this.getRenderer();
+        return renderer == null ? null : renderer.getTextureRegion(this);
     }
 
     @Override
@@ -128,22 +142,24 @@ public class Block implements ID<Block>, Disposable {
      * */
     public static class Property {
         public static final Codec<Block.Property> CODEC = CodecBuilder.<Property>create()
-            .field("data_map",
+            .optionalField("data_map",
                 Block.Property::getPropertiesMap,
                 Block.Property::setPropertiesMap,
                 CodecJsonPropertiesMap.CODEC)
             .noArgFactory(Property::new);
 
+        /**
+         * 创建一个属性的实例
+         * */
         public static Property create () {
             return new Property();
         }
 
         private JsonPropertiesMap propertiesDataMap;
 
-        public Property () {
-            /// 这里有可能浅拷贝
+        private Property () {
+            /// 有的深拷贝、有的浅拷贝，不能一概而论
             this.propertiesDataMap = new JsonPropertiesMap()
-                .add(PropertyTypes.BLOCK_FRICTON, 1f)
                 .add(PropertyTypes.BLOCK_SOUNDS_ID, Sounds.STONE)
                 .add(PropertyTypes.CATS, new CatsHolder());
         }
@@ -151,6 +167,34 @@ public class Block implements ID<Block>, Disposable {
 
         public float getFriction() {
             return this.get(PropertyTypes.BLOCK_FRICTON);
+        }
+
+        /**
+         * 方块是否可行走（寻路用）
+         * <p>
+         * 属性不存在时（旧存档/未注册）默认可行走
+         * */
+        public boolean isWalkable () {
+            Boolean walkable = this.get(PropertyTypes.BLOCK_WALKABLE);
+            return walkable == null || walkable;
+        }
+
+        public Property setWalkable (boolean walkable) {
+            return this.set(PropertyTypes.BLOCK_WALKABLE, walkable);
+        }
+
+        /**
+         * 方块是否可游泳（寻路用，供水生实体）
+         * <p>
+         * 属性不存在时默认为不可游泳
+         * */
+        public boolean isSwimmable () {
+            Boolean swimmable = this.get(PropertyTypes.BLOCK_SWIMMABLE);
+            return swimmable != null && swimmable;
+        }
+
+        public Property setSwimmable (boolean swimmable) {
+            return this.set(PropertyTypes.BLOCK_SWIMMABLE, swimmable);
         }
 
         public Property setFriction(float friction) {

@@ -16,22 +16,11 @@ public final class ItemStackBehaviours {
 
     public static final IItemStackBehaviour COMMON = register("common", new CommonItemStackBehaviour());
     public static final IItemStackBehaviour CONSUMPTION = register("consumption", new ConsumptionItemStackBehaviour());
-    public static final IItemStackBehaviour SWORD = register("sword", new SwordItemStackBehaviour());
-    public static final IItemStackBehaviour RANGED_WEAPON = register("ranged_weapon", new RangedWeaponItemStackBehaviour());
+    public static final IItemStackBehaviour SWORD = register("sword", new WeaponItemStackBehaviour(true));
+    public static final IItemStackBehaviour RANGED_WEAPON = register("ranged_weapon", new WeaponItemStackBehaviour(false));
     public static final IItemStackBehaviour EQUIPMENT = register("equipment", new EquipmentItemStackBehaviour());
 
-
-    public static IItemStackBehaviour create (Item.Type type) {
-        //判断不同的物品类型来注入行为
-        if (type == Item.Type.CONSUMPTION) return CONSUMPTION;
-        else if (type == Item.Type.WEAPON) return SWORD;
-        else if (type == Item.Type.EQUIPMENT) return EQUIPMENT;
-
-        //默认为普通物品
-        return COMMON;
-    }
-
     public static IItemStackBehaviour register (String name, IItemStackBehaviour behaviour) {
-        return Registries.ITEM_STACK_BEHAVIOUR.register(new Identifier(Fight.NAMESPACE, name), behaviour);
+        return Registries.ITEM_STACK_BEHAVIOUR.register(Identifier.of(Fight.NAMESPACE, name), behaviour);
     }
 }

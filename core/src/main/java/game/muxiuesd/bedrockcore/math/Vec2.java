@@ -30,6 +30,13 @@ public class Vec2 implements Vector<Vec2> {
         set(vector2.x, vector2.y);
     }
 
+    /**
+     * 转换成gdx的vec
+     * */
+    public Vector2 toVector2 () {
+        return new Vector2(this.x, this.y);
+    }
+
     @Override
     public Vec2 cpy () {
         return new Vec2(this);

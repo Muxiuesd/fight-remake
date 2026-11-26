@@ -3,10 +3,10 @@ package ttk.muxiuesd.world.entity.effect;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registry.DamageTypes;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Enemy;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 中毒效果

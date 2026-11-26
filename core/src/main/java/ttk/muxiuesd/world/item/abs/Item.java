@@ -1,6 +1,6 @@
 package ttk.muxiuesd.world.item.abs;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
@@ -13,9 +13,9 @@ import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.interfaces.world.item.ItemUpdateable;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registrant.Registries;
+import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.Sounds;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.serialization.codecs.CodecJsonPropertiesMap;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.ui.text.Text;
@@ -37,18 +37,15 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
 
     private Identifier identifier;                          //物品的id标识
-    public Type type;                                       //物品的类型
-    public Property property;                               //物品最原始的属性，原则上不直接对这个原始数据进行操作
-    private Resource<TextureRegion> textureRegionResource;  //物品的贴图材质资源
+    private Property property;                              //物品最原始的属性，原则上不直接对这个原始数据进行操作
 
     public Item () {}
-    public Item (Type type, Property property, String textureId) {
-        this(type, property, textureId, null);
-    }
-    public Item (Type type, Property property, String textureId, String texturePath) {
-        this.type = type;
+
+    /**
+     * 最普通的物品的构造方法
+     * */
+    public Item (Property property) {
         this.property = property;
-        this.setTextureRegionResource(Resource.ofTextureRegion(textureId, texturePath));
     }
 
     @Override
@@ -65,15 +62,41 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
     /**
      * 使用此物品
+     * <p>
+     * 默认返回false，也就是"这件物品不能使用"，并且不播放任何音效 ——
+     * 用不上的时候要静默失败，不然玩家会以为用出去了（消耗品据此决定扣不扣数量）。
+     * <p>
+     * 只有真正做成了事的子类才覆写本方法，在成功路径上自己调用
+     * {@link #playUseSound(World, LivingEntity)} 播放音效并返回true
      * @return 是否使用成功
      * */
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        //播放物品使用音效
-        AudioHolder useSound = this.property.getUseSound();
-        SoundSystem ses = world.getSystem(SoundSystem.class);
-        ses.playSpatialSound(useSound, user);
+        return false;
+    }
 
-        return true;
+    /**
+     * 播放此物品的使用音效
+     * <p>
+     * 只在子类确定使用成功时调用：默认的{@link #use}不播音效，
+     * 失败路径也不该播（静默失败）
+     * */
+    public void playUseSound (World world, LivingEntity<?> user) {
+        AudioHolder useSound = this.getProperty().getUseSound();
+        world.getSystem(SoundSystem.class).playSpatialSound(useSound, user);
+    }
+
+    /**
+     * 手持此物品对着世界里的某个目标使用（右键交互）
+     * <p>
+     * 与{@link #use}的分工：{@code use}是"使用物品本身"，不认目标（左键）；
+     * 本方法是对着鼠标指到的东西用。
+     * <p>
+     * 默认返回false，也就是"这个物品不能对着东西用"，并且不播放任何音效 ——
+     * 用不上的时候要静默失败，不然玩家会以为用出去了（消耗品据此决定扣不扣数量）
+     * @param targetPos 目标位置（通常是鼠标指向的世界坐标）
+     * */
+    public boolean useOn (ItemStack itemStack, World world, LivingEntity<?> user, Vector2 targetPos) {
+        return false;
     }
 
     /**
@@ -94,7 +117,8 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
      * 没有物品行为的物品将不能正常被使用
      * */
     public IItemStackBehaviour getBehaviour () {
-        return null;
+        //默认是普通物品的物品行为
+        return ItemStackBehaviours.COMMON;
     };
 
     /**
@@ -109,49 +133,22 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
         return this;
     }
 
-    public Type getType () {
-        return this.type;
-    }
-
-    public Item setType (Type type) {
-        this.type = type;
-        return this;
-    }
-
     @Override
     public String getID () {
         return this.getIdentifier().getID();
-    }
-
-    @Override
-    public Item setID (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
-        return this;
     }
 
     public Identifier getIdentifier () {
         return this.identifier;
     }
 
+    @Override
     public Item setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！物品：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
-        return this;
-    }
-
-    /**
-     * 获取物品贴图材质
-     * */
-    public TextureRegion getTextureRegion () {
-        return this.textureRegionResource != null ? this.textureRegionResource.get() : null;
-    }
-
-    public Resource<TextureRegion> getTextureRegionResource () {
-        return this.textureRegionResource;
-    }
-
-    public Item setTextureRegionResource (Resource<TextureRegion> textureRegionResource) {
-        this.textureRegionResource = textureRegionResource;
         return this;
     }
 
@@ -161,21 +158,11 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
     }
 
     /**
-     * 枚举：物品的类型
-     * */
-    public enum Type {
-        COMMON,         //普通物品
-        CONSUMPTION,    //消耗品
-        WEAPON,         //武器
-        EQUIPMENT       //装备
-    }
-
-    /**
      * 物品的属性类
      * */
     public static class Property implements Codecable<Property>{
         public static final Codec<Property> CODEC = CodecBuilder.<Property>create()
-            .field("data_map",
+            .optionalField("data_map",
                 Property::getPropertiesMap,
                 Property::setPropertiesMap,
                 CodecJsonPropertiesMap.CODEC)
@@ -236,15 +223,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
             return this;
         }
 
-        public float getDamage () {
-            return get(PropertyTypes.WEAPON_DAMAGE);
-        }
-
-        public Property setDamage (float damage) {
-            add(PropertyTypes.WEAPON_DAMAGE, damage);
-            return this;
-        }
-
         /**
          * 获取物品耐久
          * */
@@ -254,15 +232,6 @@ public class Item implements ID<Item>, ItemUpdateable, Codecable<Item> {
 
         public Property setDuration (int duration) {
             this.add(PropertyTypes.ITEM_DURATION, duration);
-            return this;
-        }
-
-        public float getUseSpan () {
-            return this.get(PropertyTypes.WEAPON_USE_SAPN, 0f);
-        }
-
-        public Property setUseSpan (float useSpan) {
-            this.add(PropertyTypes.WEAPON_USE_SAPN, useSpan);
             return this;
         }
 

@@ -3,6 +3,7 @@ package ttk.muxiuesd.registry;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.interfaces.util.Pair;
 import ttk.muxiuesd.recipe.CraftingTableRecipe;
 import ttk.muxiuesd.recipe.RecipeParser;
 import ttk.muxiuesd.recipe.ShapedCraftingTableRecipe;
@@ -24,17 +25,141 @@ public class CraftingRecipes {
         "GGG",
         "GGG",
         "SSS",
-        PatternPair.of('G', Items.GRASS),
-        PatternPair.of('S', Items.STONE)
-        );
+        Pattern.of('G', Items.GRASS),
+        Pattern.of('S', Items.STONE)
+    );
 
-    public static final CraftingTableRecipe B = registerShaped("a", new ItemStack(Items.IRON_SWORD, 1),
+    public static final CraftingTableRecipe WOOD_SWORD = registerShaped("wood_sword", Items.WOOD_SWORD,
+        "  S",
+        " S ",
+        "S  ",
+        Pattern.of('S', Items.STICK)
+    );
+
+    public static final CraftingTableRecipe STONE_SWORD = registerShaped("stone_sword", Items.STONE_SWORD,
+        "  T",
+        " T ",
+        "S  ",
+        Pattern.of('T', Items.STONE),
+        Pattern.of('S', Items.STICK)
+    );
+
+    public static final CraftingTableRecipe IRON_SWORD = registerShaped("iron_sword", Items.IRON_SWORD,
+        "  I",
+        " I ",
+        "S  ",
+        Pattern.of('I', Items.IRON_INGOT),
+        Pattern.of('S', Items.STICK)
+    );
+
+    public static final CraftingTableRecipe GOLD_SWORD = registerShaped("gold_sword", Items.GOLD_SWORD,
         "  G",
         " G ",
         "S  ",
-        PatternPair.of('G', Items.GRASS),
-        PatternPair.of('S', Items.STONE)
+        Pattern.of('G', Items.GOLD_INGOT),
+        Pattern.of('S', Items.STICK)
     );
+
+    /// 铁质装备合成表
+    public static final CraftingTableRecipe IRON_HELMET = registerShaped("iron_helmet", Items.IRON_HELMET,
+        "III",
+        "I I",
+        "   ",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+    public static final CraftingTableRecipe IRON_CHESTPLATE = registerShaped("iron_chestplate", Items.IRON_CHESTPLATE,
+        "I I",
+        "III",
+        "III",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+    public static final CraftingTableRecipe IRON_LEGGINGS = registerShaped("iron_leggings", Items.IRON_LEGGINGS,
+        "III",
+        "I I",
+        "I I",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+    public static final CraftingTableRecipe IRON_BOOTS = registerShaped("iron_boots", Items.IRON_BOOTS,
+        "I I",
+        "I I",
+        "   ",
+        Pattern.of('I', Items.IRON_INGOT)
+    );
+
+    /// 金质装备合成表
+    public static final CraftingTableRecipe GOLD_HELMET = registerShaped("gold_helmet", Items.GOLD_HELMET,
+        "GGG",
+        "G G",
+        "   ",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+    public static final CraftingTableRecipe GOLD_CHESTPLATE = registerShaped("gold_chestplate", Items.GOLD_CHESTPLATE,
+        "G G",
+        "GGG",
+        "GGG",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+    public static final CraftingTableRecipe GOLD_LEGGINGS = registerShaped("gold_leggings", Items.GOLD_LEGGINGS,
+        "GGG",
+        "G G",
+        "G G",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+    public static final CraftingTableRecipe GOLD_BOOTS = registerShaped("gold_boots", Items.GOLD_BOOTS,
+        "G G",
+        "G G",
+        "   ",
+        Pattern.of('G', Items.GOLD_INGOT)
+    );
+
+    /// 钻石装备合成表
+    public static final CraftingTableRecipe DIAMOND_HELMET = registerShaped("diamond_helmet", Items.DIAMOND_HELMET,
+        "DDD",
+        "D D",
+        "   ",
+        Pattern.of('D', Items.DIAMOND)
+    );
+    public static final CraftingTableRecipe DIAMOND_CHESTPLATE = registerShaped("diamond_chestplate", Items.DIAMOND_CHESTPLATE,
+        "D D",
+        "DDD",
+        "DDD",
+        Pattern.of('D', Items.DIAMOND)
+    );
+    public static final CraftingTableRecipe DIAMOND_LEGGINGS = registerShaped("diamond_leggings", Items.DIAMOND_LEGGINGS,
+        "DDD",
+        "D D",
+        "D D",
+        Pattern.of('D', Items.DIAMOND)
+    );
+    public static final CraftingTableRecipe DIAMOND_BOOTS = registerShaped("diamond_boots", Items.DIAMOND_BOOTS,
+        "D D",
+        "D D",
+        "   ",
+        Pattern.of('D', Items.DIAMOND)
+    );
+
+
+    /// 食物类合成配方
+    public static final CraftingTableRecipe BREAD = registerShaped("bread", Items.BREAD,
+        "WWW",
+        "   ",
+        "   ",
+        Pattern.of('W', Items.WHEAT)
+    );
+
+
+
+
+    /**
+     * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
+     * */
+    public static CraftingTableRecipe registerShaped (String name, Item outputItem,
+                                                      String pattern1,
+                                                      String pattern2,
+                                                      String pattern3,
+                                                      Pattern... pairs) {
+        return registerShaped(name, new ItemStack(outputItem, 1), pattern1, pattern2, pattern3, pairs);
+    }
 
     /**
      * 注册有序的工作台配方表，使用字符与物品映射类来快捷配对
@@ -43,13 +168,14 @@ public class CraftingRecipes {
                                                       String pattern1,
                                                       String pattern2,
                                                       String pattern3,
-                                                      PatternPair... pairs) {
+                                                      Pattern... pairs) {
         HashMap<Character, Item> keys = new HashMap<>();
-        for (PatternPair pair : pairs) {
+        for (Pattern pair : pairs) {
             keys.put(pair.getKey(), pair.getValue());
         }
         return registerShaped(name, pattern1, pattern2, pattern3, keys, output);
     }
+
     /**
      * 注册有序的工作台配方表,拆分了形状模板的字符串数组
      * */
@@ -68,7 +194,8 @@ public class CraftingRecipes {
     public static CraftingTableRecipe registerShaped (String name,
                                                 String[] pattern, HashMap<Character, Item> keys,
                                                 ItemStack output) {
-        Identifier identifier = Identifier.of(Fight.NAMESPACE, name);
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        //解析配方
         ShapedCraftingTableRecipe shapedRecipe = RecipeParser.parseShaped(pattern, keys, output);
         return register(identifier, shapedRecipe);
     }
@@ -80,22 +207,22 @@ public class CraftingRecipes {
      * @param recipe 注册表
      * */
     public static CraftingTableRecipe register (Identifier identifier, CraftingTableRecipe recipe) {
-        return Registries.CRAFTING_RECIPE_REGISTRY.register(identifier, recipe);
+        return Registries.CRAFTING_RECIPE.register(identifier, recipe);
     }
 
 
     /**
      * 工具类：字符与物品映射类
      * */
-    public static class PatternPair implements ttk.muxiuesd.interfaces.util.Pair<Character, Item> {
+    public static class Pattern implements Pair<Character, Item> {
         private Character character;
         private Item item;
 
-        public static PatternPair of (Character key, Item value) {
-            return new PatternPair(key, value);
+        public static Pattern of (Character key, Item value) {
+            return new Pattern(key, value);
         }
 
-        public PatternPair(Character character, Item item) {
+        public Pattern (Character character, Item item) {
             this.character = character;
             this.item = item;
         }

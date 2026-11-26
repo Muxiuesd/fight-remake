@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.particle.abs;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -9,7 +8,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.pool.particle.ParticlePool;
-import ttk.muxiuesd.resource.AssetsLoader;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.world.particle.motion.ParticleMotionComp;
 
 /**
@@ -26,7 +25,8 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
 
     private Array<ParticleMotionComp> motionComps;
 
-    private TextureRegion textureRegion;
+    private Resource<TextureRegion> textureRegionResource;   //粒子贴图资源（懒加载，贴图由发射器持有）
+    private TextureRegion summonRegion;                      //本次召唤用贴图（破坏粒子等动态贴图，优先于固定贴图）
 
     public ParticleEmitter () {
         this.activeParticles = new Array<>();
@@ -154,13 +154,33 @@ public abstract class ParticleEmitter<T extends Particle> implements Updateable,
         return this.activeParticles;
     }
 
+    /**
+     * 获取粒子贴图（首次调用触发延迟加载）
+     * */
     public TextureRegion getTextureRegion () {
-        return this.textureRegion;
+        return this.textureRegionResource == null ? null : this.textureRegionResource.get();
     }
 
-    public void setTextureRegion (String id) {
-        if (AssetsLoader.getInstance().containsId(Texture.class, id)) {
-            this.textureRegion = new TextureRegion(AssetsLoader.getInstance().getById(id, Texture.class));
-        }
+    /**
+     * 设置粒子贴图资源（懒加载：构造只注册 id→路径 映射，首次 {@link #getTextureRegion()} 才加载贴图）
+     * @param textureId 贴图资源的id
+     * @param texturePath 贴图文件在 assets 下的路径
+     * */
+    public void setTextureRegion (String textureId, String texturePath) {
+        this.textureRegionResource = Resource.ofTextureRegion(textureId, texturePath);
+    }
+
+    /**
+     * 获取本次召唤用贴图（未设置时为 null，使用固定贴图）
+     * */
+    public TextureRegion getSummonRegion () {
+        return this.summonRegion;
+    }
+
+    /**
+     * 设置本次召唤用贴图（动态贴图，如方块破坏残渣按方块贴图裁剪；使用完应复位为 null）
+     */
+    public void setSummonRegion (TextureRegion summonRegion) {
+        this.summonRegion = summonRegion;
     }
 }

@@ -47,7 +47,7 @@ public class UIList extends UIPanel {
             .sliderGotoStart();
 
         //滚动条贴着列表的右边
-        this.scrollbar.setPosition(DEFAULT_SCROLL_BAR_X, 0f);
+        this.scrollbar.setPosition(width - this.scrollbar.getWidth(), 0f);
 
         addComponent(this.scrollbar);
     }
@@ -83,7 +83,10 @@ public class UIList extends UIPanel {
      * */
     public UIList clearItems() {
         this.getItems().forEach((listItem)-> {
-            getComponents().remove(listItem);
+            //走标准移除路径，清理 screen/parentPanel 引用
+            if (listItem instanceof UIComponent uiComponent) {
+                removeComponent(uiComponent);
+            }
         });
 
         this.getItems().clear();
@@ -147,7 +150,7 @@ public class UIList extends UIPanel {
         //超过列表大小的部分不绘制
         ScissorUtil.beginScissor(
             batch, GUICamera.INSTANCE.getCamera(),
-            getAbsX(), getY(), getWidth(), getHeight()
+            getAbsX(), getAbsY(), getWidth(), getHeight()
         );
         for (UIListItem listItem : this.getItems()) {
             if (listItem instanceof UIComponent uiComponent) {
@@ -170,15 +173,31 @@ public class UIList extends UIPanel {
 
     /**
      * 设置大小的同时设置交互区域网格大小，以及一直让滚动条贴在右边
+     * <p>
+     * 滚动进度会按比例保留，不会因调整大小而丢失
      * */
     @Override
     public UIComponent setSize (float width, float height) {
         getInteractGridSize().set((int) width, (int) height);
         UIScrollBar scrollBar = this.getScrollbar();
+        //记录调整前的滚动进度（0~1）
+        float oldProgress = scrollBar.getSliderPathwayPos();
         scrollBar
             .setHeight((int) height)
             .setPosition(width - scrollBar.getWidth(), 0f);
-        scrollBar.sliderGotoStart();
+        //按旧进度恢复滑块位置，避免滚动进度丢失
+        switch (scrollBar.getType()) {
+            case VERTICAL: {
+                float maxY = height - scrollBar.getSliderHeight();
+                scrollBar.setSliderY(maxY - oldProgress * maxY);
+                break;
+            }
+            case HORIZONTAL: {
+                float maxX = width - scrollBar.getSliderWidth();
+                scrollBar.setSliderX(oldProgress * maxX);
+                break;
+            }
+        }
 
         return super.setSize(width, height);
     }

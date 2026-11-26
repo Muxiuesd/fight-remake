@@ -1,9 +1,7 @@
 package ttk.muxiuesd.world.entity.abs;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.app.interfaces.audio.SpatialAudio;
 import game.muxiuesd.bedrockcore.math.Vec2;
@@ -16,17 +14,15 @@ import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.ID;
 import ttk.muxiuesd.interfaces.Tickable;
+import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.property.PropertyType;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.registry.RenderLayers;
 import ttk.muxiuesd.render.RenderLayer;
-import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.SoundSystem;
-import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.cat.CatBoolean;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntitySounder;
@@ -38,7 +34,7 @@ import ttk.muxiuesd.world.hitbox.RectHitbox;
 /**
  * 游戏的基础实体
  * <p>
- * 拥有游戏内的坐标、运动参数以及渲染参数
+ * 拥有游戏内的坐标、运动参数；贴图资源由对应的实体渲染器持有
  */
 public abstract class Entity<T extends Entity<T>>
     implements ID<T>, ICatData, Disposable, Updateable, Tickable {
@@ -51,25 +47,12 @@ public abstract class Entity<T extends Entity<T>>
     public static final Codec<Entity<?>> CODEC = EntityCodecBuilder.<Entity<?>>create()
         .factory(EntityCodecBuilder::createEntity);
 
-    /**
-     * 加载纹理区域
-     * @param textureId 纹理材质id
-     * @param entityTexturePath 实体纹理材质在 texture/entity 下的路径，当此为null时则默认之前手动加载过
-     * */
-    public static TextureRegion getTextureRegion (String textureId, String entityTexturePath) {
-        if (entityTexturePath == null) return Util.loadTextureRegion(textureId, entityTexturePath);
-        return Util.loadTextureRegion(textureId, Fight.EntityTexturePath(entityTexturePath));
-    }
-
-
     /// 实体的默认碰撞箱ID（默认就一个身体碰撞箱）
     public static final String HITBOX_BODY = Fight.ID("entity_body");
 
-    private Identifier identifier;  //实体的id
     /// 以下都是实体的基础数据（物理参数、渲染参数等）
-    private float speed;
     private float x, y;                     //实体的世界坐标
-    private float velX, velY;               //实体的速度
+    private float velX, velY;               //实体的运动速度矢量
     private float width, height;            //实体的宽高（世界渲染）
     private float originX = 0f, originY = 0f;
     private float scaleX = 1f, scaleY = 1f;
@@ -77,14 +60,12 @@ public abstract class Entity<T extends Entity<T>>
 
     private boolean onGround = true;        //实体是否接触地面，接触地面的话会受地面摩擦影响，没有的接触的话只有空气阻力
 
-    public TextureRegion textureRegion;
-    private Resource<TextureRegion> bodyTextureRegionResource;
-
     private EntitySystem es;                        //此实体所属的实体系统
     private EntityType<?> type;                     //实体的类型
     private Property property;                      //实体的属性
     private HitboxHolder<Entity<T>> hitboxHolder;   //实体的碰撞箱持有者
     private EntitySounder sounder;                  //实体的音频发声者
+    private EntityProvider<?> provider;             //实体的提供者（持有实体的注册信息与 Identifier）
 
     public Entity (World world, EntityType<?> type) {
         this.setType(type);
@@ -95,48 +76,25 @@ public abstract class Entity<T extends Entity<T>>
 
     /**
      * 读取自定义属性标签数据
-     * */
+     * <p>
+     * 基础字段（坐标/速度/尺寸/渲染参数）由 codec 顶层字段恢复；
+     * 这里只读派生值 curSpeed（必须等 velX/velY 恢复后设置，setCurSpeed 缩放已有速度矢量）
+     */
     @Override
-    public void readCatData (JsonValue values) {
-        this.speed = values.getFloat("speed", 1.145f);
-        this.x = values.getFloat("x", 1.145f);
-        this.y = values.getFloat("y", 1.145f);
-        this.velX = values.getFloat("velX", 0);
-        this.velY = values.getFloat("velY", 0);
-        //curSpeed 在速度矢量之后设置（setCurSpeed 缩放已有速度矢量，顺序反了会被 MIN_SPEED 分支清零）
-        this.setCurSpeed(values.getFloat("curSpeed", 1.145f));
-        this.width = values.getFloat("width", 1f);
-        this.height = values.getFloat("height", 1f);
-        this.originX = values.getFloat("originX", 0);
-        this.originY = values.getFloat("originY", 0);
-        this.scaleX = values.getFloat("scaleX", 1f);
-        this.scaleY = values.getFloat("scaleY", 1f);
-        this.rotation = values.getFloat("rotation", 0);
-        this.onGround = values.getBoolean("onGround", true);
-
-        this.updateHitboxCenterPos(this.x, this.y);
+    public void readCatData (CatsHolder holder) {
+        this.setCurSpeed(holder.getFloat("curSpeed", this.getCurSpeed()));
     }
 
     /**
      * 写入自定义属性标签数据
-     * */
+     * <p>
+     * 基础字段（坐标/速度/尺寸/渲染参数）由 codec 顶层字段序列化；
+     * 这里只写派生值 curSpeed（顶层无此字段，用于按速度矢量缩放恢复）
+     */
     @Override
     public void writeCatData (CatsHolder holder) {
         holder
-            .put("speed", new CatFloat(this.speed))
-            .put("curSpeed", new CatFloat(this.getCurSpeed()))
-            .put("x", new CatFloat(this.x))
-            .put("y", new CatFloat(this.y))
-            .put("velX", new CatFloat(this.velX))
-            .put("velY", new CatFloat(this.velY))
-            .put("width", new CatFloat(this.width))
-            .put("height", new CatFloat(this.height))
-            .put("originX", new CatFloat(this.originX))
-            .put("originY", new CatFloat(this.originY))
-            .put("scaleX", new CatFloat(this.scaleX))
-            .put("scaleY", new CatFloat(this.scaleY))
-            .put("rotation", new CatFloat(this.rotation))
-            .put("onGround", new CatBoolean(this.onGround));
+            .put("curSpeed", new CatFloat(this.getCurSpeed()));
     }
 
     /**
@@ -169,12 +127,11 @@ public abstract class Entity<T extends Entity<T>>
     public void tick (World world, float delta) {
     }
 
+    /**
+     * 实体被销毁的时候调用
+     * */
     @Override
     public void dispose() {
-        if (this.textureRegion != null) {
-            this.textureRegion = null;
-        }
-        this.bodyTextureRegionResource = null;
     }
 
     /**
@@ -213,11 +170,11 @@ public abstract class Entity<T extends Entity<T>>
     }
 
 
-    public T setPosition(Vector2 vector2) {
+    public T setPosition (Vector2 vector2) {
         this.setPosition(vector2.x, vector2.y);
         return (T) this;
     }
-    public T setPosition(float x, float y) {
+    public T setPosition (float x, float y) {
         this.x = x;
         this.y = y;
         this.updateHitboxCenterPos(x, y);
@@ -228,13 +185,13 @@ public abstract class Entity<T extends Entity<T>>
         this.setSize(size.x, size.y);
         return (T) this;
     }
-    public T setSize(float width, float height) {
+    public T setSize (float width, float height) {
         this.width = width;
         this.height = height;
         return (T) this;
     }
 
-    public T setBounds(float x, float y, float width, float height) {
+    public T setBounds (float x, float y, float width, float height) {
         this.setPosition(x, y);
         this.setSize(width, height);
         return (T) this;
@@ -243,7 +200,7 @@ public abstract class Entity<T extends Entity<T>>
     /**
      * 获取实体坐标
      * */
-    public Vector2 getPosition() {
+    public Vector2 getPosition () {
         return new Vector2(this.x, this.y);
     }
 
@@ -265,25 +222,60 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 获取实体的基准速度（比如移动速度）
+     * 获取实体的移动速度（当前值，可能被状态效果改写）
      * */
     public float getSpeed () {
-        return this.speed;
+        return this.getAttributesModifier().getOrDefault(PropertyTypes.ENTITY_MOVE_SPEED, 0f);
     }
 
+    /**
+     * 获取实体的原始移动速度（固定值，不受状态效果影响）
+     * */
+    public float getBaseSpeed () {
+        return this.getAttributesModifier().getBase(PropertyTypes.ENTITY_MOVE_SPEED, 0f);
+    }
+
+    /**
+     * 设置速度（基础速度）
+     * */
     public T setSpeed (float speed) {
         //守卫检查新值（原来检查旧值，负速度可被写入且无法改回）
         if (speed >= 0) {
-            this.speed = speed;
+            //写的是原始速度，状态效果改的是当前值
+            this.getAttributesModifier().setBase(PropertyTypes.ENTITY_MOVE_SPEED, speed);
         }
         return (T) this;
     }
 
     /**
-     * 获取当前速率
-     * */
+     * 获取当前速率（由实体目前的具体速度矢量计算得到）
+     */
     public float getCurSpeed () {
         return Vec2.len(this.getVelX(), this.getVelY());
+    }
+
+    /**
+     * 实体是否处于击退中
+     * <p>
+     * 击退中的实体暂停自身意图（状态机/玩家输入），
+     * 速度由击退物理与摩擦系统控制（地面受摩擦、空中受空气阻力）。
+     * 默认未击退，由活物实体（{@link LivingEntity}）覆写
+     * */
+    public boolean isKnockback () {
+        return false;
+    }
+
+    /**
+     * 实体是否有每帧速度意图（受控运动体覆写为 true）
+     * <p>
+     * 意图实体（玩家/活物/鱼钩等，每帧由输入或状态机写入速度）：
+     * 摩擦按帧级缩放意图（稳定速度 = 意图 × (1-摩擦)，帧率无关）；
+     * 无意图实体（物品等，速度来自一次性事件后只衰减）：
+     * 摩擦按秒级衰减（等效参考帧率下的帧级表现，帧率无关）。
+     * 默认无意图
+     * */
+    public boolean hasIntent () {
+        return false;
     }
 
     /**
@@ -415,9 +407,25 @@ public abstract class Entity<T extends Entity<T>>
     }
 
     /**
-     * 获取实体的中心点的坐标（与世界坐标是两个概念），会影响实体的某些渲染坐标
+     * 获取实体的中心点坐标（世界坐标）
      * <p>
-     * 默认是实体的世界坐标
+     * 实体坐标 (x, y) 就是碰撞箱的中心：身体碰撞箱的起终点相对中心偏移宽高的一半，
+     * 见 {@link #fastAddBodyHitBox()}；脚底 = {@code y - getHeight() / 2f}。
+     * <p>
+     * <b>约定：需要把实体换算成"所在的那一格方块/区块"时，一律用这个中心点取样。</b>
+     * 全项目的判定取样点如下——
+     * <ul>
+     *     <li>移动摩擦与击退摩擦：实体中心（{@code ttk.muxiuesd.system.EntitySystem} 速度摩擦处、
+     *         {@code ttk.muxiuesd.world.entity.abs.LivingEntity} 击退物理处）</li>
+     *     <li>脚步粒子判定：实体中心（{@code ttk.muxiuesd.system.PlayerSystem#emitFootstepParticle}）</li>
+     *     <li>游泳判定：实体中心（{@code ttk.muxiuesd.system.PlayerSystem} 玩家游泳处）</li>
+     *     <li>实体归属的区块（区块加载与卸载、实体存档分组）：实体中心
+     *         （{@code ttk.muxiuesd.system.ChunkSystem#getPlayerChunkPosition}、
+     *         {@code ttk.muxiuesd.system.EntitySystem} 实体卸载与保存处）</li>
+     *     <li><b>例外：粒子发射位置与"从脚下找可站立格"用脚底</b>——粒子从脚下扬起才是想要的表现，
+     *         重生落地要以脚为准，所以这两类不做中心取样</li>
+     * </ul>
+     * 注：每次调用返回的是<b>新的</b> Vector2 副本，改它不会影响实体坐标。
      * */
     public Vector2 getCenterPos () {
         return new Vector2(this.x, this.y);
@@ -487,27 +495,13 @@ public abstract class Entity<T extends Entity<T>>
         return (T) this;
     }
 
-
     /**
-     * 快捷设置实体身体贴图材质资源
-     * @param path 以实体材质文件夹为基准的路径
+     * 获取实体的属性修饰表（原始值 / 当前值）
      * */
-    public void setBodyTextureRegionResource (String id, String path) {
-        this.setBodyTextureRegionResource(Resource.ofTextureRegion(id, Fight.EntityTexturePath(path)));
-    }
-    /**
-     * 设置实体身体贴图材质资源
-     * */
-    public void setBodyTextureRegionResource (Resource<TextureRegion> resource) {
-        this.bodyTextureRegionResource = resource;
+    public AttributesModifier getAttributesModifier () {
+        return this.getProperty().getAttributesModifier();
     }
 
-    /**
-     * 获取身体的贴图材质
-     * */
-    public TextureRegion getBodyTextureRegion () {
-        return this.bodyTextureRegionResource != null ? this.bodyTextureRegionResource.get() : null;
-    }
 
     /**
      * 检查当前的状态是否是贴地的，是则有方块摩擦力，不是则无摩擦
@@ -536,20 +530,37 @@ public abstract class Entity<T extends Entity<T>>
         return this.getIdentifier() == null ? null : this.getIdentifier().getID();
     }
 
-    @Override
-    public T setID (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
-        return (T) this;
-    }
-
+    /**
+     * 获取实体的标识符（由 {@link #getProvider()} 间接持有，实体自身不持有 Identifier）
+     * */
     public Identifier getIdentifier () {
-        return this.identifier;
+        return this.provider == null ? null : this.provider.getIdentifier();
     }
 
-    public T setIdentifier (Identifier identifier) {
-        this.identifier = identifier;
+    /**
+     * 获取实体的提供者（注册信息与 Identifier 的单一持有者）
+     * */
+    public EntityProvider<?> getProvider () {
+        return this.provider;
+    }
+
+    /**
+     * 设置实体的提供者（注册阶段由 {@link EntityProvider#create} 给定，注册过后不允许修改）
+     * */
+    public T setProvider (EntityProvider<?> provider) {
+        if (this.provider != null && this.provider != provider) {
+            throw new IllegalStateException("EntityProvider 已设置，禁止修改！实体：" + this.getID());
+        }
+        this.provider = provider;
         return (T) this;
+    }
+
+    /**
+     * 实体的 Identifier 只能通过 {@link #setProvider} 间接设置，禁止直接设置
+     * */
+    @Override
+    public T setIdentifier (Identifier identifier) {
+        throw new IllegalStateException("实体的 Identifier 不能直接设置，应通过 EntityProvider 间接持有！实体：" + this.getID());
     }
 
     /**
@@ -634,6 +645,8 @@ public abstract class Entity<T extends Entity<T>>
     public static class Property {
         //属性映射
         private PropertiesDataMap<?, ?, ?> propertiesMap;
+        //实体的属性修饰表：原始值 + 当前值
+        private AttributesModifier attributesModifier = new AttributesModifier();
 
         public Property () {
             setPropertiesMap(
@@ -666,6 +679,15 @@ public abstract class Entity<T extends Entity<T>>
 
         public Entity.Property setPropertiesMap (PropertiesDataMap<?, ?, ?> propertiesMap) {
             this.propertiesMap = propertiesMap;
+            return this;
+        }
+
+        public AttributesModifier getAttributesModifier () {
+            return this.attributesModifier;
+        }
+
+        public Entity.Property setAttributesModifier (AttributesModifier attributesModifier) {
+            this.attributesModifier = attributesModifier;
             return this;
         }
     }

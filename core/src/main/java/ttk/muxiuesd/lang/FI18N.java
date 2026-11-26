@@ -1,7 +1,7 @@
 package ttk.muxiuesd.lang;
 
-import com.badlogic.gdx.Gdx;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
@@ -27,7 +27,7 @@ public class FI18N {
      * */
     public static LangPack register (Identifier identifier, String name, String langFilePath) {
         LangPack langPack = new LangPack(identifier, name);
-        langPack.loadTexts(Gdx.files.internal(langFilePath));
+        langPack.loadTexts(UnifiedFileUtil.internalFile(langFilePath));
         return Registries.LANG_HOLDER.register(langPack.getIdentifier(), langPack);
     }
 

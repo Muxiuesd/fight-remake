@@ -2,6 +2,7 @@ package ttk.muxiuesd.mod;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import game.muxiuesd.bedrockcore.util.FileUtil;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.mod.api.ModLibLoader;
 import ttk.muxiuesd.mod.api.ModRegistrant;
@@ -45,7 +46,7 @@ public class ModLibManager {
         }
 
         FileHandle libFile = Gdx.files.internal("modlib/lib.js");
-        this.libCode = libFile.readString();
+        this.libCode = FileUtil.readText(libFile);
         try {
             this.libEngine.eval(this.getLibCode());
         } catch (ScriptException e) {

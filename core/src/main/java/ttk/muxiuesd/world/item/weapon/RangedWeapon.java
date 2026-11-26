@@ -33,11 +33,11 @@ public class RangedWeapon extends Weapon {
 
     private BulletFactory<?> factory;   //子弹的工厂实现类
 
-    public RangedWeapon (Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public RangedWeapon (Property property) {
+        super(property);
     }
-    public RangedWeapon (Property property, String textureId, String texturePath, BulletFactory<?> factory) {
-        super(property, textureId, texturePath);
+    public RangedWeapon (Property property, BulletFactory<?> factory) {
+        super(property);
         this.factory = factory;
     }
 
@@ -53,7 +53,9 @@ public class RangedWeapon extends Weapon {
             entitySystem.add(bullet);
 
             EventBus.post(EventTypes.BULLET_SHOOT, new EventPosterBulletShoot(world, user, bullet));
-            return super.use(itemStack, world, user);
+            //子弹打出去了，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
+            this.playUseSound(world, user);
+            return true;
         }
         return false;
     }

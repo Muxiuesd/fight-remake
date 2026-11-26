@@ -1,10 +1,11 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.GridPoint2;
 import ttk.muxiuesd.interfaces.Inventory;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 
 /**
@@ -35,7 +36,9 @@ public class PlayerSlotUI extends SlotUI {
      * 点击交互的核心算法
      * */
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键执行拿取/交换/合并逻辑，右键由子类自行判断
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         MouseSlotUI mouseSlotUI = MouseSlotUI.getInstance();
         if (!this.isNullSlot()) {
             ItemStack stack = this.getItemStack();
@@ -78,7 +81,7 @@ public class PlayerSlotUI extends SlotUI {
             }
         }
         this.getPlayerSystem().getPlayer().getBackpack().clear();
-        return super.click(interactPos);
+        return super.click(interactPos, button);
     }
 
     /**
@@ -89,7 +92,7 @@ public class PlayerSlotUI extends SlotUI {
         Player player = getPlayerSystem().getPlayer();
         if (player == null) return true;
         ItemStack itemStack = this.getInventory().getItemStack(this.getIndex());
-        return itemStack == null;
+        return itemStack.isVoid();
     }
 
     public ItemStack getItemStack () {

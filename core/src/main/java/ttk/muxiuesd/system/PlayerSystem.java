@@ -17,8 +17,6 @@ import ttk.muxiuesd.event.EventTypes;
 import ttk.muxiuesd.event.poster.EventPosterPlayerDeath;
 import ttk.muxiuesd.key.KeyBindings;
 import ttk.muxiuesd.registrant.Gets;
-import ttk.muxiuesd.registrant.Registrant;
-import ttk.muxiuesd.registrant.RegistrantGroup;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.*;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -32,9 +30,9 @@ import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockAir;
 import ttk.muxiuesd.world.block.instance.BlockWater;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
+import ttk.muxiuesd.world.entity.player.PlayerDebugger;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 玩家系统
@@ -44,12 +42,21 @@ import ttk.muxiuesd.world.item.abs.Item;
 public class PlayerSystem extends WorldSystem {
     public static final String PLAYER_DATA_FILE_NAME = "player_data.json";
 
+    /// 玩家启动加速半衰期（秒）：从静止起步向目标速度逼近一半所需的时间
+    private static final float ACCEL_HALF_LIFE = 0.08f;
+
+    /// 脚步粒子同一时间最多存在的数量
+    private static final int MAX_FOOTSTEP_PARTICLES = 16;
+
+    public static boolean debugMode = true; //是否启用debug模式
+
     //玩家相关的GUIScreen
     public static PlayerHUDUIScreen PLAYER_HUD_SCREEN;
     public static PlayerUIScreen PLAYER_INVENTORY_SCREEN;
 
     private Player player;
     private Vector2 playerLastPosition;
+    private boolean playerLoaded;   //本世界是否读取了已游玩的玩家存档（true=进入时回到上次退出位置）
 
     private Timer<?> bubbleEmitTimer;  //气泡粒子发射计时器
 
@@ -67,20 +74,40 @@ public class PlayerSystem extends WorldSystem {
 
     @Override
     public void initialize () {
-        //有玩家数据就读取
+        //有玩家数据就读取（含上次退出的位置 → 重新进入回到那里）
         if (UnifiedFileUtil.fileExists(Fight.getPathSavePlayer(), PLAYER_DATA_FILE_NAME)) {
-            this.player = this.readPlayerData();
+            this.setPlayer(this.readPlayerData());
+            this.playerLoaded = true;   //已游玩过：进入时保持上次退出位置
             Log.print(TAG(), "探查到玩家数据文件，读取玩家数据");
         }else {
-            this.player = Entities.PLAYER.create(getWorld());
+            this.setPlayer(Entities.PLAYER.create(getWorld()));
+            this.playerLoaded = false;   //首次进入：进入时放到出生点
             Log.print(TAG(), "未探查到玩家数据文件，新建玩家实体");
         }
 
-        this.playerLastPosition = this.player.getPosition();
+        this.playerLastPosition = this.getPlayer().getPosition();
 
         GUISystem.getInstance().setCurScreen(PLAYER_HUD_SCREEN);
 
         Log.print(TAG(), "PlayerSystem初始化完成！");
+    }
+
+    /**
+     * 决定玩家进入世界的位置（由 ChunkSystem 在确定出生点后调用）：
+     * <ul>
+     *   <li>首次进入（新建玩家）：设置位置到出生点；</li>
+     *   <li>重新进入已游玩存档（读档玩家）：保持读出的<b>上次退出位置</b>。</li>
+     * </ul>
+     * 此处<b>不加载区块</b>——玩家脚下的初始区块统一由 {@code ChunkSystem} 的预加载
+     * （{@code update(-1.2f)}）加载，避免与预加载对同一区块重复 {@code addChunk}。
+     */
+    public void placePlayerAtInitialPosition (Vector2 spawn) {
+        if (this.playerLoaded) {
+            //读档位置已由玩家数据读出，保持不动（初始区块由预加载加载）
+            return;
+        }
+        //首次进入 → 设置到出生点（初始区块由预加载加载）
+        this.player.setPosition(spawn.x, spawn.y);
     }
 
     @Override
@@ -99,14 +126,14 @@ public class PlayerSystem extends WorldSystem {
         //玩家速度计算
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         Vector2 playerCenter = this.player.getCenterPos();
-        //用玩家底部判定是否在水中（半身没入水中也算游泳），而不是中心点
-        Block block = cs.getBlock(playerCenter.x, playerCenter.y - this.player.getHeight() / 2f);
+        //是否游泳：按中心点取样（取样点约定见 Entity.getCenterPos()）
+        Block block = cs.getBlock(playerCenter.x, playerCenter.y);
 
         //玩家游泳
         if (this.bubbleEmitTimer.isReady() && block instanceof BlockWater) {
             //发射气泡粒子
             ParticleSystem pts = getManager().getSystem(ParticleSystem.class);
-            pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(3, 7),
+            pts.emitParticle(ParticleEmitters.ENTITY_SWIMMING, MathUtils.random(3, 7),
                 playerCenter.set(playerCenter.x, playerCenter.y - 0.4f),
                 new Vector2(MathUtils.random(1, 2), 0),
                 player.getOrigin(),
@@ -116,8 +143,49 @@ public class PlayerSystem extends WorldSystem {
 
         this.handleInput(delta);
 
+        //玩家行走脚下粒子（移速越快脚步越密集、粒子越多）
+        this.emitFootstepParticle(player, cs);
+
         //实时更新立体音效的接听者坐标为玩家的坐标
         SpatialAudioSystem.getInstance().getAudioListener().setPos(this.player.getX(), this.player.getY(), 0f);
+    }
+
+    /**
+     * 玩家行走脚下粒子
+     * <p>
+     * 玩家移动（且脚下有方块）时，周期性向行走方向的反方向发出脚下碎片粒子。
+     * 脚步间隔与每次粒子数量随移动速度变化：移速越快间隔越短、粒子越多
+     * */
+    private void emitFootstepParticle (Player player, ChunkSystem cs) {
+        //只要玩家在移动（速度>0）就产生脚步粒子
+        float curSpeed = player.getCurSpeed();
+        if (curSpeed <= 0f) return;
+
+        //是否踩在方块上：按中心点取样（取样点约定见 Entity.getCenterPos()）
+        Vector2 playerCenter = player.getCenterPos();
+        Block standingBlock = cs.getBlock(playerCenter.x, playerCenter.y);
+        //空气方块与水方块不可产生脚步粒子
+        if (standingBlock == null || standingBlock == Blocks.ARI || standingBlock instanceof BlockWater) return;
+        //发射点在脚底：实体坐标是碰撞箱中心，脚底 = 中心 - 半高（碎片从脚下扬起，而不是从身体中心）
+        Vector2 footPos = new Vector2(player.getX(), player.getY() - player.getHeight() / 2f);
+
+        //移速挂钩：0~1 归一化（Player.MOVE_SPEED 为最大移速）
+        float speedRatio = MathUtils.clamp(curSpeed / Player.MOVE_SPEED, 0f, 1f);
+
+        //每次粒子数量：慢速 4~6 → 全速 7~9（移速越快越多）
+        int count = MathUtils.round(MathUtils.lerp(4, 8, speedRatio)) + MathUtils.random(-1, 1);
+        count = MathUtils.clamp(count, 4, 9);
+
+        //上限控制：同一时间存在的脚步粒子最多 16 个，达到上限则不再发射（避免过量堆积）
+        int activeCount = ParticleEmitters.FOOTSTEP.getActiveParticlesCount();
+        if (activeCount >= MAX_FOOTSTEP_PARTICLES) return;
+        count = Math.min(count, MAX_FOOTSTEP_PARTICLES - activeCount);
+
+        //粒子向行走方向的反方向发出（玩家向前走，碎片向后扬起）
+        Vector2 reverseVel = new Vector2(-player.getVelX(), -player.getVelY());
+
+        ParticleSystem pts = getManager().getSystem(ParticleSystem.class);
+        pts.footstepParticle(standingBlock, footPos, reverseVel, count, 0.5f);
     }
 
     /**
@@ -126,9 +194,11 @@ public class PlayerSystem extends WorldSystem {
     private void handleInput (float delta) {
         Player curPlayer = this.getPlayer();
 
-        //需要玩家当前的GUIScreen是HUD界面，并且鼠标不在UI组件上，防止同时操作两者
-        if (GUISystem.getInstance().getCurScreen() == PLAYER_HUD_SCREEN
-            && !GUISystem.getInstance().mouseOverUI()) {
+        //当前必须是 HUD 屏幕才处理玩家输入（背包/菜单打开时不处理）
+        boolean isHUD = GUISystem.getInstance().getCurScreen() == PLAYER_HUD_SCREEN;
+
+        //鼠标操作：悬停 HUD 的 UI 组件时禁用，避免既操作 UI 又触发玩家操作/与世界交互
+        if (isHUD && !GUISystem.getInstance().mouseOverUI()) {
             //玩家右键防御
             if (KeyBindings.PlayerShield.wasJustPressed()) {
                 curPlayer.defendCDTimer.isReady();
@@ -138,11 +208,15 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerUseItem.wasJustPressed()) {
                 curPlayer.setUsingItem(curPlayer.useItem(getWorld()));
             }
-            //头两个物品槽（0号和1号）快捷循环
+            //头两个物品槽（0号和1号）快捷循环（鼠标中键，属鼠标操作）
             if (KeyBindings.PlayerChangeItem.wasJustPressed()) {
                 if (curPlayer.getHandIndex() == 0) curPlayer.setHandIndex(1);
                 else if (curPlayer.getHandIndex() == 1) curPlayer.setHandIndex(0);
             }
+        }
+
+        //键盘操作：只要在 HUD 屏幕就可执行（不受鼠标是否悬停 UI 影响，保证移动等键盘操作不被 UI 阻塞）
+        if (isHUD) {
             if (KeyBindings.PlayerDropItem.wasJustPressed()) {
                 curPlayer.dropItem(curPlayer.getHandIndex(), 1);
             }
@@ -156,7 +230,10 @@ public class PlayerSystem extends WorldSystem {
             if (KeyBindings.PlayerShortcutKey_8.wasJustPressed()) curPlayer.setHandIndex(7);
             if (KeyBindings.PlayerShortcutKey_9.wasJustPressed()) curPlayer.setHandIndex(8);
 
-            //移动方向（放在守卫内：打开GUI时不能移动）
+            //击退中不受输入控制（速度由击退物理接管，输入会覆盖击退速度）
+            if (curPlayer.isKnockback()) return;
+
+            //移动方向（放在 HUD 守卫内：打开GUI时不能移动）
             int inputX = 0;
             int inputY = 0;
             if (KeyBindings.PlayerWalkUp.wasPressed()) {
@@ -179,7 +256,27 @@ public class PlayerSystem extends WorldSystem {
                 float playerSpeed = curPlayer.getSpeed();
                 float velX = (inputX / length) * playerSpeed;
                 float velY = (inputY / length) * playerSpeed;
-                curPlayer.setVelocity(velX, velY);
+                //启动加速：从当前速度向目标速度平滑逼近（半衰期 ACCEL_HALF_LIFE），
+                //换向时自然先减速再转向；松键立即停（保持即时响应）
+                float k = 1f - (float) Math.pow(0.5f, delta / ACCEL_HALF_LIFE);
+                //只对仍按着的轴做加速，松开的方向立即归零（否则 lerp 指数衰减会残留速度，
+                //导致只松开一个方向键时玩家仍沿该方向滑行）
+                float curVelX = curPlayer.getVelX();
+                float curVelY = curPlayer.getVelY();
+                if (inputX != 0) {
+                    curVelX = curVelX + (velX - curVelX) * k;
+                } else {
+                    curVelX = 0;
+                }
+                if (inputY != 0) {
+                    curVelY = curVelY + (velY - curVelY) * k;
+                } else {
+                    curVelY = 0;
+                }
+                //这里要设置一遍速度不然后续的应用摩擦计算速度出问题
+                curPlayer
+                    .setVelocity(curVelX, curVelY)
+                    .setCurSpeed(playerSpeed);
             }
             if (inputX == 0 && inputY == 0) {
                 curPlayer.setVelocity(0, 0);
@@ -190,35 +287,45 @@ public class PlayerSystem extends WorldSystem {
         }
     }
 
-    public void setItemStack (int index, String itemId) {
-        String[] parts = itemId.split(":");
-        Registrant<Item> itemReg = RegistrantGroup.getRegistrant(parts[0], Item.class);
-        ItemStack stack = new ItemStack(itemReg.get(parts[1]));
-        this.player.backpack.setItemStack(index, stack);
-    }
-
     /**
      * 玩家重开
      * */
     private void remakePlayer () {
         //移除旧的玩家实体
+        Player oldPlayer = this.getPlayer();
         EntitySystem es = getManager().getSystem(EntitySystem.class);
-        es.remove(this.player);
+        es.remove(oldPlayer);
 
         //生成新的玩家实体
-        this.player = Entities.PLAYER.create(getWorld());
-        this.player.setEntitySystem(es);
-        //重生位置安全检查：出生点被墙/水占据时向上搜索安全位置（防止卡墙/溺水）
-        this.ensureSafeSpawnPosition();
-        this.playerLastPosition = this.player.getPosition();
-        es.add(player);
+        Player newPlayer = Entities.PLAYER.create(getWorld());
+        newPlayer.setEntitySystem(es);
+        this.setPlayer(newPlayer);
+
+        //复活到出生点（出生点是存档属性，已在世界信息中记录）
+        float sx = WorldInfoTypes.FLOAT.get(Fight.SPAWN_X);
+        float sy = WorldInfoTypes.FLOAT.get(Fight.SPAWN_Y);
+        this.teleportToSpawnPoint(newPlayer, new Vector2(sx, sy));
+        this.playerLastPosition = newPlayer.getPosition();
+        es.add(newPlayer);
 
         //更新其他与玩家有关的配置
         CameraFollowSystem cfs = getManager().getSystem(CameraFollowSystem.class);
-        cfs.setFollower(this.player);
+        cfs.setFollower(newPlayer);
 
         //播放复活音频
-        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, this.player);
+        getManager().getSystem(SoundSystem.class).playSpatialSound(Sounds.PLAYER_RESURRECTION, newPlayer);
+    }
+
+    /**
+     * 把玩家传送到指定出生点坐标（出生点是首次进入/复活时用的位置）
+     */
+    private void teleportToSpawnPoint (Player player, Vector2 spawn) {
+        player.setPosition(spawn.x, spawn.y);
+        //确保出生点所在区块已加载
+        ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
+        cs.loadChunkBlocking(cs.getChunkPos(spawn.x, spawn.y));
+        //防御：万一出生点不在可站立位置，向上找安全处兜底
+        this.ensureSafeSpawnPosition();
     }
 
     /**
@@ -228,6 +335,7 @@ public class PlayerSystem extends WorldSystem {
         ChunkSystem cs = getManager().getSystem(ChunkSystem.class);
         float px = this.player.getX();
         float py = this.player.getY();
+        //脚底 = 碰撞箱中心 - 半高（向上搜索可站立格时以脚为准，保证玩家的脚能落在那格上）
         float halfH = this.player.getHeight() / 2f;
         for (int i = 0; i < 64; i++) {
             float checkY = py + i;
@@ -271,7 +379,8 @@ public class PlayerSystem extends WorldSystem {
             return playerResult.result().get();
         }
         Log.error(TAG(), "玩家读取失败！json原文：" + playerJson);
-        return new Player(getWorld(), EntityTypes.PLAYER);
+        //必须经 EntityProvider 创建（实体持有 provider，直接 new 会导致 provider 为 null）
+        return Entities.PLAYER.create(getWorld());
     }
 
 
@@ -280,6 +389,20 @@ public class PlayerSystem extends WorldSystem {
      * */
     public Player getPlayer () {
         return this.player;
+    }
+
+    /**
+     * 设置玩家实体
+     * <p>
+     * 不支持外部随意设置玩家实体，防止出问题，所以是私有方法
+     * */
+    private void setPlayer (Player newPlayer) {
+        if (newPlayer != null) {
+            this.player = newPlayer;
+            if (debugMode) {
+                PlayerDebugger.items(newPlayer);
+            }
+        }
     }
 
     /**

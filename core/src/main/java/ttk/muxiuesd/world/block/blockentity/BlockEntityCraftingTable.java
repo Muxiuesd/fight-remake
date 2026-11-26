@@ -53,7 +53,7 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
 
         InteractSlot interactSlot = this.getSlot(interactGridPos);
         //没有物品就跳过
-        if (interactSlot.getItemStack() == null) return InteractResult.FAILURE;
+        if (interactSlot.getItemStack().isVoid()) return InteractResult.FAILURE;
 
         //输入槽位的交互
         if (interactSlot.getIndex() != OUTPUT_SLOT_INDEX) {
@@ -70,7 +70,7 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
             //就让输入槽位的东西都减一
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack itemStack = inventory.getItemStack(i);
-                if (itemStack == null) continue;
+                if (itemStack.isVoid()) continue;
                 itemStack.amountDecrease(1);
             }
         }
@@ -90,23 +90,25 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
         if (interactSlot == null || interactSlot.getIndex() == OUTPUT_SLOT_INDEX) return InteractResult.FAILURE;
 
         ItemStack slotItemStack = interactSlot.getItemStack();
-        if (slotItemStack == null) {
+        if (slotItemStack.isVoid()) {
             //交互的槽位上本来没有物品
             int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
             interactSlot.setItemStack(handItemStack.split(addAmount));
-        }else {
-            //到这里就是槽位上本来有物品
-            //检测交互槽位的物品是否与手持物品一致
-            if (! handItemStack.equals(slotItemStack)) return InteractResult.FAILURE;
+        }else if (handItemStack.equals(slotItemStack)) {
+            //到这里就是槽位上本来有物品且与手持物品一致（合并放入）
             //按住左Shift就是全部放进来
             int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
             int afterAmount = addAmount + slotItemStack.getAmount();
             int maxCount = slotItemStack.getProperty().getMaxCount();
-            //检查假如把手持的数量全部加进去是否超出限制，超过就重新设为上限值，没超过则还是原本的值
-            if (afterAmount > maxCount) addAmount = maxCount;
+            //检查假如把手持的数量全部加进去是否超出限制，超过就只放入能填满槽位的数量（保证数量守恒）
+            if (afterAmount > maxCount) addAmount = maxCount - slotItemStack.getAmount();
             //按照指定数量增减
             handItemStack.amountDecrease(addAmount);
             slotItemStack.amountIncrease(addAmount);
+        } else {
+            //不同物品：交换（手部物品放入槽位，槽位物品拿回手上）
+            interactSlot.setItemStack(handItemStack);
+            user.setHandItemStack(slotItemStack);
         }
         //记得清理
         user.getBackpack().clear();
@@ -141,14 +143,16 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
             inventory.getItemStack(3), inventory.getItemStack(4), inventory.getItemStack(5),
             inventory.getItemStack(0), inventory.getItemStack(1), inventory.getItemStack(2),
         };
-        CraftingTableRecipe recipe = Registries.CRAFTING_RECIPE_REGISTRY.findRecipe(itemStacks);
+        CraftingTableRecipe recipe = Registries.CRAFTING_RECIPE.findRecipe(itemStacks);
         if (recipe != null) {
             ItemStack output = recipe.getOutput();
             //在输出槽位放对应的输出物品
-            this.setOutputItemStack(output);
+            //必须复制：配方表的输出是全局共享的唯一实例，不能把它的引用直接放进工作台，
+            //否则工作台的输出槽会与配方共享实例互相污染（取出/破坏一个工作台会篡改所有工作台及配方）
+            this.setOutputItemStack(output.copy());
         }else {
             //没有对应的配方，就清空输出槽位
-            this.setOutputItemStack(null);
+            this.setOutputItemStack(ItemStack.VOID);
         }
         //清理一下容器
         inventory.clear();
@@ -164,7 +168,7 @@ public class BlockEntityCraftingTable extends BlockEntity implements Codecable<B
     private void printInventory (Inventory inventory) {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack itemStack = inventory.getItemStack(i);
-            if (itemStack == null) continue;
+            if (itemStack.isVoid()) continue;
             System.out.println(i + " : " + itemStack.getItem() + " : " + itemStack.getAmount());
         }
     }

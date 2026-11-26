@@ -1,11 +1,14 @@
 package ttk.muxiuesd.render.world.item;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
 import ttk.muxiuesd.registry.PropertyTypes;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.util.CurveDrawer;
 import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
@@ -13,13 +16,33 @@ import ttk.muxiuesd.world.entity.ItemEntity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
 import ttk.muxiuesd.world.item.ItemStack;
-import ttk.muxiuesd.world.item.abs.Item;
 import ttk.muxiuesd.world.item.common.ItemFishPole;
 
 /**
  * 钓竿的渲染器
+ * <p>
+ * 持有钓竿的默认贴图与抛竿贴图
  * */
 public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
+    private final Resource<TextureRegion> textureRegionResource;    //默认贴图资源
+    private final TextureRegion castTexture;                        //抛竿贴图
+
+    public FishPoleRenderer () {
+        this.textureRegionResource = Resource.ofTextureRegion(
+            Fight.ID("fish_pole"),
+            Fight.ItemTexturePath("fish_pole.png")
+        );
+        this.castTexture = Util.loadTextureRegion(
+            Fight.ID("fish_pole_cast"),
+            Fight.ItemTexturePath("fish_pole_cast.png")
+        );
+    }
+
+    @Override
+    public TextureRegion getTextureRegion () {
+        return this.textureRegionResource.get();
+    }
+
     @Override
     public void drawOnHand (Batch batch, Context context, LivingEntity<?> holder, ItemStack itemStack) {
         ItemFishPole fishPole = (ItemFishPole) itemStack.getItem();
@@ -30,14 +53,14 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(fishPole.getTextureRegion(),
+                batch.draw(getTextureRegion(),
                     renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     rotation + 180);
             } else {
-                batch.draw(fishPole.getTextureRegion(),
+                batch.draw(getTextureRegion(),
                     renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
@@ -45,19 +68,18 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
                     rotation);
             }
         }else {
-            //if (fishPole.castTexture == null) return;
             //抛竿渲染
             Direction direction = holder.getDirection();
             float rotation = MathUtils.atan2Deg360(direction.getY(), direction.getX());
             if (rotation > 90f && rotation <= 270f) {
-                batch.draw(fishPole.castTexture,
+                batch.draw(this.castTexture,
                     renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
                     - context.scaleX, context.scaleY,
                     rotation + 225f);
             } else {
-                batch.draw(fishPole.castTexture,
+                batch.draw(this.castTexture,
                     renderStartPos.x , renderStartPos.y ,
                     context.originX, context.originY,
                     context.width, context.height,
@@ -69,8 +91,7 @@ public class FishPoleRenderer implements ItemRenderer<ItemFishPole> {
 
     @Override
     public void drawOnItemEntity (Batch batch, Context context, ItemEntity itemEntity) {
-        Item item = itemEntity.getItemStack().getItem();
-        batch.draw(item.getTextureRegion(),
+        batch.draw(getTextureRegion(),
             context.x, context.y + itemEntity.getPositionOffset().y,
             context.originX, context.originY,
             context.width, context.height,

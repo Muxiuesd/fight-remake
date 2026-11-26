@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 /**
  * 注册器组管理器，这个类管理着游戏内所有的注册器
  * */
+@Deprecated
 public class RegistrantGroup {
     public static final String TAG = RegistrantGroup.class.getName();
 

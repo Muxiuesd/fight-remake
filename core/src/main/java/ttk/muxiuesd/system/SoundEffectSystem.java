@@ -13,8 +13,8 @@ import ttk.muxiuesd.system.abs.WorldSystem;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.player.Player;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;

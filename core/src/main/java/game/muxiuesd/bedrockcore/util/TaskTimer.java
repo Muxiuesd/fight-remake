@@ -21,7 +21,7 @@ public class TaskTimer extends Timer<TaskTimer> {
     }
 
     /**
-     * 检查是否到时间，如果到时间时返回true并且自动归零，同时给定的执行任务
+     * 检查是否到时间，如果到时间时返回true并且自动归零，同时执行给定的执行任务
      * */
     @Override
     public boolean isReady () {

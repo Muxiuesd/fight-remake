@@ -1,16 +1,20 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.system.PlayerSystem;
 import ttk.muxiuesd.ui.PlayerHotbarUIPanel;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.entity.Backpack;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
 
 /**
  * 快捷栏槽位UI组件
@@ -33,7 +37,9 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
     }
 
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键点击切换选中的快捷栏槽位
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         getPlayerSystem().getPlayer().setHandIndex(this.getIndex());
 
         return false;
@@ -56,9 +62,18 @@ public class HotbarPlayerSlotUI extends PlayerSlotUI {
 
             Backpack backpack = player.getBackpack();
             ItemStack itemStack = backpack.getItemStack(getIndex());
-            if (itemStack != null) {
-                //TODO 调用物品的渲染器
-                batch.draw(itemStack.getItem().getTextureRegion(), renderX + 2, renderY + 3, 16f, 16f);
+            if (!itemStack.isVoid()) {
+                Item item = itemStack.getItem();
+                ItemRenderer<Item> renderer = ItemRendererRegistry.get(item);
+                //渲染器未注册（可能返回null）时不绘制该物品，避免崩溃
+                if (renderer != null) {
+                    ItemRenderer.Context context = renderer.getContext(
+                        renderX + 2, renderY + 3,
+                        16f, 16f
+                    );
+                    renderer.draw(batch, context, itemStack);
+                    renderer.freeContext(context);
+                }
                 int amount = itemStack.getAmount();
                 if (amount > 1) drawAmount(batch, parent, renderX, renderY, amount);
             }

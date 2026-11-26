@@ -1,5 +1,6 @@
 package ttk.muxiuesd;
 
+import com.badlogic.gdx.math.MathUtils;
 import ttk.muxiuesd.util.Info;
 
 public class Fight {
@@ -10,10 +11,11 @@ public class Fight {
     public static final String SOUND_ROOT = AUDIO_ROOT + "sound/";
     public static final String TEXTURE_ROOT = "texture/";
     public static final String BLOCK_TEXTURE_ROOT   = TEXTURE_ROOT + "blocks/";
-    public static final String BOTANY_TEXTURE_ROOT   = TEXTURE_ROOT + "botany/";
+    public static final String ATTACHMENT_TEXTURE_ROOT   = BLOCK_TEXTURE_ROOT + "attachment/";
     public static final String ENTITY_TEXTURE_ROOT  = TEXTURE_ROOT + "entity/";
     public static final String ITEM_TEXTURE_ROOT    = TEXTURE_ROOT + "item/";
     public static final String UI_TEXTURE_ROOT      = TEXTURE_ROOT + "ui/";
+    public static final String PARTICLE_TEXTURE_ROOT = TEXTURE_ROOT + "particle/";
     public static final String FONT_ROOT = "font/";
     public static final String LANG_ROOT = "lang/";
 
@@ -31,12 +33,28 @@ public class Fight {
     //掉落物可以被捡起来的cd，单位：秒
     public static final Info<Float> ITEM_ENTITY_PICKUP_SPAN = Info.create("item_entity_pickup_span", 2f);
     //玩家视野，单位：区块
-    public static final Info<Integer> PLAYER_VISUAL_RANGE = Info.create("player_vision", 4);
+    public static final Info<Integer> PLAYER_VISUAL_RANGE = Info.create("player_vision", 16);
 
     //实体渲染距离，与玩家距离超过这个值的实体不渲染
     public static final Info<Float> ENTITY_RENDER_RANGE = Info.create("entity_render_range", 20f);
     //实体更新距离，与玩家距离超过这个值的实体不更新
     public static final Info<Float> ENTITY_UPDATE_RANGE = Info.create("entity_update_range", 32f);
+    //空气摩擦力(不是空气方块的摩擦力，注意区分)
+    public static final Info<Float> AIR_FRICTION= Info.create("air_friction", 0.03f);
+    //方块被破坏后掉落物的最小速度
+    public static final Info<Float> BLOCK_DROP_ITEM_ENTITY_MIN_SPEED = Info.create("block_drop_item_entity_min_speed", 0.25f);
+    //方块被破坏后掉落物的最大速度
+    public static final Info<Float> BLOCK_DROP_ITEM_ENTITY_MAX_SPEED = Info.create("block_drop_item_entity_max_speed", 0.55f);
+    /**
+     * 获取方块破坏后掉落物的随机速度
+     * */
+    public static float getBlockDropItemEntityRandomSpeed () {
+        return MathUtils.random(
+            BLOCK_DROP_ITEM_ENTITY_MIN_SPEED.getValue(),
+            BLOCK_DROP_ITEM_ENTITY_MAX_SPEED.getValue()
+        );
+    }
+
 
     /**
      * 存档路径常量
@@ -46,6 +64,10 @@ public class Fight {
     public static final String PATH_SAVE_CHUNKS = "chunks/";
     public static final String PATH_SAVE_ENTITIES = "entities/";
     public static final String PATH_SAVE_PLAYER = "player/";
+
+    /// 玩家出生点（世界坐标，作为存档属性；随世界信息读写，可后续修改）
+    public static final Info<Float> SPAWN_X = Info.create("spawn_x", 0f);
+    public static final Info<Float> SPAWN_Y = Info.create("spawn_y", 0f);
 
     /**
      *  获取玩家数据保存的路径
@@ -93,10 +115,10 @@ public class Fight {
     }
 
     /**
-     * 从植物的材质根路径中获取植物的材质
+     * 从附着物的材质根路径中获取附着物的材质
      * */
-    public static String BotanyTexturePath (String path) {
-        return BOTANY_TEXTURE_ROOT + path;
+    public static String AttachmentTexturePath (String path) {
+        return ATTACHMENT_TEXTURE_ROOT + path;
     }
 
     public static String EntityTexturePath (String path) {
@@ -108,6 +130,13 @@ public class Fight {
     }
 
     public static String UITexturePath (String path) { return UI_TEXTURE_ROOT + path; }
+
+    /**
+     * 从粒子的材质根路径中获取粒子的材质
+     * */
+    public static String ParticleTexturePath (String path) {
+        return PARTICLE_TEXTURE_ROOT + path;
+    }
 
     public static String FontPath (String path) {
         if (path.endsWith(".ttf")) return FONT_ROOT + path;

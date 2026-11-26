@@ -220,13 +220,13 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
     private void initSlots () {
         this.createSlots = new Array<>();
 
-        float trueHeight = SlotUI.SLOT_HEIGHT + 2;
-        float trueWidth = SlotUI.SLOT_WIDTH + 2;
+        float trueHeight = SlotUI.SLOT_HEIGHT;
+        float trueWidth = SlotUI.SLOT_WIDTH;
         float deltaY = this.getItemTabBackgroundRenderDeltaY();
 
         //快捷栏槽位
         for (int index = 0; index < 9; index++) {
-            addComponent(new PlayerSlotUI(getPlayerSystem(), index, 9 + (index * trueWidth), 8 + deltaY));
+            addComponent(new PlayerSlotUI(getPlayerSystem(), index, 8 + (index * trueWidth), 7 + deltaY));
         }
 
         //创造槽位
@@ -235,8 +235,8 @@ public class PlayerCreateTabUIPanel extends PlayerItemSlotsUIPanel {
             for (int x = 0; x < 9; x++) {
                 this.addCreateSlotUI(
                     new CreateSlotUI(
-                        9 + (x * trueWidth),
-                        102 - y * trueHeight + deltaY)
+                        8 + (x * trueWidth),
+                        101 - y * trueHeight + deltaY)
                         .setIndex(slotIndex)
                 );
                 slotIndex++;

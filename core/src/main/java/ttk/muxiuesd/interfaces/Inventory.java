@@ -11,20 +11,73 @@ import java.util.function.Supplier;
 
 /**
  * 容器接口
+ * <p>
+ * 实现类只需提供存储相关方法（{@link #getItemStack}/{@link #setItemStack}/
+ * {@link #setSize}/{@link #getSize}/{@link #getCapacity}/{@link #clear(int)}），
+ * 即获得完整的容器行为（添加/丢弃/拾取/清理/更新）
  * */
 public interface Inventory {
 
     /**
      * 丢出物品
+     * @return 若有东西可丢则是被丢出来的物品堆叠，没有东西可丢则是空物品堆叠
      * */
-    ItemStack dropItem (int index, int amount);
+    default ItemStack dropItem (int index, int amount) {
+        ItemStack itemStack = this.getItemStack(index);
+        if (itemStack.isVoid()) return ItemStack.VOID;
+        if (amount <= 0) return ItemStack.VOID;
+
+        //全部数量丢出，若传的数量大于则算全部丢出
+        if (amount >= itemStack.getAmount()) {
+            return this.clear(index);
+        }
+        //非全部数量丢出
+        itemStack.setAmount(itemStack.getAmount() - amount);
+        return new ItemStack(itemStack.getItem(), amount);
+    }
 
     /**
      * 添加物品
-     * <p>
-     * @return 返回被添加后的物品堆叠，若全部被添加则返回null
+     * @return 返回被添加后的物品堆叠，若全部被添加则返回空物品堆叠
      * */
-    ItemStack addItem (ItemStack itemStack);
+    default ItemStack addItem (ItemStack itemStack) {
+        if (this.isFull(itemStack)) return itemStack;
+
+        //尝试合并到已有的堆叠（物品与属性全等才合并）
+        for (int i = 0; i < this.getSize(); ++i) {
+            ItemStack stack = this.getItemStack(i);
+            if (!stack.isVoid() && !stack.isFull() && stack.equals(itemStack)) {
+                int newAmount = stack.getAmount() + itemStack.getAmount();
+                int maxCount = stack.getItem().getProperty().getMaxCount();
+                if (newAmount <= maxCount) {
+                    stack.setAmount(newAmount);
+                    return ItemStack.VOID;
+                } else {
+                    //合并到上限后剩余部分继续与其他堆叠合并或放入空位
+                    stack.setAmount(maxCount);
+                    itemStack.setAmount(newAmount - maxCount);
+                }
+            }
+        }
+
+        //查找空位，然后把物品堆叠放进去
+        for (int i = 0; i < this.getSize(); ++i) {
+            if (this.getItemStack(i).isVoid()) {
+                this.setItemStack(i, itemStack);
+                return ItemStack.VOID;
+            }
+        }
+
+        return itemStack;
+    }
+
+    /**
+     * 捡起物品
+     * @return 返回被捡起来后的物品堆叠，若全部被捡起来则返回空物品堆叠
+     * */
+    default ItemStack pickUpItem (ItemStack itemStack) {
+        return this.addItem(itemStack);
+    }
 
     /**
      * 清除物品
@@ -37,8 +90,33 @@ public interface Inventory {
     default void clear () {
         for (int i = 0;i < this.getSize();i++){
             ItemStack itemStack = this.getItemStack(i);
-            if (itemStack != null && itemStack.getAmount() == 0){
+            if (!itemStack.isVoid() && itemStack.getAmount() == 0){
                 clear(i);
+            }
+        }
+    }
+
+    /**
+     * 清除指定的物品堆叠（引用匹配，只清除第一个持有该实例的槽位）
+     * @return 若被清除的槽位有物品，则返回被清除的物品；没有则返回空物品堆叠
+     * */
+    default ItemStack clear (ItemStack itemStack) {
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getItemStack(i) == itemStack) {
+                return this.clear(i);
+            }
+        }
+        return ItemStack.VOID;
+    }
+
+    /**
+     * 更新容器内所有物品堆叠
+     * */
+    default void update (float delta) {
+        for (int i = 0; i < this.getSize(); i++) {
+            ItemStack itemStack = this.getItemStack(i);
+            if (!itemStack.isVoid()) {
+                itemStack.update(delta);
             }
         }
     }
@@ -79,7 +157,7 @@ public interface Inventory {
         for (int index = 0; index < this.getSize(); index++) {
             ItemStack stack = this.getItemStack(index);
             //还有空位说明没装满
-            if (stack == null) return false;
+            if (stack.isVoid()) return false;
             if (stack.getItem() == itemStack.getItem()
                 && stack.getAmount() < stack.getProperty().getMaxCount()) {
                 //如果有相同的物品堆叠并且容器里的物品堆叠数量并没有达到最大值，也不算满
@@ -122,7 +200,8 @@ public interface Inventory {
             Map<String, Object> items = new LinkedHashMap<>();
             for (int i = 0; i < backpack.getSize(); i++) {
                 ItemStack stack = backpack.getItemStack(i);
-                if (stack != null) {
+                //空堆叠不序列化（VOID 的 item 为 null，编码会 NPE）
+                if (!stack.isVoid()) {
                     items.put(String.valueOf(i), ItemStack.CODEC.encode(stack).unwrap());
                 }
             }

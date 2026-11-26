@@ -48,4 +48,17 @@ public class EventBus {
         }
         eventHandlersTable.get(eventType).addEvent(event);
     }
+
+    /**
+     * 取消订阅事件（按事件实例，引用匹配）
+     * <p>
+     * 世界销毁时应取消其订阅的事件实例，防止全局事件总线累积重复订阅导致事件多次触发
+     * */
+    public static <T extends Event> void unsubscribe (String eventType, T event) {
+        if (! eventHandlersTable.containsKey(eventType)) {
+            Log.error(TAG, "事件类型：" + eventType + " 不存在，无法取消订阅！！！");
+            return;
+        }
+        eventHandlersTable.get(eventType).removeEvent(event);
+    }
 }

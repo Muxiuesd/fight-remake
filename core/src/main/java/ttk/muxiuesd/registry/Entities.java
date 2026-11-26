@@ -1,24 +1,30 @@
 package ttk.muxiuesd.registry;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.EntityRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.entity.*;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Bullet;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.entity.creature.Chicken;
 import ttk.muxiuesd.world.entity.creature.PufferFish;
 import ttk.muxiuesd.world.entity.enemy.EntityTarget;
 import ttk.muxiuesd.world.entity.enemy.Slime;
+import ttk.muxiuesd.world.entity.enemy.Zombie;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
- * 所有实体的注册
+ * 游戏内所有实体的注册
+ * <p>
+ * 实体的注册是以它的Provider形式注册，相当于注册了它的工厂，工厂内的属性在注册阶段写定
  * */
 public final class Entities {
     public static void init () {}
@@ -46,7 +52,7 @@ public final class Entities {
         "slime",
         EntityProvider.Builder.<Slime>create(Slime::new)
             .setDefaultType(EntityTypes.ENEMY)
-            .setRenderer(EnemyRenderer::new)
+            .setRenderer(() -> new EnemyRenderer<>(Fight.ID("slime"), "enemy/slime.png"))
             .setCodec(Slime.CODEC)
             .build()
     );
@@ -55,7 +61,16 @@ public final class Entities {
         "target",
         EntityProvider.Builder.<EntityTarget>create(EntityTarget::new)
             .setDefaultType(EntityTypes.ENEMY)
-            .setRenderer(EnemyRenderer::new)
+            .setRenderer(() -> new EnemyRenderer<>(Fight.ID("fish"), "fish/fish.png"))
+            .setCodec(LivingEntity.CODEC)
+            .build()
+    );
+
+    public static final EntityProvider<Zombie> ZOMBIE = register(
+        "zombie",
+        EntityProvider.Builder.<Zombie>create(Zombie::new)
+            .setDefaultType(EntityTypes.ENEMY)
+            .setRenderer(() -> new EnemyRenderer<>(Fight.ID("zombie"), "enemy/zombie.png"))
             .setCodec(LivingEntity.CODEC)
             .build()
     );
@@ -65,7 +80,24 @@ public final class Entities {
         "puffer_fish",
         EntityProvider.Builder.<PufferFish>create(PufferFish::new)
             .setDefaultType(EntityTypes.CREATURE)
-            .setRenderer(LivingEntityRenderer::new)
+            .setRenderer(() -> new LivingEntityRenderer<>(Fight.ID("puffer_fish"), "fish/puffer_fish.png"))
+            .setCodec(LivingEntity.CODEC)
+            .build()
+    );
+    public static final EntityProvider<Chicken> CHICKEN = register(
+        "chicken",
+        EntityProvider.Builder.<Chicken>create(Chicken::new)
+            .setDefaultType(EntityTypes.CREATURE)
+            //鸡的贴图是朝右画的：实体朝左时水平镜像绘制
+            .setRenderer(() -> {
+                Resource<TextureRegion> bodyResource = Resource.ofTextureRegion(
+                    Fight.ID("chicken"), Fight.EntityTexturePath("chicken/chicken.png"));
+                //这里显式写出活物渲染器的实体类型，避免链式调用时被推断成 LivingEntity<?>
+                LivingEntityRenderer<Chicken> renderer = new LivingEntityRenderer<>(
+                    Fight.ID("chicken"), "chicken/chicken.png",
+                    Resource.ofFlippedTextureRegion(bodyResource));
+                return renderer.setFlipWhenFacing(true);
+            })
             .setCodec(LivingEntity.CODEC)
             .build()
     );
@@ -95,7 +127,7 @@ public final class Entities {
      * 最基础的实体注册
      * */
     public static <T extends Entity<T>> EntityProvider<T> register (String name, EntityProvider<T> provider) {
-        Identifier identifier = new Identifier(Fight.NAMESPACE, name);
+        Identifier identifier = Identifier.of(Fight.NAMESPACE, name);
         Registries.ENTITY.register(identifier, provider.setIdentifier(identifier));
         EntityRendererRegistry.register(provider, provider.renderer);
         return provider;

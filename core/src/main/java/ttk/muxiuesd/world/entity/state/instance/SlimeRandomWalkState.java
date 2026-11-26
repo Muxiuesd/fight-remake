@@ -34,12 +34,12 @@ public class SlimeRandomWalkState extends StateEnemy<Slime> {
             ()->{
                 //还在游走状态;
                 //设置速度（位移由 GroundEntityCollisionSystem 统一处理）
-                float curSpeed = entity.getCurSpeed();
+                //速度用基准速度（意图），实际速度由摩擦系统统一缩放
                 //walkDistance 是位移矢量，需归一化成方向再乘速度，避免速度被放大 1.5~2.5 倍
                 Vector2 direction = new Vector2(this.walkDistance).nor();
                 entity.setVelocity(
-                    direction.x * curSpeed,
-                    direction.y * curSpeed
+                    direction.x * entity.getSpeed(),
+                    direction.y * entity.getSpeed()
                 );
             }
         );

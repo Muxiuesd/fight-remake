@@ -14,13 +14,13 @@ public class ConvPool<T> {
 
     public <P extends Pool<T>> ConvPool (Class<T> clazz, P pool) {
         this.clazz = clazz;
-        PoolsManager.getInstance().addPool(pool);
+        PoolsManager.getInstance().addPool(this.clazz, pool);
     }
 
     public ConvPool (DefaultPool.PoolSupplier supplier) {
         Object object = supplier.get();
         this.clazz = (Class<T>) object.getClass();
-        PoolsManager.getInstance().addPool(supplier);
+        PoolsManager.getInstance().addPool(this.clazz, supplier);
     }
 
     /**

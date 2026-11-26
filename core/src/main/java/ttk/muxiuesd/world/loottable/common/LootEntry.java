@@ -1,0 +1,125 @@
+package ttk.muxiuesd.world.loottable.common;
+
+import com.badlogic.gdx.math.MathUtils;
+import ttk.muxiuesd.world.item.ItemStack;
+import ttk.muxiuesd.world.item.abs.Item;
+
+import java.util.function.Supplier;
+
+/**
+ * 战利品条目
+ * <p>
+ * 通用战利品表的随机条目，持有掉落模板 {@link ItemStack}，支持权重与随机数量。
+ * 组（互斥关系）由 {@link LootGroup} 承担，条目自身不持有分组信息
+ * */
+public class LootEntry implements Supplier<ItemStack> {
+    private ItemStack itemStack;    //掉落模板：物品 + 数量 + 属性
+    private int minAmount;          // 最小数量
+    private int maxAmount;          // 最大数量
+    private float weight;           // 掉落权重
+
+    private LootEntry (ItemStack itemStack, int minAmount, int maxAmount, float weight) {
+        this.itemStack = itemStack;
+        this.minAmount = minAmount;
+        this.maxAmount = maxAmount;
+        this.weight = weight;
+    }
+
+    /* ---------- 固定数量：数量 = itemStack 的 amount ---------- */
+
+    /**
+     * 从物品堆叠构建，掉落的数量固定为堆叠的数量
+     * */
+    public static LootEntry of (ItemStack itemStack, float weight) {
+        return new LootEntry(itemStack, itemStack.getAmount(), itemStack.getAmount(), weight);
+    }
+
+    /**
+     * 从物品构建，掉落的数量固定为 1
+     * */
+    public static LootEntry of (Item item, float weight) {
+        return of(new ItemStack(item, 1), weight);
+    }
+
+    /* ---------- 随机数量 ---------- */
+
+    /**
+     * 从物品堆叠构建，掉落的数量在最小与最大之间随机
+     * */
+    public static LootEntry of (ItemStack itemStack, int minAmount, int maxAmount, float weight) {
+        return new LootEntry(itemStack, minAmount, maxAmount, weight);
+    }
+
+    /**
+     * 从物品构建，掉落的数量在最小与最大之间随机
+     * */
+    public static LootEntry of (Item item, int minAmount, int maxAmount, float weight) {
+        return of(new ItemStack(item, 1), minAmount, maxAmount, weight);
+    }
+
+
+    /**
+     * 获取物品堆叠（copy过的副本）
+     * <p>
+     * 随机到的最小数量可能为 0，此时返回空堆叠 {@link ItemStack#VOID} 表示不掉落该物品。
+     * 不能直接调用 {@link ItemStack#copy(int)}——它会把数量 0 强制抬升为 1
+     * */
+    @Override
+    public ItemStack get () {
+        //空条目：模板本身就是 VOID，这是战利品表表达"这一抽什么都不掉"的方式（如鸡的 9:1 空掉落）。
+        //VOID 没有属性，copy() 会空指针，所以这里直接返回空堆叠，由调用方跳过
+        if (this.itemStack.isVoid()) return ItemStack.VOID;
+        //数量没写死区间时按区间随机；写死了就用写死的那个数，别去读模板数量
+        //（模板数量恒为 1，写成 LootEntry.of(item, 3, 3, 1f) 会错误地只掉 1 个）
+        int amount = this.minAmount == this.maxAmount
+            ? this.minAmount
+            : MathUtils.random(this.minAmount, this.maxAmount);
+        //数量为 0：不掉落该物品
+        if (amount <= 0) return ItemStack.VOID;
+        //复制模板（含属性），避免生成物之间的互相污染，也避免污染战利品表本身
+        return this.itemStack.copy(amount);
+    }
+
+    public ItemStack getItemStack () {
+        return itemStack;
+    }
+
+    public LootEntry setItemStack (ItemStack itemStack) {
+        this.itemStack = itemStack;
+        return this;
+    }
+
+    /**
+     * 随机数量
+     * */
+    public int getRandomAmount () {
+        return MathUtils.random(minAmount, maxAmount);
+    }
+
+    public int getMinAmount () {
+        return minAmount;
+    }
+
+    public LootEntry setMinAmount (int minAmount) {
+        this.minAmount = minAmount;
+        return this;
+    }
+
+    public int getMaxAmount () {
+        return maxAmount;
+    }
+
+    public LootEntry setMaxAmount (int maxAmount) {
+        this.maxAmount = maxAmount;
+        return this;
+    }
+
+    public float getWeight () {
+        return weight;
+    }
+
+    public LootEntry setWeight (float weight) {
+        this.weight = weight;
+        return this;
+    }
+}

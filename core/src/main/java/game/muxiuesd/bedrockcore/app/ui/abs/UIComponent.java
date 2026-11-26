@@ -73,9 +73,10 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
     /**
      * 鼠标点击这个UI组件调用
      * @param interactPos 鼠标点击这个UI组件的交互区域的坐标位置
+     * @param button 按下的是哪个鼠标按键（Input.Buttons.LEFT / Input.Buttons.RIGHT）
      * @return 是否具有传递性，比如这个组件位于另一个组件之上，有传递性则执行完这个组件的方法后继续下一个组件的方法
      * */
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
         //默认不具有传递性
         return false;
     }
@@ -219,16 +220,32 @@ public abstract class UIComponent implements Updateable, GUIDrawable, ShapeRende
 
     /**
      * 根据指定的父组件来获取x
+     * <p>
+     * 递归累加所有父级的偏移，与 {@link #getAbsX()} 语义一致
      * */
     public float getX (UIComponent component) {
-        return component != null ? this.getX() + component.getX() : this.getX();
+        float x = this.getX();
+        UIComponent parent = component;
+        while (parent != null && parent != UIPanel.VOID_INSTANCE) {
+            x += parent.getX();
+            parent = parent.getParentPanel();
+        }
+        return x;
     }
 
     /**
      * 根据指定的父组件来获取y
+     * <p>
+     * 递归累加所有父级的偏移，与 {@link #getAbsY()} 语义一致
      * */
     public float getY (UIComponent component) {
-        return component != null ? this.getY() + component.getY() : this.getY();
+        float y = this.getY();
+        UIComponent parent = component;
+        while (parent != null && parent != UIPanel.VOID_INSTANCE) {
+            y += parent.getY();
+            parent = parent.getParentPanel();
+        }
+        return y;
     }
 
     public Vector2 getSize() {

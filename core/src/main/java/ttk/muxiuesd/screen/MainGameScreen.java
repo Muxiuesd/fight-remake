@@ -34,19 +34,28 @@ public class MainGameScreen implements Screen {
     @Override
     public void show() {
         //初始化注册游戏世界内的元素
+        //注意：Items 的静态字段引用了 Blocks、Walls、Entities、StatusEffects、Sounds，
+        //必须确保这些注册表在 Items 之前完成类加载（init 触发类加载 → 静态字段初始化）
         Pools.init();
+        //装备类型是纯数据注册（无贴图/音效等 GL 依赖），但必须在 Items 之前完成：
+        //Items 的静态字段初始化时就会构造 EquipmentItem（引用 EquipmentTypes.HELMET 等）
+        EquipmentTypes.init();
         EventTypes.init();
         Sounds.init();
         BlockEntities.init();
         Blocks.init();
         Walls.init();
-        Items.init();
         EntityTypes.init();
         Entities.init();
         StatusEffects.init();
+        Items.init();
         WorldInfoTypes.init();
         ItemGroups.init();
         CraftingRecipes.init();
+        BlockDropLootTables.init();
+        EntityDeathLootTables.init();
+        FishingLootTables.init();
+        AttachmentPlacements.init();
 
         MainWorld mainWorld = new MainWorld(this);
         //游戏世界的渲染处理器注册
@@ -140,6 +149,12 @@ public class MainGameScreen implements Screen {
     public void dispose() {
         this.unregisterWorldRenderProcessors();
         this.world.dispose();
+
+        //清除 GUI 渲染处理器对本世界的引用（P-C14）：
+        //GUI 处理器是全局常驻的渲染处理器，若不清理，回主菜单后每帧仍会对已 dispose 的世界
+        //执行 LightSystem.afterProcess()（用退出时世界的夜晚环境色做乘法混合），
+        //导致主菜单背景被染成"世界夜晚亮度"
+        FightCore.getInstance().guiRenderProcessor.setMainGameScreen(null);
     }
 
     public World getWorld() {

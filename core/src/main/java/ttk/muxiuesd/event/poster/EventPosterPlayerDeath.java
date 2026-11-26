@@ -2,7 +2,7 @@ package ttk.muxiuesd.event.poster;
 
 import ttk.muxiuesd.event.EventPoster;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 
 public class EventPosterPlayerDeath extends EventPoster {
     public final World world;

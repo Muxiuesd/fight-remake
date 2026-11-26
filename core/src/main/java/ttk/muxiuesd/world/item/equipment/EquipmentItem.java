@@ -5,8 +5,9 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
 import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.ui.text.Text;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
 
@@ -15,41 +16,34 @@ import ttk.muxiuesd.world.item.abs.Item;
  * TODO 装备的装备属性效果
  * */
 public class EquipmentItem extends Item {
-    /// 装备类型
-    public enum Type{
-        HELMET,     //头盔
-        CHESTPLATE, //胸甲
-        LEGGINGS,   //腿甲
-        BOOTS,      //靴子
-        OTHERS      //其他类型
+    /// 本装备物品持有的装备类型（注册实例），由 Builder 在构造时注入，之后不可改
+    private final EquipmentType equipmentType;
+
+    public EquipmentItem (EquipmentType equipmentType, Property property) {
+        super(property);
+        this.equipmentType = equipmentType;
     }
 
     /**
-     * 创建默认的装备属性类
+     * 获取本装备持有的装备类型
+     * <p>
+     * 装备槽位持有的也是"注册实例"，两者是同一实例时该装备才能放入该槽位。
      * */
-    public static Property createDefaultProperty () {
-        return new Property()
-            .add(PropertyTypes.ITEM_MAX_COUNT, 1)
-            .add(PropertyTypes.ITEM_ON_USING, false)
-            .add(PropertyTypes.ITEM_USE_SOUND, Sounds.EQUIP)
-            .add(PropertyTypes.DAMAGE_REDUCTION, 1.145f);
+    public EquipmentType getEquipmentType () {
+        return this.equipmentType;
     }
 
-    //装备的类型
-    public final EquipmentItem.Type equipmentType;
-
-    public EquipmentItem (EquipmentItem.Type equipmentType, Property property, String textureName) {
-        this(equipmentType, property, Fight.ID(textureName), Fight.ItemTexturePath(textureName + ".png"));
-    }
-
-    public EquipmentItem (EquipmentItem.Type equipmentType, Property property, String textureId, String texturePath) {
-        super(Item.Type.EQUIPMENT, property, textureId, texturePath);
-        this.equipmentType = equipmentType;
+    @Override
+    public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
+        //能走到这里说明装备类型的装备槽位已经找到、装备已经换好了（见 EquipmentItemStackBehaviour#use）
+        //物品默认的 use 不播音效也不报成功，所以这里自己补上
+        this.playUseSound(world, user);
+        return true;
     }
 
     @Override
     public Array<Text> getTooltips (Array<Text> array, ItemStack itemStack) {
-        array.add(Text.of("减伤度：" + itemStack.getProperty().get(PropertyTypes.DAMAGE_REDUCTION)));
+        array.add(Text.ofText(Fight.ID("damage_reduction")).set(0, itemStack.getProperty().get(PropertyTypes.DAMAGE_REDUCTION)));
         return super.getTooltips(array, itemStack);
     }
 

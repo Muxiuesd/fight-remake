@@ -3,10 +3,11 @@ package ttk.muxiuesd.world.entity.abs;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.serialization.codecs.builders.EntityCodecBuilder;
 import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatFloat;
 import ttk.muxiuesd.world.cat.CatsHolder;
@@ -26,8 +27,6 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
      */
     public static final Codec<Bullet<?>> CODEC = EntityCodecBuilder.<Bullet<?>>create()
         .field("damage", Bullet::getDamage, Bullet::setDamage, Codec.FLOAT)
-        .field("maxLiveTime", Bullet::getMaxLiveTime, Bullet::setMaxLiveTime, Codec.FLOAT)
-        .field("liveTime", Bullet::getLiveTime, Bullet::setLiveTime, Codec.FLOAT)
         .factory(EntityCodecBuilder::createEntity);
 
     public Entity<?> owner;
@@ -35,6 +34,7 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     public float damage;
     private float maxLiveTime;  // 最大存活时间
     private float liveTime; // 已存活时间
+    private String textureId;   // 贴图id（数据，贴图资源实例由渲染器持有并按需加载）
 
     public Bullet (World world, EntityType<?> entityType) {
         super(world, entityType);
@@ -69,7 +69,11 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
         setSpeed(speed);
         this.maxLiveTime = maxLiveTime;
         this.liveTime = initLiveTime;
-        setBodyTextureRegionResource(textureId, texturePath);
+        this.textureId = textureId;
+        if (textureId != null && texturePath != null) {
+            //只注册 id→路径 映射（数据），贴图资源实例由渲染器按需加载缓存
+            Util.registerTextureIdPath(textureId, Fight.EntityTexturePath(texturePath));
+        }
         //默认大小
         setSize(0.5f, 0.5f);
         fastAddBodyHitBox();
@@ -77,10 +81,10 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.maxLiveTime = values.getFloat("maxLiveTime", this.maxLiveTime);
-        this.liveTime = values.getFloat("liveTime", this.liveTime);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.maxLiveTime = holder.getFloat("maxLiveTime", this.maxLiveTime);
+        this.liveTime = holder.getFloat("liveTime", this.liveTime);
     }
 
     @Override
@@ -93,11 +97,6 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
     @Override
     public void update (float delta) {
         this.setLiveTime(this.getLiveTime() + delta);
-
-        //空气阻力：子弹不受方块摩擦影响，速度只随空气阻力逐渐衰减
-        float drag = (float) Math.pow(AIR_DRAG_PER_SECOND, delta);
-        this.setVelX(this.getVelX() * drag);
-        this.setVelY(this.getVelY() * drag);
 
         // 位移由 BulletCollisionSystem 统一处理（含墙体碰撞与 CCD 分步）
         super.update(delta);
@@ -122,6 +121,13 @@ public abstract class Bullet<T extends Bullet<T>> extends Entity<T> {
 
     public float getDamage () {
         return damage;
+    }
+
+    /**
+     * 获取子弹的贴图id（贴图资源实例由渲染器持有）
+     * */
+    public String getTextureId () {
+        return this.textureId;
     }
 
     public Bullet setDamage (float damage) {

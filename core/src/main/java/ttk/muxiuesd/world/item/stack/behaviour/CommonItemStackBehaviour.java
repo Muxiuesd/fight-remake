@@ -20,13 +20,10 @@ public class CommonItemStackBehaviour extends HasDurationItemStackBehaviour {
 
     @Override
     public boolean hasDuration (World world, LivingEntity<?> user, ItemStack itemStack) {
-        //有耐久直接使用
-        itemStack.getItem().use(itemStack, world, user);
+        //有耐久直接使用，使用失败则不扣耐久
+        if (!itemStack.getItem().use(itemStack, world, user)) {
+            return false;
+        }
         return super.hasDuration(world, user, itemStack);
-    }
-
-    @Override
-    public boolean noDuration (World world, LivingEntity<?> user, ItemStack itemStack) {
-        return super.noDuration(world, user, itemStack);
     }
 }

@@ -14,9 +14,29 @@ public class FoodItemGroup {
         .build()
         .selfAction(group -> {
         group
+            //素类
+            .add(Items.POTATO)
+            .add(Items.POTATO_BAKED)
+            .add(Items.SEEDS_WHEAT)
+            .add(Items.WHEAT)
+            .add(Items.BREAD)
+
+            //肉类
             .add(Items.FISH)
             .add(Items.PUFFER_FISH)
-            .add(Items.POTATO)
+            .add(Items.CHICKEN_RAW)
+            .add(Items.CHICKEN_COOKED)
+
+            //药水
+            .add(Items.POTION_HEAL_LEVEL_1)
+            .add(Items.POTION_HEAL_LEVEL_2)
+            .add(Items.POTION_HEAL_LEVEL_3)
+            .add(Items.POTION_POISON_LEVEL_1)
+            .add(Items.POTION_POISON_LEVEL_2)
+            .add(Items.POTION_POISON_LEVEL_3)
+            .add(Items.POTION_MOVE_SPEED_LEVEL_1)
+            .add(Items.POTION_MOVE_SPEED_LEVEL_2)
+            .add(Items.POTION_MOVE_SPEED_LEVEL_3)
         ;
     });
 }

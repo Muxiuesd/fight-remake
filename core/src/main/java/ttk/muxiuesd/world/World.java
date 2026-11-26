@@ -9,6 +9,7 @@ import game.muxiuesd.bedrockcore.util.Log;
 import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.data.WorldInfoDataOutput;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.WorldInfoTypes;
 import ttk.muxiuesd.screen.MainGameScreen;
 import ttk.muxiuesd.system.abs.WorldSystem;
@@ -65,7 +66,7 @@ public abstract class World implements Updateable, Disposable {
      * 设置世界的名称
      * */
     public static void setWorldName(String worldName) {
-        if (worldName == null || !worldName.isBlank()) {
+        if (worldName == null || worldName.isBlank()) {
             Log.error(Fight.class.getName(), "设定的世界名称：" + worldName + " 不合法！！！");
         }else {
             Fight.WORLD_NAME.setValue(worldName);
@@ -74,14 +75,21 @@ public abstract class World implements Updateable, Disposable {
     /**
      * 获取世界名称
      * */
-    public String getWorldName() {
+    public String getWorldName () {
         return Fight.WORLD_NAME.getValue();
     }
 
     /**
      * 读取世界信息
      * */
-    public void readWorldInfo() {
+    public void readWorldInfo () {
+        //切档清理：清空全局静态的世界信息map，避免上一个存档的字段残留到本次存档
+        //（WorldInfoTypes 的 map 是全局共享单例，decode 只会 put、从不 clear，
+        //若新档缺失某些键，旧档残留值会被新世界读到 → 串档/用错出生点、种子等）
+        Registries.WORLD_INFO_HASH_MAP.getMap().forEach((key, value) -> {
+            value.clear();
+        });
+
         //检查世界信息文件是否存在
         if(UnifiedFileUtil.fileExists(Fight.getPathSaveWorld(), WorldInfo.FILE_NAME)) {
             //存在就读取
@@ -90,13 +98,13 @@ public abstract class World implements Updateable, Disposable {
             DataResult<WorldInfo> result = WorldInfo.CODEC.decode(raw);
             //让这个实例存在（error 但 result 有值时也使用解码结果；完全失败时兜底新建）
             if (result.result().isPresent()) {
-                WorldInfo.INSTANCE = result.result().get();
+                WorldInfo.setInstance(result.result().get());
             } else {
-                WorldInfo.INSTANCE = new WorldInfo();
+                WorldInfo.setInstance(new WorldInfo());
             }
         }else {
             //如果不存在，就新建一个
-            WorldInfo.INSTANCE = new WorldInfo();
+            WorldInfo.setInstance(new WorldInfo());
         }
     }
 
@@ -105,7 +113,7 @@ public abstract class World implements Updateable, Disposable {
      * */
     private void writeWorldInfo () {
         try {
-            RawObject raw = WorldInfo.CODEC.encode(WorldInfo.INSTANCE);
+            RawObject raw = WorldInfo.CODEC.encode(WorldInfo.getInstance());
             String json = RawObjectJsonConverter.toJson(raw);
             //输出
             new WorldInfoDataOutput().output(json);

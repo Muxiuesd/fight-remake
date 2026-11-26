@@ -8,7 +8,7 @@ import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.resource.NinePatchResource;
 import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.system.PlayerSystem;
-import ttk.muxiuesd.world.entity.Player;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * UI面板：玩家血条

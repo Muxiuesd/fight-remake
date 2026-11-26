@@ -4,8 +4,8 @@ import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import game.muxiuesd.bedrockcore.serialization.builders.CodecBuilder0;
 import ttk.muxiuesd.id.Identifier;
+import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.registry.PropertyTypes;
-import ttk.muxiuesd.serialization.codecs.CodecCatsHolder;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
@@ -34,7 +34,10 @@ public class BlockWithEntityCodecBuilder {
                 (block, id) -> {
                     //工厂创建出来的方块实例没有标识符，在这里恢复，否则getID()会空指针
                     if (id != null && Identifier.check(id)) {
-                        block.setIdentifier(new Identifier(id));
+                        block.setIdentifier(Identifier.of(id));
+                        //渲染器是在注册时绑到方块原型上的，渲染热路径直接读实例的这个字段，
+                        //所以这里要按id把原型上的渲染器补到新实例上，否则读档出来的方块渲染时空指针
+                        block.setRenderer(Registries.BLOCK.get(block.getIdentifier()).getRenderer());
                     }
                 },
                 Codec.STRING)
@@ -43,7 +46,7 @@ public class BlockWithEntityCodecBuilder {
                 BlockWithEntity::setBlockEntity,
                 blockEntityCodec
             )
-            .field("property",
+            .optionalField("property",
                 block -> {
                     //调用cats写入
                     CatsHolder cats = block.getProperty().get(PropertyTypes.CATS);
@@ -55,10 +58,10 @@ public class BlockWithEntityCodecBuilder {
                 (block, property) -> {
                     //设置属性
                     block.setProperty(property);
-                    //把属性中保存的cats数据读取到方块和方块实体上
+                    //把属性中保存的cats数据读取到方块和方块实体上（直接传 CatsHolder，省 JsonValue 中间转换）
                     CatsHolder cats = property.get(PropertyTypes.CATS);
                     if (cats != null) {
-                        block.readCatData(CodecCatsHolder.toJsonValue(cats));
+                        block.readCatData(cats);
                     }
                 },
                 Block.Property.CODEC

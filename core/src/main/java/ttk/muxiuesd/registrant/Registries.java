@@ -1,7 +1,6 @@
 package ttk.muxiuesd.registrant;
 
 import game.muxiuesd.bedrockcore.serialization.Codec;
-import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.audio.AudioHolder;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.Registry;
@@ -16,11 +15,17 @@ import ttk.muxiuesd.serialization.abs.WorldInfoHashMap;
 import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
+import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.item.equipment.EquipmentType;
+import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
+import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
+import ttk.muxiuesd.world.loottable.fishing.FishingLootTable;
+import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.wall.Wall;
 
 import java.util.HashMap;
@@ -44,6 +49,7 @@ public class Registries {
     public static final Registry<DamageType<?, ?>> DAMAGE_TYPE = create(RegistryKeys.DAMAGE_TYPE);
     public static final Registry<PropertyType<?>> PROPERTY_TYPE = create(RegistryKeys.PROPERTY_TYPE);
     public static final Registry<StatusEffect> STATUS_EFFECT = create(RegistryKeys.STATUS_EFFECT);
+    public static final Registry<EquipmentType> EQUIPMENT_TYPE = create(RegistryKeys.EQUIPMENT_TYPE);
 
     public static final Registry<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = create(RegistryKeys.ITEM_STACK_BEHAVIOUR);
     public static final Registry<CookingRecipe> COOKING_RECIPE = create(RegistryKeys.COOKING_RECIPE);
@@ -52,8 +58,15 @@ public class Registries {
     public static final Registry<BlockSounds> BLOCK_SOUNDS = create(RegistryKeys.BLOCK_SOUNDS);
     public static final Registry<RenderLayer> RENDER_LAYER = create(RegistryKeys.RENDER_LAYER);
 
-    public static final CraftingRecipeRegistry CRAFTING_RECIPE_REGISTRY = create(RegistryKeys.CRAFTING_RECIPE_REGISTRY_KEY, new CraftingRecipeRegistry());
+    public static final CraftingRecipeRegistry CRAFTING_RECIPE = create(RegistryKeys.CRAFTING_RECIPE, new CraftingRecipeRegistry());
 
+    public static final Registry<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE      = create(RegistryKeys.BLOCK_DROP_LOOT_TABLE);
+    public static final Registry<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE  = create(RegistryKeys.ENTITY_DEATH_LOOT_TABLE);
+    public static final Registry<FishingLootTable> FISHING_LOOT_TABLE          = create(RegistryKeys.FISHING_LOOT_TABLE);
+
+    public static final Registry<Biome> BIOME = create(RegistryKeys.BIOME);
+
+    public static final Registry<ParticleEmitter<?>> PARTICLE_EMITTER = create(RegistryKeys.PARTICLE_EMITTER);
 
 
     public static final BlockRendererRegistry BLOCK_RENDERER = create(
@@ -103,11 +116,7 @@ public class Registries {
         @Override
         public T register (Identifier identifier, T value) {
             if (this.contains(identifier.getID()) || this.contains(identifier)) {
-                Identifier oldId = this.idMap.get(identifier.getID());
-                T oldValue = this.regedit.get(oldId);
-                Log.print(this.getClass().getName(),
-                    "覆盖旧的注册元素：" + identifier.getID() + "@@" + oldValue
-                    + " 新的值为：" + value);
+                throw new RuntimeException("注册Id：" + identifier.getID() + " 重复！！！");
             }
             this.idMap.put(identifier.getID(), identifier);
             this.regedit.put(identifier, value);
@@ -138,6 +147,7 @@ public class Registries {
          * <p>
          * 用于存档解码等容错路径（未知 id 的旧数据应跳过而不是崩溃/整块重建）
          * */
+        @Override
         public T getOrNull (String id) {
             Identifier identifier = this.idMap.get(id);
             if (identifier == null) return null;

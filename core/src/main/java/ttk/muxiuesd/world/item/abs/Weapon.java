@@ -17,12 +17,15 @@ public abstract class Weapon extends Item {
         return new Property()
             .add(PropertyTypes.ITEM_MAX_COUNT, 1)
             .add(PropertyTypes.WEAPON_DAMAGE, 1f)
+            .add(PropertyTypes.WEAPON_KNOCKBACK, 2f)
             .add(PropertyTypes.ITEM_DURATION, 100)
             .add(PropertyTypes.WEAPON_USE_SAPN, 1f);
     }
 
-    public Weapon (Property property, String textureId, String texturePath) {
-        super(Type.WEAPON, property, textureId, texturePath);
+    public Weapon (Property property) {
+        super(property);
+        //武器是功能型物品：手持时左键不破坏世界（武器的左键是"攻击"，不是"挖"）
+        this.getProperty().add(PropertyTypes.ITEM_FUNCTIONAL, true);
     }
 
     @Override

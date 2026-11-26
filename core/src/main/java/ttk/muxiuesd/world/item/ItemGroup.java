@@ -55,7 +55,7 @@ public class ItemGroup {
         if (this.getItemsList().size() > index) {
             return this.getItemsList().get(index);
         }
-        return null;
+        return ItemStack.VOID;
     }
 
     public Identifier getIdentifier () {
@@ -96,7 +96,7 @@ public class ItemGroup {
      * */
     public static class Builder {
         private Identifier identifier;
-        private ItemStack iconItemStack;
+        private ItemStack iconItemStack = ItemStack.VOID;
 
         public Builder () {}
 

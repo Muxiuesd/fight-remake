@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import game.muxiuesd.bedrockcore.util.Log;
+import game.muxiuesd.bedrockcore.util.UnifiedFileUtil;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.mod.api.ModFileLoader;
 import ttk.muxiuesd.resource.AssetsLoader;
@@ -158,9 +159,9 @@ public class AudioLoader {
      * */
     public FileHandle getFileHandle(String id, String path) {
         if (this.inGame(id)) {
-            return Gdx.files.internal(path);
+            return UnifiedFileUtil.internalFile(path);
         }
-        return Gdx.files.absolute(path);
+        return UnifiedFileUtil.absoluteFile(path);
     }
 
     public String getPath (String path) {

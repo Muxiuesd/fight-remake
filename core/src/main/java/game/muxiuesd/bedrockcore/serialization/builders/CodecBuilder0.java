@@ -43,6 +43,33 @@ public class CodecBuilder0<T> {
         return this;
     }
 
+    /**
+     * 可选字段：存档里缺这个字段不算错误
+     * <p>
+     * 缺字段时什么都不做，对象保留工厂/构造器构造出来的值
+     * */
+    public <F> CodecBuilder0<T> optionalField (String name,
+                                               Function<T, ? extends F> getter,
+                                               BiConsumer<T, ? extends F> setter,
+                                               Codec<? extends F> codec) {
+        setterFields.add(new FieldBinding<>(name, getter, setter, codec, true, true, null));
+        return this;
+    }
+
+    /**
+     * 可选字段：存档里缺这个字段时写入 defaultValue
+     * <p>
+     * 用 Supplier 而不是直接传值：默认值可能是可变对象（集合、背包），不能让所有对象共用一份
+     * */
+    public <F> CodecBuilder0<T> optionalField (String name,
+                                               Function<T, ? extends F> getter,
+                                               BiConsumer<T, ? extends F> setter,
+                                               Codec<? extends F> codec,
+                                               Supplier<? extends F> defaultValue) {
+        setterFields.add(new FieldBinding<>(name, getter, setter, codec, true, true, defaultValue));
+        return this;
+    }
+
     // 无参工厂
     public Codec<T> noArgFactory (Supplier<T> factory) {
         if (!paramFields.isEmpty()) throw new IllegalStateException("Cannot use noArgFactory with paramFields");
@@ -52,7 +79,4 @@ public class CodecBuilder0<T> {
     public Codec<T> build (Function<Object[], T> factory) {
         return new ObjectCodec<>(factory, paramFields, setterFields);
     }
-
-
-
 }

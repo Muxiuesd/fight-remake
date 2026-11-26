@@ -1,19 +1,19 @@
 package ttk.muxiuesd.ui.screen;
 
 import com.badlogic.gdx.Gdx;
-import game.muxiuesd.bedrockcore.app.ui.abs.UIScreen;
 import game.muxiuesd.bedrockcore.app.ui.components.UIButton;
 import game.muxiuesd.bedrockcore.app.ui.components.UIPanel;
 import game.muxiuesd.bedrockcore.app.ui.components.UITextButton;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.FightCore;
+import ttk.muxiuesd.ui.abs.FightUIScreen;
 import ttk.muxiuesd.ui.components.FightUITextButton;
 import ttk.muxiuesd.ui.text.Text;
 
 /**
  * 主菜单的UIScreen
  * */
-public class StartMenuUIScreen extends UIScreen {
+public class StartMenuUIScreen extends FightUIScreen {
 
     private UIPanel buttonsPanel;
     private UITextButton startButton;
@@ -62,9 +62,6 @@ public class StartMenuUIScreen extends UIScreen {
 
     @Override
     public void hide () {
-        this.getComponents().forEach(uiComponent -> {
-            uiComponent.setMouseOver(false);
-            uiComponent.setClicked(false);
-        });
+        super.hide();
     }
 }

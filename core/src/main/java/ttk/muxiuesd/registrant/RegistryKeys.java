@@ -18,12 +18,18 @@ import ttk.muxiuesd.world.block.BlockSounds;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityProvider;
+import ttk.muxiuesd.world.biome.Biome;
 import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.DamageType;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.StatusEffect;
 import ttk.muxiuesd.world.item.ItemGroup;
 import ttk.muxiuesd.world.item.abs.Item;
+import ttk.muxiuesd.world.item.equipment.EquipmentType;
+import ttk.muxiuesd.world.loottable.block.BlockDropLootTable;
+import ttk.muxiuesd.world.loottable.entity.EntityDeathLootTable;
+import ttk.muxiuesd.world.loottable.fishing.FishingLootTable;
+import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.wall.Wall;
 
 /**
@@ -43,6 +49,7 @@ public class RegistryKeys {
     public static final RegistryKey<DamageType<?, ?>> DAMAGE_TYPE = new RegistryKey<>();
     public static final RegistryKey<PropertyType<?>> PROPERTY_TYPE = new RegistryKey<>();
     public static final RegistryKey<StatusEffect> STATUS_EFFECT = new RegistryKey<>();
+    public static final RegistryKey<EquipmentType> EQUIPMENT_TYPE = new RegistryKey<>();
 
     public static final RegistryKey<IItemStackBehaviour> ITEM_STACK_BEHAVIOUR = new RegistryKey<>();
     public static final RegistryKey<CookingRecipe> COOKING_RECIPE = new RegistryKey<>();
@@ -55,7 +62,16 @@ public class RegistryKeys {
     public static final RegistryKey<BlockEntityRenderer<? extends BlockEntity>> BLOCK_ENTITY_RENDERER = new RegistryKey<>();
     public static final RegistryKey<EntityRenderer<? extends Entity<?>>> ENTITY_RENDERER = new RegistryKey<>();
 
-    public static final RegistryKey<CraftingTableRecipe> CRAFTING_RECIPE_REGISTRY_KEY = new RegistryKey<>();
+    public static final RegistryKey<CraftingTableRecipe> CRAFTING_RECIPE = new RegistryKey<>();
+
+    public static final RegistryKey<BlockDropLootTable> BLOCK_DROP_LOOT_TABLE = new RegistryKey<>();
+    public static final RegistryKey<EntityDeathLootTable> ENTITY_DEATH_LOOT_TABLE = new RegistryKey<>();
+    public static final RegistryKey<FishingLootTable> FISHING_LOOT_TABLE = new RegistryKey<>();
+
+    public static final RegistryKey<Biome> BIOME = new RegistryKey<>();
+
+    public static final RegistryKey<ParticleEmitter<?>> PARTICLE_EMITTER = new RegistryKey<>();
+
 
     public static final RegistryKey<FightPool<?>> POOL = new RegistryKey<>();
     public static final RegistryKey<WorldInfoHashMap<?, ?>> WORLD_INFO_HASH_MAP = new RegistryKey<>();

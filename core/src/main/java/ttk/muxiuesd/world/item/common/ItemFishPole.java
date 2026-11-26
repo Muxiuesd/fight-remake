@@ -1,29 +1,23 @@
 package ttk.muxiuesd.world.item.common;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import game.muxiuesd.bedrockcore.util.TaskTimer;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.interfaces.world.item.IItemStackBehaviour;
 import ttk.muxiuesd.registry.Entities;
+import ttk.muxiuesd.registry.FishingLootTables;
 import ttk.muxiuesd.registry.ItemStackBehaviours;
-import ttk.muxiuesd.registry.Pools;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.system.ParticleSystem;
-import ttk.muxiuesd.util.Direction;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.instance.BlockWater;
-import ttk.muxiuesd.world.entity.ItemEntity;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.entity.common.EntityFishingHook;
+import ttk.muxiuesd.world.entity.player.Player;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.loottable.FishingLootTable;
 
 /**
  * 钓鱼竿
@@ -31,21 +25,15 @@ import ttk.muxiuesd.world.loottable.FishingLootTable;
  * 能抛出的钓鱼钩
  * */
 public class ItemFishPole extends Item {
-    public TextureRegion castTexture;
     public float castSpeed = 10f;
     public float pullSpeed = castSpeed * 2;
 
     public ItemFishPole () {
-        super(Type.COMMON, new Property().setMaxCount(1)
+        super(new Property().setMaxCount(1)
                 .add(PropertyTypes.ITEM_WITH_ENTITY, null)
-                .add(PropertyTypes.FISHING_POLE_USING, false),
-            Fight.ID("fish_pole"),
-            Fight.ItemTexturePath("fish_pole.png"));
-
-        this.castTexture = Util.loadTextureRegion(
-            Fight.ID("fish_pole_cast"),
-            Fight.ItemTexturePath("fish_pole_cast.png")
-        );
+                .add(PropertyTypes.FISHING_POLE_USING, false)
+                //鱼竿是功能型物品：手持时左键不破坏世界（左键是"抛竿/收杆"）
+                .add(PropertyTypes.ITEM_FUNCTIONAL, true));
     }
 
     @Override
@@ -66,35 +54,26 @@ public class ItemFishPole extends Item {
             es.add(fishingHook);
             fishingHook.setEntitySystem(es);
             this.throwHook(itemStack, world, fishingHook);
-            return super.use(itemStack, world, user);
+            //抛出鱼钩，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
+            this.playUseSound(world, user);
+            return true;
         }else if (!hook.onCasting() && !hook.isReturning){ //鱼钩实体不在抛竿或者收杆途中则可以收起鱼钩
             Vector2 hookPos = hook.getCenterPos();
             ChunkSystem cs = world.getSystem(ChunkSystem.class);
             Block block = cs.getBlock(hookPos.x, hookPos.y);
             if (block instanceof BlockWater) {
                 //需要鱼钩在水中才能钓到鱼
-                //生成钓鱼战利品
-                FishingLootTable.fastGenerate(100, genItemStack -> {
-                    //ItemEntity itemEntity = (ItemEntity)Gets.ENTITY(Fight.getId("item_entity"), hook.getEntitySystem());
-                    ItemEntity itemEntity = Pools.ITEM_ENTITY.obtain();
-                    itemEntity.setEntitySystem(user.getEntitySystem());
-                    itemEntity.setPosition(hookPos);
-                    itemEntity.setLivingTime(Fight.ITEM_ENTITY_PICKUP_SPAN.getValue());
-                    itemEntity.setItemStack(genItemStack);
-                    itemEntity.setSpeed(this.pullSpeed);
-                    itemEntity.setCurSpeed(this.pullSpeed);
-                    itemEntity.setVelocity(new Direction(hook.getCenterPos(), hook.getOwner().getCenterPos()).toVector2());
-                    itemEntity.setOnGround(false);
-                    itemEntity.setOnAirTimer(new TaskTimer(0.3f, 0, () -> {
-                        itemEntity.setOnAirTimer(null);
-                    }));
-
-                    user.getEntitySystem().add(itemEntity);
-                });
+                //生成钓鱼战利品：查注册的钓鱼表，掉落物从鱼钩位置朝使用者飞
+                FishingLootTables.generate(
+                    world, user, itemStack,
+                    hookPos, hook.getOwner().getCenterPos(), this.pullSpeed, 100
+                );
             }
 
             this.pullHook(itemStack);
-            return super.use(itemStack, world, user);
+            //收杆，播放音效并报告成功
+            this.playUseSound(world, user);
+            return true;
         }
         //到这里就说明在抛竿或者收杆的动作之中，所以是使用失败的
         return false;

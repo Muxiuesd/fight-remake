@@ -8,14 +8,18 @@ import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
 import ttk.muxiuesd.registrant.BlockEntityRendererRegistry;
 import ttk.muxiuesd.registrant.BlockRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
-import ttk.muxiuesd.render.world.block.BotanyRenderer;
-import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.BlockEntity;
-import ttk.muxiuesd.world.block.abs.BlockWithEntity;
-import ttk.muxiuesd.world.block.abs.Botany;
-import ttk.muxiuesd.world.block.instance.*;
-import ttk.muxiuesd.world.block.instance.botany.BotanyPotato;
+import ttk.muxiuesd.render.world.block.AttachmentRenderer;
+import ttk.muxiuesd.render.world.block.FurnaceRenderer;
+import ttk.muxiuesd.world.block.abs.*;
+import ttk.muxiuesd.world.block.instance.BlockAir;
+import ttk.muxiuesd.world.block.instance.BlockCraftingTable;
+import ttk.muxiuesd.world.block.instance.BlockFurnace;
+import ttk.muxiuesd.world.block.instance.BlockWater;
+import ttk.muxiuesd.world.block.instance.attachment.AttachmentStick;
+import ttk.muxiuesd.world.block.instance.attachment.BotanyPotato;
+import ttk.muxiuesd.world.block.instance.attachment.BotanyWheat;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -27,87 +31,263 @@ public final class Blocks {
     }
 
     /// 普通方块
-    public static final BlockAir ARI = register("air", BlockAir::new, BlockAir.RENDERER);
-    public static final BlockTest TEST_BLOCK = register("block_test", BlockTest::new);
-    public static final BlockGrass GRASS = register("grass", BlockGrass::new);
-    public static final Block FARMLAND_DRY = register("farmland_dry");
-    public static final BlockStone STONE = register("stone", BlockStone::new);
-    public static final BlockSand SAND = register("sand", BlockSand::new);
-    public static final BlockWater WATER = register("water", BlockWater::new, BlockWater.RENDERER);
+    //自然方块
+    public static final Block ARI = register("air", BlockAir::new, BlockAir.RENDERER);
+    public static final Block TEST_BLOCK = registerCommon("block_test",
+        () -> Block.createProperty().setFriction(0.9f)
+    );
+    public static final Block GRASS = registerCommon("grass",
+        () -> Block.createProperty().setFriction(0.05f).setSounds(Sounds.GRASS)
+    );
+    public static final Block STONE = registerCommon("stone",
+        () -> Block.createProperty().setFriction(0.06f).setSounds(Sounds.STONE)
+    );
+    public static final Block SNOW = registerCommon("snow",
+        () -> Block.createProperty().setFriction(0.15f).setSounds(Sounds.STONE) //后面改
+    );
+    public static final Block SAND = registerCommon("sand",
+        () -> Block.createProperty().setFriction(0.1f).setSounds(Sounds.SAND)
+    );
+    public static final Block FARMLAND_DRY = registerCommon("farmland_dry",
+        () -> Block.createProperty().setFriction(0.1f).setSounds(Sounds.GRASS)
+    );
+    public static final Block WATER = register("water", BlockWater::new,
+        () -> Block.createProperty().setFriction(0.77f).setWalkable(false).setSwimmable(true),
+        BlockWater.RENDERER
+    );
 
-    public static final Block GLASS = register("glass");
-    //矿
-    public static final Block COAL_ORE = register("coal_ore");
+    //建筑方块
+    public static final Block GLASS = registerCommon("glass",
+        () -> Block.createProperty().setFriction(0.05f)
+    );
+
+    //矿物方块
+    public static final Block COAL_ORE = registerCommon("coal_ore",
+        () -> Block.createProperty().setFriction(0.06f)
+    );
+
     //颜色方块
-    public static final Block WOOL_BLACK = register("wool_colored_black", "wool/wool_colored_black");
-    public static final Block WOOL_BLUE = register("wool_colored_blue", "wool/wool_colored_blue");
-    public static final Block WOOL_BROWN = register("wool_colored_brown", "wool/wool_colored_brown");
-    public static final Block WOOL_CYAN = register("wool_colored_cyan", "wool/wool_colored_cyan");
-    public static final Block WOOL_GRAY = register("wool_colored_gray", "wool/wool_colored_gray");
-    public static final Block WOOL_GREEN = register("wool_colored_green", "wool/wool_colored_green");
-    public static final Block WOOL_LIGHT_BLUE = register("wool_colored_light_blue", "wool/wool_colored_light_blue");
-    public static final Block WOOL_LIME = register("wool_colored_lime", "wool/wool_colored_lime");
-    public static final Block WOOL_MAGENTA = register("wool_colored_magenta", "wool/wool_colored_magenta");
-    public static final Block WOOL_ORANGE = register("wool_colored_orange", "wool/wool_colored_orange");
-    public static final Block WOOL_PINK = register("wool_colored_pink", "wool/wool_colored_pink");
-    public static final Block WOOL_PURPLE = register("wool_colored_purple", "wool/wool_colored_purple");
-    public static final Block WOOL_RED = register("wool_colored_red", "wool/wool_colored_red");
-    public static final Block WOOL_SILVER = register("wool_colored_silver", "wool/wool_colored_silver");
-    public static final Block WOOL_WHITE = register("wool_colored_white", "wool/wool_colored_white");
-    public static final Block WOOL_YELLOW = register("wool_colored_yellow", "wool/wool_colored_yellow");
+    public static final float WOOL_FRICTION = 0.05f;
+    public static final Block WOOL_BLACK = register("wool_colored_black", "wool/wool_colored_black",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_BLUE = register("wool_colored_blue", "wool/wool_colored_blue",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_BROWN = register("wool_colored_brown", "wool/wool_colored_brown",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_CYAN = register("wool_colored_cyan", "wool/wool_colored_cyan",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_GRAY = register("wool_colored_gray", "wool/wool_colored_gray",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_GREEN = register("wool_colored_green", "wool/wool_colored_green",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_LIGHT_BLUE = register("wool_colored_light_blue", "wool/wool_colored_light_blue",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_LIME = register("wool_colored_lime", "wool/wool_colored_lime",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_MAGENTA = register("wool_colored_magenta", "wool/wool_colored_magenta",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_ORANGE = register("wool_colored_orange", "wool/wool_colored_orange",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_PINK = register("wool_colored_pink", "wool/wool_colored_pink",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_PURPLE = register("wool_colored_purple", "wool/wool_colored_purple",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_RED = register("wool_colored_red", "wool/wool_colored_red",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_SILVER = register("wool_colored_silver", "wool/wool_colored_silver",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_WHITE = register("wool_colored_white", "wool/wool_colored_white",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
+    public static final Block WOOL_YELLOW = register("wool_colored_yellow", "wool/wool_colored_yellow",
+        () -> Block.createProperty().setFriction(WOOL_FRICTION)
+    );
 
-    /// 植物
-    public static final Botany POTATO = registerBotany("potato", BotanyPotato::new);
+    /// 附着物
+    //农作物
+    public static final Botany POTATO = registerBotany("potato", BotanyPotato::new,
+        "potatoes_stage_0.png",
+        "potatoes_stage_1.png",
+        "potatoes_stage_2.png",
+        "potatoes_stage_3.png"
+    );
+    public static final Botany WHEAT = registerBotany("wheat", BotanyWheat::new,
+        "wheat_stage_0.png",
+        "wheat_stage_1.png",
+        "wheat_stage_2.png",
+        "wheat_stage_3.png",
+        "wheat_stage_4.png",
+        "wheat_stage_5.png",
+        "wheat_stage_6.png",
+        "wheat_stage_7.png"
+    );
+
+    //装饰
+    /**
+     * 木棍：贴在草方块上的一格装饰
+     * <p>
+     * 贴图直接用木棍物品的贴图，不复制资源文件——{@code AssetsLoader}的缓存按路径命中，
+     * 相同的贴图路径只会加载一次，两张图共用同一个{@link com.badlogic.gdx.graphics.Texture}
+     * <p>
+     * 用{@link BlockRenderer.StandardRenderer}而不是{@link AttachmentRenderer}：后者绘制原点在格子中心、
+     * 贴图向上占半格（那是给竖直生长的植物用的），木棍需要与方块同框、落在格子正中
+     * */
+    public static final AttachmentStick STICK_ATTACHMENT = register(
+        "stick_attachment",
+        AttachmentStick::new,
+        new BlockRenderer.StandardRenderer<AttachmentStick>(Fight.ID("stick_attachment"), Fight.ItemTexturePath("stick.png"))
+    );
+
 
     /// 带有方块实体的方块
     public static final BlockCraftingTable CRAFTING_TABLE = register("crafting_table", BlockCraftingTable::new);
-    public static final BlockFurnace FURNACE = register("furnace", BlockFurnace::new);
+    public static final BlockFurnace FURNACE = register("furnace", BlockFurnace::new, new FurnaceRenderer());
+
+
+
+    /**
+     * 注册一个附着物方块
+     * @param textureNames 贴图文件名（位于 attachment/crops/ 目录下），只有一张贴图的附着物传一个就行
+     * */
+    public static <T extends Attachment> T registerAttachment (String name, Supplier<T> factory, String... textureNames) {
+        return register(
+            name,
+            factory,
+            new AttachmentRenderer<T>(textureNames)
+        );
+    }
+
+    /**
+     * 注册一个植物方块
+     * <p>
+     * 植物是每格独享实例，这里注册的实例与世界里的每格实例都出自同一个工厂
+     * @param growLevelTextureNames 不同生长等级的贴图文件名（位于 attachment/crops/ 目录下），按生长等级从小到大
+     * */
+    public static <T extends Botany> T registerBotany (String name, Supplier<T> factory, String... growLevelTextureNames) {
+        return registerAttachment(name, factory, growLevelTextureNames);
+    }
+
+    /**
+     * 快捷方法：注册一个名称与贴图路径相同的普通方块
+     * <p>
+     * 直接在{@link Fight#BLOCK_TEXTURE_ROOT}中的贴图文件
+     * @param propertyProvider 属性的工厂
+     * */
+    public static Block registerCommon (String name, Supplier<Block.Property> propertyProvider) {
+        return register(
+            name,
+            name,
+            propertyProvider
+        );
+    }
+
+    /**
+     * 注册一个名称与贴图路径不完全相同的普通方块
+     * @param pathName 以{@link Fight#BLOCK_TEXTURE_ROOT}为起始的路径的贴图文件
+     * @param propertyProvider 属性的工厂
+     * */
+    public static Block register (String name, String pathName, Supplier<Block.Property> propertyProvider) {
+        String path = Fight.BlockTexturePath(pathName);
+        //没有后缀自动加上
+        if (!path.endsWith(".png")) path += ".png";
+        return register(
+            name,
+            path,
+            Block::new,
+            propertyProvider
+        );
+    }
+
+    /**
+     * 注册一个使用标准渲染器的方块，显式指定贴图路径（与id相绑定）
+     * @param texturePath 贴图文件路径
+     * */
+    public static <T extends Block> T register (String name,
+                                                String texturePath,
+                                                Function<Block.Property, T> fun,
+                                                Supplier<Block.Property> propertyProvider) {
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        return register(
+            identifier,
+            () -> fun.apply(propertyProvider.get()),
+            new BlockRenderer.StandardRenderer<T>(identifier.getID(), texturePath)
+        );
+    }
+
 
 
     /**
-     * 注册一个非常普通的方块
+     * 注册一个使用自定义渲染器的方块
+     * @param fun 方块的工厂
+     * @param propertyProvider 属性工厂
      * */
-    public static Block register (String name) {
-        return register(name, Block.createProperty());
+    public static <T extends Block> T register (String name,
+                                                Function<Block.Property, T> fun,
+                                                Supplier<Block.Property> propertyProvider,
+                                                BlockRenderer<T> renderer) {
+        return register(
+            name,
+            () -> fun.apply(propertyProvider.get()),
+            renderer
+        );
     }
 
     /**
-     * 注册一个名称与贴图路径不完全相同的方块
-     * @param pathName 在{@link Fight#BLOCK_TEXTURE_ROOT}下的路径
+     * 注册一个名称与贴图路径相同的方块，使用标准方块渲染器
+     * @param factory 工厂类（已设置方块属性）
      * */
-    public static Block register (String name, String pathName) {
-        return register(name, () -> new CommonBlock(name, pathName, Block.createProperty()));
-    }
-
-    public static Block register (String name, Block.Property property) {
-        return register(name, () -> new CommonBlock(name, property));
-    }
-
     public static <T extends Block> T register (String name, Supplier<T> factory) {
-        return register(name, factory, new BlockRenderer.StandardRenderer<>());
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        return register(
+            identifier,
+            factory,
+            new BlockRenderer.StandardRenderer<T>(identifier.getID(), Fight.BlockTexturePath(name + ".png"))
+        );
     }
 
-    /**
-     * 注册一个植物
-     * */
-    public static <T extends Botany> T registerBotany (String name, Supplier<T> factory) {
-        return register(name, factory, new BotanyRenderer<>());
-    }
 
     /**
-     * 方块注册的基本方法
-     * @param name 名字
-     * @param factory 工厂类（用于语法糖）
-     * @param renderer 渲染器
+     * 注册一个使用自定义渲染器的方块
+     * @param factory 工厂类（已设置方块属性）
      * */
     public static <T extends Block> T register (String name, Supplier<T> factory, BlockRenderer<T> renderer) {
-        String id = Fight.ID(name);
-        Identifier identifier = new Identifier(id);
+        return register(
+            Identifier.of(Fight.ID(name)),
+            factory,
+            renderer
+        );
+    }
+
+    /**
+     * 方块注册的最基本方法
+     * @param identifier id标识符
+     * @param factory 工厂类（已设置方块属性）
+     * @param renderer 渲染器，为null时根据贴图路径自动创建标准渲染器
+     * */
+    public static <T extends Block> T register (Identifier identifier,
+                                                Supplier<T> factory,
+                                                BlockRenderer<T> renderer) {
         T block = factory.get();
         block.setIdentifier(identifier);
+        block.setRenderer(renderer);    //渲染热路径直接读字段，不再查注册表
         Registries.BLOCK.register(identifier, block);
 
         registerBlockRenderer(block, renderer);
+
         if (block instanceof BlockWithEntity blockWithEntity) {
             registerBlockEntityRenderer(blockWithEntity, blockWithEntity.getBlockEntityRenderer());
         }
@@ -123,4 +303,13 @@ public final class Blocks {
     void registerBlockEntityRenderer (T blockWithEntity, BlockEntityRenderer<E> renderer) {
         BlockEntityRendererRegistry.register(blockWithEntity, renderer);
     }
+
+
+    /**
+     * 本类是否已经类初始化完成（上面所有方块字段都已赋值）
+     * <p>
+     * 必须在所有方块字段<b>之后</b>声明，静态字段是按声明顺序赋值的，
+     * 所以本字段为true就代表所有的方块都能安全地被引用了。见{@link AttachmentPlacements#init()}
+     * */
+    static final boolean READY = true;
 }

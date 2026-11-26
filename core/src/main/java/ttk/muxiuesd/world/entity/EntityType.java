@@ -27,7 +27,7 @@ public class EntityType<T extends Entity<?>> {
      * 添加附属类型
      * */
     public <E extends Entity<?>> EntityType<E> addChildType(String name, EntityType<E> childType) {
-        this.childTypes.put(new Identifier(Fight.ID(name)), childType);
+        this.childTypes.put(Identifier.of(Fight.ID(name)), childType);
         return childType;
     }
 
@@ -35,7 +35,7 @@ public class EntityType<T extends Entity<?>> {
      * 获取指定名称的附属类型
      * */
     public EntityType<?> getChildType (String name) {
-        return this.childTypes.get(new Identifier(Fight.ID(name)));
+        return this.childTypes.get(Identifier.of(Fight.ID(name)));
     }
 
     public String getId () {
@@ -47,13 +47,11 @@ public class EntityType<T extends Entity<?>> {
     }
 
     public EntityType<T> setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！实体类型：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
-        return this;
-    }
-
-    public EntityType<T> setId (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
         return this;
     }
 }

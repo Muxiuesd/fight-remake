@@ -4,30 +4,30 @@ import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.render.world.item.ItemRenderer;
+import ttk.muxiuesd.interfaces.world.entity.BulletFactory;
 import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.registrant.ItemRendererRegistry;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.render.world.item.FishPoleRenderer;
+import ttk.muxiuesd.render.world.item.LongSwordRenderer;
+import ttk.muxiuesd.render.world.item.SwordRenderer;
 import ttk.muxiuesd.render.world.item.TorchRenderer;
+import ttk.muxiuesd.util.Direction;
+import ttk.muxiuesd.world.World;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.Botany;
+import ttk.muxiuesd.world.entity.EntityType;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.bullet.BulletFire;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.common.CommonItem;
 import ttk.muxiuesd.world.item.common.ItemFishPole;
-import ttk.muxiuesd.world.item.common.ItemStick;
 import ttk.muxiuesd.world.item.consumption.*;
-import ttk.muxiuesd.world.item.equipment.EquipmentDiamondBoots;
-import ttk.muxiuesd.world.item.equipment.EquipmentDiamondChestplate;
-import ttk.muxiuesd.world.item.equipment.EquipmentDiamondHelmet;
-import ttk.muxiuesd.world.item.equipment.EquipmentDiamondLeggings;
-import ttk.muxiuesd.world.item.food.ItemFish;
-import ttk.muxiuesd.world.item.food.ItemPufferFish;
-import ttk.muxiuesd.world.item.weapon.IronSword;
-import ttk.muxiuesd.world.item.weapon.ItemTorch;
-import ttk.muxiuesd.world.item.weapon.WeaponDiamondSword;
+import ttk.muxiuesd.world.item.equipment.EquipmentItemBuilder;
+import ttk.muxiuesd.world.item.weapon.RangedWeaponBuilder;
+import ttk.muxiuesd.world.item.weapon.sword.SwordBuilder;
 import ttk.muxiuesd.world.wall.Wall;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -40,16 +40,19 @@ public final class Items {
 
     /// 常规物品
     //材料类
-    public static final Item STICK = register("stick", ItemStick::new);
+    public static final Item STICK = register("stick");
     public static final Item SLIME_BALL = register("slime_ball");
+    public static final Item BONE = register("bone");
+    public static final Item BONE_MEAL = register("bone_meal", BoneMealItem::new);
+    //矿物材料
+    public static final Item RAW_IRON = register("raw_iron");
+    public static final Item RAW_GOLD = register("raw_gold");
     public static final Item IRON_INGOT = register("iron_ingot");
     public static final Item GOLD_INGOT = register("gold_ingot");
+    public static final Item DIAMOND = register("diamond");
     public static final Item COAL = register("coal");
-
-    public static final Item BAIT = register("bait", ItemBait::new);
-    //食物类
-    public static final Item FISH = register("fish", ItemFish::new);
-    public static final Item PUFFER_FISH = register("puffer_fish", ItemPufferFish::new);
+    public static final Item BAIT = register("bait");
+    public static final Item POTION_BOTTLE = register("potion_bottle", Fight.ItemTexturePath("potion/potion_bottle_empty.png"));
     //杂物类
     public static final Item RUBBISH = register("rubbish");
 
@@ -57,27 +60,137 @@ public final class Items {
     public static final Item FISH_POLE = register("fish_pole", ItemFishPole::new, FishPoleRenderer::new);
 
     /// 武器类的物品
-    public static final Item IRON_SWORD = register("iron_sword", IronSword::new);
-    public static final Item TEST_WEAPON = register("diamond_sword", WeaponDiamondSword::new);
-    public static final Item TORCH = register("torch", ItemTorch::new, TorchRenderer::new);
+    public static final Item WOOD_SWORD = register("wood_sword",
+        SwordBuilder.create()
+            .setAttackRange(2.5f)
+            .setDamage(1f)
+            .setUseSpan(1f)
+            .setDuration(50)
+            .setKnockback(0.5f),
+        new SwordRenderer("wood_sword")
+    );
+    public static final Item WOOD_LONG_SWORD = register("wood_long_sword",
+        SwordBuilder.create()
+            .setAttackRange(4.5f)
+            .setDamage(1.5f)
+            .setUseSpan(2.5f)
+            .setDuration(90)
+            .setKnockback(2.5f),
+        new LongSwordRenderer("wood_long_sword")
+    );
+    public static final Item STONE_SWORD = register("stone_sword",
+        SwordBuilder.create()
+            .setAttackRange(2.5f)
+            .setDamage(1.5f)
+            .setUseSpan(1f)
+            .setDuration(100)
+            .setKnockback(1.0f),
+        new SwordRenderer("stone_sword")
+    );
+    public static final Item IRON_SWORD = register("iron_sword",
+        SwordBuilder.create()
+            .setAttackRange(3f)
+            .setDamage(3.5f)
+            .setUseSpan(0.5f)
+            .setDuration(345)
+            .setKnockback(1.5f),
+        new SwordRenderer("iron_sword")
+    );
+    public static final Item GOLD_SWORD = register("gold_sword",
+        SwordBuilder.create()
+            .setAttackRange(3f)
+            .setDamage(4.5f)
+            .setUseSpan(0.5f)
+            .setDuration(555)
+            .setKnockback(2f),
+        new SwordRenderer("gold_sword")
+    );
+    //远程类武器
+    public static final Item TEST_WEAPON = register("diamond_sword",
+        RangedWeaponBuilder.create()
+            .setFactory(new BulletFactory<BulletFire>() {
+                @Override
+                public BulletFire create (World world, Entity<?> owner, EntityType<?> entityType, Direction direction) {
+                    BulletFire bullet = Entities.BULLET_FIRE.create(world);
+                    bullet.setOwner(owner);
+                    bullet.setType(owner.getType().getChildType("bullet"));
+                    bullet.setPosition(owner.getPosition());
+                    bullet.setVelocity(direction, bullet.getSpeed());
+
+                    bullet.fastAddBodyHitBox();
+                    return bullet;
+                }
+
+                @Override
+                public String getBulletId () {
+                    return Entities.BULLET_FIRE.getID();
+                }
+            })
+    );
+    //火把也能用来攻击
+    public static final Item TORCH = register(
+        "torch",
+        SwordBuilder.create()
+            .setAttackRange(2f)
+            .setDuration(50),
+        new TorchRenderer()
+    );
 
     /// 装备物品
-    public static final Item DIAMOND_HELMET = register("diamond_helmet", EquipmentDiamondHelmet::new);
-    public static final Item DIAMOND_CHESTPLATE = register("diamond_chestplate", EquipmentDiamondChestplate::new);
-    public static final Item DIAMOND_LEGGINGS = register("diamond_leggings", EquipmentDiamondLeggings::new);
-    public static final Item DIAMOND_BOOTS = register("diamond_boots", EquipmentDiamondBoots::new);
+    public static final Item IRON_HELMET        = register("iron_helmet",
+        EquipmentItemBuilder.create(EquipmentTypes.HELMET).setDamageReduction(3.5f)
+    );
+    public static final Item IRON_CHESTPLATE    = register("iron_chestplate",
+        EquipmentItemBuilder.create(EquipmentTypes.CHESTPLATE).setDamageReduction(4f)
+    );
+    public static final Item IRON_LEGGINGS      = register("iron_leggings",
+        EquipmentItemBuilder.create(EquipmentTypes.LEGGINGS).setDamageReduction(3.5f)
+    );
+    public static final Item IRON_BOOTS         = register("iron_boots",
+        EquipmentItemBuilder.create(EquipmentTypes.BOOTS).setDamageReduction(3f)
+    );
+
+    public static final Item GOLD_HELMET        = register("gold_helmet",
+        EquipmentItemBuilder.create(EquipmentTypes.HELMET).setDamageReduction(4.5f)
+    );
+    public static final Item GOLD_CHESTPLATE    = register("gold_chestplate",
+        EquipmentItemBuilder.create(EquipmentTypes.CHESTPLATE).setDamageReduction(5f)
+    );
+    public static final Item GOLD_LEGGINGS      = register("gold_leggings",
+        EquipmentItemBuilder.create(EquipmentTypes.LEGGINGS).setDamageReduction(4.5f)
+    );
+    public static final Item GOLD_BOOTS         = register("gold_boots",
+        EquipmentItemBuilder.create(EquipmentTypes.BOOTS).setDamageReduction(4f)
+    );
+
+    public static final Item DIAMOND_HELMET     = register("diamond_helmet",
+        EquipmentItemBuilder.create(EquipmentTypes.HELMET).setDamageReduction(5.5f)
+    );
+    public static final Item DIAMOND_CHESTPLATE = register("diamond_chestplate",
+        EquipmentItemBuilder.create(EquipmentTypes.CHESTPLATE).setDamageReduction(6.5f)
+    );
+    public static final Item DIAMOND_LEGGINGS   = register("diamond_leggings",
+        EquipmentItemBuilder.create(EquipmentTypes.LEGGINGS).setDamageReduction(6f)
+    );
+    public static final Item DIAMOND_BOOTS      = register("diamond_boots",
+        EquipmentItemBuilder.create(EquipmentTypes.BOOTS).setDamageReduction(5f)
+    );
+
 
     /// 刷怪蛋物品
     //怪物刷怪蛋
-    public static final Item SPAWN_EGG_SLIME = register("spawn_egg_slime", Entities.SLIME);
+    public static final Item SPAWN_EGG_SLIME = registerSpawnEgg("spawn_egg_slime", Entities.SLIME);
+    public static final Item SPAWN_EGG_ZOMBIE = registerSpawnEgg("spawn_egg_zombie", Entities.ZOMBIE);
     //生物刷怪蛋
-    public static final Item SPAWN_EGG_PUFFER_FISH = register("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
+    public static final Item SPAWN_EGG_PUFFER_FISH = registerSpawnEgg("spawn_egg_puffer_fish", Entities.PUFFER_FISH);
+    public static final Item SPAWN_EGG_CHICKEN = registerSpawnEgg("spawn_egg_chicken", Entities.CHICKEN);
 
     /// 方块物品
     public static final Item TEST_BLOCK = register(Blocks.TEST_BLOCK);
     public static final Item GRASS = register(Blocks.GRASS);
     public static final Item FARMLAND_DRY = register(Blocks.FARMLAND_DRY);
     public static final Item STONE = register(Blocks.STONE);
+    public static final Item SNOW = register(Blocks.SNOW);
     public static final Item SAND = register(Blocks.SAND);
     public static final Item WATER = register(Blocks.WATER);
     public static final Item GLASS = register(Blocks.GLASS);
@@ -106,41 +219,176 @@ public final class Items {
 
     /// 农作物物品
     public static final Item POTATO = register("potato", Blocks.POTATO);
+    public static final Item SEEDS_WHEAT = register("seeds_wheat", Blocks.WHEAT);
+    public static final Item WHEAT = register("wheat");
+    //食物类
+    public static final Item FISH = register("fish", Fight.ItemTexturePath("foods/fish.png"),
+        EffectItemBuilder.create()
+            .setSounds(EffectItem.EAT_SOUNDS)
+            .setEffects(
+                EffectItem.Effect.of(StatusEffects.HEALING, 5f, 1),
+                EffectItem.Effect.of(StatusEffects.POISON, 6f, 1)
+            )
+    );
+    public static final Item PUFFER_FISH = register("puffer_fish",
+        Fight.EntityTexturePath("fish/puffer_fish.png"),
+        EffectItemBuilder.create()
+            .setSounds(EffectItem.EAT_SOUNDS)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 5f, 1))
+    );
+    public static final Item POTATO_BAKED = register("potato_baked",
+        Fight.ItemTexturePath("foods/potato_baked.png"),
+        EffectItemBuilder.create()
+            .setSounds(EffectItem.EAT_SOUNDS)
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 10f, 2))
+    );
+    //生鸡肉：走食物注册，但不带任何状态效果（不加 setEffects，吃下去只播默认音效）
+    public static final Item CHICKEN_RAW = register("chicken_raw",
+        Fight.ItemTexturePath("foods/chicken_raw.png"),
+        EffectItemBuilder.create()
+    );
+    //熟鸡肉：治疗效果等级 1、持续 1 秒（每整秒回 2×等级 血，故总共回 2 点）
+    public static final Item CHICKEN_COOKED = register("chicken_cooked",
+        Fight.ItemTexturePath("foods/chicken_cooked.png"),
+        EffectItemBuilder.create()
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 1f, 1))
+    );
+    //面包
+    public static final Item BREAD = register("bread",
+        Fight.ItemTexturePath("foods/bread.png"),
+        EffectItemBuilder.create()
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 2f, 1))
+    );
+
 
     /// 墙体物品
     public static final Item SMOOTH_STONE = register(Walls.SMOOTH_STONE);
 
+    /// 药水物品
+    //治疗药水
+    public static final Item POTION_HEAL_LEVEL_1 = register("potion_heal_level_1",
+        Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 10f, 1))
+    );
+    public static final Item POTION_HEAL_LEVEL_2 = register("potion_heal_level_2",
+        Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 30f, 2))
+    );
+    public static final Item POTION_HEAL_LEVEL_3 = register("potion_heal_level_3",
+        Fight.ItemTexturePath("potion/potion_bottle_heal.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.HEALING, 60f, 3))
+    );
+    //毒药水
+    public static final Item POTION_POISON_LEVEL_1 = register("potion_poison_level_1",
+        Fight.ItemTexturePath("potion/potion_bottle_poison.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 10f, 1))
+    );
+    public static final Item POTION_POISON_LEVEL_2 = register("potion_poison_level_2",
+        Fight.ItemTexturePath("potion/potion_bottle_poison.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 30f, 2))
+    );
+    public static final Item POTION_POISON_LEVEL_3 = register("potion_poison_level_3",
+        Fight.ItemTexturePath("potion/potion_bottle_poison.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.POISON, 60f, 3))
+    );
+    //速度药水
+    public static final Item POTION_MOVE_SPEED_LEVEL_1 = register("potion_move_speed_level_1",
+        Fight.ItemTexturePath("potion/potion_bottle_move_speed.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.MOVE_SPEED, 10f, 1))
+    );
+    public static final Item POTION_MOVE_SPEED_LEVEL_2 = register("potion_move_speed_level_2",
+        Fight.ItemTexturePath("potion/potion_bottle_move_speed.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.MOVE_SPEED, 30f, 2))
+    );
+    public static final Item POTION_MOVE_SPEED_LEVEL_3 = register("potion_move_speed_level_3",
+        Fight.ItemTexturePath("potion/potion_bottle_move_speed.png"),
+        EffectItemBuilder.create()
+            .setSounds(Sounds.ENTITY_DRINK)
+            .setEffects(EffectItem.Effect.of(StatusEffects.MOVE_SPEED, 60f, 3))
+    );
+
+
+
+    /**
+     * 最简单、最普通物品的注册
+     * */
+    public static Item register (String name) {
+        return register(name, () -> new Item(new Item.Property()));
+    }
+
+    /**
+     * 最简单的物品注册，显式指定贴图文件路径
+     * */
+    public static Item register (String name, String texturePath) {
+        return register(name, texturePath, () -> new Item(new Item.Property()));
+    }
 
     /**
      * 注册农作物物品
      * */
-    public static CropItem register (String name, Botany crop) {
-        CropItem cropItem = register(name, () -> new CropItem(name, crop));
-        crop.setDroppedItem(cropItem);
-        return cropItem;
+    public static CropItem register (String name, Attachment crop) {
+        return register(name, (attachment) -> new CropItem(attachment, CropItem.PLANT_SOUNDS), crop);
     }
 
     /**
-     * 普通物品的注册
+     * 注册农作物物品
+     * @param supplier 作为种子的物品
+     * @param crop 农作物
      * */
-    public static Item register (String name) {
-        return register(name, () -> new CommonItem(name));
+    public static <A extends Attachment, R extends CropItem> CropItem register (String name, Function<A, R> supplier, A crop) {
+        return register(name, () -> supplier.apply(crop));
     }
 
     /**
      * 刷怪蛋物品的注册
+     * <p>
+     * 需要贴图在 item/spawn_eggs/ 目录下
      * */
-    public static <T extends Entity<T>> Item register (String name, EntityProvider<T> entityProvider) {
-        return register(name, () -> new SpawnEggItem<>(name, entityProvider));
+    public static <T extends Entity<T>> Item registerSpawnEgg (String name, EntityProvider<T> entityProvider) {
+        return register(
+            name,
+            Fight.ItemTexturePath("spawn_eggs/" + name + ".png"),
+            () -> new SpawnEggItem<>(entityProvider)
+        );
     }
 
     /**
-     * 根据名字来创建id
+     * 根据名称来注册物品
      * <p>
-     * 使用普通标准渲染器
+     * 使用普通标准渲染器，贴图路径为 item/{name}.png
+     * @param factory 物品实例的构造工厂（物品的属性需要已创建）
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory) {
-        return register(factory, new ItemRenderer.StandardRenderer<>(), Identifier.of(Fight.ID(name)));
+        return register(name, Fight.ItemTexturePath(name + ".png"), factory);
+    }
+
+    /**
+     * 根据名称、贴图文件路径来注册物品
+     * <p>
+     * 使用普通标准渲染器，显式指定贴图路径（用于贴图不在默认 item 目录下的物品）
+     * @param texturePath   物品的贴图文件路径
+     * @param factory       物品实例的构造工厂（物品的属性需要已创建）
+     * */
+    public static <T extends Item> T register (String name, String texturePath, Supplier<T> factory) {
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        return register(factory, identifier,
+            new ItemRenderer.StandardRenderer<>(identifier.getID(), texturePath));
     }
 
 
@@ -148,53 +396,71 @@ public final class Items {
      * 根据名字来创建id
      * <p>
      * 使用自定义的渲染器
+     * @param name      物品的名字
+     * @param factory   物品实例的构造工厂
+     * @param rendererFactory 物品渲染器的构造工厂
      * */
     public static <T extends Item> T register (String name, Supplier<T> factory, Supplier<ItemRenderer<T>> rendererFactory) {
-        return register(factory, rendererFactory.get(), Identifier.of(Fight.ID(name)));
+        return register(
+            factory,
+            Identifier.of(Fight.ID(name)),
+            rendererFactory.get()
+        );
     }
 
     /**
-     * 根据名字来创建id
+     * 快捷注册物品
      * <p>
-     * 使用自定义的渲染器
+     * 使用自定义的渲染器，渲染器接受 T 或 T 的父类型（PECS: Consumer Super）
+     * @param renderer  物品的渲染器
      * */
-    public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<T> renderer) {
-        return register(factory, renderer, Identifier.of(Fight.ID(name)));
+    @SuppressWarnings("unchecked")
+    public static <T extends Item> T register (String name, Supplier<T> factory, ItemRenderer<? super T> renderer) {
+        Identifier identifier = Identifier.of(Fight.ID(name));
+        return register(
+            factory,
+            identifier,
+            (ItemRenderer<T>) renderer
+        );
     }
 
     /**
-     * 注册方块的方块物品
+     * 快速注册方块的方块物品
      * @param block 已经注册过的方块
      * */
     public static Item register (Block block) {
-        String id = block.getID();
+        Identifier identifier = block.getIdentifier();
         return register(
-            () -> new BlockItem(block, id), //方块的id默认作为方块物品的贴图材质id
-            new ItemRenderer.StandardRenderer<>(),
-            block.getIdentifier()   //方块的identifier与方块物品的identifier相同
+            () -> new BlockItem(block), //方块的贴图由方块渲染器（id→路径映射）提供
+            identifier,      //方块的identifier与方块物品的identifier相同
+            new ItemRenderer.StandardRenderer<>(identifier.getID(), null)
         );
     }
 
     /**
-     * 注册墙体的墙体物品
+     * 快速注册墙体的墙体物品
+     * @param wall 已经注册过的墙体
      * */
     public static <T extends Wall<T>> Item register (Wall<T> wall) {
-        String id = wall.getID();
-        //墙体的id默认是墙体物品的贴图材质id
+        Identifier identifier = wall.getIdentifier();
         return register(
-            () -> new WallItem(wall, id),
-            new ItemRenderer.StandardRenderer<>(),
-            wall.getIdentifier()    //墙体的identifier与墙体物品的identifier相同
+            () -> new WallItem(wall),
+            identifier,    //墙体的identifier与墙体物品的identifier相同
+            new ItemRenderer.StandardRenderer<>(identifier.getID(), null)
         );
     }
 
     /**
-     * 物品注册的基本方法
+     * 物品注册的最基本方法
+     * <p>
+     * 注册物品以及对应的渲染器
      * @param factory 物品的构造工厂
-     * @param renderer 物品的渲染器
      * @param identifier 物品的id标识
+     * @param renderer 物品的渲染器，为null时根据贴图路径自动创建标准渲染器
      * */
-    public static <T extends Item> T register (Supplier<T> factory, ItemRenderer<T> renderer, Identifier identifier) {
+    public static <T extends Item> T register (Supplier<T> factory,
+                                               Identifier identifier,
+                                               ItemRenderer<T> renderer) {
         T item = factory.get();
         item.setIdentifier(identifier);
         Registries.ITEM.register(identifier, item);

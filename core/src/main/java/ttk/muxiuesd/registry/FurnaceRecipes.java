@@ -16,14 +16,25 @@ public final class FurnaceRecipes {
     private static final LinkedHashMap<Item, CookingRecipe> map = new LinkedHashMap<>();//key为输入的物品
 
     public static final CookingRecipe RUBBISH = register("recipe_rubbish", Items.STICK, Items.RUBBISH);
+
+    /// 炼制材料配方
     public static final CookingRecipe GLASS = register("recipe_glass", Items.SAND, Items.GLASS);
+
+    /// 炼金配方
     public static final CookingRecipe COAL = register("recipe_coal", Items.COAL_ORE, Items.COAL);
+    public static final CookingRecipe IRON = register("recipe_iron", Items.RAW_IRON, Items.IRON_INGOT);
+    public static final CookingRecipe GOLD = register("recipe_gold", Items.RAW_GOLD, Items.GOLD_INGOT);
+
+    /// 烹饪食物配方
+    public static final CookingRecipe CHICKEN_COOKED = register("recipe_chicken_cooked", Items.CHICKEN_RAW, Items.CHICKEN_COOKED);
+    public static final CookingRecipe POTATO_BAKED = register("recipe_potato_baked", Items.POTATO, Items.POTATO_BAKED);
+
 
     /**
      * 普通的配方注册，输入一个就输出一个
      * */
     public static CookingRecipe register (String name, Item input, Item output) {
-        return register(new CookingRecipe(new Identifier(Fight.ID(name)), new ItemStack(input, 1)) {
+        return register(new CookingRecipe(Identifier.of(Fight.ID(name)), new ItemStack(input, 1)) {
             @Override
             public ItemStack getOutput () {
                 return new ItemStack(output, 1);

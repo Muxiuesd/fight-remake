@@ -10,6 +10,7 @@ import ttk.muxiuesd.serialization.codecs.CodecCatsHolder;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.cat.CatsHolder;
 import ttk.muxiuesd.world.entity.EntityType;
+import ttk.muxiuesd.world.entity.abs.AttributesModifier;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
@@ -32,7 +33,8 @@ public class EntityCodecBuilder {
             .field("y", Entity::getY, Entity::setY, Codec.FLOAT)
             .field("velX", Entity::getVelX, Entity::setVelX, Codec.FLOAT)
             .field("velY", Entity::getVelY, Entity::setVelY, Codec.FLOAT)
-            .field("speed", Entity::getSpeed, Entity::setSpeed, Codec.FLOAT)
+            //写原始速度，不能写 getSpeed：后者是当前值，带速度提升效果时存档会把加速值当成固定值，效果就永久了
+            .field("speed", Entity::getBaseSpeed, Entity::setSpeed, Codec.FLOAT)
             .field("width", Entity::getWidth, Entity::setWidth, Codec.FLOAT)
             .field("height", Entity::getHeight, Entity::setHeight, Codec.FLOAT)
             .field("originX", Entity::getOriginX, Entity::setOriginX, Codec.FLOAT)
@@ -41,6 +43,13 @@ public class EntityCodecBuilder {
             .field("scaleY", Entity::getScaleY, Entity::setScaleY, Codec.FLOAT)
             .field("rotation", Entity::getRotation, Entity::setRotation, Codec.FLOAT)
             .field("onGround", Entity::isOnGround, Entity::setOnGround, Codec.BOOL)
+            //实体属性表：原始值 + 被改过的当前值（当前血量就是靠它落盘的）
+            //可选字段：旧存档没有这张表，缺了就保持构造器给的空表，不算解码错误
+            //必须排在 cats 之前解码：cats 解码会调 readCatData，里面的血量钳制要用到属性表里的上限
+            .optionalField("attributes",
+                entity -> entity.getProperty().getAttributesModifier(),
+                (entity, attributes) -> entity.getProperty().setAttributesModifier(attributes),
+                AttributesModifier.CODEC)
             //cats 自定义数据：编码时先把实体字段写入 cats，解码时恢复（缺失字段时跳过，兼容旧存档）
             .field("cats",
                 entity -> {
@@ -53,7 +62,7 @@ public class EntityCodecBuilder {
                 (entity, cats) -> {
                     if (cats != null) {
                         entity.getProperty().setCatsHolder(cats);
-                        entity.readCatData(CodecCatsHolder.toJsonValue(cats));
+                        entity.readCatData(cats);
                     }
                 },
                 CodecCatsHolder.CODEC);

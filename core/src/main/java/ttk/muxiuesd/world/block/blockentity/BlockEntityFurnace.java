@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
 import ttk.muxiuesd.interfaces.Inventory;
@@ -29,29 +28,14 @@ import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.interact.InteractSlot;
 import ttk.muxiuesd.world.item.ItemStack;
 import ttk.muxiuesd.world.light.PointLight;
-import ttk.muxiuesd.world.particle.ParticleEmittersReg;
+import ttk.muxiuesd.registry.ParticleEmitters;
 
 /**
  * 熔炉
  * */
 public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEntityFurnace> {
-    /*public static final Codec<BlockEntityFurnace> CODEC1 = CodecBuilder.<BlockEntityFurnace>create()
-        .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
-        .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
-        .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC)
-        .factory((blockPos, id) -> {
-            //从注册表拿到方块实体的提供者
-            BlockEntityProvider<?> provider = Registries.BLOCK_ENTITY.get(id);
-            BlockEntity blockEntity = provider.create(blockPos);
-            blockEntity.setProvider(provider);
-            return (BlockEntityFurnace) blockEntity;
-        });*/
-
     public static final Codec<BlockEntityFurnace> CODEC = BlockEntityCodecBuilder
-        .create(builder ->
-            builder
-                .field("curEnergy", BlockEntityFurnace::getCurEnergy, BlockEntityFurnace::setCurEnergy, Codec.INT)
-                .field("curTick", BlockEntityFurnace::getCurTick, BlockEntityFurnace::setCurTick, Codec.INT)
+        .create(builder -> builder
     );
 
 
@@ -82,10 +66,10 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
     }
 
     @Override
-    public void readCatData (JsonValue values) {
-        super.readCatData(values);
-        this.curEnergy = values.getInt("curEnergy", 0);
-        this.curTick = values.getInt("curTick", 0);
+    public void readCatData (CatsHolder holder) {
+        super.readCatData(holder);
+        this.curEnergy = holder.getInt("curEnergy", 0);
+        this.curTick = holder.getInt("curTick", 0);
     }
 
 
@@ -105,19 +89,15 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
         int addAmount = KeyBindings.PlayerShift.wasPressed() ? handItemStack.getAmount() : 1;
         ItemStack bePutStack = new ItemStack(handItemStack.getItem(), addAmount);
 
-        if (interactStack == null) {
+        if (interactStack.isVoid()) {
             //如果槽位上没东西，就直接加入
             inventory.setItemStack(interactSlot.getIndex(), bePutStack);
             handItemStack.setAmount(handItemStack.getAmount() - addAmount);
-            //handItemStack.setAmount(handItemStack.getAmount() - addAmount);
-        }else if (interactStack.getAmount() == interactStack.getProperty().getMaxCount()) {
-            //槽位上的物品数量满了
-            return InteractResult.FAILURE;
-        } else {
-            //如果槽位上有东西且数量没满
-            //手持物品与槽位上的物品不同也是交互失败
-            if (interactStack.getItem() != handItemStack.getItem()) return InteractResult.FAILURE;
-            //到这里就是相同物品
+        }else if (interactStack.equals(handItemStack)) {
+            //同物品：合并（槽满则无法放入）
+            if (interactStack.getAmount() == interactStack.getProperty().getMaxCount()) {
+                return InteractResult.FAILURE;
+            }
             int bePutStackAmount = bePutStack.getAmount();
             int interactStackAmount = interactStack.getAmount();
             int newAmount = bePutStackAmount + interactStackAmount;
@@ -132,7 +112,12 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
                 interactStack.setAmount(newAmount);
                 bePutStack.setAmount(0);
             }
-            handItemStack.setAmount(handItemStack.getAmount() - addAmount - bePutStack.getAmount());
+            //手部扣减 = 尝试放入量 - 放不下的剩余部分 = 实际放入量（保证数量守恒）
+            handItemStack.setAmount(handItemStack.getAmount() - addAmount + bePutStack.getAmount());
+        } else {
+            //不同物品：交换（手部物品放入槽位，槽位物品拿回手上）
+            inventory.setItemStack(interactSlot.getIndex(), handItemStack);
+            user.setHandItemStack(interactStack);
         }
 
         world.getSystem(SoundSystem.class).playSpatialSound(Sounds.ITEM_PUT, getSounder());
@@ -149,6 +134,8 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
         if (interactSlot == null) return InteractResult.FAILURE;
         //到这里说明交互到了槽位
         ItemStack interactStack = inventory.getItemStack(interactSlot.getIndex());
+        //点击空槽不处理（否则 dropItem 返回空堆叠会把玩家手持物品清空）
+        if (interactStack.isVoid()) return InteractResult.FAILURE;
         int outAmount = KeyBindings.PlayerShift.wasPressed() ? interactStack.getAmount() : 1;
         //丢出物品
         ItemStack outStack = inventory.dropItem(interactSlot.getIndex(), outAmount);
@@ -169,7 +156,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
         ItemStack inputStack = inventory.getItemStack(this.getInputSlotIndex());
         ItemStack fuelStack = inventory.getItemStack(this.getFuelSlotIndex());
         //输入槽位有物品
-        if (inputStack != null) {
+        if (!inputStack.isVoid()) {
             //先检查配方
             if (!FurnaceRecipes.has(inputStack)) {
                 //没有配方就直接跳过
@@ -182,7 +169,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
             //从配方表中获取输出结果
             ItemStack resultStack = FurnaceRecipes.getOutput(inputStack);
             //输出的位置不空
-            if (outputStack != null) {
+            if (!outputStack.isVoid()) {
                 //满了就直接跳过
                 if (outputStack.isFull()) return;
                 //输出和结果不一样也跳过
@@ -192,7 +179,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
             //检查能量值
             if (this.curEnergy == 0) {
                 //没有燃料则跳过
-                if (fuelStack == null) return;
+                if (fuelStack.isVoid()) return;
                 int energy = Fuels.get(fuelStack.getItem());
                 if (energy == 0) {
                     //能量没有增加成功，也直接跳过
@@ -215,7 +202,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
                 this.curTick = 0;
                 inputStack.amountFastDecrease();
 
-                if (outputStack == null) {
+                if (outputStack.isVoid()) {
                     //输出槽位位空时
                     inventory.setItemStack(this.getOutputSlotIndex(), resultStack.copy(1));
                 } else {
@@ -242,7 +229,7 @@ public class BlockEntityFurnace extends BlockEntity implements Codecable<BlockEn
         if (this.isWorking() && MathUtils.random() < 0.07f) {
             ParticleSystem ps = world.getSystemManager().getSystem(ParticleSystem.class);
             //TODO 有些常量可以提出，减少new的次数
-            ps.emitParticle(ParticleEmittersReg.FURNACE_FIRE, MathUtils.random(1, 3),
+            ps.emitParticle(ParticleEmitters.FURNACE_FIRE, MathUtils.random(1, 3),
                 new Vector2(getBlockPos()).add(0, -0.42f), new Vector2(0, 0.6f), new Vector2(),
                 new Vector2(0.2f, 0.2f), new Vector2(0.05f, 0.05f), new Vector2(1f ,1f),
                 0f, 2.2f);

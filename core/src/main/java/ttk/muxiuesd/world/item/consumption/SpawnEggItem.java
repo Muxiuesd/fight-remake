@@ -4,7 +4,6 @@ import ttk.muxiuesd.interfaces.world.entity.EntityProvider;
 import ttk.muxiuesd.system.EntitySystem;
 import ttk.muxiuesd.util.Util;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.ItemStack;
@@ -15,30 +14,26 @@ import ttk.muxiuesd.world.item.ItemStack;
 public class SpawnEggItem<T extends Entity<T>> extends ConsumptionItem{
     private final EntityProvider<T> entityProvider;
 
-    public SpawnEggItem (String name, EntityProvider<T> entityProvider) {
-        super(name);
+    public SpawnEggItem (EntityProvider<T> entityProvider) {
+        super();
         this.entityProvider = entityProvider;
     }
-    public SpawnEggItem (Property property, String textureId, EntityProvider<T> entityProvider) {
-        super(property, textureId);
-        this.entityProvider = entityProvider;
-    }
-    public SpawnEggItem (Property property, String textureId, String texturePath, EntityProvider<T> entityProvider) {
-        super(property, textureId, texturePath);
+    public SpawnEggItem (Property property, EntityProvider<T> entityProvider) {
+        super(property);
         this.entityProvider = entityProvider;
     }
 
     @Override
     public boolean use (ItemStack itemStack, World world, LivingEntity<?> user) {
-        if (user instanceof Player) {
-            EntitySystem es = world.getSystem(EntitySystem.class);
-            T entity = this.entityProvider.create(world);
-            entity.setPosition(Util.getMouseWorldPosition());
-            entity.setEntitySystem(es);
-            es.add(entity);
-        }
+        EntitySystem es = world.getSystem(EntitySystem.class);
+        T entity = this.entityProvider.create(world);
+        entity.setPosition(Util.getMouseWorldPosition());
+        entity.setEntitySystem(es);
+        es.add(entity);
 
-        return super.use(itemStack, world, user);
+        //召唤成功，播放音效并报告成功（物品默认的 use 不播音效也不报成功）
+        this.playUseSound(world, user);
+        return true;
     }
 
     public EntityProvider<T> getEntityProvider () {

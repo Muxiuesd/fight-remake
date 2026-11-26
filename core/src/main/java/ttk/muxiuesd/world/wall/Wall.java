@@ -7,6 +7,7 @@ import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.CodecBuilder;
 import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.registrant.Registries;
 import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.hitbox.Hitbox;
@@ -28,14 +29,14 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
         .paramField("id", Wall::getID, Codec.STRING)
         .paramField("x", wall -> wall.x, Codec.FLOAT)
         .paramField("y", wall -> wall.y, Codec.FLOAT)
-        .field("property", Wall::getProperty, Wall::setProperty, Block.Property.CODEC)
+        .optionalField("property", Wall::getProperty, Wall::setProperty, Block.Property.CODEC)
         .factory((id, x, y) -> {
             Wall<?> prototype = Registries.WALL.getOrNull(id);
             if (prototype == null) {
                 throw new IllegalArgumentException("墙体注册表中不存在id为：" + id + " 的墙体原型（旧存档数据）");
             }
             Wall<?> self = prototype.createSelf(new Vector2(x, y));
-            self.setID(id);
+            self.setIdentifier(Identifier.of(id));
             return self;
         });
 
@@ -43,8 +44,8 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
     private RectHitbox rectHitbox;  //普通墙体只有一个矩形碰撞箱，最好也只有一个
     private HitboxHolder<Wall<T>> hitboxHolder;
 
-    public Wall(Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public Wall(Property property) {
+        super(property);
 
         this.rectHitbox = new RectHitbox()
             .setStartPos(HITBOX_START_X_OFFSET, HITBOX_START_Y_OFFSET)
@@ -54,9 +55,20 @@ public abstract class Wall<T extends Wall<T>> extends Block implements ShapeRend
     }
 
     /**
-     * 创建一个墙体实例
+     * 由原型创建这一格的墙体实例
+     * <p>
+     * 渲染器一并复制过去：墙体每格一个实例，取贴图（破坏残渣、脚步粒子）要靠它
      * */
-    public abstract T createSelf (Vector2 position);
+    public final T createSelf (Vector2 position) {
+        T self = this.createSelfInstance(position);
+        self.setRenderer(this.getRenderer());
+        return self;
+    }
+
+    /**
+     * 子类实现的实例创建，只负责填好自身数据（坐标、id 等），渲染器由{@link #createSelf}统一复制
+     * */
+    protected abstract T createSelfInstance (Vector2 position);
 
     @Override
     public void renderShape(ShapeRenderer batch) {

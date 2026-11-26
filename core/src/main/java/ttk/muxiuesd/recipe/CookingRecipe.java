@@ -34,13 +34,11 @@ public abstract class CookingRecipe implements RecipeOutput {
     }
 
     public CookingRecipe setIdentifier (Identifier identifier) {
+        //Identifier 只在注册阶段给定，注册过后不允许修改
+        if (this.identifier != null && !this.identifier.equals(identifier)) {
+            throw new IllegalStateException("Identifier 已设置，禁止修改！烧炼配方：" + this.identifier.getID() + " -> " + identifier.getID());
+        }
         this.identifier = identifier;
-        return this;
-    }
-
-    public CookingRecipe setId (String id) {
-        //总是创建新实例，防止修改共享的注册表 key（Identifier 的 hashCode 基于 id）
-        this.identifier = new Identifier(id);
         return this;
     }
 

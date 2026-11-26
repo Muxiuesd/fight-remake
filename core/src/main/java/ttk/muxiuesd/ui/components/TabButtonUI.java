@@ -1,5 +1,6 @@
 package ttk.muxiuesd.ui.components;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
@@ -50,7 +51,9 @@ public class TabButtonUI extends UIComponent {
     }
 
     @Override
-    public boolean click (GridPoint2 interactPos) {
+    public boolean click (GridPoint2 interactPos, int button) {
+        //只有左键点击切换选中的物品组页面
+        if (button != Input.Buttons.LEFT) return super.click(interactPos, button);
         //设置这个物品组页面按钮是被选中的
         this.createTabUIPanel.setSelectedTabButton(this);
 
@@ -59,7 +62,7 @@ public class TabButtonUI extends UIComponent {
             Sounds.ITEM_CLICK,
             () -> pos
         );
-        return super.click(interactPos);
+        return super.click(interactPos, button);
     }
 
     @Override
@@ -76,7 +79,12 @@ public class TabButtonUI extends UIComponent {
 
         //绘制当前展示物品组的图标，使用物品自己的渲染器
         ItemStack iconItemStack = this.displayItemGroup.getIconItemStack();
+        //图标为空堆叠（未设置图标）时不绘制，避免 getItem() NPE
+        if (iconItemStack.isVoid()) return;
         ItemRenderer<Item> renderer = ItemRendererRegistry.get(iconItemStack.getItem());
+        //渲染器未注册（可能返回null）时不绘制图标，避免崩溃
+        if (renderer == null) return;
+
         ItemRenderer.Context rendererContext = renderer.getContext(
             renderX + ICON_RENDER_OFFSET.getX(), renderY + ICON_RENDER_OFFSET.getY(),
             ICON_WIDTH, ICON_HEIGHT
@@ -95,6 +103,8 @@ public class TabButtonUI extends UIComponent {
             else rendererContext.y -= SELECTED_ICON_RENDER_DELTA_Y;
         }
         renderer.draw(batch, rendererContext, iconItemStack);
+        //释放渲染上下文，防止池对象泄漏
+        renderer.freeContext(rendererContext);
     }
 
     /**

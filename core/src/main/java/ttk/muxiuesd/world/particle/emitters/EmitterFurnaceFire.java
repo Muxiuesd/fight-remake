@@ -4,9 +4,9 @@ package ttk.muxiuesd.world.particle.emitters;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.pool.particle.ParticleFirePool;
 import ttk.muxiuesd.pool.particle.ParticlePool;
-import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleFire;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcAirFriction;
@@ -22,7 +22,7 @@ public class EmitterFurnaceFire extends ParticleEmitter<ParticleFire> {
         setParticlePool(POOL);
         addMotionComp(new PmcAirFriction());
         addMotionComp(new PmcSizeTrans());
-        setTextureRegion(ParticleAssets.FIRE);
+        setTextureRegion(Fight.ID("fire"), Fight.EntityTexturePath("bullet/flame.png"));
     }
 
     @Override

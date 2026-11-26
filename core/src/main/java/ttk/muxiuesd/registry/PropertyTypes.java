@@ -23,6 +23,14 @@ public final class PropertyTypes {
     public static final PropertyType<Integer> ITEM_MAX_COUNT = register("item_max_count", new DefaultIntPropertyType());
     public static final PropertyType<Integer> ITEM_DURATION = register("item_duration", new DefaultIntPropertyType());
     public static final PropertyType<Boolean> ITEM_ON_USING = register("item_on_using", new DefaultBoolPropertyType());
+    /**
+     * 功能型物品：手持时左键一律不破坏世界（附着物 / 墙体 / 方块都不破坏），
+     * 无论这次左键的物品使用成功还是失败。
+     * <p>
+     * 用于"左键是主动能"的物品（武器、鱼竿等），避免它们的左键既发动功能又拆地形。
+     * 注意：它是"物品类型级"的标记，判定时读物品原型的属性，不要读堆叠里的属性副本。
+     * */
+    public static final PropertyType<Boolean> ITEM_FUNCTIONAL = register("item_functional", new DefaultBoolPropertyType());
     public static final PropertyType<Boolean> FISHING_POLE_USING = register("fishing_pole_using", new PropertyFishingPoleUsing());
     //public static final PropertyType<String> ITEM_USE_SOUND_ID = register("item_use_sound_id", new DefaultStringPropertyType());
     public static final PropertyType<AudioHolder> ITEM_USE_SOUND = register("item_use_sound", new PropertyItemUseSound());
@@ -32,6 +40,7 @@ public final class PropertyTypes {
     public static final PropertyType<Float> WEAPON_USE_SAPN = register("weapon_use_span", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_DAMAGE = register("weapon_damage", new DefaultFloatPropertyType());
     public static final PropertyType<Float> WEAPON_ATTACK_RANGE = register("weapon_attack_range", new DefaultFloatPropertyType());
+    public static final PropertyType<Float> WEAPON_KNOCKBACK = register("weapon_knockback", new DefaultFloatPropertyType());
 
     /// 装备物品的属性
     public static final PropertyType<Float> DAMAGE_REDUCTION = register("damage_reduction", new DefaultFloatPropertyType());
@@ -39,11 +48,21 @@ public final class PropertyTypes {
     /// 方块属性
     public static final PropertyType<Float> BLOCK_FRICTON = register("block_friction", new DefaultFloatPropertyType());
     public static final PropertyType<BlockSounds> BLOCK_SOUNDS_ID = register("block_sounds", new PropertyBlockSounds());
+    public static final PropertyType<Boolean> BLOCK_WALKABLE = register("block_walkable", new DefaultBoolPropertyType());
+    public static final PropertyType<Boolean> BLOCK_SWIMMABLE = register("block_swimmable", new DefaultBoolPropertyType());
+
+    /// 实体属性（存的都是原始值，当前值由状态效果派生，见 AttributesModifier）
+    /// 生命值：原始值是最大血量（固定值），当前值是当前血量（受伤/治疗改的就是它）
+    public static final PropertyType<Float> ENTITY_HEALTH = register("entity_health", new DefaultFloatPropertyType());
+    /// 移动速度
+    public static final PropertyType<Float> ENTITY_MOVE_SPEED = register("entity_move_speed", new DefaultFloatPropertyType());
+    /// 近战攻击力
+    public static final PropertyType<Float> ENTITY_ATTACK_DAMAGE = register("entity_attack_damage", new DefaultFloatPropertyType());
 
 
     public static <T> PropertyType<T> register (String name, PropertyType<T> type) {
         String id = Fight.ID(name);
-        Identifier identifier = new Identifier(id);
+        Identifier identifier = Identifier.of(id);
         return (PropertyType<T>) Registries.PROPERTY_TYPE.register(identifier, type).setIdentifier(identifier);
     }
 }

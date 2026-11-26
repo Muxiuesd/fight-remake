@@ -1,6 +1,5 @@
 package ttk.muxiuesd.serialization.codecs;
 
-import com.badlogic.gdx.utils.JsonValue;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.DataResult;
 import game.muxiuesd.bedrockcore.serialization.RawObject;
@@ -54,28 +53,5 @@ public class CodecCatsHolder {
         if (raw instanceof Double d) return new CatFloat(d.floatValue());
         if (raw instanceof String s) return new CatString(s);
         return null;
-    }
-
-    /**
-     * 将cats持有者转换为json值树
-     * <p>
-     * 用于适配旧的{@code readCatData(JsonValue)}接口
-     * */
-    public static JsonValue toJsonValue (CatsHolder holder) {
-        JsonValue json = new JsonValue(JsonValue.ValueType.object);
-        holder.getMap().forEach((key, catValue) -> {
-            json.addChild(key, toJsonValue(catValue));
-        });
-        return json;
-    }
-
-    private static JsonValue toJsonValue (CatValue<?> catValue) {
-        Object value = catValue.get();
-        if (value instanceof Integer i) return new JsonValue(i);
-        if (value instanceof Long l) return new JsonValue(l);
-        if (value instanceof Boolean b) return new JsonValue(b);
-        if (value instanceof Float f) return new JsonValue(f);
-        if (value instanceof Double d) return new JsonValue(d);
-        return new JsonValue(String.valueOf(value));
     }
 }

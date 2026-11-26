@@ -14,11 +14,26 @@ public class MaterialItemGroup {
         .build()
         .selfAction(group -> {
         group
+            //普通材料
             .add(Items.STICK)
             .add(Items.SLIME_BALL)
+            .add(Items.BONE)
+            .add(Items.BONE_MEAL)
+
             .add(Items.COAL)
+            .add(Items.RAW_IRON)
+            .add(Items.RAW_GOLD)
             .add(Items.IRON_INGOT)
             .add(Items.GOLD_INGOT)
+            .add(Items.DIAMOND)
+
+            .add(Items.POTION_BOTTLE)
+
+            //刷怪蛋（姑且放这里）
+            .add(Items.SPAWN_EGG_SLIME)
+            .add(Items.SPAWN_EGG_ZOMBIE)
+            .add(Items.SPAWN_EGG_PUFFER_FISH)
+            .add(Items.SPAWN_EGG_CHICKEN)
             ;
     });
 }

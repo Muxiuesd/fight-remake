@@ -9,7 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
  * 渲染裁剪工具，指定渲染的时候只在某些区域内渲染出图形
  * */
 public class ScissorUtil {
-    static boolean popped = false;
+    ///当前裁剪栈的深度，支持嵌套裁剪
+    static int stackDepth = 0;
     /**
      * 开始指定矩形区域的裁剪
      * @param batch 当前的batch
@@ -32,17 +33,17 @@ public class ScissorUtil {
 
         // 压入裁剪栈
         ScissorStack.pushScissors(scissors);
-        popped = true;
+        stackDepth++;
     }
 
     /**
      * 结束裁剪
      */
     public static void endScissor (Batch batch) {
-        if (!popped) return;
+        if (stackDepth <= 0) return;
 
         batch.flush();
         ScissorStack.popScissors();
-        popped = false;
+        stackDepth--;
     }
 }

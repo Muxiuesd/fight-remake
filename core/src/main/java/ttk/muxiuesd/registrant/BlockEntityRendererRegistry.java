@@ -45,7 +45,7 @@ public class BlockEntityRendererRegistry extends Registries.DefaultRegistry<Bloc
     public <T extends BlockWithEntity, E extends BlockEntity>
     BlockEntityRenderer<E> registerRenderer (T blockWithEntity, BlockEntityRenderer<E> renderer) {
         if (blockWithEntity != null && renderer != null) {
-            Identifier identifier = new Identifier(blockWithEntity.getID());
+            Identifier identifier = Identifier.of(blockWithEntity.getID());
             if (contains(identifier)) {
                 Log.print(this.getClass().getName(),
                     "已存在过方块实体：" + blockWithEntity.getClass().getName() + " 的渲染器，执行覆盖！");

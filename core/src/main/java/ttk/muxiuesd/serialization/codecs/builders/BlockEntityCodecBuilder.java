@@ -24,7 +24,7 @@ public class BlockEntityCodecBuilder {
         CodecBuilder2<T, BlockPos, String> builder2 = builder0
             .paramField("block_pos", BlockEntity::getBlockPos, BlockPos.CODEC)
             .paramField("id", (entity -> entity.getProvider().getID()), Codec.STRING)
-            .field("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC);
+            .optionalField("inventory", BlockEntity::getInventory, BlockEntity::setInventory, Backpack.CODEC);
 
         return function.apply(builder2).factory((blockPos, id) -> {
             //从注册表获取这个种类的方块实体的提供者

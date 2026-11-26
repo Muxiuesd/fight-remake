@@ -1,6 +1,5 @@
 package ttk.muxiuesd.world.block.abs;
 
-import com.badlogic.gdx.utils.JsonValue;
 import ttk.muxiuesd.interfaces.ICatData;
 import ttk.muxiuesd.interfaces.render.world.block.BlockEntityRenderer;
 import ttk.muxiuesd.world.World;
@@ -16,12 +15,8 @@ public abstract class BlockWithEntity extends Block implements ICatData{
     //方块对应的方块实体实例
     private BlockEntity blockEntity;
 
-    public BlockWithEntity (Property property, String textureId) {
-        super(property, textureId);
-    }
-
-    public BlockWithEntity (Property property, String textureId, String texturePath) {
-        super(property, textureId, texturePath);
+    public BlockWithEntity (Property property) {
+        super(property);
     }
 
     /**
@@ -41,9 +36,9 @@ public abstract class BlockWithEntity extends Block implements ICatData{
     }
 
     @Override
-    public void readCatData (JsonValue values) {
+    public void readCatData (CatsHolder holder) {
         //让方块实体读取属性
-        this.getBlockEntity().readCatData(values);
+        this.getBlockEntity().readCatData(holder);
     }
 
     /**

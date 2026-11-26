@@ -27,6 +27,14 @@ public class BlockRendererRegistry extends Registries.DefaultRegistry<BlockRende
         return (BlockRenderer<T>) renderer;
     }
 
+    /**
+     * 安全获取渲染器（未注册时返回 null 而不抛异常）
+     */
+    public static <T extends Block> BlockRenderer<T> getOrNull (T block) {
+        if (block == null) return null;
+        return (BlockRenderer<T>) getInstance().getOrNull(block.getID());
+    }
+
     /// 单例模式
     private static BlockRendererRegistry INSTANCE;
     public static BlockRendererRegistry getInstance () {
@@ -42,7 +50,7 @@ public class BlockRendererRegistry extends Registries.DefaultRegistry<BlockRende
      * */
     public <T extends Block> BlockRenderer<T> registerRenderer (T block, BlockRenderer<T> blockRenderer) {
         if (block != null && blockRenderer != null) {
-            Identifier identifier = new Identifier(block.getID());
+            Identifier identifier = Identifier.of(block.getID());
             if (contains(identifier)) {
                 Log.print(this.getClass().getName(),
                     "已存在过方块：" + block.getClass().getName() + " 的渲染器，执行覆盖！");

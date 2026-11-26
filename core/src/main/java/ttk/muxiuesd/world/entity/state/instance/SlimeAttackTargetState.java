@@ -18,7 +18,7 @@ public class SlimeAttackTargetState extends StateEnemy<Slime> {
     public void handle (World world, Slime entity, float delta) {
         //有目标
         if (entity.checkTarget()) {
-            entity.walkToTarget(delta);
+            entity.walkToTarget(entity.getCurTarget());
             entity.remoteAttack(delta);
         }else {
             //没目标就休息一下或者随机游走

@@ -6,13 +6,36 @@
   "text.fight:button_exit_game":     "退出游戏",
   "text.fight:button_create_new_world":     "新建世界",
 
+  "text.fight:info_entry_game_name":      "Fight:战斗爽！",
+  "text.fight:info_entry_fps":            "当前帧率: {0} fps",
+  "text.fight:info_entry_memory":         "已使用: {0} MB / 分配: {1} MB",
+  "text.fight:info_entry_position":       "x: {0}, y: {1}, 高度：{2} m",
+  "text.fight:info_entry_biome":          "当前群系：{0}",
+
   "text.fight:weapon_use_span":     "&&a攻击间隔：{0}",
   "text.fight:weapon_damage":       "&&a武器伤害：{0}",
   "text.fight:weapon_attack_range": "&&a攻击范围：{0}",
   "text.fight:effect_duration":     "&&a持续时间：{0}",
   "text.fight:item_duration":       "&&a剩余耐久：{0} / {1}",
   "text.fight:shoot_bullet":        "&&a发射子弹：{0}",
+  "text.fight:damage_reduction":    "&&a减伤度：{0}",
 
+
+  "item.fight:wood_sword":  "木剑",
+
+  "item.fight:stone_sword": "石剑",
+
+  "item.fight:iron_sword":          "&&c铁剑",
+  "item.fight:iron_helmet":         "&&c铁头盔",
+  "item.fight:iron_chestplate":     "&&c铁胸甲",
+  "item.fight:iron_leggings":       "&&c铁裤腿",
+  "item.fight:iron_boots":          "&&c铁靴子",
+
+  "item.fight:gold_sword":          "&&c金剑",
+  "item.fight:gold_helmet":         "&&c金头盔",
+  "item.fight:gold_chestplate":     "&&c金胸甲",
+  "item.fight:gold_leggings":       "&&c金裤腿",
+  "item.fight:gold_boots":          "&&c金靴子",
 
   "item.fight:diamond_sword":       "&&m钻石剑",
   "item.fight:diamond_helmet":      "&&m钻石头盔",
@@ -20,19 +43,44 @@
   "item.fight:diamond_leggings":    "&&m钻石裤腿",
   "item.fight:diamond_boots":       "&&m钻石靴子",
 
-  "item.fight:iron_sword": "&&c铁剑",
 
-  "item.fight:torch": "火把",
-  "item.fight:stick": "木棍",
+  "item.fight:torch":     "火把",
   "item.fight:fish_pole": "钓鱼竿",
+  "item.fight:stick":     "木棍",
+  "item.fight:bone":      "骨头",
+  "item.fight:bone_meal": "骨粉",
 
-  "item.fight:fish": "鱼",
-  "item.fight:puffer_fish": "河豚",
+  "item.fight:potato":          "土豆",
+  "item.fight:seeds_wheat":     "小麦种子",
+  "item.fight:wheat":           "小麦",
 
-  "item.fight:rubbish": "垃圾",
+  "item.fight:fish":            "鱼",
+  "item.fight:puffer_fish":     "河豚",
+  "item.fight:potato_baked":    "熟土豆",
+  "item.fight:chicken_raw":     "生鸡肉",
+  "item.fight:chicken_cooked":  "熟鸡肉",
+  "item.fight:bread":           "面包",
 
-  "item.fight:coal": "煤炭",
+  "item.fight:rubbish":     "垃圾",
 
-  "effect.fight:healing": "治疗 等级：{0}",
-  "effect.fight:poison": "中毒 等级：{0}"
+  "item.fight:coal":        "煤炭",
+  "item.fight:raw_iron":    "粗铁矿",
+  "item.fight:raw_gold":    "粗金矿",
+  "item.fight:iron_ingot":  "&&c铁锭",
+  "item.fight:gold_ingot":  "&&c金锭",
+  "item.fight:diamond":     "&&m钻石",
+
+  "item.fight:potion_heal_level_1":       "治疗药水 Ⅰ",
+  "item.fight:potion_heal_level_2":       "治疗药水 Ⅱ",
+  "item.fight:potion_heal_level_3":       "治疗药水 Ⅲ",
+  "item.fight:potion_poison_level_1":     "中毒药水 Ⅰ",
+  "item.fight:potion_poison_level_2":     "中毒药水 Ⅱ",
+  "item.fight:potion_poison_level_3":     "中毒药水 Ⅲ",
+  "item.fight:potion_move_speed_level_1": "速度提升药水 Ⅰ",
+  "item.fight:potion_move_speed_level_2": "速度提升药水 Ⅱ",
+  "item.fight:potion_move_speed_level_3": "速度提升药水 Ⅲ",
+
+  "effect.fight:healing":       "治疗 等级：{0}",
+  "effect.fight:poison":        "中毒 等级：{0}",
+  "effect.fight:move_speed":    "移速增加 等级：{0}"
 }

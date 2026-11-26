@@ -44,6 +44,7 @@ public class ObjectCodec<T> extends Codec<T> {
         Map<String, Object> rawMap = input.asMap().get();
         StringBuilder errors = new StringBuilder();
         boolean hasError = false;
+        boolean paramMissing = false;
 
         // 收集构造参数
         Object[] paramValues = new Object[paramFields.size()];
@@ -53,6 +54,7 @@ public class ObjectCodec<T> extends Codec<T> {
             if (rawVal == null) {
                 errors.append(p.name).append(": Missing; ");
                 hasError = true;
+                paramMissing = true;
                 paramValues[i] = null;
             } else {
                 DataResult<?> dr = p.codec.decode(Codec.wrap(rawVal));
@@ -66,6 +68,9 @@ public class ObjectCodec<T> extends Codec<T> {
             }
         }
 
+        //构造参数缺失时不构造：把 null 塞给工厂只会在更下游抛空指针，错误信息也丢了
+        if (paramMissing) return DataResult.error(errors.toString());
+
         T instance = factory.apply(paramValues);
 
         // setter 注入
@@ -73,6 +78,13 @@ public class ObjectCodec<T> extends Codec<T> {
             if (!f.decodeOnRead) continue;
             Object rawVal = rawMap.get(f.name);
             if (rawVal == null) {
+                //可选字段：字段缺失不算错误。声明了默认值就写进去，否则保持工厂/构造器给的值
+                if (f.optional) {
+                    if (f.defaultValue != null) {
+                        ((BiConsumer<T, Object>) f.setter).accept(instance, f.defaultValue.get());
+                    }
+                    continue;
+                }
                 errors.append(f.name).append(": Missing; ");
                 hasError = true;
                 continue;

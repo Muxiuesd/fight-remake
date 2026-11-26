@@ -1,5 +1,6 @@
 package ttk.muxiuesd.world.item;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
@@ -14,7 +15,6 @@ import ttk.muxiuesd.ui.text.Text;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.entity.abs.LivingEntity;
 import ttk.muxiuesd.world.item.abs.Item;
-import ttk.muxiuesd.world.item.abs.Weapon;
 
 /**
  * 物品堆栈
@@ -25,7 +25,7 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     public static final Codec<ItemStack> CODEC = CodecBuilder.<ItemStack>create()
         .field("item", ItemStack::getItem, ItemStack::setItem, Item.CODEC)
         .field("amount", ItemStack::getAmount, ItemStack::setAmount, Codec.INT)
-        .field("property", ItemStack::getProperty, ItemStack::setProperty, Item.Property.CODEC)
+        .optionalField("property", ItemStack::getProperty, ItemStack::setProperty, Item.Property.CODEC)
         .noArgFactory(ItemStack::new);
 
 
@@ -37,7 +37,7 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     private IItemStackBehaviour behaviour;//物品堆叠所用的行为，一般来说根据物品的类型来判断
     private Item.Property property;//物品堆叠所持有的物品属性，与物品本身自带的属性不是一个实例
     private int amount;         //数量
-    public Timer<?> useTimer;   //使用时间计时器
+    private Timer<?> useTimer;  //使用时间计时器
 
     /**
      * 给空物品使用的构造方法，啥也没有
@@ -48,11 +48,11 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     }
     public ItemStack (Item item) {
         //不指定数量就默认这个物品的最大数量
-        this(item, item.property.getMaxCount());
+        this(item, item.getProperty().getMaxCount());
     }
     public ItemStack (Item item, int amount) {
         //没有指定物品属性就获取复制的
-        this(item, amount, item.getBehaviour(), item.property.copy());
+        this(item, amount, item.getBehaviour(), item.getProperty().copy());
     }
     //需要指定物品属性
     public ItemStack (Item item, int amount, Item.Property property) {
@@ -74,6 +74,14 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     }
 
     /**
+     * 对着世界里的某个目标使用（右键交互）
+     * @param targetPos 目标位置（通常是鼠标指向的世界坐标）
+     * */
+    public boolean useOn (World world, LivingEntity<?> user, Vector2 targetPos) {
+        return this.behaviour.useOn(world, user, this, targetPos);
+    }
+
+    /**
      * 这个物品堆叠从手上换下来
      * */
     public void putDown (World world, LivingEntity<?> holder) {
@@ -84,7 +92,16 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     public void update (float delta) {
         //更新物品
         this.getItem().update(delta, this);
-        if (this.useTimer != null) this.useTimer.update(delta);
+        if (this.useTimer != null) {
+            //检测使用完成：useTimer 的 curSpan 从"未到最大"推进到"达到最大"（冷却结束）
+            float prev = this.useTimer.getCurSpan();
+            float max = this.useTimer.getMaxSpan();
+            this.useTimer.update(delta);
+            //使用完成 → 及时复位 ITEM_ON_USING = false
+            if (prev < max && this.useTimer.getCurSpan() >= max) {
+                this.setOnUsing(false);
+            }
+        }
     }
 
     /**
@@ -110,6 +127,12 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
         return array;
     }
 
+    /**
+     * 复制，数量跟原本的一样
+     * */
+    public ItemStack copy () {
+        return copy(this.getAmount());
+    }
 
     /**
      * 指定数量的复制，数量最少为1
@@ -126,10 +149,10 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     /**
      * 分开物品堆叠
      * <p>
-     * 分离出指定数量，原物品堆叠数量会减少
+     * 分离出指定数量，原物品堆叠数量会减少；无法分离时返回空物品堆叠
      * */
     public ItemStack split (int amount) {
-        if (amount <= 0) return null;
+        if (amount <= 0) return ItemStack.VOID;
         ItemStack newStack;
         //超过或者等于最大数量，直接返回目前的数量
         if (amount >= this.getAmount()) {
@@ -169,7 +192,9 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
      * 检测两个物品堆叠是否相同，需要所持有的物品以及属性（数量，种类，值）相同
      * */
     public boolean equals (ItemStack stack) {
-        if (stack == null) return false;
+        //空堆叠（VOID/null）只与空堆叠相等
+        if (this.isVoid()) return stack == null || stack.isVoid();
+        if (stack == null || stack.isVoid()) return false;
         //物品不是一种就无需判断直接false
         if (this.getItem() != stack.getItem()) return false;
         //比较所持有的属性
@@ -177,10 +202,82 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     }
 
     /**
-     * 物品是否在使用中
+     * 覆写 Object.equals（委托给 {@link #equals(ItemStack)}），
+     * 使 List/Map 的 contains/remove 等操作遵循属性全等语义
      * */
+    @Override
+    public boolean equals (Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof ItemStack stack) {
+            return this.equals(stack);
+        }
+        return false;
+    }
+
+    /**
+     * 与 {@link #equals(Object)} 保持契约一致
+     * <p>
+     * 基于物品实例的哈希（属性全等的堆叠物品实例相同 → 哈希相同；
+     * 属性不同但物品相同 → 哈希可相同，不违反 equals/hashCode 契约）
+     * */
+    @Override
+    public int hashCode () {
+        return this.getItem() != null ? this.getItem().hashCode() : 0;
+    }
+
+    /**
+     * 这个物品堆叠是否是空的（空物品堆叠 {@link #VOID}）
+     * <p>
+     * 空槽位/空手的统一判断，替代 null 判断
+     * */
+    public boolean isVoid () {
+        return this == VOID;
+    }
+
+    /**
+     * 物品是否在使用中
+     */
     public boolean onUsing () {
         return this.getProperty().get(PropertyTypes.ITEM_ON_USING, false);
+    }
+
+    /**
+     * 设置物品是否在使用中（写入 ITEM_ON_USING 属性）
+     */
+    public ItemStack setOnUsing (boolean onUsing) {
+        this.getProperty().add(PropertyTypes.ITEM_ON_USING, onUsing);
+        return this;
+    }
+
+    /**
+     * 物品是否正在使用中
+     * <p>
+     * 满足任一即为正在使用：① {@link #onUsing()} 为 true（如鱼竿抛竿的持续状态）；
+     * ② useTimer 存在且仍处于冷却中（curSpan < maxSpan，如武器攻击后的 CD）。
+     */
+    public boolean isUsing () {
+        if (this.onUsing()) return true;
+        if (this.useTimer == null) return false;
+        //注意：不能调用 useTimer.isReady() 来判断——isReady() 到点会归零 curSpan（Timer 设计），
+        //在"检查切换是否允许"这种只读场景调用会污染 useTimer 状态（冷却完的被归零后，
+        //下次切回该武器被误判为使用中，须再等一个 CD 周期才能切换）。
+        //此处只读比较 curSpan 与 maxSpan，无副作用。
+        return this.useTimer.getCurSpan() < this.useTimer.getMaxSpan();
+    }
+
+    /**
+     * 获取使用计时器（无使用间隔属性的物品为 null）
+     */
+    public Timer<?> getUseTimer () {
+        return this.useTimer;
+    }
+
+    /**
+     * 设置使用计时器
+     */
+    public ItemStack setUseTimer (Timer<?> useTimer) {
+        this.useTimer = useTimer;
+        return this;
     }
 
     /**
@@ -198,8 +295,12 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
         this.behaviour = item.getBehaviour();
         this.setProperty(item.getProperty().copy());
 
-        if (item instanceof Weapon weapon) {
-            this.useTimer = new Timer<>(weapon.getProperty().getUseSpan());
+        //有使用间隔属性的物品就创建 CD 计时器（不再绑死 Weapon 类型）
+        if (item.getProperty().contain(PropertyTypes.WEAPON_USE_SAPN)) {
+            float span = item.getProperty().get(PropertyTypes.WEAPON_USE_SAPN, 0f);
+            //初始化为"已冷却完毕"（curSpan = maxSpan，isReady() 为 true）：
+            //物品刚获得/切换到时未使用即可立即使用，也可立即切换手持（避免 isUsing() 把未使用误判为使用中）
+            this.useTimer = new Timer<>(span, span);
         }
         return this;
     }
@@ -225,8 +326,12 @@ public class ItemStack implements Updateable, Codecable<ItemStack> {
     }
 
     public ItemStack setAmount (int amount) {
-        if (amount >= this.getProperty().getMaxCount()) this.amount = this.getProperty().getMaxCount();
-        if (amount >= 0) this.amount = amount;
+        //空堆叠无属性，直接返回（getProperty() 为 null）
+        if (this.isVoid()) return this;
+        //上限保护：数量不能超过堆叠上限（原两个独立 if 会让超上限值覆盖上限，堆叠数量可突破上限）；负数忽略
+        if (amount >= 0) {
+            this.amount = Math.min(amount, this.getProperty().getMaxCount());
+        }
         return this;
     }
 

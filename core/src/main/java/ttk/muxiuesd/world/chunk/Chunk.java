@@ -1,37 +1,31 @@
 package ttk.muxiuesd.world.chunk;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import game.muxiuesd.bedrockcore.app.interfaces.Updateable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.Drawable;
-import game.muxiuesd.bedrockcore.app.interfaces.render.ShapeRenderable;
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.util.Log;
 import ttk.muxiuesd.interfaces.ChunkTraversalJob;
-import ttk.muxiuesd.interfaces.render.world.block.BlockRenderer;
-import ttk.muxiuesd.interfaces.render.world.block.WallRenderer;
-import ttk.muxiuesd.registrant.BlockRendererRegistry;
-import ttk.muxiuesd.registrant.WallRendererRegistry;
 import ttk.muxiuesd.registry.Blocks;
 import ttk.muxiuesd.serialization.codecs.CodecChunk;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.util.ChunkPosition;
+import ttk.muxiuesd.world.biome.Biome;
+import ttk.muxiuesd.world.block.abs.Attachment;
 import ttk.muxiuesd.world.block.abs.Block;
-import ttk.muxiuesd.world.block.abs.Botany;
 import ttk.muxiuesd.world.wall.Wall;
 
 
 /**
  * 一个区块
  * <p>
- * 一行一行更新绘制
+ * 只持有数据：方块、墙体、附着物、地形高度，以及区块内的坐标换算
+ * <p>
+ * 区块内容的绘制不在这里，统一由 {@link ttk.muxiuesd.system.ChunkRenderSystem} 负责
  * */
-public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable {
+public class Chunk implements Disposable, Updateable {
     /**
      * 区块的现代化编解码器
      * */
@@ -64,8 +58,16 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     public static final int ChunkWidth = 16;
     public static final int ChunkHeight = 16;
-    public static final int LowestHeight = 0;
-    public static final int HighestHeight = 7;
+    /// 高度（地形强度标量）范围与层级常量
+    public static final int LowestHeight = 0;         // 地形最低（最深的海洋）
+    public static final int HighestHeight = 256;      // 地形最高（最高山峰）
+    public static final int SEA_LEVEL = 150;          // 海平面/海陆分界阈值（区块平滑高度 ≥ 150 → 陆地）
+    public static final int BEACH_MAX = 156;          // 沙滩带上限（150~156 → 海岸过渡/沙滩）
+    public static final int GRASS_TOP = 200;          // 统一高程带：草地带顶（>BEACH_MAX 且 ≤200 → 草地）
+    public static final int STONE_TOP = 235;          // 统一高程带：石头带顶（>200 且 ≤235 → 石头）
+    public static final int SNOWLINE = 236;           // 统一高程带：雪带底（≥236 → 雪方块）
+    public static final int LOW_BAND_TOP = 165;       // 低地分段上限（区块高度 <165 → 湿地，紧贴海岸）
+    public static final int HIGH_BAND_BOTTOM = 220;   // 高地分段下限（区块高度 ≥220 → 山地）
 
     //区块分区
     public static final Vector2 ZONE_RECTANGLE_OFFSET = new Vector2(- Block.WIDTH / 2, - Block.HEIGHT / 2);
@@ -85,8 +87,22 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     private final Block[][] blocks;
     //储存一个区块里的墙，有的位置可能为null
     private final Wall<?>[][]  walls;
-    private final Botany[][]  botanys;
+    private final Attachment[][]  attachments;
     private final int[][] heights;
+
+    /**
+     * 每一行的占用位图：第 x 位为 1 表示这一格有内容
+     * <p>
+     * 渲染只遍历置位的格子，空层（整行位图为 0）直接跳过，不再逐格判断
+     * <p>
+     * 只在下面三个 setter 里维护，任何地方都不要绕过 setter 直接写上面三个数组
+     * */
+    private final long[] blockBits = new long[ChunkHeight];
+    private final long[] wallBits = new long[ChunkHeight];
+    private final long[] attachmentBits = new long[ChunkHeight];
+
+    private Biome biome;   //该区块所属的群系（生成时确定，供渲染/判定复用）
+    private boolean canSpawn;   //该区块是否可作为玩家出生点（由群系注册阶段确定，随存档保存）
 
 
     public Chunk(ChunkSystem chunkSystem) {
@@ -96,55 +112,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public Chunk () {
         this.blocks = new Block[ChunkHeight][ChunkWidth];
         this.walls  = new Wall[ChunkHeight][ChunkWidth];
-        this.botanys = new Botany[ChunkHeight][ChunkWidth];
+        this.attachments = new Attachment[ChunkHeight][ChunkWidth];
         this.heights = new int[ChunkHeight][ChunkWidth];
-    }
-
-    @Override
-    public void draw(Batch batch) {
-        ChunkPosition cp = this.chunkPosition;
-        //绘制方快
-        this.traversal((x, y) -> {
-            Block block = this.blocks[y][x];
-            if (block != null) {
-                BlockRenderer<Block> renderer = BlockRendererRegistry.get(block);
-                if (renderer != null) {
-                    BlockRenderer.Context context = renderer.getContext();
-                    context.x = x + cp.x * ChunkWidth;
-                    context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, block, context);
-                    renderer.freeContext(context);
-                }
-            }
-        });
-        //绘制墙体
-        this.traversal((x, y) -> {
-            Wall<?> wall = this.walls[y][x];
-            if (wall != null) {
-                WallRenderer<Wall<?>> renderer = WallRendererRegistry.getRenderer(wall);
-                if (renderer != null) {
-                    WallRenderer.Context context = renderer.getContext();
-                    context.x = x + cp.x * ChunkWidth;
-                    context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, wall, context);
-                    renderer.freeContext(context);
-                }
-            }
-        });
-        //绘制植物
-        this.traversal((x, y) -> {
-            Botany botany = this.botanys[y][x];
-            if (botany != null) {
-                BlockRenderer<Block> renderer = BlockRendererRegistry.get(botany);
-                if (renderer != null) {
-                    BlockRenderer.Context context = renderer.getContext();
-                    context.x = x + cp.x * ChunkWidth;
-                    context.y = y + cp.y * ChunkHeight;
-                    renderer.render(batch, botany, context);
-                    renderer.freeContext(context);
-                }
-            }
-        });
     }
 
     @Override
@@ -164,6 +133,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     public void setBlock (Block block, int cx, int cy) {
         if (block == null) block = Blocks.ARI;
         this.blocks[cy][cx] = block;
+        if (block == Blocks.ARI) this.blockBits[cy] &= ~(1L << cx);
+        else this.blockBits[cy] |= 1L << cx;
         //确保区块系统里存在这个方块
         if (this.chunkSystem != null) {
             this.chunkSystem.addBlock(block, this.getWorldX(cx), this.getWorldY(cy));
@@ -186,6 +157,8 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     public void setWall (Wall<?> wall, int cx, int cy) {
         this.walls[cy][cx] = wall;
+        if (wall == null) this.wallBits[cy] &= ~(1L << cx);
+        else this.wallBits[cy] |= 1L << cx;
     }
 
     /**
@@ -205,24 +178,45 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     }
 
     /**
-     * 设置这个区块上的某一个植物
+     * 设置这个区块上的某一个附着物
      * */
-    public void setBotany (Botany botany, int cx, int cy) {
-        this.botanys[cy][cx] = botany;
+    public void setAttachment (Attachment attachment, int cx, int cy) {
+        this.attachments[cy][cx] = attachment;
+        if (attachment == null) this.attachmentBits[cy] &= ~(1L << cx);
+        else this.attachmentBits[cy] |= 1L << cx;
     }
 
     /**
-     * 获取这个区块上的某一个植物
+     * 获取这个区块上的某一个附着物
      * */
-    public Botany getBotany (int cx, int cy) {
-        return this.botanys[cy][cx];
+    public Attachment getAttachment (int cx, int cy) {
+        return this.attachments[cy][cx];
     }
 
     /**
-     * 检测这个区块上是否有植物
+     * 检测这个区块上是否有附着物
      * */
-    public boolean hasBotany (int cx, int cy) {
-        return this.botanys[cy][cx] != null;
+    public boolean hasAttachment (int cx, int cy) {
+        return this.attachments[cy][cx] != null;
+    }
+
+    /**
+     * 这一行的方块占用位图，第 x 位为 1 表示这一格有方块
+     * <p>
+     * 渲染用：只遍历置位的格子
+     * */
+    public long getBlockBits (int cy) {
+        return this.blockBits[cy];
+    }
+
+    /** 这一行的墙体占用位图，用法同上 */
+    public long getWallBits (int cy) {
+        return this.wallBits[cy];
+    }
+
+    /** 这一行的附着物占用位图，用法同上 */
+    public long getAttachmentBits (int cy) {
+        return this.attachmentBits[cy];
     }
 
 
@@ -235,6 +229,24 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
 
     public int getHeight (int cx, int cy) {
         return this.heights[cy][cx];
+    }
+
+    public Biome getBiome () {
+        return this.biome;
+    }
+
+    public Chunk setBiome (Biome biome) {
+        this.biome = biome;
+        return this;
+    }
+
+    public boolean getCanSpawn () {
+        return this.canSpawn;
+    }
+
+    public Chunk setCanSpawn (boolean canSpawn) {
+        this.canSpawn = canSpawn;
+        return this;
     }
 
     /**
@@ -260,14 +272,14 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
     }
 
     /**
-     * 查找植物
+     * 查找附着物
      * @param wx 世界坐标x
      * @param wy 世界坐标y
-     * @return 找到植物就返回对应的实例，否则为null
+     * @return 找到附着物就返回对应的实例，否则为null
      */
-    public Botany seekBotany (float wx, float wy) {
+    public Attachment seekAttachment (float wx, float wy) {
         GridPoint2 chunkPos = this.worldPos2ChunkPos(wx, wy);
-        return this.getBotany(chunkPos.x, chunkPos.y);
+        return this.getAttachment(chunkPos.x, chunkPos.y);
     }
 
     /**
@@ -291,43 +303,6 @@ public class Chunk implements Disposable, Updateable, Drawable, ShapeRenderable 
             cy = (int) (wy % ChunkHeight);
         }
         return new GridPoint2(cx, cy);
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        //绘制区块边界
-        if (this.chunkSystem.chunkEdgeRender) {
-            batch.setColor(Color.PURPLE);
-            //内部区域边界
-            for (int i = 0; i < chunkZone.length; i++) {
-                Rectangle zone = chunkZone[i];
-                batch.rect(zone.x, zone.y, zone.width, zone.height);
-            }
-            //区块整个边界
-            batch.setColor(new Color(255, 0, 0, 255));
-            batch.rect(
-                this.chunkPosition.x * ChunkWidth + ZONE_RECTANGLE_OFFSET.x,
-                this.chunkPosition.y * ChunkHeight+ ZONE_RECTANGLE_OFFSET.y,
-                ChunkWidth, ChunkHeight
-            );
-            //还原颜色
-            batch.setColor(Color.WHITE);
-        }
-        //绘制墙体的碰撞箱范围
-        if (this.chunkSystem.wallHitboxRender) {
-            batch.setColor(Color.BLUE);
-            this.traversal(((x, y) -> {
-                Wall wall = walls[y][x];
-                if (wall != null && wall.getHitboxRectangle() != null) {
-                    /*Rectangle hitbox = wall.getHitbox();
-                    batch.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());*/
-                    wall.renderShape(batch);
-                }
-            }));
-            //还原颜色
-            batch.setColor(Color.WHITE);
-        }
-
     }
 
     /**

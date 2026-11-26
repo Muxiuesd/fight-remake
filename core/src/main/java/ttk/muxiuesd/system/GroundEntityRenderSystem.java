@@ -31,13 +31,8 @@ public class GroundEntityRenderSystem extends EntityRenderSystem implements IWor
     }
 
     @Override
-    public void draw(Batch batch) {
-        drawEntities(batch, this.getGroundEntities());
-    }
-
-    @Override
-    public void renderShape(ShapeRenderer batch) {
-        renderShapeEntities(batch, this.getGroundEntities());
+    protected Array<Entity<?>> getRenderEntities () {
+        return this.getGroundEntities();
     }
 
     @Override

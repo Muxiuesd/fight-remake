@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import game.muxiuesd.bedrockcore.util.TaskTimer;
 import game.muxiuesd.bedrockcore.util.Timer;
-import ttk.muxiuesd.Fight;
+import ttk.muxiuesd.registry.ParticleEmitters;
 import ttk.muxiuesd.registry.PropertyTypes;
 import ttk.muxiuesd.system.ChunkSystem;
 import ttk.muxiuesd.system.ParticleSystem;
@@ -32,21 +32,22 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
     private float cycle;
     public boolean isReturning;
 
+    /// 抛射/回收速度（世界单位/秒）
+    private static final float THROW_SPEED = 6f;
+
 
     public EntityFishingHook(World world, EntityType<?> entityType) {
         super(world, entityType);
-        setSpeed(0);
+        //抛射速度：throwMovement/returningMovement 用 setCurSpeed/getSpeed 按此缩放方向矢量
+        //（之前为 0 导致鱼钩抛射速度被 setCurSpeed(getSpeed()) 归零，鱼钩原地不动）
+        setSpeed(THROW_SPEED);
         setSize(0.7f, 0.7f);
-        setBodyTextureRegionResource(
-            Fight.ID("fishing_hook"),
-            "fish/fishing_hook.png"
-        );
         fastAddBodyHitBox();
-
         this.moveTimer = new TaskTimer(0.7f, () -> this.moveTimer = null); //用完就丢的计时器
         this.bubbleEmitTimer = new TaskTimer(0.6f, 0.3f, () -> {
             if (this.getParticleSystem() == null) return;
-            this.pts.emitParticle(Fight.ID("entity_swimming"), MathUtils.random(2, 5),
+            this.pts.emitParticle(ParticleEmitters.ENTITY_SWIMMING,
+                MathUtils.random(2, 5),
                 getCenterPos().add(0, - getHeight() / 2),
                 new Vector2(MathUtils.random(0.5f, 1.2f), 0),
                 getOrigin(),
@@ -56,6 +57,14 @@ public class EntityFishingHook extends Entity<EntityFishingHook> {
 
         this.positionOffset = new Vector2(0, 0);
         this.isReturning = false;
+    }
+
+    /**
+     * 鱼钩是受控运动体：抛射/回收时每帧由自身逻辑写入速度意图
+     */
+    @Override
+    public boolean hasIntent () {
+        return true;
     }
 
     @Override

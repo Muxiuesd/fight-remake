@@ -3,9 +3,9 @@ package ttk.muxiuesd.world.particle.emitters;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.pool.particle.ParticleBubblePool;
 import ttk.muxiuesd.pool.particle.ParticlePool;
-import ttk.muxiuesd.world.particle.ParticleAssets;
 import ttk.muxiuesd.world.particle.ParticleBubble;
 import ttk.muxiuesd.world.particle.abs.ParticleEmitter;
 import ttk.muxiuesd.world.particle.motion.PmcSizeTrans;
@@ -20,7 +20,7 @@ public class EmitterEntitySwimming extends ParticleEmitter<ParticleBubble> {
         setParticlePool(POOL);
         addMotionComp(new PmcWaterFriction());
         addMotionComp(new PmcSizeTrans());
-        setTextureRegion(ParticleAssets.BUBBLE);
+        setTextureRegion(Fight.ID("bubble"), Fight.ParticleTexturePath("bubble.png"));
     }
 
     @Override

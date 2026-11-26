@@ -4,8 +4,8 @@ import ttk.muxiuesd.event.abs.EntityHurtEvent;
 import ttk.muxiuesd.registry.Sounds;
 import ttk.muxiuesd.system.SoundSystem;
 import ttk.muxiuesd.world.World;
-import ttk.muxiuesd.world.entity.Player;
 import ttk.muxiuesd.world.entity.abs.Entity;
+import ttk.muxiuesd.world.entity.player.Player;
 
 /**
  * 玩家受到攻击

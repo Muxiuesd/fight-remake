@@ -1,16 +1,50 @@
 package ttk.muxiuesd.interfaces.render.world.entity;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
+import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.pool.FightPool;
+import ttk.muxiuesd.resource.Resource;
 import ttk.muxiuesd.world.entity.abs.Entity;
 
 /**
  * 实体的渲染器接口
+ * <p>
+ * 实体的贴图资源由渲染器持有，实体本身不持有贴图
  * */
 public interface EntityRenderer<T extends Entity<?>> {
+    /**
+     * 获取实体的贴图
+     * <p>
+     * 默认返回null，没有贴图的渲染器（如自定义渲染器）可以不实现
+     * */
+    default TextureRegion getTextureRegion () {
+        return null;
+    }
+
+    /**
+     * 是否有影子
+     * <p>
+     * 默认没有。有影子的渲染器覆写为 true 并实现 {@link #drawShadow}，
+     * 影子由 {@code EntityRenderSystem} 在"影子趟"里统一绘制
+     * */
+    default boolean hasShadow () {
+        return false;
+    }
+
+    /**
+     * 单独绘制影子
+     * <p>
+     * 由 {@code EntityRenderSystem} 在影子趟统一调用：这一趟只画影子不画身体，
+     * 一趟画完才开始画所有实体的身体，所以影子永远不会压住别的实体的身体
+     * */
+    default void drawShadow (Batch batch, T entity, Context context) {
+    }
+
     /**
      * 图像的绘制
      * */
@@ -99,6 +133,16 @@ public interface EntityRenderer<T extends Entity<?>> {
             scaleX = 1f, scaleY = 1f,
             rotation = 0f;
 
+        /**
+         * 是否水平镜像绘制
+         * <p>
+         * 与几何参数无关：x/y/width/height/origin/scale/rotation 只决定四边形的位置与形状，
+         * 而绘制时写进顶点的 UV 是直接取自贴图对象的（{@code SpriteBatch.draw} 里
+         * {@code u = region.u; u2 = region.u2;}，没有任何跟缩放相关的分支），
+         * 所以镜像只能靠换一张 UV 相反的贴图，这个字段就是"要不要换"的信号
+         * */
+        public boolean flipX = false;
+
         public Context() {}
         public Context (float x, float y, float width, float height) {
             this.x = x;
@@ -118,6 +162,116 @@ public interface EntityRenderer<T extends Entity<?>> {
             this.scaleX = 1f;
             this.scaleY = 1f;
             this.rotation = 0f;
+            this.flipX = false;
+        }
+    }
+
+    /**
+     * 标准实体渲染器
+     * <p>
+     * 持有实体的贴图资源
+     * */
+    class StandardRenderer<T extends Entity<?>> implements EntityRenderer<T> {
+        private final Resource<TextureRegion> textureRegionResource;
+        /**
+         * 水平镜像的贴图资源
+         * <p>
+         * 为 null 表示这个渲染器没有镜像贴图，此时即使上下文要求镜像也只会画原贴图
+         * */
+        private final Resource<TextureRegion> flippedTextureRegionResource;
+
+        /**
+         * @param textureId 贴图资源的id（一般与实体id相同）
+         * @param texturePath 贴图文件在 texture/entity 目录下的路径
+         * */
+        public StandardRenderer (String textureId, String texturePath) {
+            this(Resource.ofTextureRegion(textureId, Fight.EntityTexturePath(texturePath)), null);
+        }
+
+        /**
+         * 带镜像贴图的构造
+         *
+         * @param textureRegionResource 贴图资源
+         * @param flippedTextureRegionResource 水平镜像的贴图资源，
+         *                                     由 {@link Resource#ofFlippedTextureRegion} 创建，
+         *                                     没有则传 null
+         * */
+        public StandardRenderer (Resource<TextureRegion> textureRegionResource,
+                                 Resource<TextureRegion> flippedTextureRegionResource) {
+            this.textureRegionResource = textureRegionResource;
+            this.flippedTextureRegionResource = flippedTextureRegionResource;
+        }
+
+        @Override
+        public TextureRegion getTextureRegion () {
+            return this.textureRegionResource.get();
+        }
+
+        /**
+         * 获取水平镜像的贴图（首次调用时才真正创建）
+         * <p>
+         * 没有配置镜像贴图时返回 null，调用方需要判空
+         * */
+        public TextureRegion getFlippedTextureRegion () {
+            if (this.flippedTextureRegionResource == null) return null;
+            return this.flippedTextureRegionResource.get();
+        }
+
+        @Override
+        public void draw (Batch batch, T entity, Context context) {
+            //最基础的绘制，绘制实体的身体贴图
+            //需要镜像绘制的时候用镜像贴图，否则用原贴图
+            TextureRegion bodyTextureRegion = context.flipX ? this.getFlippedTextureRegion() : this.getTextureRegion();
+            if (bodyTextureRegion != null) {
+                batch.draw(bodyTextureRegion,
+                    context.x - context.width / 2, context.y - context.height / 2,
+                    context.originX, context.originY,
+                    context.width, context.height,
+                    context.scaleX, context.scaleY,
+                    context.rotation
+                );
+            }
+        }
+
+        @Override
+        public void drawShape (ShapeRenderer batch, T entity, Context context) {
+        }
+    }
+
+    /**
+     * 实体影子
+     * <p>
+     * 影子与身体分开画：同一个渲染层内先画完所有影子、再画所有身体。
+     * 所有实体共用同一张影子贴图，几何只在这里写一份
+     * */
+    class Shadow {
+        /** 影子颜色：白色 + 2/3 透明度（影子贴图本身是全白的） */
+        public static final Color COLOR = new Color(1f, 1f, 1f, 0.333f);
+        /** 影子贴图资源，所有实体共用 */
+        public static final Resource<TextureRegion> RESOURCE = Resource.ofTextureRegion(
+            Fight.ID("entity_shadow"),
+            Fight.EntityTexturePath("shadow.png")
+        );
+
+        private Shadow () {
+        }
+
+        /**
+         * 在渲染上下文所在的位置画一个影子
+         * <p>
+         * 纵向压成实体的一半高，并整体下移实体的 1/5 高度，让影子贴在地面上
+         * */
+        public static void draw (Batch batch, Context context) {
+            batch.setColor(COLOR);
+            batch.draw(RESOURCE.get(),
+                context.x - context.width / 2f,
+                context.y - (context.height / 5f) - (context.height / 2f),
+                context.originX, context.originY,
+                context.width, context.height,
+                context.scaleX, context.scaleY / 2f,
+                context.rotation
+            );
+            batch.setColor(1f, 1f, 1f, 1f);
         }
     }
 }

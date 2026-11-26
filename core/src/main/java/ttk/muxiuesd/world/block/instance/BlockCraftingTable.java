@@ -2,10 +2,10 @@ package ttk.muxiuesd.world.block.instance;
 
 import game.muxiuesd.bedrockcore.serialization.Codec;
 import game.muxiuesd.bedrockcore.serialization.Codecable;
-import ttk.muxiuesd.Fight;
 import ttk.muxiuesd.serialization.codecs.builders.BlockWithEntityCodecBuilder;
 import ttk.muxiuesd.world.World;
 import ttk.muxiuesd.world.block.BlockPos;
+import ttk.muxiuesd.world.block.abs.Block;
 import ttk.muxiuesd.world.block.abs.BlockWithEntity;
 import ttk.muxiuesd.world.block.blockentity.BlockEntityCraftingTable;
 
@@ -20,9 +20,7 @@ public class BlockCraftingTable extends BlockWithEntity implements Codecable<Blo
     );
 
     public BlockCraftingTable () {
-        super(createProperty().setFriction(0.7f),
-            Fight.ID("crafting_table"),
-            Fight.BlockTexturePath("crafting_table.png"));
+        super(Block.createProperty().setFriction(0.7f));
     }
 
 

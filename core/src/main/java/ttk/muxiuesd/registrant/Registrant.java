@@ -1,5 +1,6 @@
 package ttk.muxiuesd.registrant;
 
+import ttk.muxiuesd.id.Identifier;
 import ttk.muxiuesd.interfaces.ID;
 
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.function.Supplier;
  * 实体，方块，墙，等等游戏元素的注册
  * 为之后的MOD做准备
  * */
+@Deprecated
 public class Registrant<T extends ID> {
     private final String namespace; //命名空间
     private final HashMap<String, Supplier<? extends T>> regedit; //注册表，key为名称而不是id
@@ -42,7 +44,7 @@ public class Registrant<T extends ID> {
             throw new RuntimeException("注册Id：" + this.getId(name) + " 不存在！！！");
         }
         T t = this.regedit.get(name).get();
-        t.setID(this.getId(name));
+        t.setIdentifier(Identifier.of(this.getId(name)));
         return t;
     }
 
